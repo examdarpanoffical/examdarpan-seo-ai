@@ -1,0 +1,44 @@
+[
+  {
+    "id": "rssb",
+    "name": "Rajasthan Staff Selection Board (RSSB)",
+    "url": "https://rssb.rajasthan.gov.in/",
+    "priority": 1,
+    "keywords": ["भर्ती", "सीधी भर्ती", "विज्ञप्ति", "प्रेस नोट", "परीक्षा", "प्रवेश पत्र", "एडमिट", "परिणाम", "रिजल्ट", "उत्तर कुंजी", "आंसर की", "परीक्षा तिथि", "CET", "syllabus", "result", "admit", "recruitment"]
+  },
+  {
+    "id": "rpsc",
+    "name": "Rajasthan Public Service Commission (RPSC)",
+    "url": "https://rpsc.rajasthan.gov.in/",
+    "priority": 1,
+    "keywords": ["भर्ती", "विज्ञापन", "प्रेस नोट", "परीक्षा", "प्रवेश पत्र", "एडमिट", "परिणाम", "रिजल्ट", "उत्तर कुंजी", "आंसर की", "परीक्षा तिथि", "syllabus", "result", "admit", "recruitment"]
+  },
+  {
+    "id": "education",
+    "name": "Rajasthan School Education Department",
+    "url": "https://education.rajasthan.gov.in/",
+    "priority": 1,
+    "keywords": ["शिक्षा", "विद्यालय", "शिक्षक", "भर्ती", "आदेश", "परिपत्र", "प्रेस", "छात्रवृत्ति", "स्कूल", "PM SHRI", "शिक्षा विभाग"]
+  },
+  {
+    "id": "rbse",
+    "name": "Board of Secondary Education Rajasthan (RBSE)",
+    "url": "https://rajeduboard.rajasthan.gov.in/main.asp",
+    "priority": 1,
+    "keywords": ["परिणाम", "result", "परीक्षा", "प्रवेश पत्र", "admit", "उत्तर कुंजी", "syllabus", "बोर्ड", "12", "10", "माध्यमिक", "उच्च माध्यमिक"]
+  },
+  {
+    "id": "rajasthan-police",
+    "name": "Rajasthan Police",
+    "url": "https://police.rajasthan.gov.in/portal/RecruitmentsResults",
+    "priority": 1,
+    "keywords": ["भर्ती", "recruitment", "परिणाम", "result", "प्रवेश पत्र", "admit", "कांस्टेबल", "उप निरीक्षक", "SI", "प्लाटून", "यंग प्रोफेशनल"]
+  },
+  {
+    "id": "rajasthan-recruitment",
+    "name": "Rajasthan Recruitment Portal",
+    "url": "https://recruitment.rajasthan.gov.in/",
+    "priority": 1,
+    "keywords": ["recruitment", "भर्ती", "advertisement", "विज्ञापन", "admit", "result", "परिणाम", "application", "आवेदन"]
+  }
+]

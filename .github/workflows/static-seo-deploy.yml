@@ -1,0 +1,60 @@
+name: Exam Darpan Automatic SEO Deploy
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: examdarpan-static-seo
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r monitor_requirements.txt
+
+      - name: Build static SEO pages
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python scripts/generate_static.py
+
+      - name: Verify generated SEO files
+        run: |
+          test -f public/sitemap.xml
+          test -f public/robots.txt || true
+          echo "Generated article pages:"
+          find public -maxdepth 1 -type f -name "*.html" | wc -l
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/firebase-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
+          firebase use examdarpan-dd963
+          firebase deploy --only hosting --non-interactive
+
+      - name: Cleanup credentials
+        if: always()
+        run: rm -f /tmp/firebase-service-account.json

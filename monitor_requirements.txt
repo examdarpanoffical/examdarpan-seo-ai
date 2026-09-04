@@ -1,0 +1,5 @@
+firebase-admin==6.9.0
+beautifulsoup4==4.13.4
+requests==2.32.4
+pypdf==6.0.0
+google-genai==1.31.0

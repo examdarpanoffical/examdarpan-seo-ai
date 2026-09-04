@@ -1,0 +1,13 @@
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Login | Exam Darpan</title><link rel="stylesheet" href="../styles.css"><script src="../firebase-config.js"></script></head>
+<body class="admin-shell"><main class="container" style="max-width:520px;padding-top:60px"><div class="form"><h1>Exam Darpan Admin</h1><p class="meta">Authorized editors only.</p>
+<div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div><div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+<button id="login" class="btn btn-primary" style="width:100%">Login</button><p id="msg" class="meta"></p></div></main>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js';
+import{getAuth,signInWithEmailAndPassword}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js';
+import{initializeAppCheck,ReCaptchaEnterpriseProvider}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app-check.js';
+const app=initializeApp(window.FIREBASE_CONFIG);
+if(window.FIREBASE_APPCHECK_SITE_KEY){try{initializeAppCheck(app,{provider:new ReCaptchaEnterpriseProvider(window.FIREBASE_APPCHECK_SITE_KEY),isTokenAutoRefreshEnabled:true});}catch(e){console.warn(e)}}
+const auth=getAuth(app),emailEl=document.getElementById('email'),passwordEl=document.getElementById('password'),loginBtn=document.getElementById('login'),msgEl=document.getElementById('msg');
+loginBtn.addEventListener('click',async()=>{msgEl.textContent='Signing in…';loginBtn.disabled=true;try{await signInWithEmailAndPassword(auth,emailEl.value.trim(),passwordEl.value);location.href='dashboard.html'}catch(e){console.error(e);msgEl.textContent=e.code?e.code+': '+e.message:e.message;loginBtn.disabled=false}});
+</script></body></html>

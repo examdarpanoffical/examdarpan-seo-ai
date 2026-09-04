@@ -1,0 +1,22 @@
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard | Exam Darpan</title><link rel="stylesheet" href="../styles.css"><script src="../firebase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script></head>
+<body class="admin-shell"><header class="admin-nav"><div class="container" style="display:flex;justify-content:space-between;align-items:center">
+<strong>EXAM DARPAN CMS</strong><div><span id="authStatus" style="color:#fff;margin-right:15px">Checking admin…</span><a href="../" style="color:#fff;margin-right:15px">View Site</a><button id="logout" class="btn btn-gold">Logout</button></div></div></header>
+<main class="main container"><div class="admin-grid"><section class="form"><h2 id="formTitle">New Article</h2><input type="hidden" id="postId">
+<div class="field"><label>Title</label><input id="title"></div>
+<div class="field"><label>Slug</label><input id="slug" placeholder="rajasthan-ldc-recruitment-2026"></div>
+<div class="field"><label>Category</label><select id="category"><option>Rajasthan Jobs</option><option>Government Jobs</option><option>Admit Card</option><option>Results</option><option>Answer Key</option><option>Syllabus</option><option>Latest Updates</option></select></div>
+<div class="field"><label>Excerpt</label><textarea id="excerpt" style="min-height:90px"></textarea></div>
+<div class="field"><label>Content HTML</label><textarea id="content" style="min-height:300px" placeholder="AI draft यहाँ आएगा; आप review/edit कर सकते हैं."></textarea></div>
+<div class="field"><label>Featured Image</label><input id="image" placeholder="Generate free branded thumbnail or paste image URL"></div>
+<div class="field"><button type="button" id="aiImageGenerate" class="btn btn-gold">Generate Free Branded Thumbnail</button><p id="aiImageMsg" class="meta">यह local thumbnail है; Gemini Image/Blaze की जरूरत नहीं.</p><div id="aiImagePreview" style="margin-top:10px"></div></div>
+<div class="field"><label>Official Notification URL</label><input id="notification"></div><div class="field"><label>Apply Online URL</label><input id="apply"></div><div class="field"><label>Official Website URL</label><input id="official"></div><div class="field"><label>Notification PDF URL</label><input id="pdf"></div><div class="field"><label>Tags (comma separated)</label><input id="tags"></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button id="saveDraft" class="btn btn-dark">Save Draft</button><button id="publish" class="btn btn-primary">Publish</button><button id="clear" class="btn btn-gold">Clear</button></div><p id="msg" class="meta"></p>
+<hr style="border:0;border-top:1px solid #e2e8f0;margin:20px 0"><h3>Gemini AI Draft Assistant</h3>
+<p class="meta">Official notification/source text paste करें. Gemini उसी source पर आधारित natural Hindi draft बनाएगी. Publish से पहले facts और official links जरूर verify करें.</p>
+<div class="field"><label>Topic</label><input id="aiTopic" placeholder="उदाहरण: Rajasthan LDC Recruitment 2026"></div>
+<div class="field"><label>Official Source Text</label><textarea id="aiSource" style="min-height:200px" placeholder="Official notification/PDF का relevant text यहाँ paste करें…"></textarea></div>
+<button id="aiGenerate" class="btn btn-gold">Generate Draft with Gemini</button><p id="aiMsg" class="meta"></p></section>
+<section><div class="form"><h2>Posts</h2><input id="filter" placeholder="Search posts" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:11px"><div id="posts" style="margin-top:12px"></div></div></section></div></main>
+<script type="module" src="dashboard.js"></script></body></html>
