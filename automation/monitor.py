@@ -1,1 +1,224 @@
-import hashlib import json import os import re import time from datetime import datetime, timezone from urllib.parse import urljoin, urlparse import requests from bs4 import BeautifulSoup from pypdf import PdfReader import firebase_admin from firebase_admin import credentials, firestore from google import genai from google.genai import types BASE = os.path.dirname(os.path.abspath(__file__)) ROOT = os.path.dirname(BASE) SOURCES_FILE = os.path.join(BASE, "sources.json") UA = os.getenv( "MONITOR_USER_AGENT", "ExamDarpanOfficialMonitor/2.0 (+https://examdarpan.in)", ) MAX_ITEMS_PER_SOURCE = int( os.getenv("MAX_ITEMS_PER_SOURCE", "3") ) MAX_TEXT_CHARS = int( os.getenv("MAX_SOURCE_CHARS", "30000") ) REQUEST_TIMEOUT = int( os.getenv("REQUEST_TIMEOUT", "30") ) REQUEST_RETRIES = int( os.getenv("REQUEST_RETRIES", "3") ) RETRY_BACKOFF = float( os.getenv("RETRY_BACKOFF", "2") ) ERROR_RETRY_HOURS = int( os.getenv("ERROR_RETRY_HOURS", "6") ) BOOTSTRAP_SKIP_EXISTING = ( os.getenv( "BOOTSTRAP_SKIP_EXISTING", "false", ).lower() == "true" ) GEMINI_MODEL = os.getenv( "GEMINI_MODEL", "gemini-3.6-flash", ) KEYWORDS_GLOBAL = [ "recruit", "recruitment", "result", "admit", "answer", "key", "syllabus", "notification", "advertisement", "press", "exam", "vacancy", "selection", "application", "परिणाम", "रिजल्ट", "प्रवेश", "प्रवेश पत्र", "उत्तर कुंजी", "आंसर की", "परीक्षा", "परीक्षा तिथि", "भर्ती", "विज्ञप्ति", "विज्ञापन", "आवेदन", "आदेश", "परिपत्र", "नियुक्ति", "रिक्ति", ] # ---------------------------------------------------------------------- # OFFICIAL FALLBACK URLS # ---------------------------------------------------------------------- SOURCE_FALLBACKS = { "rssb": [ "https://rsmssb.rajasthan.gov.in/", "https://rsmssb.rajasthan.gov.in/page?menuName=Home", "https://www.recruitment.rajasthan.gov.in/", ], "rpsc": [ "https://rpsc.rajasthan.gov.in/", "https://www.recruitment.rajasthan.gov.in/", ], "education": [ "https://education.rajasthan.gov.in/", ], "rbse": [ "https://rajeduboard.rajasthan.gov.in/main.asp", "https://rajeduboard.rajasthan.gov.in/", ], "rajasthan-police": [ "https://police.rajasthan.gov.in/portal/RecruitmentsResults", "https://police.rajasthan.gov.in/", ], "rajasthan-recruitment": [ "https://www.recruitment.rajasthan.gov.in/", ], } # ---------------------------------------------------------------------- # LOGGING # ---------------------------------------------------------------------- def log(*args): print( datetime.now(timezone.utc).isoformat(), *args, flush=True, ) # ---------------------------------------------------------------------- # FIREBASE # ---------------------------------------------------------------------- def get_db(): if not firebase_admin._apps: raw = os.getenv( "FIREBASE_SERVICE_ACCOUNT_JSON", "", ).strip() if not raw: raise RuntimeError( "FIREBASE_SERVICE_ACCOUNT_JSON secret is missing" ) try: service_account = json.loads(raw) except json.JSONDecodeError as exc: raise RuntimeError( "FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON" ) from exc cred = credentials.Certificate( service_account ) firebase_admin.initialize_app( cred ) return firestore.client() # ---------------------------------------------------------------------- # HTTP # ---------------------------------------------------------------------- def fetch(url): headers = { "User-Agent": UA, "Accept": ( "text/html,application/xhtml+xml," "application/xml;q=0.9," "application/pdf;q=0.8," "*/*;q=0.7" ), "Accept-Language": "hi,en;q=0.8", "Cache-Control": "no-cache", } last_error = None for attempt in range( 1, REQUEST_RETRIES + 1, ): try: response = requests.get( url, headers=headers, timeout=REQUEST_TIMEOUT, allow_redirects=True, ) response.raise_for_status() return response except requests.RequestException as exc: last_error = exc log( "FETCH RETRY", f"{attempt}/{REQUEST_RETRIES}", url, repr(exc), ) if attempt < REQUEST_RETRIES: time.sleep( RETRY_BACKOFF * attempt ) raise last_error # ---------------------------------------------------------------------- # HTML / PDF TEXT # ---------------------------------------------------------------------- def clean_text(html): soup = BeautifulSoup( html, "html.parser", ) for element in soup( [ "script", "style", "noscript", "svg", "nav", "footer", ] ): element.decompose() text = "\n".join( line.strip() for line in soup.get_text( "\n" ).splitlines() if line.strip() ) return re.sub( r"\n{3,}", "\n\n", text, ) def extract_pdf(url, data): filename = ( "exam_darpan_" + hashlib.sha1( url.encode("utf-8") ).hexdigest()[:12] + ".pdf" ) path = os.path.join( "/tmp", filename, ) with open( path, "wb", ) as file: file.write(data) reader = PdfReader(path) parts = [] for page in reader.pages[:30]: try: parts.append( page.extract_text() or "" ) except Exception as exc: log( "PDF PAGE ERROR", url, repr(exc), ) return "\n".join(parts).strip() def fetch_source_text(item): response = fetch( item["url"] ) content_type = response.headers.get( "content-type", "", ).lower() clean_url = ( item["url"] .lower() .split("?")[0] ) if ( "pdf" in content_type or clean_url.endswith(".pdf") ): return extract_pdf( item["url"], response.content, ) return clean_text( response.text ) # ---------------------------------------------------------------------- # CANDIDATE FILTER # ---------------------------------------------------------------------- def is_candidate( title, href, source, ): haystack = ( title + " " + href ).lower() keywords = ( source.get( "keywords", [], ) + KEYWORDS_GLOBAL ) return any( keyword.lower() in haystack for keyword in keywords ) def same_or_allowed_host( href, source_url, ): target_host = ( urlparse(href) .netloc .lower() ) source_host = ( urlparse(source_url) .netloc .lower() ) if not target_host: return True if target_host == source_host: return True # Official Rajasthan government domains. if target_host.endswith( ".rajasthan.gov.in" ): return True if target_host == "rajasthan.gov.in": return True return False # ---------------------------------------------------------------------- # DISCOVERY # ---------------------------------------------------------------------- def discover_from_page( source, page_url, ): response = fetch( page_url ) content_type = response.headers.get( "content-type", "", ).lower() clean_url = ( page_url .lower() .split("?")[0] ) if ( "pdf" in content_type or clean_url.endswith(".pdf") ): return [ { "title": source["name"], "url": page_url, "source_page": page_url, } ] soup = BeautifulSoup( response.text, "html.parser", ) items = [] seen_urls = set() for anchor in soup.find_all( "a", href=True, ): title = " ".join( anchor.get_text( " ", strip=True, ).split() ) href = urljoin( page_url, anchor["href"].strip(), ) if not title: continue if href.startswith( "javascript:" ): continue if href.startswith( "mailto:" ): continue if href.startswith( "#" ): continue if not same_or_allowed_host( href, page_url, ): continue normalized_url = ( href.split("#")[0] ) if normalized_url in seen_urls: continue if not is_candidate( title, href, source, ): continue seen_urls.add( normalized_url ) items.append( { "title": title[:300], "url": normalized_url, "source_page": page_url, } ) return items def discover(source): urls = [] primary = source.get( "url", "", ).strip() if primary: urls.append( primary ) for fallback in SOURCE_FALLBACKS.get( source["id"], [], ): if fallback not in urls: urls.append( fallback ) all_items = [] seen = set() successful_pages = 0 for page_url in urls: try: log( "DISCOVER", source["id"], page_url, ) found = discover_from_page( source, page_url, ) successful_pages += 1 for item in found: normalized_url = ( item["url"] .split("#")[0] ) if normalized_url in seen: continue seen.add( normalized_url ) all_items.append( item ) except Exception as exc: log( "DISCOVERY ERROR", source["id"], page_url, repr(exc), ) continue if successful_pages == 0: raise RuntimeError( "All official source endpoints failed" ) # Prefer shorter/relevant titles. all_items.sort( key=lambda item: ( len( item.get( "title", "", ) ), item.get( "title", "", ).lower(), ) ) return all_items # ---------------------------------------------------------------------- # SLUG # ---------------------------------------------------------------------- def slugify(text): text = re.sub( r"[^\w\s-]", "", text, flags=re.UNICODE, ).strip().lower() slug = re.sub( r"[-\s]+", "-", text, )[:110] return ( slug or hashlib.sha1( text.encode( "utf-8" ) ).hexdigest()[:12] ) # ---------------------------------------------------------------------- # GEMINI # ---------------------------------------------------------------------- def generate_article( topic, source_text, source_url, source_name, ): api_key = os.getenv( "GEMINI_API_KEY", "", ).strip() if not api_key: raise RuntimeError( "GEMINI_API_KEY secret is missing" ) client = genai.Client( api_key=api_key ) prompt = f""" You are the senior Hindi editorial assistant for Exam Darpan, an independent Indian education and government-job information portal. Write a publication-quality Hindi draft using ONLY the official source text supplied below. IMPORTANT FACT RULES: 1. The supplied official source is the only factual authority. 2. Never invent or guess any information. 3. Never invent vacancies. 4. Never invent dates. 5. Never invent application dates. 6. Never invent exam dates. 7. Never invent fees. 8. Never invent age limits. 9. Never invent eligibility. 10. Never invent salary. 11. Never invent selection process. 12. Never invent post names. 13. Never invent department claims. 14. Never invent URLs. 15. Never invent application links. 16. Never infer missing numbers. 17. If a fact is absent, omit it. 18. Preserve exact dates and numbers. 19. If the official source says proposed/tentative, preserve that wording. 20. Do not call Exam Darpan an official government website. 21. Do not claim Exam Darpan is affiliated with the government. 22. Do not claim that an application link exists unless the official source actually provides it. 23. Do not use outside knowledge. 24. Do not create facts from the topic/title alone. EDITORIAL STYLE: - Natural Hindi. - Useful for Indian students and government-job aspirants. - Clear headings. - Short paragraphs. - Tables only where genuinely useful. - No clickbait. - No fake urgency. - No filler. - No exaggerated claims. - No unsupported conclusions. OUTPUT: Return HTML only. Allowed tags: h2,h3,p,ul,ol,li,strong, table,thead,tbody,tr,th,td,a The output MUST start exactly with: <p>AI-assisted draft — Human verification required before publication.</p> The output MUST end with a short official-source verification note. TOPIC: {topic} OFFICIAL SOURCE NAME: {source_name} OFFICIAL SOURCE URL: {source_url} OFFICIAL SOURCE TEXT: {source_text[:MAX_TEXT_CHARS]} """ response = client.models.generate_content( model=GEMINI_MODEL, contents=prompt, config=types.GenerateContentConfig( temperature=0.2 ), ) text = ( response.text or "" ).strip() if not text: raise RuntimeError( "Gemini returned an empty response" ) return text # ---------------------------------------------------------------------- # TELEGRAM # ---------------------------------------------------------------------- def send_telegram(message): token = os.getenv( "TELEGRAM_BOT_TOKEN", "", ).strip() chat_id = os.getenv( "TELEGRAM_CHAT_ID", "", ).strip() if not token or not chat_id: log( "Telegram secrets missing; " "skipping notification" ) return url = ( "https://api.telegram.org/" f"bot{token}/sendMessage" ) response = requests.post( url, json={ "chat_id": chat_id, "text": message, "disable_web_page_preview": False, }, timeout=20, ) response.raise_for_status() # ---------------------------------------------------------------------- # FIRESTORE SEEN STATE # ---------------------------------------------------------------------- def item_key( source_id, url, ): normalized_url = ( url.split("#")[0] ) return hashlib.sha256( ( source_id + "|" + normalized_url ).encode( "utf-8" ) ).hexdigest() def should_retry( ref_data, ): if ref_data.get( "status" ) != "error": return False checked_at = ref_data.get( "checkedAt" ) if not checked_at: return True try: elapsed = ( time.time() - checked_at.timestamp() ) return elapsed >= ( ERROR_RETRY_HOURS * 60 * 60 ) except Exception: return True def already_processed( ref, ): snapshot = ref.get() if not snapshot.exists: return False data = ( snapshot.to_dict() or {} ) status = data.get( "status", "", ) # Permanent successful states. if status in { "draft_created", "published", "skipped_short", "bootstrap_recorded", }: return True # Error states are retried later. if status == "error": return not should_retry( data ) return False # ---------------------------------------------------------------------- # CREATE FIRESTORE DRAFT # ---------------------------------------------------------------------- def create_draft( db, source, item, article, ): posts = db.collection( "posts" ) title = item["title"] category = ( "Rajasthan Jobs" if source["id"] in { "rssb", "rpsc", "rajasthan-recruitment", "rajasthan-police", } else "Latest Updates" ) data = { "title": title, "slug": slugify( title ), "category": category, "excerpt": "", "content": article, "featuredImage": "", "officialNotificationUrl": item[ "url" ], "applyOnlineUrl": "", "officialWebsiteUrl": source[ "url" ], "notificationPdfUrl": ( item["url"] if item["url"] .lower() .split("?")[0] .endswith(".pdf") else "" ), "tags": [ "Rajasthan", source["id"], "Latest Update", ], "authorName": "Exam Darpan AI", "authorUrl": ( "https://examdarpan.in/author.html" ), # NEVER auto-publish. "status": "draft", "sourceName": source[ "name" ], "sourceUrl": item[ "url" ], "autoGenerated": True, "updatedAt": firestore.SERVER_TIMESTAMP, "createdAt": firestore.SERVER_TIMESTAMP, } document = posts.add( data )[1] return document.id # ---------------------------------------------------------------------- # MAIN # ---------------------------------------------------------------------- def main(): db = get_db() seen = db.collection( "monitor_seen" ) with open( SOURCES_FILE, encoding="utf-8", ) as file: sources = json.load(file) total_new = 0 total_errors = 0 total_skipped = 0 for source in sorted( sources, key=lambda item: item.get( "priority", 9, ), ): source_id = source[ "id" ] log( "================================================" ) log( "Checking", source["name"], ) try: discovered = discover( source ) log( "DISCOVERED", source_id, len(discovered), ) except Exception as exc: total_errors += 1 log( "SOURCE ERROR", source_id, repr(exc), ) continue for item in discovered[ :MAX_ITEMS_PER_SOURCE ]: url = item[ "url" ] key = item_key( source_id, url, ) ref = seen.document( key ) if already_processed( ref ): log( "ALREADY PROCESSED", url, ) continue # ---------------------------------------------------------- # BOOTSTRAP # ---------------------------------------------------------- if BOOTSTRAP_SKIP_EXISTING: ref.set( { "sourceId": source_id, "sourceName": source[ "name" ], "url": url, "title": item[ "title" ], "checkedAt": firestore.SERVER_TIMESTAMP, "status": "bootstrap_recorded", }, merge=True, ) total_skipped += 1 log( "BOOTSTRAP RECORDED", url, ) continue # ---------------------------------------------------------- # FETCH + GEMINI + FIRESTORE # ---------------------------------------------------------- try: log( "FETCH SOURCE", url, ) source_text = ( fetch_source_text( item ) .strip() ) if len(source_text) < 120: log( "SKIP short source", url, ) ref.set( { "sourceId": source_id, "sourceName": source[ "name" ], "url": url, "title": item[ "title" ], "checkedAt": firestore.SERVER_TIMESTAMP, "status": "skipped_short", }, merge=True, ) total_skipped += 1 continue log( "GENERATE GEMINI", item["title"], ) article = generate_article( item["title"], source_text, url, source["name"], ) post_id = create_draft( db, source, item, article, ) # Only mark processed AFTER the draft # has actually been created. ref.set( { "sourceId": source_id, "sourceName": source[ "name" ], "url": url, "title": item[ "title" ], "checkedAt": firestore.SERVER_TIMESTAMP, "status": "draft_created", "postId": post_id, }, merge=True, ) total_new += 1 log( "DRAFT CREATED", post_id, item["title"], ) except Exception as exc: total_errors += 1 log( "ITEM ERROR", url, repr(exc), ) # Important: # Failed items are NOT permanently consumed. # They can be retried later. ref.set( { "sourceId": source_id, "sourceName": source[ "name" ], "url": url, "title": item[ "title" ], "checkedAt": firestore.SERVER_TIMESTAMP, "status": "error", "error": str(exc)[:2000], }, merge=True, ) continue log( "================================================" ) log( "Done.", "New drafts:", total_new, "| Errors:", total_errors, "| Skipped:", total_skipped, ) log( "AI drafts are NEVER automatically published." ) if __name__ == "__main__": main() 
+import hashlib, json, os, re, sys, time
+from datetime import datetime, timezone
+from urllib.parse import urljoin, urlparse
+
+import requests
+from bs4 import BeautifulSoup
+from pypdf import PdfReader
+import firebase_admin
+from firebase_admin import credentials, firestore
+from google import genai
+from google.genai import types
+
+BASE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(BASE)
+SOURCES_FILE = os.path.join(BASE, "sources.json")
+UA = os.getenv("MONITOR_USER_AGENT", "ExamDarpanOfficialMonitor/1.0 (+https://examdarpan.in)")
+MAX_ITEMS_PER_SOURCE = int(os.getenv("MAX_ITEMS_PER_SOURCE", "3"))
+MAX_TEXT_CHARS = int(os.getenv("MAX_SOURCE_CHARS", "30000"))
+BOOTSTRAP_SKIP_EXISTING = os.getenv("BOOTSTRAP_SKIP_EXISTING", "false").lower() == "true"
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+
+KEYWORDS_GLOBAL = ["recruit", "result", "admit", "answer", "key", "syllabus", "notification", "advertisement", "press", "exam", "परीक्षा", "भर्ती", "विज्ञप्ति", "परिणाम", "प्रवेश", "उत्तर कुंजी", "परीक्षा तिथि", "आवेदन", "आदेश", "परिपत्र"]
+
+
+def log(*args):
+    print(datetime.now().isoformat(), *args, flush=True)
+
+
+def get_db():
+    if not firebase_admin._apps:
+        raw = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
+        if not raw:
+            raise RuntimeError("FIREBASE_SERVICE_ACCOUNT_JSON secret is missing")
+        cred = credentials.Certificate(json.loads(raw))
+        firebase_admin.initialize_app(cred)
+    return firestore.client()
+
+
+def clean_text(html):
+    soup = BeautifulSoup(html, "html.parser")
+    for x in soup(["script", "style", "noscript", "svg"]):
+        x.decompose()
+    text = "\n".join(line.strip() for line in soup.get_text("\n").splitlines() if line.strip())
+    return re.sub(r"\n{3,}", "\n\n", text)
+
+
+def fetch(url):
+    r = requests.get(url, headers={"User-Agent": UA, "Accept-Language": "hi,en;q=0.8"}, timeout=35)
+    r.raise_for_status()
+    return r
+
+
+def extract_pdf(url, data):
+    path = os.path.join("/tmp", "source.pdf")
+    with open(path, "wb") as f:
+        f.write(data)
+    reader = PdfReader(path)
+    parts = []
+    for page in reader.pages[:25]:
+        try:
+            parts.append(page.extract_text() or "")
+        except Exception:
+            pass
+    return "\n".join(parts).strip()
+
+
+def is_candidate(title, href, source):
+    hay = (title + " " + href).lower()
+    return any(k.lower() in hay for k in source["keywords"] + KEYWORDS_GLOBAL)
+
+
+def discover(source):
+    r = fetch(source["url"])
+    content_type = r.headers.get("content-type", "").lower()
+    if "pdf" in content_type or source["url"].lower().endswith(".pdf"):
+        return [{"title": source["name"], "url": source["url"], "source_page": source["url"]}]
+    soup = BeautifulSoup(r.text, "html.parser")
+    items = []
+    seen = set()
+    base_host = urlparse(source["url"]).netloc
+    for a in soup.find_all("a", href=True):
+        title = " ".join(a.get_text(" ", strip=True).split())
+        href = urljoin(source["url"], a["href"].strip())
+        if not title or href.startswith("javascript:") or href.startswith("mailto:"):
+            continue
+        if urlparse(href).netloc and urlparse(href).netloc != base_host:
+            continue
+        if href in seen or not is_candidate(title, href, source):
+            continue
+        seen.add(href)
+        items.append({"title": title[:300], "url": href, "source_page": source["url"]})
+    return items[:40]
+
+
+def fetch_source_text(item):
+    r = fetch(item["url"])
+    ctype = r.headers.get("content-type", "").lower()
+    if "pdf" in ctype or item["url"].lower().split("?")[0].endswith(".pdf"):
+        return extract_pdf(item["url"], r.content)
+    return clean_text(r.text)
+
+
+def slugify(text):
+    text = re.sub(r"[^\w\s-]", "", text, flags=re.UNICODE).strip().lower()
+    return re.sub(r"[-\s]+", "-", text)[:110] or hashlib.sha1(text.encode()).hexdigest()[:12]
+
+
+def generate_article(topic, source_text, source_url, source_name):
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY secret is missing")
+    client = genai.Client(api_key=api_key)
+    prompt = f"""You are the senior Hindi editorial assistant for Exam Darpan, an independent Indian education and government-job information portal.
+
+Write a publication-quality Hindi draft using ONLY the official source text below.
+
+STRICT FACT RULES:
+- The official source is the factual authority.
+- Never invent or guess dates, vacancies, fees, age limits, eligibility, salary, selection process, exam dates, URLs, post names or department claims.
+- If a fact is absent, omit it.
+- Preserve exact numbers and dates.
+- Clearly label tentative/proposed dates as tentative/proposed.
+- Do not call Exam Darpan an official government website.
+- Do not claim that an application link exists unless the source provides it.
+
+STYLE:
+- Natural Hindi for Indian students/job seekers.
+- Useful headings and short paragraphs.
+- Use a table only when it improves clarity.
+- No clickbait or filler.
+
+OUTPUT:
+Return HTML only using h2,h3,p,ul,ol,li,strong,table,thead,tbody,tr,th,td,a.
+Start exactly with: <p>AI-assisted draft — Human verification required before publication.</p>
+End with a concise official-source verification note.
+
+TOPIC: {topic}
+OFFICIAL SOURCE: {source_name}
+OFFICIAL SOURCE URL: {source_url}
+
+SOURCE TEXT:
+{source_text[:MAX_TEXT_CHARS]}
+"""
+    response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt, config=types.GenerateContentConfig(temperature=0.2))
+    text = (response.text or "").strip()
+    if not text:
+        raise RuntimeError("Gemini returned an empty response")
+    return text
+
+
+def send_telegram(message):
+    token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    if not token or not chat_id:
+        log("Telegram secrets missing; skipping notification")
+        return
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    r = requests.post(url, json={"chat_id": chat_id, "text": message, "disable_web_page_preview": False}, timeout=20)
+    r.raise_for_status()
+
+
+def main():
+    db = get_db()
+    posts = db.collection("posts")
+    seen = db.collection("monitor_seen")
+    sources = json.load(open(SOURCES_FILE, encoding="utf-8"))
+    total_new = 0
+
+    for source in sorted(sources, key=lambda x: x.get("priority", 9)):
+        log("Checking", source["name"])
+        try:
+            discovered = discover(source)
+        except Exception as e:
+            log("SOURCE ERROR", source["id"], repr(e))
+            continue
+        for item in discovered[:MAX_ITEMS_PER_SOURCE]:
+            key = hashlib.sha256((source["id"] + "|" + item["url"]).encode()).hexdigest()
+            ref = seen.document(key)
+            if ref.get().exists:
+                continue
+            # Mark first so a repeated failed run doesn't spam. Failed items remain visible in state for diagnosis.
+            ref.set({"sourceId": source["id"], "sourceName": source["name"], "url": item["url"], "title": item["title"], "checkedAt": firestore.SERVER_TIMESTAMP, "status": "seen"})
+            if BOOTSTRAP_SKIP_EXISTING:
+                continue
+            try:
+                text = fetch_source_text(item)
+                if len(text.strip()) < 120:
+                    log("SKIP short source", item["url"])
+                    ref.update({"status": "skipped_short"})
+                    continue
+                article = generate_article(item["title"], text, item["url"], source["name"])
+                data = {
+                    "title": item["title"],
+                    "slug": slugify(item["title"]),
+                    "category": "Rajasthan Jobs" if source["id"] in {"rssb", "rpsc", "rajasthan-recruitment", "rajasthan-police"} else "Latest Updates",
+                    "excerpt": "",
+                    "content": article,
+                    "featuredImage": "",
+                    "officialNotificationUrl": item["url"],
+                    "applyOnlineUrl": "",
+                    "officialWebsiteUrl": source["url"],
+                    "notificationPdfUrl": item["url"] if item["url"].lower().split("?")[0].endswith(".pdf") else "",
+                    "tags": ["Rajasthan", source["id"], "Latest Update"],
+                    "authorName": "Exam Darpan AI",
+                    "authorUrl": "https://examdarpan.in/author.html",
+                    "status": "draft",
+                    "sourceName": source["name"],
+                    "sourceUrl": item["url"],
+                    "autoGenerated": True,
+                    "updatedAt": firestore.SERVER_TIMESTAMP,
+                    "createdAt": firestore.SERVER_TIMESTAMP,
+                }
+                doc = posts.add(data)[1]
+                ref.update({"status": "draft_created", "postId": doc.id})
+                total_new += 1
+                log("DRAFT CREATED", doc.id, item["title"])
+            except Exception as e:
+                log("ITEM ERROR", item["url"], repr(e))
+                ref.update({"status": "error", "error": str(e)[:1000]})
+    log("Done. New drafts:", total_new, "(Telegram share happens after publication via telegram_publisher.py)")
+
+
+if __name__ == "__main__":
+    main()
