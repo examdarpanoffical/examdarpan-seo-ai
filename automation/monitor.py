@@ -148,17 +148,6 @@ SOURCE TEXT:
     return text
 
 
-def send_telegram(message):
-    token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
-    if not token or not chat_id:
-        log("Telegram secrets missing; skipping notification")
-        return
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    r = requests.post(url, json={"chat_id": chat_id, "text": message, "disable_web_page_preview": False}, timeout=20)
-    r.raise_for_status()
-
-
 def main():
     db = get_db()
     posts = db.collection("posts")
@@ -217,7 +206,7 @@ def main():
             except Exception as e:
                 log("ITEM ERROR", item["url"], repr(e))
                 ref.update({"status": "error", "error": str(e)[:1000]})
-    log("Done. New drafts:", total_new, "(Telegram share happens after publication via telegram_publisher.py)")
+    log("Done. New drafts:", total_new)
 
 
 if __name__ == "__main__":
