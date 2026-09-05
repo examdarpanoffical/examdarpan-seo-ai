@@ -97,6 +97,39 @@ def xml_esc(value: Any) -> str:
     return html.escape(str(value or ""), quote=False)
 
 
+def clean_title(value: Any) -> str:
+    """Normalize imported article titles before rendering anywhere."""
+    t = str(value or "").strip()
+
+    # Fix missing whitespace caused by imported/concatenated title fields.
+    t = re.sub(r'([a-zA-Z0-9)])([अ-ह][ऀ-ॿ])', r'\1 \2', t)
+    t = re.sub(r'([ऀ-ॿ])([A-Za-z])', r'\1 \2', t)
+
+    # Normalize whitespace.
+    t = re.sub(r'\s+', ' ', t).strip()
+
+    # Remove obvious repeated suffixes / duplicated phrases.
+    words = t.split()
+    if len(words) >= 8:
+        for n in range(min(18, len(words) // 2), 2, -1):
+            if words[-n:] == words[-2*n:-n]:
+                t = " ".join(words[:-n]).strip()
+                break
+
+    # Remove repeated full sentence/phrase after punctuation.
+    parts = re.split(r'\s*[|—–]\s*', t)
+    if len(parts) >= 2:
+        cleaned = []
+        seen = set()
+        for part in parts:
+            key = re.sub(r'\W+', ' ', part.lower()).strip()
+            if key and key not in seen:
+                cleaned.append(part.strip())
+                seen.add(key)
+        t = " | ".join(cleaned)
+
+    return t.strip(" -|—–")
+
 def slugify(value: Any) -> str:
     s = str(value or "").strip().strip("/")
     # Keep existing ASCII slugs stable. For new non-ASCII slugs, transliterate only
@@ -222,7 +255,7 @@ def related_posts(post: dict[str, Any], posts: list[dict[str, Any]], limit: int 
 
 
 def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
-    title = str(p.get("title") or "Exam Darpan Article").strip()
+    title = clean_title(p.get("title")) or "Exam Darpan Article"
     desc = short_description(p)
     cat = str(p.get("category") or "Latest Updates").strip()
     pub = iso(p.get("publishedAt"))
@@ -263,13 +296,13 @@ def schema_breadcrumb(p: dict[str, Any], url: str) -> dict[str, Any]:
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{BASE}/"},
             {"@type": "ListItem", "position": 2, "name": cat, "item": f"{BASE}{category_path(cat_slug)}"},
-            {"@type": "ListItem", "position": 3, "name": str(p.get("title") or "Article"), "item": url},
+            {"@type": "ListItem", "position": 3, "name": clean_title(p.get("title")) or "Article", "item": url},
         ],
     }
 
 
 def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
-    title = str(p.get("title") or "Exam Darpan Article").strip()
+    title = clean_title(p.get("title")) or "Exam Darpan Article"
     s = slugify(p.get("slug"))
     cat = str(p.get("category") or "Latest Updates").strip()
     cat_slug = CATEGORY_BY_NAME.get(cat, CATEGORY_BY_NAME["Latest Updates"])[0]
@@ -288,7 +321,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
             rs = slugify(r.get("slug"))
             cards.append(
                 f'<article class="card post"><div class="post-copy"><span class="badge">{esc(r.get("category") or "Latest Updates")}</span>'
-                f'<h3><a href="{article_path(rs)}">{esc(r.get("title") or "Related article")}</a></h3>'
+                f'<h3><a href="{article_path(rs)}">{esc(clean_title(r.get("title")) or "Related article")}</a></h3>'
                 f'<p>{esc(short_description(r))}</p><div class="post-meta"><span>{date_hi(r.get("publishedAt"))}</span></div></div></article>'
             )
         related_html = f'<section class="related-section"><div class="section-title"><div><span class="eyebrow">YOU MAY ALSO LIKE</span><h2>Related Updates</h2></div></div><div class="posts-grid">{"".join(cards)}</div></section>'
@@ -368,7 +401,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     items: list[str] = []
     for i, p in enumerate(posts[:24]):
         s = slugify(p.get("slug"))
-        title = str(p.get("title") or "Untitled")
+        title = clean_title(p.get("title")) or "Untitled"
         cat = str(p.get("category") or "Latest Updates")
         desc = short_description(p)
         img = safe_url(p.get("featuredImage"))
@@ -384,13 +417,78 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     text = re.sub(r'<!-- STATIC-POSTS-START -->.*?<!-- STATIC-POSTS-END -->', static_posts, text, flags=re.S)
 
     # Static matrix blocks provide real crawlable links even if JavaScript fails or is disabled.
-    for element, cat in [("matrixLatestJobs", "Rajasthan Jobs"), ("matrixAdmitCards", "Admit Card"), ("matrixResults", "Results")]:
-        arr = [p for p in posts if str(p.get("category") or "") == cat][:5] or posts[:5]
-        block = "".join(
-            f'<a class="matrix-item" href="{article_path(slugify(p.get("slug")))}"><span>{esc(p.get("title") or "Untitled")}</span><small>{date_hi(p.get("publishedAt"))}</small></a>'
-            for p in arr
+    # IMPORTANT: never fall back to arbitrary posts. A matrix must contain only
+    # posts belonging to its intended topic.
+    def normalized_category(value: Any) -> str:
+        return re.sub(r"\\s+", " ", str(value or "").strip().lower())
+
+    category_aliases = {
+        "rajasthan jobs": {
+            "rajasthan jobs",
+            "rajasthan job",
+            "rajasthan recruitment",
+            "rajasthan vacancy",
+        },
+        "government jobs": {
+            "government jobs",
+            "government job",
+            "all india jobs",
+            "all india job",
+            "central government jobs",
+        },
+        "admit card": {
+            "admit card",
+            "admit cards",
+            "admitcard",
+        },
+        "results": {
+            "results",
+            "result",
+        },
+    }
+
+    def posts_for_matrix(topic: str) -> list[dict[str, Any]]:
+        aliases = category_aliases.get(topic, {normalized_category(topic)})
+        matched = [
+            p for p in posts
+            if normalized_category(p.get("category")) in aliases
+        ]
+        matched.sort(
+            key=lambda p: (
+                as_datetime(p.get("publishedAt"))
+                or datetime.min.replace(tzinfo=timezone.utc),
+                str(p.get("id", "")),
+            ),
+            reverse=True,
         )
-        text = re.sub(rf'(<div id="{element}" class="matrix-list">).*?(</div>)', rf'\1<!-- STATIC-MATRIX -->{block}\2', text, flags=re.S)
+        return matched[:5]
+
+    matrix_config = [
+        ("matrixLatestJobs", "rajasthan jobs"),
+        ("matrixAdmitCards", "admit card"),
+        ("matrixResults", "results"),
+    ]
+
+    for element, topic in matrix_config:
+        arr = posts_for_matrix(topic)
+        block = "".join(
+            f'<a class="matrix-item" href="{article_path(slugify(item.get("slug")))}">'
+            f'<span>{esc(clean_title(item.get("title")) or "Untitled")}</span>'
+            f'<small>{date_hi(item.get("publishedAt"))}</small></a>'
+            for item in arr
+        )
+
+        # If there are no matching published posts, keep the matrix empty
+        # instead of polluting it with unrelated articles.
+        if not block:
+            block = '<div class="matrix-empty">अभी कोई नई verified update उपलब्ध नहीं है।</div>'
+
+        text = re.sub(
+            rf'(<div id="{element}" class="matrix-list">).*?(</div>)',
+            rf'\1<!-- STATIC-MATRIX -->{block}\2',
+            text,
+            flags=re.S,
+        )
 
     # Hero/category CTA links.
     text = text.replace('href="?category=Rajasthan%20Jobs"', f'href="{category_path("rajasthan-jobs")}"')
@@ -429,7 +527,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
         s = slugify(p.get("slug"))
         items.append(
             f'<article class="card post"><div class="post-top"><div class="post-copy">'
-            f'<span class="badge">{esc(category_name)}</span><h2><a href="{article_path(s)}">{esc(p.get("title") or "Untitled")}</a></h2>'
+            f'<span class="badge">{esc(category_name)}</span><h2><a href="{article_path(s)}">{esc(clean_title(p.get("title")) or "Untitled")}</a></h2>'
             f'<p>{esc(short_description(p))}</p><div class="post-meta"><span>{date_hi(p.get("publishedAt"))}</span><span>•</span><span>{reading_time(p.get("content"))} min read</span></div>'
             f'<a class="read-more" href="{article_path(s)}">पूरा article पढ़ें <b>→</b></a></div></div></article>'
         )
@@ -510,7 +608,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
         s = slugify(p.get("slug")); url = article_url(s); pub = iso(p.get("publishedAt")) or iso(p.get("updatedAt"))
         pub_dt = as_datetime(p.get("publishedAt")) or as_datetime(p.get("updatedAt"))
         pub_rfc = format_datetime(pub_dt, usegmt=True) if pub_dt else ""
-        rss_items.append(f'<item><title>{xml_esc(p.get("title") or "Untitled")}</title><link>{xml_esc(url)}</link><guid isPermaLink="true">{xml_esc(url)}</guid><description>{xml_esc(short_description(p))}</description>{f"<pubDate>{xml_esc(pub_rfc)}</pubDate>" if pub_rfc else ""}</item>')
+        rss_items.append(f'<item><title>{xml_esc(clean_title(p.get("title")) or "Untitled")}</title><link>{xml_esc(url)}</link><guid isPermaLink="true">{xml_esc(url)}</guid><description>{xml_esc(short_description(p))}</description>{f"<pubDate>{xml_esc(pub_rfc)}</pubDate>" if pub_rfc else ""}</item>')
     rss = f'''<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel><title>Exam Darpan</title><link>{BASE}/</link><description>Exam Darpan latest government job and exam updates</description><language>hi-IN</language>{"".join(rss_items)}</channel></rss>
 '''
