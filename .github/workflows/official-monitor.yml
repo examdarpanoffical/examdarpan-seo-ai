@@ -28,6 +28,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-3.6-flash          BOOTSTRAP_SKIP_EXISTING: 'false'
+          GEMINI_MODEL: gemini-3.6-flash
+          BOOTSTRAP_SKIP_EXISTING: 'false'
           MAX_ITEMS_PER_SOURCE: '2'
         run: python automation/monitor.py
