@@ -1,6 +1,6 @@
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js';
 import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js';
-import{getFirestore,doc,getDoc,collection,query,orderBy,getDocs,addDoc,updateDoc,deleteDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js';
+import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs,addDoc,updateDoc,deleteDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js';
 import{getAI,getGenerativeModel,GoogleAIBackend}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-ai.js';
 import{initializeAppCheck,ReCaptchaEnterpriseProvider}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app-check.js';
 
