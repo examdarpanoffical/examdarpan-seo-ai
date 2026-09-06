@@ -86,3 +86,6 @@ img,svg,video,canvas,iframe{max-width:100%;height:auto}.head,.head>*{min-width:0
  .article-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
  .quick-fact strong{font-size:12px}
 }
+
+/* Editorial verification signal */
+.verified-line{display:flex;align-items:center;gap:.45rem;margin:.65rem 0 1rem;padding:.65rem .8rem;border:1px solid rgba(20,120,70,.16);border-radius:10px;background:rgba(20,120,70,.05);font-size:.88rem;line-height:1.4}.verified-line span{font-weight:800}.verified-line strong{font-weight:700}

@@ -207,6 +207,13 @@ def application_status(p: dict[str, Any]) -> tuple[str, str]:
         return ("COMING SOON","status-soon")
     return ("UPDATE","status-update")
 
+def verification_line(p: dict[str, Any]) -> str:
+    verified = date_value(p, "lastVerifiedAt", "verifiedAt", "sourceVerifiedAt")
+    if not verified:
+        return ""
+    return f'<div class="verified-line"><span>✓</span> Official source last verified: <strong>{esc(date_hi(verified))}</strong></div>'
+
+
 def quick_facts(p: dict[str, Any]) -> str:
     fields = [("कुल पद",date_value(p,"totalPosts","vacancies","vacancy")),("आवेदन शुरू",date_value(p,"applicationStartDate","startDate","applyStartDate")),("अंतिम तिथि",date_value(p,"applicationLastDate","lastDate","lastDateTime","applyLastDate")),("परीक्षा तिथि",date_value(p,"examDate","examDateTime"))]
     cells=[]
@@ -265,10 +272,22 @@ def clean_text(value: Any) -> str:
 
 
 def clean_article_content(value: Any) -> str:
+    """Remove internal editorial markers before Firestore HTML becomes public."""
     text = str(value or "")
-    text = re.sub(r'<p>\s*AI-assisted draft\s*[—-]?\s*Human verification required before publication\.?\s*</p>', "", text, flags=re.I)
     text = re.sub(r'AI-assisted draft\s*[—-]?\s*Human verification required before publication\.?', "", text, flags=re.I)
-    return text.strip()
+    text = re.sub(r'Human verification required before publication\.?', "", text, flags=re.I)
+    text = re.sub(r'<p>\s*(?:meta\s*)?title\s*:\s*.*?</p>', "", text, flags=re.I | re.S)
+    text = re.sub(r'<p>\s*meta\s*description\s*:\s*.*?</p>', "", text, flags=re.I | re.S)
+    text = re.sub(r'(?im)^\s*(?:meta\s*)?title\s*:\s*[^\n<]+(?:<br\s*/?>)?\s*', "", text)
+    text = re.sub(r'(?im)^\s*meta\s*description\s*:\s*[^\n<]+(?:<br\s*/?>)?\s*', "", text)
+    text = re.sub(r'<p>\s*Home\s*[»›]\s*[^<]+</p>', "", text, flags=re.I)
+    text = re.sub(r'(?im)^\s*Home\s*[»›]\s*[^\n<]+(?:<br\s*/?>)?\s*', "", text)
+    text = re.sub(r'<\s*(script|style|iframe|object|embed|form|base|link)[^>]*>[\s\S]*?<\s*/\s*\1\s*>', "", text, flags=re.I)
+    text = re.sub(r'<\s*(script|style|iframe|object|embed|form|base|link)[^>]*/?>', "", text, flags=re.I)
+    text = re.sub(r"\s+on[a-z]+\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]+)", "", text, flags=re.I)
+    text = re.sub(r'(?i)javascript\s*:', "", text)
+    text = re.sub(r'<p>\s*</p>', "", text, flags=re.I)
+    return re.sub(r'\n{3,}', "\n\n", text).strip()
 
 def reading_time(content: Any) -> int:
     words = len(clean_text(content).split())
@@ -474,6 +493,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span aria-current="page">{esc(title)}</span></nav>
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
 <div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div>
+{verification_line(p)}
 {cover}
 {quick_facts(p)}
 <div class="article-content">{content}</div>
@@ -593,9 +613,10 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
             {"@type": "ListItem", "position": 2, "name": title, "item": url},
         ],
     }
+    robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" if filtered else "noindex,follow"
     return f'''{CATEGORY_MARKER}
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)} | Exam Darpan</title><meta name="description" content="{esc(description[:155])}"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css">
+<title>{esc(title)} | Exam Darpan</title><meta name="description" content="{esc(description[:155])}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.webp">
 <script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script></head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
@@ -634,7 +655,8 @@ def write_categories(posts: list[dict[str, Any]]) -> list[str]:
     for name, slug_name, title, desc in CATEGORIES:
         out = PUBLIC / f"category-{slug_name}.html"
         out.write_text(category_page(name, slug_name, title, desc, posts), encoding="utf-8")
-        paths.append(category_path(slug_name))
+        if any(normalized_category(p) == name for p in posts):
+            paths.append(category_path(slug_name))
     return paths
 
 
@@ -656,7 +678,8 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
         cname = next((name for name, slug_name, _, _ in CATEGORIES if slug_name == cslug), None)
         cposts = [p for p in posts if normalized_category(p) == cname] if cname else []
         clast = max((iso(p.get("updatedAt")) or iso(p.get("publishedAt")) or "" for p in cposts), default=None) or None
-        urls.append((category_path(cslug), clast, None))
+        if cposts:
+            urls.append((category_path(cslug), clast, None))
 
     for p, s in zip(posts, article_slugs):
         urls.append((f"/{quote(s, safe='-._~')}", iso(p.get("updatedAt")) or iso(p.get("publishedAt")), safe_url(p.get("featuredImage")) or None))
@@ -739,7 +762,7 @@ def main() -> int:
 
     (PUBLIC / "exam-calendar.html").write_text(exam_calendar_page(posts), encoding="utf-8")
     category_paths = write_categories(posts)
-    category_slugs = [x[1] for x in CATEGORIES]
+    category_slugs = [path.removeprefix("/category-") for path in category_paths]
     write_sitemaps(posts, article_slugs, category_slugs)
 
     verify_generated_output(posts)

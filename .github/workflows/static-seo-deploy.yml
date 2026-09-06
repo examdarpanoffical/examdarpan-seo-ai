@@ -1,6 +1,8 @@
 name: Exam Darpan Automatic SEO Deploy
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
