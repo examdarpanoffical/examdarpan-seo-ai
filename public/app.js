@@ -24,9 +24,29 @@ function render(){
   const html=list.map((p,i)=>`<article class="card post ${i===0&&!search&&!cat||cat==='All'&&i===0&&!search?'featured-post':''}"><div class="post-top"><div class="post-copy"><span class="badge">${esc(p.category||'Latest Update')}</span><h2><a href="${articleUrl(p.slug)}">${esc(p.title||'Untitled')}</a></h2><p>${esc(p.excerpt||'Exam Darpan पर नवीनतम verified information पढ़ें।')}</p><div class="post-meta"><span>${formatDate(p.publishedAt)}</span><span>•</span><span>${readingTime(p.content)} min read</span></div><a class="read-more" href="${articleUrl(p.slug)}">पूरा article पढ़ें <b>→</b></a></div>${p.featuredImage?`<img loading="lazy" decoding="async" src="${esc(p.featuredImage)}" alt="${esc(p.title||'Exam Darpan article image')}">`:''}</div></article>`).join('');
   $('#postsContainer').innerHTML=html||'<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>दूसरी category या search try करें.</div>';renderMatrix();
 }
-function matrix(id,cat){const el=$('#'+id);if(!el)return;const arr=posts.filter(p=>p.category===cat).slice(0,5);const data=arr.length?arr:posts.slice(0,5);el.innerHTML=data.map(p=>`<a class="matrix-item" href="${articleUrl(p.slug)}"><span>${esc(p.title||'Untitled')}</span><small>${formatDate(p.publishedAt)}</small></a>`).join('')||'<div class="empty">No updates</div>'}
+function matrix(id,cat){const el=$('#'+id);if(!el)return;const arr=posts.filter(p=>p.category===cat).slice(0,5);el.innerHTML=arr.map(p=>`<a class="matrix-item" href="${articleUrl(p.slug)}"><span>${esc(p.title||'Untitled')}</span><small>${formatDate(p.publishedAt)}</small></a>`).join('')||'<div class="empty">No updates</div>'}
 function renderMatrix(){matrix('matrixLatestJobs','Rajasthan Jobs');matrix('matrixAdmitCards','Admit Card');matrix('matrixResults','Results');}
 window.setCategory=c=>{window.currentCategory=c;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.cat===c));render();if(location.search!==`?category=${encodeURIComponent(c)}`&&c!=='All')history.replaceState({},'',`?category=${encodeURIComponent(c)}`);};
 window.handleSearch=()=>{render();const q=$('#searchInput')?.value.trim();history.replaceState({},'',q?`?q=${encodeURIComponent(q)}`:window.currentCategory&&window.currentCategory!=='All'?`?category=${encodeURIComponent(window.currentCategory)}`:'/')};
-function boot(){document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().getFullYear());loadPosts();}
+
+async function loadDailyQuiz(){
+  const meta=$('#dailyQuizMeta'),cta=$('#dailyQuizCta'),summary=$('#dailyQuizSummary');
+  if(!meta)return;
+  try{
+    const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0'), d=String(now.getDate()).padStart(2,'0');
+    const today=`${y}-${m}-${d}`;
+    const q=query(collection(db,'quizzes'),where('status','==','published'),where('quizDate','==',today),limit(1));
+    const snap=await getDocs(q),docSnap=snap.docs[0];
+    if(!docSnap){meta.textContent='आज का quiz अभी publish नहीं हुआ है।';cta.textContent='Previous Quizzes →';cta.href='/quiz.html#previous';return}
+    const quiz=docSnap.data(),count=Array.isArray(quiz.questions)?quiz.questions.length:0;
+    meta.textContent=`${count} Questions • ${quiz.durationMinutes||10} Minutes`;
+    cta.textContent='Start Today’s Quiz →';cta.href=`/quiz.html?id=${encodeURIComponent(docSnap.id)}`;
+    if(summary)summary.textContent=quiz.description||'Timer के साथ quiz दें और submit करने के बाद score, सही-गलत answers और explanations देखें।';
+  }catch(e){
+    console.warn('Daily quiz unavailable',e);
+    meta.textContent='आज का quiz check करने के लिए खोलें।';
+  }
+}
+
+function boot(){document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().getFullYear());loadPosts();loadDailyQuiz();}
 boot();

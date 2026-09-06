@@ -13,6 +13,27 @@
 <div class="field"><button type="button" id="aiImageGenerate" class="btn btn-gold">Generate Free Branded Thumbnail</button><p id="aiImageMsg" class="meta">यह local thumbnail है; Gemini Image/Blaze की जरूरत नहीं.</p><div id="aiImagePreview" style="margin-top:10px"></div></div>
 <div class="field"><label>Official Notification URL</label><input id="notification"></div><div class="field"><label>Apply Online URL</label><input id="apply"></div><div class="field"><label>Official Website URL</label><input id="official"></div><div class="field"><label>Notification PDF URL</label><input id="pdf"></div><div class="field"><label>Tags (comma separated)</label><input id="tags"></div>
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button id="saveDraft" class="btn btn-dark">Save Draft</button><button id="publish" class="btn btn-primary">Publish</button><button id="clear" class="btn btn-gold">Clear</button></div><p id="msg" class="meta"></p>
+<hr style="border:0;border-top:1px solid #e2e8f0;margin:20px 0">
+<div class="admin-quiz-box">
+  <div class="section-label">STUDENT PRACTICE</div><h2>Daily Quiz Publisher</h2>
+  <p class="meta">रोज़ का quiz यहीं बनाएं और Publish करते ही students के लिए <strong>/quiz.html</strong> पर live करें। Article deploy की जरूरत नहीं।</p>
+  <input type="hidden" id="quizId">
+  <div class="admin-form-grid">
+    <div class="field"><label>Quiz Date</label><input id="quizDate" type="date"></div>
+    <div class="field"><label>Time Limit (minutes)</label><input id="quizDuration" type="number" min="1" max="180" value="10"></div>
+  </div>
+  <div class="field"><label>Quiz Title</label><input id="quizTitle" placeholder="Daily Current Affairs Quiz — 6 September 2026"></div>
+  <div class="field"><label>Short Description</label><textarea id="quizDescription" style="min-height:70px" placeholder="आज के 10 महत्वपूर्ण प्रश्न..."></textarea></div>
+  <div id="quizQuestions" class="quiz-admin-questions"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+    <button type="button" id="addQuizQuestion" class="btn btn-light">+ Add Question</button>
+    <button type="button" id="saveQuizDraft" class="btn btn-dark">Save Quiz Draft</button>
+    <button type="button" id="publishQuiz" class="btn btn-primary">Publish Daily Quiz</button>
+    <button type="button" id="clearQuiz" class="btn btn-gold">Clear</button>
+  </div>
+  <p id="quizMsg" class="meta"></p>
+</div>
+<div class="admin-quiz-list"><h3>Published / Draft Quizzes</h3><div id="quizPosts" class="quiz-admin-list"></div></div>
 <hr style="border:0;border-top:1px solid #e2e8f0;margin:20px 0"><h3>Gemini AI Draft Assistant</h3>
 <p class="meta">Official notification/source text paste करें. Gemini उसी source पर आधारित natural Hindi draft बनाएगी. Publish से पहले facts और official links जरूर verify करें.</p>
 <div class="field"><label>Topic</label><input id="aiTopic" placeholder="उदाहरण: Rajasthan LDC Recruitment 2026"></div>

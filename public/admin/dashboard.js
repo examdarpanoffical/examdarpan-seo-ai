@@ -27,6 +27,7 @@ async function ensureAdmin(user){
     uid=user.uid;
     $('authStatus').textContent='Admin verified';
     await loadPosts();
+    await loadQuizzes();
   }catch(e){
     console.error(e);
     $('authStatus').textContent='Admin verification failed';
@@ -68,6 +69,17 @@ function fill(p){
 }
 function articleData(status){
   const title=$('title').value.trim();
+  const category=$('category').value||'Latest Updates';
+  const lower=title.toLowerCase();
+  const guards={
+    'Admit Card':['admit card','admitcard','hall ticket','प्रवेश पत्र','प्रवेश-पत्र','city intimation','exam city'],
+    'Results':['result','परिणाम','scorecard','score card'],
+    'Answer Key':['answer key','answerkey','उत्तर कुंजी'],
+    'Syllabus':['syllabus','पाठ्यक्रम']
+  };
+  if(status==='published' && guards[category] && title && !guards[category].some(x=>lower.includes(x))){
+    throw new Error(`Category "${category}" title से match नहीं कर रही। सही category चुनें ताकि गलत section में article न जाए.`);
+  }
   const content=cleanContent($('content').value);
   const plain=content.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
   const excerpt=$('excerpt').value.trim()||plain.replace(/^AI-assisted draft — Human verification required before publication\.?/i,'').slice(0,155).trim();
@@ -109,6 +121,91 @@ $('publish').onclick=()=>save('published');
 $('clear').onclick=clearForm;
 $('filter').oninput=renderList;
 $('logout').onclick=()=>signOut(auth);
+
+
+/* ---------------- Daily Quiz CMS ---------------- */
+let quizQuestions=[];
+function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function newQuizQuestion(q={}){quizQuestions.push({question:q.question||'',options:Array.isArray(q.options)&&q.options.length===4?q.options:['','','',''],answerIndex:Number.isInteger(q.answerIndex)?q.answerIndex:0,explanation:q.explanation||''});renderQuizEditor();}
+function renderQuizEditor(){
+  const box=$('quizQuestions');if(!box)return;
+  box.innerHTML=quizQuestions.map((q,i)=>`<div class="quiz-admin-question card pad"><div class="quiz-admin-qhead"><strong>Question ${i+1}</strong><button type="button" class="btn btn-light" data-qremove="${i}">Remove</button></div>
+  <div class="field"><label>Question</label><textarea data-qfield="${i}:question" rows="3" placeholder="Question text">${escapeHtml(q.question)}</textarea></div>
+  <div class="quiz-admin-options">${q.options.map((o,j)=>`<div class="field"><label>Option ${String.fromCharCode(65+j)}</label><input data-qfield="${i}:option:${j}" value="${escapeHtml(o)}"></div>`).join('')}</div>
+  <div class="admin-form-grid"><div class="field"><label>Correct Answer</label><select data-qfield="${i}:answer">${q.options.map((o,j)=>`<option value="${j}" ${q.answerIndex===j?'selected':''}>${String.fromCharCode(65+j)}${o?` — ${escapeHtml(o).slice(0,55)}`:''}</option>`).join('')}</select></div>
+  <div class="field"><label>Explanation</label><textarea data-qfield="${i}:explanation" rows="2" placeholder="क्यों सही है?">${escapeHtml(q.explanation)}</textarea></div></div></div>`).join('')||'<div class="empty">पहला question add करें।</div>';
+  box.querySelectorAll('[data-qremove]').forEach(b=>b.onclick=()=>{quizQuestions.splice(Number(b.dataset.qremove),1);renderQuizEditor()});
+  box.querySelectorAll('[data-qfield]').forEach(el=>el.oninput=()=>syncQuizField(el));
+}
+function syncQuizField(el){
+  const parts=el.dataset.qfield.split(':'),i=Number(parts[0]),type=parts[1],idx=Number(parts[2]);
+  if(!quizQuestions[i])return;
+  if(type==='question')quizQuestions[i].question=el.value;
+  if(type==='option')quizQuestions[i].options[idx]=el.value;
+  if(type==='answer')quizQuestions[i].answerIndex=Number(el.value);
+  if(type==='explanation')quizQuestions[i].explanation=el.value;
+}
+function clearQuizForm(){
+  $('quizId').value='';$('quizDate').value=todayISO();$('quizDuration').value=10;$('quizTitle').value='';$('quizDescription').value='';
+  quizQuestions=[];renderQuizEditor();$('quizMsg').textContent='';
+}
+function quizData(status){
+  const clean=quizQuestions.map(q=>({question:q.question.trim(),options:q.options.map(x=>x.trim()),answerIndex:Number(q.answerIndex),explanation:q.explanation.trim()}));
+  if(!clean.length)throw new Error('कम से कम 1 question add करें.');
+  if(clean.some(q=>!q.question||q.options.some(x=>!x)||q.options.length!==4))throw new Error('हर question में question text और चारों options भरें.');
+  if(clean.some(q=>q.answerIndex<0||q.answerIndex>3))throw new Error('हर question का correct answer select करें.');
+  const date=$('quizDate').value;if(!date)throw new Error('Quiz date required.');
+  return {title:$('quizTitle').value.trim()||`Daily Quiz — ${date}`,description:$('quizDescription').value.trim(),quizDate:date,durationMinutes:Math.min(180,Math.max(1,Number($('quizDuration').value)||10)),questions:clean,status,updatedAt:serverTimestamp()};
+}
+async function saveQuiz(status){
+  try{
+    const data=quizData(status),id=$('quizId').value;
+    if(status==='published'){
+      const existing=await getDocs(query(collection(db,'quizzes'),where('status','==','published'),where('quizDate','==',data.quizDate),limit(3)));
+      const clash=existing.docs.find(s=>s.id!==id);
+      if(clash)throw new Error('इस date का एक published quiz पहले से मौजूद है. उसे Edit करें या पहले Unpublish/Draft करें.');
+    }
+    if(id)await updateDoc(doc(db,'quizzes',id),data);
+    else await addDoc(collection(db,'quizzes'),{...data,createdAt:serverTimestamp()});
+    $('quizMsg').textContent=status==='published'?'Quiz published successfully — students can attempt it now.':'Quiz draft saved.';
+    clearQuizForm();await loadQuizzes();
+  }catch(e){console.error(e);$('quizMsg').textContent='Quiz save error: '+(e.message||e)}
+}
+async function loadQuizzes(){
+  const el=$('quizPosts');if(!el)return;el.innerHTML='<div class="empty">Loading quizzes…</div>';
+  try{
+    const snap=await getDocs(query(collection(db,'quizzes'),orderBy('updatedAt','desc')));
+    const list=snap.docs.map(d=>({id:d.id,...d.data()}));
+    el.innerHTML=list.map(q=>`<div class="card pad quiz-admin-row"><div><strong>${escapeHtml(q.title||'Untitled Quiz')}</strong><div class="meta">${escapeHtml(q.quizDate||'')} · ${(q.questions||[]).length} questions · ${q.durationMinutes||10} min · ${escapeHtml(q.status||'draft')}</div></div><div class="quiz-admin-actions"><button class="btn btn-dark" data-qedit="${q.id}">Edit</button>${q.status==='published'?`<button class="btn btn-light" data-qunpublish="${q.id}">Unpublish</button>`:''}<button class="btn btn-gold" data-qdelete="${q.id}">Delete</button></div></div>`).join('')||'<div class="empty">No quizzes yet.</div>';
+    el.querySelectorAll('[data-qedit]').forEach(b=>b.onclick=()=>fillQuiz(list.find(q=>q.id===b.dataset.qedit)));
+    el.querySelectorAll('[data-qunpublish]').forEach(b=>b.onclick=()=>unpublishQuiz(b.dataset.qunpublish));
+    el.querySelectorAll('[data-qdelete]').forEach(b=>b.onclick=()=>deleteQuiz(b.dataset.qdelete));
+  }catch(e){el.innerHTML='<div class="empty">Quiz list load नहीं हुई.<br>'+escapeHtml(e.message||'Firestore error')+'</div>'}
+}
+function fillQuiz(q){
+  $('quizId').value=q.id;$('quizDate').value=q.quizDate||todayISO();$('quizDuration').value=q.durationMinutes||10;$('quizTitle').value=q.title||'';$('quizDescription').value=q.description||'';
+  quizQuestions=(q.questions||[]).map(x=>({question:x.question||'',options:Array.isArray(x.options)&&x.options.length===4?x.options:['','','',''],answerIndex:Number(x.answerIndex)||0,explanation:x.explanation||''}));
+  renderQuizEditor();$('quizMsg').textContent='Quiz loaded for editing.';document.querySelector('.admin-quiz-box')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function unpublishQuiz(id){
+  if(!confirm('इस quiz को unpublish करके draft बनाना है?'))return;
+  try{
+    await updateDoc(doc(db,'quizzes',id),{status:'draft',updatedAt:serverTimestamp()});
+    $('quizMsg').textContent='Quiz unpublished — students इसे अब नहीं देख पाएंगे.';
+    await loadQuizzes();
+  }catch(e){alert(e.message||'Unpublish failed')}
+}
+async function deleteQuiz(id){
+  if(!confirm('Delete this quiz?'))return;
+  try{await deleteDoc(doc(db,'quizzes',id));await loadQuizzes()}catch(e){alert(e.message||'Delete failed')}
+}
+$('quizDate')?.addEventListener('focus',()=>{if(!$('quizDate').value)$('quizDate').value=todayISO()});
+$('addQuizQuestion')?.addEventListener('click',()=>newQuizQuestion());
+$('saveQuizDraft')?.addEventListener('click',()=>saveQuiz('draft'));
+$('publishQuiz')?.addEventListener('click',()=>saveQuiz('published'));
+$('clearQuiz')?.addEventListener('click',clearQuizForm);
+if($('quizDate')&&!$('quizDate').value)$('quizDate').value=todayISO();
+renderQuizEditor();
 
 const AI_PROMPT=`You are the senior Hindi editorial assistant for Exam Darpan, an independent Indian education and government-job information portal.
 

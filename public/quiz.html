@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Quiz | Exam Darpan</title>
+<meta name="description" content="Exam Darpan Daily Quiz — timer के साथ सरकारी नौकरी और परीक्षा की तैयारी करें, score और explanations तुरंत देखें।">
+<meta name="robots" content="index,follow"><link rel="canonical" href="https://examdarpan.in/quiz.html">
+<link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css"><script src="/firebase-config.js"></script>
+</head>
+<body>
+<div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
+<header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div>
+<nav class="nav"><div class="container"><a href="/">Home</a><a href="/category-rajasthan-jobs">राजस्थान Jobs</a><a href="/category-government-jobs">All India Jobs</a><a href="/category-admit-card">Admit Card</a><a href="/category-results">Results</a><a href="/exam-calendar.html">Exam Calendar</a><a class="active" href="/quiz.html">Daily Quiz</a></div></nav></header>
+<main class="main container quiz-shell">
+<section id="quizLoading" class="card quiz-hero"><span class="hero-kicker">DAILY PRACTICE</span><h1>आज का Daily Quiz</h1><p>Timer के साथ questions attempt करें और submit करने के बाद पूरा answer review देखें।</p><div class="quiz-loading">आज का quiz load हो रहा है…</div></section>
+<section id="quizApp" class="quiz-app" hidden></section>
+<section id="quizResult" class="quiz-result card" hidden></section>
+<section id="previous" class="card previous-quizzes"><div class="section-title"><div><span class="eyebrow">HISTORY</span><h2>Previous Quizzes</h2></div></div><div id="previousList" class="previous-list"><div class="empty">Previous quizzes load हो रहे हैं…</div></div></section>
+</main>
+<footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p></div><div><h4>Important</h4><p><a href="/">Home</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p></div></div></footer>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js';
+import{getFirestore,collection,getDocs,query,where,orderBy,limit,doc,getDoc}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js';
+const app=initializeApp(window.FIREBASE_CONFIG),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let quiz=null,quizId=null,current=0,answers=[],timer=null,submitted=false,started=false;
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const fmtDate=s=>{try{return new Intl.DateTimeFormat('hi-IN',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(`${s}T00:00:00`))}catch{return s}};
+function renderQuiz(){
+  const q=quiz.questions[current],total=quiz.questions.length,chosen=answers[current];
+  $('quizApp').innerHTML=`<div class="quiz-top card"><div><span class="eyebrow">EXAM DARPAN QUIZ</span><h1>${esc(quiz.title||'Daily Quiz')}</h1><p>${esc(quiz.description||'आज की practice quiz')}</p></div><div class="quiz-timer"><small>TIME LEFT</small><strong id="timerValue">--:--</strong></div></div>
+  <div class="quiz-progress card"><div class="quiz-progress-row"><strong>Question ${current+1} of ${total}</strong><span>${answers.filter(x=>x!==null).length}/${total} answered</span></div><div class="progress-track"><i style="width:${((current+1)/total)*100}%"></i></div></div>
+  <div class="quiz-card card"><div class="quiz-question-head"><span>Q${current+1}</span><small>Choose one answer</small></div><h2>${esc(q.question||'')}</h2><div class="quiz-options">${(q.options||[]).map((o,i)=>`<button class="quiz-option ${chosen===i?'selected':''}" data-opt="${i}"><span class="option-letter">${String.fromCharCode(65+i)}</span><span>${esc(o)}</span><b>${chosen===i?'✓':''}</b></button>`).join('')}</div></div>
+  <div class="quiz-nav card"><button id="prevQ" class="btn btn-light" ${current===0?'disabled':''}>← Previous</button><div class="quiz-dots">${quiz.questions.map((_,i)=>`<button class="${i===current?'active ':''}${answers[i]!==null?'answered':''}" data-q="${i}">${i+1}</button>`).join('')}</div><button id="nextQ" class="btn btn-primary">${current===total-1?'Submit Quiz':'Next →'}</button></div>`;
+  document.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{if(submitted)return;answers[current]=Number(b.dataset.opt);renderQuiz();});
+  document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{if(submitted)return;current=Number(b.dataset.q);renderQuiz();});
+  $('prevQ').onclick=()=>{if(current>0){current--;renderQuiz()}};
+  $('nextQ').onclick=()=>{if(current<total-1){current++;renderQuiz()}else submitQuiz()};
+}
+function startTimer(minutes){
+  let left=Math.max(1,Number(minutes||10))*60;
+  const tick=()=>{const el=$('timerValue');if(!el)return;const mm=Math.floor(left/60),ss=left%60;el.textContent=`${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;if(left<=0){clearInterval(timer);submitQuiz(true);return}left--};
+  tick();timer=setInterval(tick,1000);
+}
+function submitQuiz(auto=false){
+  if(submitted)return;
+  submitted=true;clearInterval(timer);
+  const total=quiz.questions.length;
+  let right=0;quiz.questions.forEach((q,i)=>{if(answers[i]===Number(q.answerIndex))right++});
+  const attempted=answers.filter(x=>x!==null).length,wrong=attempted-right,skipped=total-attempted,accuracy=attempted?Math.round(right/attempted*100):0;
+  const result={right,wrong,skipped,total,accuracy,auto,date:new Date().toISOString()};
+  try{localStorage.setItem(`examDarpanQuiz:${quizId}`,JSON.stringify({...result,answers}))}catch{}
+  $('quizApp').hidden=true;$('quizResult').hidden=false;
+  $('quizResult').innerHTML=`<div class="result-hero"><span class="result-check">✓</span><div><span class="eyebrow">QUIZ COMPLETE</span><h1>${auto?'Time Up — ':''}${esc(quiz.title||'Daily Quiz')}</h1><p>${right} सही · ${wrong} गलत · ${skipped} छोड़े गए</p></div><div class="score-ring"><strong>${right}/${total}</strong><span>${accuracy}% accuracy</span></div></div>
+  <div class="result-stats"><div><strong>${right}</strong><span>सही</span></div><div><strong>${wrong}</strong><span>गलत</span></div><div><strong>${skipped}</strong><span>छोड़े</span></div><div><strong>${accuracy}%</strong><span>Accuracy</span></div></div>
+  <div class="result-actions"><button id="retry" class="btn btn-primary">Try Again</button><a class="btn btn-light" href="#previous">Previous Quizzes</a></div>
+  <div class="answer-review"><div class="section-title"><div><span class="eyebrow">ANSWER REVIEW</span><h2>सभी Answers &amp; Explanations</h2></div></div>${quiz.questions.map((q,i)=>{const correct=Number(q.answerIndex),a=answers[i];return `<article class="review-item ${a===correct?'review-correct':a===null?'review-skipped':'review-wrong'}"><div class="review-q"><span>Q${i+1}</span><strong>${esc(q.question||'')}</strong></div><p><b>आपका answer:</b> ${a===null?'नहीं दिया':esc(q.options?.[a]||'—')}</p><p><b>सही answer:</b> ${esc(q.options?.[correct]||'—')}</p>${q.explanation?`<div class="explanation"><b>💡 Explanation</b><p>${esc(q.explanation)}</p></div>`:''}</article>`}).join('')}</div>`;
+  $('retry').onclick=()=>{submitted=false;current=0;answers=quiz.questions.map(()=>null);$('quizResult').hidden=true;$('quizApp').hidden=false;renderQuiz();startTimer(quiz.durationMinutes)};
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function loadQuiz(){
+  const id=new URLSearchParams(location.search).get('id');
+  try{
+    if(id){const s=await getDoc(doc(db,'quizzes',id));if(s.exists()&&s.data().status==='published'){quizId=s.id;quiz={id:s.id,...s.data()}}}
+    if(!quiz){
+      const q=query(collection(db,'quizzes'),where('status','==','published'),where('quizDate','==',today()),limit(1));
+      const snap=await getDocs(q);if(snap.docs[0]){quizId=snap.docs[0].id;quiz={id:quizId,...snap.docs[0].data()}}
+    }
+    $('quizLoading').hidden=true;
+    if(!quiz){$('quizApp').hidden=false;$('quizApp').innerHTML='<div class="card empty"><h2>आज का quiz अभी publish नहीं हुआ है।</h2><p>Previous Quizzes नीचे उपलब्ध हैं।</p></div>';loadPrevious();return}
+    quiz.questions=Array.isArray(quiz.questions)?quiz.questions.filter(q=>q&&q.question&&Array.isArray(q.options)&&q.options.length>=2):[];
+    answers=quiz.questions.map(()=>null);
+    $('quizApp').hidden=false;renderQuiz();startTimer(quiz.durationMinutes||10);loadPrevious();
+  }catch(e){$('quizLoading').innerHTML=`<div class="empty"><strong>Quiz load नहीं हुआ.</strong><br>${esc(e.message||'Firestore error')}</div>`;loadPrevious()}
+}
+async function loadPrevious(){
+  try{
+    const q=query(collection(db,'quizzes'),where('status','==','published'),orderBy('quizDate','desc'),limit(12));
+    const snap=await getDocs(q);
+    const rows=snap.docs.map(s=>({id:s.id,...s.data()})).filter(x=>x.id!==quizId);
+    $('previousList').innerHTML=rows.length?rows.map(x=>{let attempt=null;try{attempt=JSON.parse(localStorage.getItem(`examDarpanQuiz:${x.id}`)||'null')}catch{};return `<a class="previous-quiz" href="/quiz.html?id=${encodeURIComponent(x.id)}"><div><strong>${esc(x.title||'Daily Quiz')}</strong><span>${fmtDate(x.quizDate)} · ${(x.questions||[]).length} Questions · ${x.durationMinutes||10} min${attempt?` · Last score: ${attempt.right}/${attempt.total}`:''}</span></div><b>→</b></a>`}).join(''):'<div class="empty">अभी previous quizzes उपलब्ध नहीं हैं।</div>';
+  }catch(e){$('previousList').innerHTML='<div class="empty">Previous quizzes अभी load नहीं हो पाए।</div>'}
+}
+loadQuiz();
+</script>
+</body></html>

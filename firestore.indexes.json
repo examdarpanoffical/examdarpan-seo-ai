@@ -15,6 +15,22 @@
         {"fieldPath":"slug","order":"ASCENDING"},
         {"fieldPath":"status","order":"ASCENDING"}
       ]
+    },
+    {
+      "collectionGroup": "quizzes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath":"status","order":"ASCENDING"},
+        {"fieldPath":"quizDate","order":"DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "quizzes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath":"status","order":"ASCENDING"},
+        {"fieldPath":"quizDate","order":"ASCENDING"}
+      ]
     }
   ],
   "fieldOverrides": []

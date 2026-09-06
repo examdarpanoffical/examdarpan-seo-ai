@@ -178,9 +178,24 @@ def post_title(p: dict[str, Any]) -> str:
 
 
 def normalized_category(p: dict[str, Any]) -> str:
+    """Normalize categories and prevent obvious cross-section contamination."""
     raw = str(p.get("category") or p.get("categoryName") or "").strip()
-    aliases = {"Rajasthan":"Rajasthan Jobs","All India Jobs":"Government Jobs","Admit Cards":"Admit Card","Result":"Results","Answer Keys":"Answer Key","Exam Syllabus":"Syllabus"}
-    return aliases.get(raw, raw if raw in CATEGORY_BY_NAME else "Latest Updates")
+    aliases = {
+        "Rajasthan":"Rajasthan Jobs", "All India Jobs":"Government Jobs",
+        "Admit Cards":"Admit Card", "Result":"Results",
+        "Answer Keys":"Answer Key", "Exam Syllabus":"Syllabus",
+    }
+    category = aliases.get(raw, raw if raw in CATEGORY_BY_NAME else "Latest Updates")
+    title = clean_text(p.get("title")).lower()
+    required_terms = {
+        "Admit Card": ("admit card", "admitcard", "hall ticket", "प्रवेश पत्र", "प्रवेश-पत्र", "city intimation", "exam city"),
+        "Results": ("result", "परिणाम", "scorecard", "score card"),
+        "Answer Key": ("answer key", "answerkey", "उत्तर कुंजी"),
+        "Syllabus": ("syllabus", "पाठ्यक्रम"),
+    }
+    if category in required_terms and title and not any(term in title for term in required_terms[category]):
+        return "Latest Updates"
+    return category
 
 def date_value(p: dict[str, Any], *keys: str) -> Any:
     for key in keys:
@@ -227,15 +242,16 @@ def quick_facts(p: dict[str, Any]) -> str:
 
 
 def matrix_matches(p: dict[str, Any], matrix: str) -> bool:
+    """Strict homepage buckets: never infer a section from title keywords."""
     cat = normalized_category(p)
-    title = post_title(p).lower()
     if matrix == "results":
-        return cat == "Results" or bool(re.search(r"\bresult\b|परिणाम|score\s*card", title, flags=re.I))
+        return cat == "Results"
     if matrix == "admit":
-        return cat == "Admit Card" or bool(re.search(r"admit\s*card|hall\s*ticket|प्रवेश\s*पत्र|call\s*letter", title, flags=re.I))
+        return cat == "Admit Card"
     if matrix == "latest":
-        return not matrix_matches(p, "results") and not matrix_matches(p, "admit") and cat in {"Rajasthan Jobs", "Government Jobs", "Latest Updates"}
+        return cat in {"Rajasthan Jobs", "Government Jobs", "Latest Updates"}
     return False
+
 
 
 def clean_description(value: Any) -> str:
@@ -564,6 +580,18 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     text = re.sub(r'<a class="social telegram"[\s\S]*?</a>', '', text, count=1)
     text = text.replace('नई vacancy, exam date, admit card और result की useful updates सीधे channel पर पाएं।', 'नई vacancy, exam date, admit card और result की useful updates के लिए Exam Darpan community से जुड़े रहें।')
 
+    # Replace marketing-heavy hero mini panel with a concise trust signal.
+    text = re.sub(
+        r'<div class="hero-mini">.*?</div>\s*</section>',
+        '<div class="hero-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>',
+        text, count=1, flags=re.S
+    )
+
+    # Daily quiz entry point. Quiz data stays in Firestore so publishing does not require a deploy.
+    if '<!-- EXAM-DARPAN-DAILY-QUIZ -->' not in text:
+        quiz = """<section class="card daily-quiz-teaser" id="daily-quiz"><div class="quiz-teaser-icon">?</div><div class="quiz-teaser-copy"><span class="eyebrow">DAILY PRACTICE</span><h2>आज का Daily Quiz</h2><p id="dailyQuizSummary">आज के नए प्रश्नों के साथ अपनी तैयारी check करें। Timer के साथ quiz दें और अंत में score व explanations देखें।</p><div class="quiz-teaser-meta"><span id="dailyQuizMeta">Loading today’s quiz…</span><a id="dailyQuizCta" class="btn btn-primary" href="/quiz.html">Quiz खोलें →</a></div></div></section><!-- EXAM-DARPAN-DAILY-QUIZ -->"""
+        text = text.replace('  <section class="layout" id="updates">', f'  {quiz}\n  <section class="layout" id="updates">', 1)
+
     # Add crawlable category hub immediately before the Latest Articles section once.
     if '<!-- EXAM-DARPAN-CATEGORY-HUB -->' not in text:
         hub = '<section class="card pad category-hub" id="categories"><div class="section-title"><div><span class="eyebrow">BROWSE BY TOPIC</span><h2>Popular Categories</h2></div></div><div class="category-links">'
@@ -621,7 +649,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 <script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script></head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
-<main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="hero-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="hero-mini"><div class="mini-icon">✓</div><strong>Source-first</strong><span>Primary official sources को priority</span><div class="mini-icon second">⚡</div><strong>Fast reading</strong><span>Short, clean और mobile-first layout</span></div></section>
+<main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="hero-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="hero-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
 <section id="articles" class="layout"><div><div class="section-title"><div><span class="eyebrow">{esc(category_name.upper())}</span><h2>Latest {esc(title)}</h2></div><span class="result-count">{len(filtered)} articles</span></div><div class="posts-grid">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside><div class="card pad trust-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card pad editor-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy.html">Editorial Policy <b>→</b></a></div></aside></section></main>
 <footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>'''
 
@@ -644,7 +672,7 @@ def exam_calendar_page(posts: list[dict[str, Any]]) -> str:
     return f"""<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Exam Calendar 2026 | Exam Darpan</title><meta name="description" content="Rajasthan और Government Exams की application last date और exam date एक जगह देखें।"><meta name="robots" content="index,follow"><link rel="canonical" href="{BASE}/exam-calendar.html"><link rel="stylesheet" href="/styles.css"><link rel="icon" href="/assets/favicon.webp"></head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
-<header class="header"><div class="container head"><a class="brand" href="/"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path("rajasthan-jobs")}">राजस्थान Jobs</a><a href="{category_path("government-jobs")}">All India Jobs</a><a href="{category_path("admit-card")}">Admit Card</a><a href="{category_path("results")}">Results</a><a href="/exam-calendar.html" class="active">Exam Calendar</a></div></nav></header>
+<header class="header"><div class="container head"><a class="brand" href="/"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path("rajasthan-jobs")}">राजस्थान Jobs</a><a href="{category_path("government-jobs")}">All India Jobs</a><a href="{category_path("admit-card")}">Admit Card</a><a href="{category_path("results")}">Results</a><a href="/exam-calendar.html" class="active">Exam Calendar</a><a href="/quiz.html">Daily Quiz</a></div></nav></header>
 <main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM CALENDAR</span><h1>Exam Calendar 2026</h1><p>Application deadlines और exam dates को एक जगह देखें। किसी भी अंतिम कार्रवाई से पहले official notification verify करें।</p></div></section>
 <section class="card pad calendar-card"><div class="section-title"><div><span class="eyebrow">DATES</span><h2>Important Exam Dates</h2></div><span class="result-count">{len(rows)} updates</span></div>
 <div class="table-scroll"><table class="calendar-table"><thead><tr><th>Exam / Recruitment</th><th>Last Date</th><th>Exam Date</th><th>Status</th></tr></thead><tbody>{"".join(rows) if rows else '<tr><td colspan="4">Published articles में अभी structured date data उपलब्ध नहीं है।</td></tr>'}</tbody></table></div></section></main>
@@ -715,6 +743,7 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
     bad_patterns = [
         re.compile(r"AI-assisted draft\s*[—-]?\s*Human verification required before publication", re.I),
         re.compile(r"href=[\"']?/article/", re.I),
+        re.compile(r"\d{1,2}\s+(?:जनवरी|फ़रवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर)[A-Za-z]", re.I),
     ]
     for path in files:
         if not path.exists() or not path.is_file():
