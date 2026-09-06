@@ -57,3 +57,32 @@ img,svg,video,canvas,iframe{max-width:100%;height:auto}.head,.head>*{min-width:0
 .article-cover-brand strong{color:#fff;font-size:12px;letter-spacing:.04em;white-space:nowrap}
 .article-cover-brand span{font-size:10px;color:#bfdbfe;overflow-wrap:anywhere}
 @media(max-width:850px){.article-cover-card{min-height:220px;margin:16px 0 24px;border-radius:17px}.article-cover-inner{min-height:220px;padding:20px 18px}.article-cover-card h2{font-size:clamp(22px,6vw,30px);margin:18px 0 22px;line-height:1.18}.article-cover-brand{gap:8px}.article-cover-brand strong{font-size:10px}.article-cover-brand span{font-size:8px}.article-cover-kicker{font-size:9px;padding:6px 9px}}
+
+
+/* Exam Darpan 2.0 utility/status components */
+.post-badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+.status-badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:9px;font-weight:900;letter-spacing:.03em;line-height:1.2;border:1px solid transparent}
+.status-open{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.status-closing{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+.status-closed{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.status-soon{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.status-admit{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
+.status-result{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.status-update{background:#f8fafc;color:#64748b;border-color:#e2e8f0}
+.article-facts{max-width:850px;margin:0 auto 26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px}
+.quick-fact{padding:12px 13px;border:1px solid #e2e8f0;border-radius:13px;background:#f8fafc;min-width:0}
+.quick-fact span{display:block;font-size:10px;color:#64748b;margin-bottom:4px}
+.quick-fact strong{display:block;font-size:14px;color:#172033;overflow-wrap:anywhere}
+.status-fact strong{display:inline-flex}
+.table-scroll{overflow-x:auto}
+.calendar-table{width:100%;border-collapse:collapse;min-width:680px}
+.calendar-table th,.calendar-table td{padding:13px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
+.calendar-table th{font-size:11px;background:#f8fafc;color:#475569}
+.calendar-table td{font-size:13px}
+.calendar-table a{font-weight:800;color:#172033;text-decoration:none}
+.calendar-table a:hover{text-decoration:underline}
+.matrix-empty{display:block;padding:16px;color:#64748b;font-size:12px}
+@media(max-width:650px){
+ .article-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quick-fact strong{font-size:12px}
+}

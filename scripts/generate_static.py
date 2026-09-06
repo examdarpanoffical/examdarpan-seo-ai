@@ -41,6 +41,7 @@ STATIC_PAGES = [
     ("/privacy.html", "Privacy Policy"),
     ("/disclaimer.html", "Disclaimer"),
     ("/terms.html", "Terms & Conditions"),
+    ("/exam-calendar.html", "Exam Calendar"),
 ]
 
 CATEGORIES = [
@@ -97,39 +98,6 @@ def xml_esc(value: Any) -> str:
     return html.escape(str(value or ""), quote=False)
 
 
-def clean_title(value: Any) -> str:
-    """Normalize imported article titles before rendering anywhere."""
-    t = str(value or "").strip()
-
-    # Fix missing whitespace caused by imported/concatenated title fields.
-    t = re.sub(r'([a-zA-Z0-9)])([अ-ह][ऀ-ॿ])', r'\1 \2', t)
-    t = re.sub(r'([ऀ-ॿ])([A-Za-z])', r'\1 \2', t)
-
-    # Normalize whitespace.
-    t = re.sub(r'\s+', ' ', t).strip()
-
-    # Remove obvious repeated suffixes / duplicated phrases.
-    words = t.split()
-    if len(words) >= 8:
-        for n in range(min(18, len(words) // 2), 2, -1):
-            if words[-n:] == words[-2*n:-n]:
-                t = " ".join(words[:-n]).strip()
-                break
-
-    # Remove repeated full sentence/phrase after punctuation.
-    parts = re.split(r'\s*[|—–]\s*', t)
-    if len(parts) >= 2:
-        cleaned = []
-        seen = set()
-        for part in parts:
-            key = re.sub(r'\W+', ' ', part.lower()).strip()
-            if key and key not in seen:
-                cleaned.append(part.strip())
-                seen.add(key)
-        t = " | ".join(cleaned)
-
-    return t.strip(" -|—–")
-
 def slugify(value: Any) -> str:
     s = str(value or "").strip().strip("/")
     # Keep existing ASCII slugs stable. For new non-ASCII slugs, transliterate only
@@ -139,6 +107,140 @@ def slugify(value: Any) -> str:
         return s[:140]
     import hashlib
     return hashlib.sha1(str(value or "article").encode("utf-8")).hexdigest()[:12]
+
+
+def clean_title(value: Any) -> str:
+    """Normalize imported titles and remove accidental repeated phrases."""
+    text = clean_text(value)
+    if not text:
+        return "Exam Darpan Article"
+    text = re.sub(r"^(?:meta\s*title\s*:\s*)", "", text, flags=re.I)
+    # Repair script-boundary imports such as "अगस्तJunior".
+    text = re.sub(r"([\u0900-\u097f])(?=[A-Za-z])", r"\1 ", text)
+    text = re.sub(r"([A-Za-z])(?=[\u0900-\u097f])", r"\1 ", text)
+    text = re.sub(r"\s+", " ", text).strip(" -|:;")
+
+    # Compare common recruitment abbreviations as their expanded forms so an
+    # imported title like "JE ... Junior Engineer ..." is recognized as a
+    # repeated phrase even when the source used the abbreviation once.
+    aliases = {
+        "je": "junior engineer", "jen": "junior engineer", "ja": "junior assistant",
+        "jr": "junior", "jr.": "junior", "jr": "junior", "ca": "commercial assistant",
+        "ldc": "lower division clerk", "udc": "upper division clerk",
+    }
+    raw_words = text.split()
+    compare_words = []
+    for w in raw_words:
+        key = re.sub(r"[^A-Za-z0-9.]", "", w).lower()
+        compare_words.extend(aliases.get(key, key).split())
+
+    # Find a repeated 6-24 word phrase with a short separator. Track source-word
+    # spans so we can remove the second occurrence from the original title.
+    best = None
+    n = len(compare_words)
+    for size in range(min(24, n // 2), 5, -1):
+        for i in range(0, n - 2 * size + 1):
+            left = compare_words[i:i+size]
+            for gap in range(0, min(12, n - (i + size) - size) + 1):
+                j = i + size + gap
+                if compare_words[j:j+size] == left:
+                    best = (j, j + size)
+                    break
+            if best:
+                break
+        if best:
+            break
+
+    if best:
+        # Reconstruct a source-word range conservatively using the original
+        # token positions. In ambiguous alias expansions, remove the trailing
+        # repeated clause from the title rather than altering the first clause.
+        j, end_j = best
+        # Map expanded comparison positions back to raw word positions.
+        pos_map = []
+        for idx, w in enumerate(raw_words):
+            key = re.sub(r"[^A-Za-z0-9.]", "", w).lower()
+            expansion = aliases.get(key, key).split()
+            pos_map.extend([idx] * len(expansion))
+        raw_start = pos_map[j]
+        raw_end = pos_map[end_j - 1] + 1
+        raw_words = raw_words[:raw_start] + raw_words[raw_end:]
+        text = " ".join(raw_words).strip(" -|:;")
+        # If the duplicated clause had a short grammatical tail, remove that
+        # tail too; otherwise the cleaned title can end as "31 अगस्त पदों पर भर्ती".
+        text = re.sub(r"\s+पदों\s+पर\s+भर्ती\s*$", "", text).strip(" -|:;")
+
+    return text or "Exam Darpan Article"
+
+
+def post_title(p: dict[str, Any]) -> str:
+    return clean_title(p.get("title"))
+
+
+def normalized_category(p: dict[str, Any]) -> str:
+    raw = str(p.get("category") or p.get("categoryName") or "").strip()
+    aliases = {"Rajasthan":"Rajasthan Jobs","All India Jobs":"Government Jobs","Admit Cards":"Admit Card","Result":"Results","Answer Keys":"Answer Key","Exam Syllabus":"Syllabus"}
+    return aliases.get(raw, raw if raw in CATEGORY_BY_NAME else "Latest Updates")
+
+def date_value(p: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        value = p.get(key)
+        if value not in (None, ""):
+            return value
+    return None
+
+def application_status(p: dict[str, Any]) -> tuple[str, str]:
+    explicit = str(date_value(p, "applicationStatus", "jobStatus", "statusLabel") or "").strip().lower()
+    mapping = {"open":("OPEN","status-open"),"active":("OPEN","status-open"),"closing soon":("CLOSING SOON","status-closing"),"closed":("CLOSED","status-closed"),"coming soon":("COMING SOON","status-soon"),"admit card":("ADMIT CARD","status-admit"),"result":("RESULT","status-result")}
+    if explicit in mapping:
+        return mapping[explicit]
+    last = as_datetime(date_value(p, "applicationLastDate","lastDate","lastDateTime","applyLastDate"))
+    start = as_datetime(date_value(p, "applicationStartDate","startDate","applyStartDate"))
+    now = datetime.now(timezone.utc)
+    if last:
+        if now > last:
+            return ("CLOSED","status-closed")
+        if (last-now).total_seconds() <= 3*86400:
+            return ("CLOSING SOON","status-closing")
+        if not start or now >= start:
+            return ("OPEN","status-open")
+        return ("COMING SOON","status-soon")
+    return ("UPDATE","status-update")
+
+def quick_facts(p: dict[str, Any]) -> str:
+    fields = [("कुल पद",date_value(p,"totalPosts","vacancies","vacancy")),("आवेदन शुरू",date_value(p,"applicationStartDate","startDate","applyStartDate")),("अंतिम तिथि",date_value(p,"applicationLastDate","lastDate","lastDateTime","applyLastDate")),("परीक्षा तिथि",date_value(p,"examDate","examDateTime"))]
+    cells=[]
+    for label,value in fields:
+        if value in (None,""):
+            continue
+        rendered = date_hi(value) if "तिथि" in label or "शुरू" in label else clean_text(value)
+        cells.append(f'<div class="quick-fact"><span>{esc(label)}</span><strong>{esc(rendered)}</strong></div>')
+    status,cls=application_status(p)
+    return f'<div class="article-facts"><div class="quick-fact status-fact"><span>स्थिति</span><strong class="{cls}">{esc(status)}</strong></div>{"".join(cells)}</div>' if cells else ""
+
+
+def matrix_matches(p: dict[str, Any], matrix: str) -> bool:
+    cat = normalized_category(p)
+    title = post_title(p).lower()
+    if matrix == "results":
+        return cat == "Results" or bool(re.search(r"\bresult\b|परिणाम|score\s*card", title, flags=re.I))
+    if matrix == "admit":
+        return cat == "Admit Card" or bool(re.search(r"admit\s*card|hall\s*ticket|प्रवेश\s*पत्र|call\s*letter", title, flags=re.I))
+    if matrix == "latest":
+        return not matrix_matches(p, "results") and not matrix_matches(p, "admit") and cat in {"Rajasthan Jobs", "Government Jobs", "Latest Updates"}
+    return False
+
+
+def clean_description(value: Any) -> str:
+    text = clean_text(value)
+    if not text:
+        return ""
+    m = re.search(r"meta\s*description\s*:\s*(.+)$", text, flags=re.I)
+    if m:
+        text = m.group(1).strip()
+    text = re.sub(r"^meta\s*title\s*:\s*.*?(?=meta\s*description\s*:)", "", text, flags=re.I)
+    text = re.sub(r"^meta\s*description\s*:\s*", "", text, flags=re.I)
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def article_url(slug: str) -> str:
@@ -162,15 +264,21 @@ def clean_text(value: Any) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def clean_article_content(value: Any) -> str:
+    text = str(value or "")
+    text = re.sub(r'<p>\s*AI-assisted draft\s*[—-]?\s*Human verification required before publication\.?\s*</p>', "", text, flags=re.I)
+    text = re.sub(r'AI-assisted draft\s*[—-]?\s*Human verification required before publication\.?', "", text, flags=re.I)
+    return text.strip()
+
 def reading_time(content: Any) -> int:
     words = len(clean_text(content).split())
     return max(1, (words + 179) // 180)
 
 
 def short_description(p: dict[str, Any]) -> str:
-    desc = clean_text(p.get("excerpt"))
+    desc = clean_description(p.get("excerpt"))
     if not desc:
-        desc = clean_text(p.get("content"))
+        desc = clean_description(p.get("content"))
     desc = re.sub(r"^AI-assisted draft\s*[—-]?\s*Human verification required before publication\.?\s*", "", desc, flags=re.I)
     return desc[:155].strip() or "Exam Darpan पर सरकारी नौकरी, परीक्षा, Admit Card और Result की verified जानकारी पढ़ें।"
 
@@ -232,7 +340,7 @@ def fetch_posts() -> list[dict[str, Any]]:
 
 def related_posts(post: dict[str, Any], posts: list[dict[str, Any]], limit: int = 6) -> list[dict[str, Any]]:
     current_id = post.get("id")
-    current_cat = str(post.get("category") or "Latest Updates")
+    current_cat = normalized_category(post)
     current_tags = {str(x).strip().lower() for x in (post.get("tags") or []) if str(x).strip()}
 
     scored: list[tuple[int, datetime, dict[str, Any]]] = []
@@ -240,12 +348,12 @@ def related_posts(post: dict[str, Any], posts: list[dict[str, Any]], limit: int 
         if other.get("id") == current_id or other.get("slug") == post.get("slug"):
             continue
         score = 0
-        if str(other.get("category") or "") == current_cat:
+        if normalized_category(other) == current_cat:
             score += 5
         tags = {str(x).strip().lower() for x in (other.get("tags") or []) if str(x).strip()}
         score += min(3, len(current_tags & tags))
-        title_words = set(re.findall(r"[a-z0-9]{3,}|[\u0900-\u097f]{3,}", str(post.get("title") or "").lower()))
-        other_words = set(re.findall(r"[a-z0-9]{3,}|[\u0900-\u097f]{3,}", str(other.get("title") or "").lower()))
+        title_words = set(re.findall(r"[a-z0-9]{3,}|[\u0900-\u097f]{3,}", post_title(post).lower()))
+        other_words = set(re.findall(r"[a-z0-9]{3,}|[\u0900-\u097f]{3,}", post_title(other).lower()))
         score += min(2, len(title_words & other_words))
         if score:
             scored.append((score, as_datetime(other.get("publishedAt")) or datetime.min.replace(tzinfo=timezone.utc), other))
@@ -255,9 +363,9 @@ def related_posts(post: dict[str, Any], posts: list[dict[str, Any]], limit: int 
 
 
 def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
-    title = clean_title(p.get("title")) or "Exam Darpan Article"
+    title = post_title(p)
     desc = short_description(p)
-    cat = str(p.get("category") or "Latest Updates").strip()
+    cat = normalized_category(p)
     pub = iso(p.get("publishedAt"))
     mod = iso(p.get("updatedAt")) or pub
     img = safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.webp"
@@ -288,7 +396,7 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
 
 
 def schema_breadcrumb(p: dict[str, Any], url: str) -> dict[str, Any]:
-    cat = str(p.get("category") or "Latest Updates").strip()
+    cat = normalized_category(p)
     cat_slug = CATEGORY_BY_NAME.get(cat, CATEGORY_BY_NAME["Latest Updates"])[0]
     return {
         "@context": "https://schema.org",
@@ -296,15 +404,15 @@ def schema_breadcrumb(p: dict[str, Any], url: str) -> dict[str, Any]:
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{BASE}/"},
             {"@type": "ListItem", "position": 2, "name": cat, "item": f"{BASE}{category_path(cat_slug)}"},
-            {"@type": "ListItem", "position": 3, "name": clean_title(p.get("title")) or "Article", "item": url},
+            {"@type": "ListItem", "position": 3, "name": post_title(p), "item": url},
         ],
     }
 
 
 def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
-    title = clean_title(p.get("title")) or "Exam Darpan Article"
+    title = post_title(p)
     s = slugify(p.get("slug"))
-    cat = str(p.get("category") or "Latest Updates").strip()
+    cat = normalized_category(p)
     cat_slug = CATEGORY_BY_NAME.get(cat, CATEGORY_BY_NAME["Latest Updates"])[0]
     desc = short_description(p)
     img = safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.webp"
@@ -312,7 +420,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     pub = iso(p.get("publishedAt"))
     mod = iso(p.get("updatedAt")) or pub
     related = related_posts(p, posts)
-    content = str(p.get("content") or "<p>इस article का content अभी उपलब्ध नहीं है।</p>")
+    content = clean_article_content(p.get("content")) or "<p>इस article का content अभी उपलब्ध नहीं है।</p>"
 
     related_html = ""
     if related:
@@ -320,8 +428,8 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
         for r in related:
             rs = slugify(r.get("slug"))
             cards.append(
-                f'<article class="card post"><div class="post-copy"><span class="badge">{esc(r.get("category") or "Latest Updates")}</span>'
-                f'<h3><a href="{article_path(rs)}">{esc(clean_title(r.get("title")) or "Related article")}</a></h3>'
+                f'<article class="card post"><div class="post-copy"><div class="post-badges"><span class="badge">{esc(r.get("category") or "Latest Updates")}</span><span class="status-badge {application_status(r)[1]}">{esc(application_status(r)[0])}</span></div>'
+                f'<h3><a href="{article_path(rs)}">{esc(post_title(r))}</a></h3>'
                 f'<p>{esc(short_description(r))}</p><div class="post-meta"><span>{date_hi(r.get("publishedAt"))}</span></div></div></article>'
             )
         related_html = f'<section class="related-section"><div class="section-title"><div><span class="eyebrow">YOU MAY ALSO LIKE</span><h2>Related Updates</h2></div></div><div class="posts-grid">{"".join(cards)}</div></section>'
@@ -364,9 +472,10 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
 <nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span aria-current="page">{esc(title)}</span></nav>
-<span class="badge">{esc(cat)}</span><h1>{esc(title)}</h1>
+<div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
 <div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div>
 {cover}
+{quick_facts(p)}
 <div class="article-content">{content}</div>
 <div class="notice"><strong>महत्वपूर्ण:</strong> आवेदन, फीस, पात्रता, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई से पहले संबंधित विभाग की official notification जरूर verify करें।</div>
 {action_html}
@@ -401,7 +510,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     items: list[str] = []
     for i, p in enumerate(posts[:24]):
         s = slugify(p.get("slug"))
-        title = clean_title(p.get("title")) or "Untitled"
+        title = post_title(p)
         cat = str(p.get("category") or "Latest Updates")
         desc = short_description(p)
         img = safe_url(p.get("featuredImage"))
@@ -409,86 +518,24 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         cls = " featured-post" if i == 0 else ""
         items.append(
             f'<article class="card post{cls}"><div class="post-top"><div class="post-copy">'
-            f'<span class="badge">{esc(cat)}</span><h2><a href="{article_path(s)}">{esc(title)}</a></h2>'
+            f'<div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h2><a href="{article_path(s)}">{esc(title)}</a></h2>'
             f'<p>{esc(desc)}</p><div class="post-meta"><span>{date_hi(p.get("publishedAt"))}</span><span>•</span><span>{reading_time(p.get("content"))} min read</span></div>'
             f'<a class="read-more" href="{article_path(s)}">पूरा article पढ़ें <b>→</b></a></div>{image}</div></article>'
         )
     static_posts = '<!-- STATIC-POSTS-START -->' + "".join(items) + '<!-- STATIC-POSTS-END -->'
     text = re.sub(r'<!-- STATIC-POSTS-START -->.*?<!-- STATIC-POSTS-END -->', static_posts, text, flags=re.S)
 
-    # Static matrix blocks provide real crawlable links even if JavaScript fails or is disabled.
-    # IMPORTANT: never fall back to arbitrary posts. A matrix must contain only
-    # posts belonging to its intended topic.
-    def normalized_category(value: Any) -> str:
-        return re.sub(r"\\s+", " ", str(value or "").strip().lower())
-
-    category_aliases = {
-        "rajasthan jobs": {
-            "rajasthan jobs",
-            "rajasthan job",
-            "rajasthan recruitment",
-            "rajasthan vacancy",
-        },
-        "government jobs": {
-            "government jobs",
-            "government job",
-            "all india jobs",
-            "all india job",
-            "central government jobs",
-        },
-        "admit card": {
-            "admit card",
-            "admit cards",
-            "admitcard",
-        },
-        "results": {
-            "results",
-            "result",
-        },
-    }
-
-    def posts_for_matrix(topic: str) -> list[dict[str, Any]]:
-        aliases = category_aliases.get(topic, {normalized_category(topic)})
-        matched = [
-            p for p in posts
-            if normalized_category(p.get("category")) in aliases
-        ]
-        matched.sort(
-            key=lambda p: (
-                as_datetime(p.get("publishedAt"))
-                or datetime.min.replace(tzinfo=timezone.utc),
-                str(p.get("id", "")),
-            ),
-            reverse=True,
-        )
-        return matched[:5]
-
-    matrix_config = [
-        ("matrixLatestJobs", "rajasthan jobs"),
-        ("matrixAdmitCards", "admit card"),
-        ("matrixResults", "results"),
-    ]
-
-    for element, topic in matrix_config:
-        arr = posts_for_matrix(topic)
+    # Static matrix blocks are category-aware and never fall back to unrelated posts.
+    matrix_specs = [("matrixLatestJobs", "latest"), ("matrixAdmitCards", "admit"), ("matrixResults", "results")]
+    for element, matrix_type in matrix_specs:
+        arr = [p for p in posts if matrix_matches(p, matrix_type)][:5]
         block = "".join(
-            f'<a class="matrix-item" href="{article_path(slugify(item.get("slug")))}">'
-            f'<span>{esc(clean_title(item.get("title")) or "Untitled")}</span>'
-            f'<small>{date_hi(item.get("publishedAt"))}</small></a>'
-            for item in arr
+            f'<a class="matrix-item" href="{article_path(slugify(p.get("slug")))}"><span>{esc(post_title(p))}</span><small>{date_hi(p.get("publishedAt"))}</small></a>'
+            for p in arr
         )
-
-        # If there are no matching published posts, keep the matrix empty
-        # instead of polluting it with unrelated articles.
         if not block:
-            block = '<div class="matrix-empty">अभी कोई नई verified update उपलब्ध नहीं है।</div>'
-
-        text = re.sub(
-            rf'(<div id="{element}" class="matrix-list">).*?(</div>)',
-            rf'\1<!-- STATIC-MATRIX -->{block}\2',
-            text,
-            flags=re.S,
-        )
+            block = '<span class="matrix-empty">नई verified update जल्द यहाँ दिखाई देगी।</span>'
+        text = re.sub(rf'(<div id="{element}" class="matrix-list">).*?(</div>)', rf'\1<!-- STATIC-MATRIX -->{block}\2', text, flags=re.S)
 
     # Hero/category CTA links.
     text = text.replace('href="?category=Rajasthan%20Jobs"', f'href="{category_path("rajasthan-jobs")}"')
@@ -520,14 +567,14 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 
 
 def category_page(category_name: str, category_slug: str, title: str, description: str, posts: list[dict[str, Any]]) -> str:
-    filtered = [p for p in posts if str(p.get("category") or "Latest Updates") == category_name]
+    filtered = [p for p in posts if normalized_category(p) == category_name]
     url = f"{BASE}{category_path(category_slug)}"
     items = []
     for p in filtered:
         s = slugify(p.get("slug"))
         items.append(
             f'<article class="card post"><div class="post-top"><div class="post-copy">'
-            f'<span class="badge">{esc(category_name)}</span><h2><a href="{article_path(s)}">{esc(clean_title(p.get("title")) or "Untitled")}</a></h2>'
+            f'<div class="post-badges"><span class="badge">{esc(category_name)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h2><a href="{article_path(s)}">{esc(post_title(p))}</a></h2>'
             f'<p>{esc(short_description(p))}</p><div class="post-meta"><span>{date_hi(p.get("publishedAt"))}</span><span>•</span><span>{reading_time(p.get("content"))} min read</span></div>'
             f'<a class="read-more" href="{article_path(s)}">पूरा article पढ़ें <b>→</b></a></div></div></article>'
         )
@@ -558,6 +605,30 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 <footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>'''
 
 
+
+
+def exam_calendar_page(posts: list[dict[str, Any]]) -> str:
+    rows = []
+    for p in posts:
+        last = date_value(p, "applicationLastDate","lastDate","lastDateTime","applyLastDate")
+        exam = date_value(p, "examDate","examDateTime")
+        if not last and not exam:
+            continue
+        status, cls = application_status(p)
+        rows.append(
+            f'<tr><td><a href="{article_path(slugify(p.get("slug")))}">{esc(post_title(p))}</a></td>'
+            f'<td>{esc(date_hi(last) if last else "—")}</td><td>{esc(date_hi(exam) if exam else "—")}</td>'
+            f'<td><span class="status-badge {cls}">{esc(status)}</span></td></tr>'
+        )
+    return f"""<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exam Calendar 2026 | Exam Darpan</title><meta name="description" content="Rajasthan और Government Exams की application last date और exam date एक जगह देखें।"><meta name="robots" content="index,follow"><link rel="canonical" href="{BASE}/exam-calendar.html"><link rel="stylesheet" href="/styles.css"><link rel="icon" href="/assets/favicon.webp"></head><body>
+<div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
+<header class="header"><div class="container head"><a class="brand" href="/"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path("rajasthan-jobs")}">राजस्थान Jobs</a><a href="{category_path("government-jobs")}">All India Jobs</a><a href="{category_path("admit-card")}">Admit Card</a><a href="{category_path("results")}">Results</a><a href="/exam-calendar.html" class="active">Exam Calendar</a></div></nav></header>
+<main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM CALENDAR</span><h1>Exam Calendar 2026</h1><p>Application deadlines और exam dates को एक जगह देखें। किसी भी अंतिम कार्रवाई से पहले official notification verify करें।</p></div></section>
+<section class="card pad calendar-card"><div class="section-title"><div><span class="eyebrow">DATES</span><h2>Important Exam Dates</h2></div><span class="result-count">{len(rows)} updates</span></div>
+<div class="table-scroll"><table class="calendar-table"><thead><tr><th>Exam / Recruitment</th><th>Last Date</th><th>Exam Date</th><th>Status</th></tr></thead><tbody>{"".join(rows) if rows else '<tr><td colspan="4">Published articles में अभी structured date data उपलब्ध नहीं है।</td></tr>'}</tbody></table></div></section></main>
+<footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan</p></div></div></footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>"""
+
 def write_categories(posts: list[dict[str, Any]]) -> list[str]:
     paths: list[str] = []
     for name, slug_name, title, desc in CATEGORIES:
@@ -583,7 +654,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
         urls.append((path, None, None))
     for cslug in category_slugs:
         cname = next((name for name, slug_name, _, _ in CATEGORIES if slug_name == cslug), None)
-        cposts = [p for p in posts if str(p.get("category") or "Latest Updates") == cname] if cname else []
+        cposts = [p for p in posts if normalized_category(p) == cname] if cname else []
         clast = max((iso(p.get("updatedAt")) or iso(p.get("publishedAt")) or "" for p in cposts), default=None) or None
         urls.append((category_path(cslug), clast, None))
 
@@ -608,11 +679,41 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
         s = slugify(p.get("slug")); url = article_url(s); pub = iso(p.get("publishedAt")) or iso(p.get("updatedAt"))
         pub_dt = as_datetime(p.get("publishedAt")) or as_datetime(p.get("updatedAt"))
         pub_rfc = format_datetime(pub_dt, usegmt=True) if pub_dt else ""
-        rss_items.append(f'<item><title>{xml_esc(clean_title(p.get("title")) or "Untitled")}</title><link>{xml_esc(url)}</link><guid isPermaLink="true">{xml_esc(url)}</guid><description>{xml_esc(short_description(p))}</description>{f"<pubDate>{xml_esc(pub_rfc)}</pubDate>" if pub_rfc else ""}</item>')
+        rss_items.append(f'<item><title>{xml_esc(post_title(p))}</title><link>{xml_esc(url)}</link><guid isPermaLink="true">{xml_esc(url)}</guid><description>{xml_esc(short_description(p))}</description>{f"<pubDate>{xml_esc(pub_rfc)}</pubDate>" if pub_rfc else ""}</item>')
     rss = f'''<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel><title>Exam Darpan</title><link>{BASE}/</link><description>Exam Darpan latest government job and exam updates</description><language>hi-IN</language>{"".join(rss_items)}</channel></rss>
 '''
     (PUBLIC / "feed.xml").write_text(rss, encoding="utf-8")
+
+
+def verify_generated_output(posts: list[dict[str, Any]]) -> None:
+    """Fail deployment if known SEO regressions reappear."""
+    files = [PUBLIC / "index.html", PUBLIC / "sitemap.xml", PUBLIC / "feed.xml", *PUBLIC.glob("*.html")]
+    bad_patterns = [
+        re.compile(r"AI-assisted draft\s*[—-]?\s*Human verification required before publication", re.I),
+        re.compile(r"href=[\"']?/article/", re.I),
+    ]
+    for path in files:
+        if not path.exists() or not path.is_file():
+            continue
+        txt = path.read_text(encoding="utf-8", errors="ignore")
+        for pat in bad_patterns:
+            if pat.search(txt):
+                raise RuntimeError(f"SEO verification failed in {path.name}: {pat.pattern}")
+    for p in posts:
+        s = slugify(p.get("slug")); path = PUBLIC / f"{s}.html"
+        if not path.exists():
+            raise RuntimeError(f"SEO verification failed: missing {path.name}")
+        txt = path.read_text(encoding="utf-8", errors="ignore")
+        if txt.count('<link rel="canonical"') != 1:
+            raise RuntimeError(f"SEO verification failed: canonical count != 1 in {path.name}")
+        if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
+            raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
+    sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
+    for p in posts:
+        url = article_url(slugify(p.get("slug")))
+        if sitemap.count(f"<loc>{xml_esc(url)}</loc>") != 1:
+            raise RuntimeError(f"SEO verification failed: sitemap entry missing/duplicated for {url}")
 
 
 def main() -> int:
@@ -636,9 +737,12 @@ def main() -> int:
         article_slugs.append(s)
         seen.add(s)
 
+    (PUBLIC / "exam-calendar.html").write_text(exam_calendar_page(posts), encoding="utf-8")
     category_paths = write_categories(posts)
     category_slugs = [x[1] for x in CATEGORIES]
     write_sitemaps(posts, article_slugs, category_slugs)
+
+    verify_generated_output(posts)
 
     print(f"Static SEO build: {len(article_slugs)} published article pages generated + {len(category_paths)} category pages + sitemap + RSS.")
     print(f"Published posts included: {len(posts)}")
