@@ -4,32 +4,56 @@
       "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
-        {"fieldPath":"status","order":"ASCENDING"},
-        {"fieldPath":"publishedAt","order":"DESCENDING"}
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "publishedAt",
+          "order": "DESCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
-        {"fieldPath":"slug","order":"ASCENDING"},
-        {"fieldPath":"status","order":"ASCENDING"}
+        {
+          "fieldPath": "slug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "quizzes",
       "queryScope": "COLLECTION",
       "fields": [
-        {"fieldPath":"status","order":"ASCENDING"},
-        {"fieldPath":"quizDate","order":"DESCENDING"}
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "quizDate",
+          "order": "DESCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "quizzes",
       "queryScope": "COLLECTION",
       "fields": [
-        {"fieldPath":"status","order":"ASCENDING"},
-        {"fieldPath":"quizDate","order":"ASCENDING"}
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "quizDate",
+          "order": "ASCENDING"
+        }
       ]
     }
   ],

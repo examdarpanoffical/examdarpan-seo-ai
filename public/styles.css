@@ -113,3 +113,253 @@ img,svg,video,canvas,iframe{max-width:100%;height:auto}.head,.head>*{min-width:0
 @media(max-width:650px){
  .hero-trust{min-height:auto;padding:14px}.hero-trust-icon{width:40px;height:40px;flex-basis:40px}.daily-quiz-teaser{align-items:flex-start;padding:16px}.quiz-teaser-meta{align-items:flex-start;flex-direction:column}.quiz-teaser-meta .btn{width:100%}.quiz-top{align-items:flex-start}.quiz-top h1{font-size:19px}.quiz-timer{min-width:90px}.quiz-timer strong{font-size:20px}.quiz-card{padding:18px 14px}.quiz-card h2{font-size:18px}.quiz-nav{flex-wrap:wrap}.quiz-dots{order:3;width:100%}.result-hero{align-items:flex-start;flex-wrap:wrap}.score-ring{margin-left:0}.result-stats{grid-template-columns:repeat(2,1fr)}.admin-form-grid,.quiz-admin-options{grid-template-columns:1fr}
 }
+
+
+/* =========================================================
+   EXAM DARPAN — PREMIUM HOMEPAGE LAYER
+   Added automatically: ED Premium Homepage
+   ========================================================= */
+
+:root{
+  --ed-ink:#0f172a;
+  --ed-muted:#64748b;
+  --ed-line:#e2e8f0;
+  --ed-surface:#ffffff;
+  --ed-soft:#f8fafc;
+  --ed-brand:#1d4ed8;
+  --ed-brand-dark:#173ea5;
+  --ed-accent:#f59e0b;
+  --ed-radius:20px;
+}
+
+/* Better global rhythm */
+main .container > section{
+  margin-top:34px;
+  margin-bottom:34px;
+}
+
+/* ---------- DAILY QUIZ ---------- */
+.ed-premium-quiz-section{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #dbe4f0;
+  border-radius:24px;
+  padding:0 !important;
+  background:
+    radial-gradient(circle at 92% 8%,rgba(245,158,11,.16),transparent 28%),
+    radial-gradient(circle at 8% 95%,rgba(29,78,216,.08),transparent 30%),
+    linear-gradient(135deg,#ffffff 0%,#f8fbff 100%);
+  box-shadow:0 18px 45px rgba(15,23,42,.08);
+}
+
+.ed-premium-quiz-section::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:5px;
+  height:100%;
+  background:linear-gradient(180deg,#1d4ed8,#f59e0b);
+}
+
+.ed-premium-quiz-section .section-title,
+.ed-premium-quiz-section > div,
+.ed-premium-quiz-section > p,
+.ed-premium-quiz-section > a{
+  position:relative;
+  z-index:1;
+}
+
+.ed-premium-quiz-section .section-title{
+  padding:25px 25px 8px;
+}
+
+.ed-premium-quiz-section h2{
+  font-size:clamp(24px,3vw,34px);
+  letter-spacing:-.02em;
+  margin:4px 0 8px;
+  color:var(--ed-ink);
+}
+
+.ed-premium-quiz-section .eyebrow{
+  color:var(--ed-brand);
+  font-weight:800;
+  letter-spacing:.12em;
+}
+
+.ed-premium-quiz-section p{
+  color:#475569;
+  line-height:1.7;
+}
+
+.ed-premium-quiz-section a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:10px 25px 25px;
+  padding:12px 19px;
+  border-radius:12px;
+  background:var(--ed-brand);
+  color:#fff !important;
+  font-weight:800;
+  text-decoration:none;
+  box-shadow:0 8px 20px rgba(29,78,216,.20);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+
+.ed-premium-quiz-section a:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 26px rgba(29,78,216,.27);
+}
+
+/* ---------- TOPIC SECTION ---------- */
+.ed-topic-section{
+  position:relative;
+}
+
+.ed-topic-section .section-title{
+  margin-bottom:18px;
+}
+
+.ed-topic-section h2{
+  color:var(--ed-ink);
+  font-size:clamp(23px,3vw,31px);
+  letter-spacing:-.02em;
+}
+
+.ed-topic-section > div:last-child,
+.ed-topic-section .category-grid,
+.ed-topic-section .topic-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+
+.ed-topic-section a{
+  min-height:82px;
+  display:flex !important;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+  padding:17px 18px;
+  border:1px solid var(--ed-line);
+  border-radius:16px;
+  background:var(--ed-surface);
+  color:var(--ed-ink) !important;
+  font-weight:800;
+  text-decoration:none;
+  box-shadow:0 5px 16px rgba(15,23,42,.045);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+
+.ed-topic-section a:hover{
+  transform:translateY(-3px);
+  border-color:#b8c8e5;
+  box-shadow:0 12px 26px rgba(15,23,42,.09);
+}
+
+.ed-topic-section a::after{
+  content:"Explore →";
+  color:var(--ed-brand);
+  font-size:12px;
+  font-weight:700;
+}
+
+/* ---------- LATEST ARTICLES ---------- */
+.ed-topic-section ~ section{
+  scroll-margin-top:90px;
+}
+
+main .section-title h2{
+  letter-spacing:-.02em;
+}
+
+main article,
+main .post-card,
+main .article-card{
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+
+main article:hover,
+main .post-card:hover,
+main .article-card:hover{
+  transform:translateY(-2px);
+}
+
+/* ---------- EDITORIAL TEAM ---------- */
+.ed-editorial-section{
+  margin-top:42px !important;
+  border:1px solid var(--ed-line);
+  border-radius:20px;
+  padding:24px;
+  background:linear-gradient(135deg,#f8fafc,#ffffff);
+}
+
+.ed-editorial-section h3{
+  color:var(--ed-ink);
+}
+
+.ed-editorial-section .meta,
+.ed-editorial-section p{
+  color:#64748b;
+  line-height:1.7;
+}
+
+/* ---------- MOBILE ---------- */
+@media(max-width:800px){
+  main .container > section{
+    margin-top:25px;
+    margin-bottom:25px;
+  }
+
+  .ed-premium-quiz-section{
+    border-radius:19px;
+  }
+
+  .ed-premium-quiz-section .section-title{
+    padding:21px 19px 5px;
+  }
+
+  .ed-premium-quiz-section a{
+    margin:8px 19px 20px;
+    width:calc(100% - 38px);
+  }
+
+  .ed-topic-section > div:last-child,
+  .ed-topic-section .category-grid,
+  .ed-topic-section .topic-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .ed-topic-section a{
+    min-height:74px;
+    padding:14px;
+    border-radius:14px;
+    font-size:14px;
+  }
+
+  .ed-editorial-section{
+    padding:20px;
+    border-radius:17px;
+  }
+}
+
+@media(max-width:430px){
+  .ed-topic-section > div:last-child,
+  .ed-topic-section .category-grid,
+  .ed-topic-section .topic-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+/* Respect reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto !important;
+    transition:none !important;
+  }
+}

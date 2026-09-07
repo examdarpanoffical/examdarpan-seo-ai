@@ -33,6 +33,25 @@
   </div>
   <p id="quizMsg" class="meta"></p>
 </div>
+<div class="admin-quiz-analytics card pad" style="margin-top:20px">
+  <div class="section-label">STUDENT ANALYTICS</div>
+  <h2>Quiz Results &amp; Student Analytics</h2>
+  <p class="meta">किस student ने test दिया, score, time और maximum scroll यहाँ दिखेगा.</p>
+  <div id="quizAnalyticsSummary" class="result-stats" style="margin:15px 0"></div>
+  <div style="overflow:auto">
+    <table style="width:100%;border-collapse:collapse;min-width:850px">
+      <thead>
+        <tr>
+          <th>Student</th><th>Quiz</th><th>Score</th><th>Accuracy</th>
+          <th>Time</th><th>Max Scroll</th><th>Status</th><th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody id="quizAnalyticsRows">
+        <tr><td colspan="8">Analytics load हो रहे हैं…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 <div class="admin-quiz-list"><h3>Published / Draft Quizzes</h3><div id="quizPosts" class="quiz-admin-list"></div></div>
 <hr style="border:0;border-top:1px solid #e2e8f0;margin:20px 0"><h3>Gemini AI Draft Assistant</h3>
 <p class="meta">Official notification/source text paste करें. Gemini उसी source पर आधारित natural Hindi draft बनाएगी. Publish से पहले facts और official links जरूर verify करें.</p>
@@ -40,4 +59,4 @@
 <div class="field"><label>Official Source Text</label><textarea id="aiSource" style="min-height:200px" placeholder="Official notification/PDF का relevant text यहाँ paste करें…"></textarea></div>
 <button id="aiGenerate" class="btn btn-gold">Generate Draft with Gemini</button><p id="aiMsg" class="meta"></p></section>
 <section><div class="form"><h2>Posts</h2><input id="filter" placeholder="Search posts" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:11px"><div id="posts" style="margin-top:12px"></div></div></section></div></main>
-<script type="module" src="dashboard.js"></script></body></html>
+<script type="module" src="dashboard.js?v=20260906-analytics2"></script></body></html>

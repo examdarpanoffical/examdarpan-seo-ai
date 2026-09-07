@@ -28,6 +28,7 @@ async function ensureAdmin(user){
     $('authStatus').textContent='Admin verified';
     await loadPosts();
     await loadQuizzes();
+    await loadQuizAnalytics();
   }catch(e){
     console.error(e);
     $('authStatus').textContent='Admin verification failed';
@@ -206,6 +207,77 @@ $('publishQuiz')?.addEventListener('click',()=>saveQuiz('published'));
 $('clearQuiz')?.addEventListener('click',clearQuizForm);
 if($('quizDate')&&!$('quizDate').value)$('quizDate').value=todayISO();
 renderQuizEditor();
+
+
+/* ---------------- Student Quiz Analytics ---------------- */
+function formatSeconds(sec){
+  sec=Number(sec)||0;
+  const m=Math.floor(sec/60),s=sec%60;
+  return `${m}m ${String(s).padStart(2,'0')}s`;
+}
+function formatStamp(v){
+  try{
+    if(!v)return '—';
+    const d=v.toDate?v.toDate():new Date(v);
+    return new Intl.DateTimeFormat('hi-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(d);
+  }catch{return '—'}
+}
+async function loadQuizAnalytics(){
+  const rows=$('quizAnalyticsRows'),summary=$('quizAnalyticsSummary');
+  if(!rows)return;
+  try{
+    // Load attempts without an orderBy query so analytics does not depend
+    // on a Firestore index. Sort safely in the browser instead.
+    const snap=await getDocs(collection(db,'quizAttempts'));
+    console.log('QUIZ ANALYTICS: Firestore attempts fetched =', snap.size);
+    const data=snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>{
+        const getTime=v=>{
+          try{
+            if(!v)return 0;
+            if(typeof v.toMillis==='function')return v.toMillis();
+            if(typeof v.toDate==='function')return v.toDate().getTime();
+            const t=new Date(v).getTime();
+            return Number.isFinite(t)?t:0;
+          }catch{return 0}
+        };
+        return getTime(b.startedAt)-getTime(a.startedAt);
+      })
+      .slice(0,500);
+    const submitted=data.filter(x=>x.status==='submitted');
+    const avgScore=submitted.length?Math.round(submitted.reduce((a,x)=>a+(Number(x.right)||0),0)/submitted.length):0;
+    const avgScroll=data.length?Math.round(data.reduce((a,x)=>a+(Number(x.maxScrollPercent)||0),0)/data.length):0;
+    const completed=submitted.length;
+    const started=data.length;
+    const uniqueStudents=new Set(data.map(x=>x.studentUid).filter(Boolean)).size;
+
+    summary.innerHTML=`
+      <div><strong>${started}</strong><span>Test Starts</span></div>
+      <div><strong>${completed}</strong><span>Submitted</span></div>
+      <div><strong>${uniqueStudents}</strong><span>Students</span></div>
+      <div><strong>${avgScroll}%</strong><span>Avg Max Scroll</span></div>`;
+
+    rows.innerHTML=data.length?data.map(x=>`
+      <tr style="border-top:1px solid #e2e8f0">
+        <td style="padding:10px"><strong>${escapeHtml(x.studentName||'Anonymous Student')}</strong><br><small>${escapeHtml((x.studentUid||'').slice(0,12))}</small></td>
+        <td style="padding:10px">${escapeHtml(x.quizTitle||'Daily Quiz')}<br><small>${escapeHtml(x.quizDate||'')}</small></td>
+        <td style="padding:10px"><strong>${x.status==='submitted'?`${Number(x.right)||0}/${Number(x.total)||0}`:'—'}</strong><br><small>${Number(x.wrong)||0} wrong · ${Number(x.skipped)||0} skipped</small></td>
+        <td style="padding:10px">${x.status==='submitted'?(Number(x.accuracy)||0)+'%':'—'}</td>
+        <td style="padding:10px">${formatSeconds(x.timeSpentSeconds)}</td>
+        <td style="padding:10px"><strong>${Number(x.maxScrollPercent)||0}%</strong></td>
+        <td style="padding:10px">${escapeHtml(x.status||'started')}</td>
+        <td style="padding:10px">${formatStamp(x.submittedAt||x.startedAt)}</td>
+      </tr>`).join(''):'<tr><td colspan="8" style="padding:15px">अभी कोई student attempt नहीं है.</td></tr>';
+  }catch(e){
+    console.error('QUIZ ANALYTICS FIRESTORE ERROR:', e);
+    const msg=String(e?.message||e||'Unknown Firestore error');
+    rows.innerHTML=`<tr><td colspan="8" style="padding:15px;color:#b91c1c">
+      <strong>Analytics load नहीं हुई</strong><br>
+      ${escapeHtml(msg)}
+    </td></tr>`;
+  }
+}
 
 const AI_PROMPT=`You are the senior Hindi editorial assistant for Exam Darpan, an independent Indian education and government-job information portal.
 

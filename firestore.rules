@@ -16,5 +16,23 @@ service cloud.firestore {
       allow read: if resource.data.status == 'published' || isAdmin();
       allow create, update, delete: if isAdmin();
     }
+
+    match /quizAttempts/{attemptId} {
+      // Students must be signed in anonymously or normally.
+      // They may create/update only their own attempt.
+      allow create: if request.auth != null
+        && request.resource.data.studentUid == request.auth.uid
+        && request.resource.data.quizId is string;
+
+      allow update: if request.auth != null
+        && resource.data.studentUid == request.auth.uid
+        && request.resource.data.studentUid == request.auth.uid;
+
+      allow read: if isAdmin()
+        || (request.auth != null && resource.data.studentUid == request.auth.uid);
+
+      allow delete: if isAdmin();
+    }
   }
 }
+
