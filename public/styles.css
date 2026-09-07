@@ -4186,3 +4186,311 @@ video {
     transition: none;
   }
 }
+
+/* =========================================================
+   FINAL MOBILE + DAILY TEST POLISH
+   ========================================================= */
+
+/* Hero region */
+.hero-kicker-group{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-bottom:8px;
+}
+
+.hero-kicker{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:9px;
+  line-height:1;
+  letter-spacing:.11em;
+  font-weight:950;
+  white-space:nowrap;
+}
+
+.hero-kicker-rajasthan{
+  color:#075985;
+  background:#e0f2fe;
+  border:1px solid #bae6fd;
+}
+
+.hero-kicker-india{
+  color:#6d28d9;
+  background:#f3e8ff;
+  border:1px solid #ddd6fe;
+}
+
+/* Make the trust panel impossible to disappear on narrow screens */
+.hero-trust{
+  width:100%;
+  min-width:0;
+}
+
+/* Better quiz visual */
+.quiz-device{
+  transform:rotate(-2deg);
+}
+
+.quiz-device::after{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.10);
+  pointer-events:none;
+}
+
+.quiz-device-top b{
+  margin-left:auto;
+  color:#fbbf24;
+  font-size:.61rem;
+  letter-spacing:.06em;
+}
+
+.quiz-device-body{
+  box-shadow:0 8px 22px rgba(15,23,42,.08);
+}
+
+.quiz-mini-stats span{
+  border:1px solid #e8eef6;
+}
+
+.quiz-mini-stats span:last-child b{
+  color:#f59e0b;
+}
+
+.quiz-main-cta{
+  font-weight:950;
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width:760px){
+
+  .hero{
+    grid-template-columns:1fr !important;
+    gap:16px !important;
+    width:100%;
+  }
+
+  .hero > div:first-child{
+    min-width:0;
+    width:100%;
+  }
+
+  .hero-kicker-group{
+    gap:6px;
+    margin-bottom:9px;
+  }
+
+  .hero-kicker{
+    font-size:8px;
+    padding:6px 9px;
+  }
+
+  .hero h1{
+    max-width:none;
+    font-size:clamp(1.65rem,7.8vw,2.15rem);
+    overflow-wrap:anywhere;
+  }
+
+  .hero p{
+    max-width:none;
+  }
+
+  .hero-trust{
+    display:flex !important;
+    width:100%;
+    margin-top:2px !important;
+    padding:12px !important;
+    box-sizing:border-box;
+  }
+
+  .hero-trust > div{
+    min-width:0;
+  }
+
+  .hero-trust strong,
+  .hero-trust p{
+    overflow-wrap:anywhere;
+  }
+
+  /* Daily Test is the attention block */
+  .daily-quiz-teaser{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    width:100%;
+    box-sizing:border-box;
+    margin:14px 0 18px !important;
+    padding:16px !important;
+    gap:13px !important;
+    border-radius:20px !important;
+  }
+
+  .quiz-visual{
+    width:100%;
+    min-height:190px;
+  }
+
+  .quiz-visual-glow{
+    width:205px;
+    height:205px;
+  }
+
+  .quiz-device{
+    width:min(100%,245px);
+    transform:none;
+    padding:8px;
+    border-radius:21px;
+  }
+
+  .quiz-device-body{
+    padding:14px;
+    border-radius:14px;
+  }
+
+  .quiz-device-top{
+    padding:3px 5px 8px;
+    gap:7px;
+    font-size:.58rem;
+  }
+
+  .quiz-device-top img{
+    width:29px;
+    height:29px;
+  }
+
+  .quiz-device-top b{
+    font-size:.54rem;
+  }
+
+  .quiz-device-body strong{
+    font-size:1.05rem;
+  }
+
+  .quiz-mini-stats{
+    gap:5px;
+    margin:11px 0;
+  }
+
+  .quiz-mini-stats span{
+    padding:7px 4px;
+    font-size:.58rem;
+  }
+
+  .quiz-mini-stats b{
+    font-size:.82rem;
+  }
+
+  .quiz-mini-progress{
+    height:6px;
+  }
+
+  .quiz-device-body small{
+    font-size:.59rem;
+  }
+
+  .quiz-teaser-copy{
+    width:100%;
+    min-width:0;
+  }
+
+  .quiz-kicker-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:7px;
+    flex-wrap:wrap;
+  }
+
+  .quiz-teaser-copy h2{
+    font-size:1.48rem;
+    line-height:1.12;
+    margin:8px 0;
+  }
+
+  .quiz-teaser-copy > p{
+    font-size:.82rem;
+    line-height:1.55;
+  }
+
+  .quiz-feature-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+    margin:12px 0;
+  }
+
+  .quiz-feature-row span{
+    justify-content:center;
+    padding:7px 4px;
+    font-size:.59rem;
+    white-space:nowrap;
+  }
+
+  .quiz-teaser-meta{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px;
+  }
+
+  .quiz-teaser-meta > span{
+    font-size:.64rem;
+  }
+
+  .quiz-main-cta{
+    width:100%;
+    min-height:46px;
+    justify-content:center;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width:390px){
+
+  .main.container{
+    padding-left:9px !important;
+    padding-right:9px !important;
+  }
+
+  .hero{
+    padding:16px !important;
+    border-radius:18px !important;
+  }
+
+  .hero h1{
+    font-size:1.48rem;
+  }
+
+  .hero-trust{
+    padding:10px !important;
+  }
+
+  .daily-quiz-teaser{
+    padding:13px !important;
+  }
+
+  .quiz-device{
+    width:220px;
+  }
+
+  .quiz-device-top{
+    font-size:.54rem;
+  }
+
+  .quiz-device-top b{
+    font-size:.48rem;
+  }
+
+  .quiz-teaser-copy h2{
+    font-size:1.34rem;
+  }
+
+  .quiz-feature-row span{
+    font-size:.56rem;
+  }
+}
