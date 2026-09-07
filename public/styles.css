@@ -5208,3 +5208,62 @@ input:focus-visible{
   outline:3px solid #2563eb;
   outline-offset:3px;
 }
+
+
+/* EXAMDARPAN BRAND POLISH 2026 */
+/*
+  Brand positioning:
+  ExamDarpan = latest exam information first.
+  Daily Test = secondary daily engagement feature.
+*/
+
+.hero h1,
+.hero-title,
+.hero-copy h1 {
+  text-wrap: balance;
+}
+
+.daily-test,
+.daily-quiz,
+.quiz-section,
+.daily-test-card {
+  text-align: center;
+}
+
+.daily-test a,
+.daily-quiz a,
+.quiz-section a {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .hero h1,
+  .hero-title,
+  .hero-copy h1 {
+    text-align: left;
+    text-wrap: balance;
+  }
+
+  .daily-test,
+  .daily-quiz,
+  .quiz-section,
+  .daily-test-card {
+    text-align: center;
+  }
+
+  .daily-test .btn,
+  .daily-test a,
+  .daily-quiz .btn,
+  .daily-quiz a,
+  .quiz-section .btn,
+  .quiz-section a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 580px);
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+}
