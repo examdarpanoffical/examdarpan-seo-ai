@@ -5147,3 +5147,64 @@ img{
   max-width:100%;
   height:auto;
 }
+
+/* ===== ACCESSIBILITY CONTRAST POLISH ===== */
+/* Keep the premium palette, but strengthen low-contrast secondary text. */
+
+.topbar-note{
+  color:#cbd5e1 !important;
+}
+
+.search input::placeholder{
+  color:#64748b !important;
+  opacity:1;
+}
+
+.matrix-item small,
+.post-meta,
+.result-count,
+.meta{
+  color:#475569 !important;
+}
+
+.hero p,
+.post p{
+  color:#475569 !important;
+}
+
+.quiz-teaser-copy > p{
+  color:#475569 !important;
+}
+
+.quiz-device-body small{
+  color:#475569 !important;
+}
+
+.quiz-device-top span{
+  color:#e2e8f0 !important;
+}
+
+.footer p,
+.footer a{
+  color:#cbd5e1;
+}
+
+.btn-light{
+  color:#1e293b !important;
+}
+
+.tab{
+  color:#334155;
+}
+
+.trust-card p{
+  color:#475569 !important;
+}
+
+/* Keep focus states clearly visible */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible{
+  outline:3px solid #2563eb;
+  outline-offset:3px;
+}
