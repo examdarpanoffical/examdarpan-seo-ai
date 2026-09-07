@@ -4494,3 +4494,73 @@ video {
     font-size:.56rem;
   }
 }
+
+/* FINAL QUIZ CTA CENTER FIX */
+.daily-quiz-teaser {
+  text-align: center;
+}
+
+.daily-quiz-teaser .quiz-teaser-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.daily-quiz-teaser .quiz-teaser-meta {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.daily-quiz-teaser #dailyQuizCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* Keep the premium visual balanced on desktop */
+@media (min-width: 769px) {
+  .daily-quiz-teaser .quiz-teaser-copy {
+    align-items: center;
+  }
+
+  .daily-quiz-teaser .quiz-teaser-meta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .daily-quiz-teaser #dailyQuizCta {
+    min-width: 220px;
+  }
+}
+
+/* Mobile: CTA stays perfectly centered and comfortably tappable */
+@media (max-width: 768px) {
+  .daily-quiz-teaser {
+    text-align: center;
+  }
+
+  .daily-quiz-teaser .quiz-teaser-copy {
+    width: 100%;
+    align-items: center;
+  }
+
+  .daily-quiz-teaser .quiz-teaser-meta {
+    width: 100%;
+    align-items: center;
+  }
+
+  .daily-quiz-teaser #dailyQuizCta {
+    width: min(100%, 280px);
+    min-height: 48px;
+    margin: 0 auto;
+    justify-content: center;
+  }
+}
