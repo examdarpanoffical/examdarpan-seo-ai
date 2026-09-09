@@ -2,24 +2,90 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {
-      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
-    match /posts/{postId} {
-      allow read: if resource.data.status == 'published' || isAdmin();
-      allow create, update, delete: if isAdmin();
+
+    function isWriter() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/writers/$(request.auth.uid));
     }
+
     match /admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
     }
+
+    match /writers/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid || isAdmin();
+      allow write: if false;
+    }
+
+    match /posts/{postId} {
+      allow read: if isAdmin()
+        || (resource.data.status == 'published')
+        || (isWriter() && resource.data.ownerUid == request.auth.uid);
+
+      allow create: if isAdmin()
+        || (isWriter()
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.status in ['draft', 'pending_review']);
+
+      allow update: if isAdmin()
+        || (isWriter()
+          && resource.data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == request.auth.uid
+          && (
+            (
+              resource.data.status in ['draft', 'changes_requested']
+              && request.resource.data.status in ['draft', 'pending_review']
+            )
+            ||
+            (
+              resource.data.status == 'pending_review'
+              && request.resource.data.status == 'changes_requested'
+            )
+          ));
+
+      allow delete: if isAdmin()
+        || (isWriter()
+          && resource.data.ownerUid == request.auth.uid
+          && resource.data.status in ['draft', 'changes_requested']);
+    }
+
     match /quizzes/{quizId} {
-      allow read: if resource.data.status == 'published' || isAdmin();
-      allow create, update, delete: if isAdmin();
+      allow read: if isAdmin()
+        || (resource.data.status == 'published')
+        || (isWriter() && resource.data.ownerUid == request.auth.uid);
+
+      allow create: if isAdmin()
+        || (isWriter()
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.status in ['draft', 'pending_review']);
+
+      allow update: if isAdmin()
+        || (isWriter()
+          && resource.data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == request.auth.uid
+          && (
+            (
+              resource.data.status in ['draft', 'changes_requested']
+              && request.resource.data.status in ['draft', 'pending_review']
+            )
+            ||
+            (
+              resource.data.status == 'pending_review'
+              && request.resource.data.status == 'changes_requested'
+            )
+          ));
+
+      allow delete: if isAdmin()
+        || (isWriter()
+          && resource.data.ownerUid == request.auth.uid
+          && resource.data.status in ['draft', 'changes_requested']);
     }
 
     match /quizAttempts/{attemptId} {
-      // Students must be signed in anonymously or normally.
-      // They may create/update only their own attempt.
       allow create: if request.auth != null
         && request.resource.data.studentUid == request.auth.uid
         && request.resource.data.quizId is string;
@@ -33,6 +99,20 @@ service cloud.firestore {
 
       allow delete: if isAdmin();
     }
+
+    match /quizLeaderboard/{entryId} {
+      // Public leaderboard contains only safe display fields.
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.studentUid == request.auth.uid
+        && request.resource.data.quizId is string
+        && request.resource.data.studentName is string
+        && request.resource.data.score is number
+        && request.resource.data.total is number;
+      allow update: if request.auth != null
+        && resource.data.studentUid == request.auth.uid
+        && request.resource.data.studentUid == request.auth.uid;
+      allow delete: if isAdmin();
+    }
   }
 }
-
