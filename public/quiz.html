@@ -5,7 +5,7 @@
 <title>Daily Quiz | Exam Darpan</title>
 <meta name="description" content="Exam Darpan Daily Quiz — timer के साथ सरकारी नौकरी और परीक्षा की तैयारी करें, score और explanations तुरंत देखें।">
 <meta name="robots" content="index,follow"><link rel="canonical" href="https://examdarpan.in/quiz">
-<link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css"><script src="/firebase-config.js"></script><script src="/quiz-leaderboard.js"></script>
+<link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css"><script src="/firebase-config.js"></script><script src="/quiz-leaderboard.js" defer></script>
 
 <style id="exam-darpan-quiz-premium-ui">
 :root{
@@ -2944,77 +2944,122 @@ body{
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js';
 import{getAuth,signInAnonymously}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js';
-import{getFirestore,collection,getDocs,query,where,orderBy,limit,doc,getDoc,addDoc,updateDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js';
+import{getFirestore,collection,getDocs,query,where,orderBy,limit,doc,getDoc,addDoc,updateDoc,setDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js';
+
 const app=initializeApp(window.FIREBASE_CONFIG);
 const auth=getAuth(app),db=getFirestore(app);
-let studentUid=null,attemptId=null,studentName='',attemptStartedAt=Date.now(),maxScrollPercent=0,scrollTimer=null;
+window.dispatchEvent(new CustomEvent('examDarpan:firebaseReady'));
 const $=id=>document.getElementById(id);
-try{history.scrollRestoration='manual'}catch{}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let quiz=null,quizId=null,current=0,answers=[],timer=null,submitted=false,started=false;
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const fmtDate=s=>{try{return new Intl.DateTimeFormat('hi-IN',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(`${s}T00:00:00`))}catch{return s}};
+const fmtScore=n=>{const x=Number(n)||0;return Number.isInteger(x)?String(x):x.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')};
+const fmtTime=sec=>{sec=Math.max(0,Math.round(Number(sec)||0));return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`};
+
+let studentUid=null,attemptId=null,studentName='',attemptStartedAt=Date.now(),maxScrollPercent=0,scrollTimer=null;
+let quiz=null,quizId=null,current=0,answers=[],timer=null,submitted=false,started=false;
+
+function normalizeQuizConfig(q){
+  const marks=Number(q.marksPerQuestion),num=Number(q.negativeNumerator),den=Number(q.negativeDenominator);
+  return {...q,
+    testType:q.testType||'daily',
+    marksPerQuestion:Number.isFinite(marks)&&marks>0?marks:1,
+    negativeMarkingEnabled:q.negativeMarkingEnabled!==false,
+    negativeNumerator:Number.isFinite(num)&&num>0?num:1,
+    negativeDenominator:Number.isFinite(den)&&den>0?den:3,
+    leaderboardEnabled:q.leaderboardEnabled!==false,
+    showRankAfterSubmit:q.showRankAfterSubmit!==false
+  };
+}
+
+function calculateResult(){
+  const total=quiz.questions.length;
+  let right=0;
+  quiz.questions.forEach((q,i)=>{if(answers[i]===Number(q.answerIndex))right++});
+  const attempted=answers.filter(x=>x!==null).length;
+  const wrong=attempted-right,skipped=total-attempted;
+  const marks=quiz.marksPerQuestion;
+  const deduction=quiz.negativeMarkingEnabled?marks*quiz.negativeNumerator/quiz.negativeDenominator:0;
+  const score=(right*marks)-(wrong*deduction);
+  const maxMarks=total*marks;
+  const accuracy=attempted?Math.round(right/attempted*100):0;
+  const timeTakenSeconds=Math.max(0,Math.round((Date.now()-attemptStartedAt)/1000));
+  return {right,wrong,skipped,total,accuracy,score,maxMarks,marksPerQuestion:marks,negativeMarkingEnabled:quiz.negativeMarkingEnabled,negativeNumerator:quiz.negativeNumerator,negativeDenominator:quiz.negativeDenominator,negativeDeductionPerWrong:deduction,timeTakenSeconds};
+}
+
+function getStudentName(){try{return localStorage.getItem('examDarpanStudentName')||''}catch{return ''}}
+function saveStudentName(name){try{localStorage.setItem('examDarpanStudentName',name)}catch{}}
 
 async function ensureAnonymousStudent(){
   if(auth.currentUser){studentUid=auth.currentUser.uid;return}
-  const cred=await signInAnonymously(auth);
-  studentUid=cred.user.uid;
-}
-
-function getStudentName(){
-  try{return localStorage.getItem('examDarpanStudentName')||''}catch{return ''}
-}
-
-function saveStudentName(name){
-  try{localStorage.setItem('examDarpanStudentName',name)}catch{}
+  const cred=await signInAnonymously(auth);studentUid=cred.user.uid;
 }
 
 function updateScroll(){
-  const docEl=document.documentElement;
-  const max=Math.max(1,docEl.scrollHeight-window.innerHeight);
+  const max=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
   const pct=Math.min(100,Math.max(0,Math.round((window.scrollY/max)*100)));
   if(pct>maxScrollPercent)maxScrollPercent=pct;
-  if(attemptId && studentUid){
+  if(attemptId&&studentUid){
     clearTimeout(scrollTimer);
-    scrollTimer=setTimeout(async()=>{
-      try{
-        await updateDoc(doc(db,'quizAttempts',attemptId),{
-          maxScrollPercent,
-          lastScrollPercent:pct,
-          lastActiveAt:serverTimestamp()
-        });
-      }catch(e){}
-    },700);
+    scrollTimer=setTimeout(async()=>{try{await updateDoc(doc(db,'quizAttempts',attemptId),{maxScrollPercent,lastScrollPercent:pct,lastActiveAt:serverTimestamp()})}catch{}} ,700);
   }
 }
 
 async function createAttempt(){
   await ensureAnonymousStudent();
-  const ref=await addDoc(collection(db,'quizAttempts'),{
-    quizId:quizId,
-    quizTitle:quiz.title||'Daily Quiz',
-    quizDate:quiz.quizDate||today(),
-    studentUid,
-    studentName,
-    status:'started',
-    startedAt:serverTimestamp(),
-    maxScrollPercent:0,
-    lastScrollPercent:0,
-    lastActiveAt:serverTimestamp()
-  });
-  attemptId=ref.id;
-  attemptStartedAt=Date.now();
+  const ref=await addDoc(collection(db,'quizAttempts'),{quizId,quizTitle:quiz.title||'Daily Quiz',quizDate:quiz.quizDate||today(),studentUid,studentName,status:'started',startedAt:serverTimestamp(),maxScrollPercent:0,lastScrollPercent:0,lastActiveAt:serverTimestamp()});
+  attemptId=ref.id;attemptStartedAt=Date.now();maxScrollPercent=0;
   window.addEventListener('scroll',updateScroll,{passive:true});
 }
 
 async function saveAttemptResult(result){
   if(!attemptId)return;
+
+  const payload={
+    status:'submitted',
+    studentName,
+    studentUid,
+    quizId,
+    quizTitle:quiz.title||'Daily Quiz',
+    quizDate:quiz.quizDate||today(),
+    right:result.right,
+    wrong:result.wrong,
+    skipped:result.skipped,
+    total:result.total,
+    accuracy:result.accuracy,
+    score:result.score,
+    maxMarks:result.maxMarks,
+    marksPerQuestion:result.marksPerQuestion,
+    negativeMarkingEnabled:result.negativeMarkingEnabled,
+    negativeNumerator:result.negativeNumerator,
+    negativeDenominator:result.negativeDenominator,
+    negativeDeductionPerWrong:result.negativeDeductionPerWrong,
+    autoSubmit:!!result.auto,
+    answers,
+    maxScrollPercent,
+    timeSpentSeconds:result.timeTakenSeconds,
+    timeTakenSeconds:result.timeTakenSeconds,
+    submittedAt:serverTimestamp(),
+    submittedAtMs:Date.now(),
+    lastActiveAt:serverTimestamp()
+  };
+
   try{
-    await updateDoc(doc(db,'quizAttempts',attemptId),{
+    await updateDoc(doc(db,'quizAttempts',attemptId),payload);
+  }catch(e){
+    console.error('Attempt save failed',e);
+  }
+
+  /*
+   * Public leaderboard mirror.
+   * Do NOT expose answers here because this collection is publicly readable.
+   */
+  try{
+    const leaderboardPayload={
       status:'submitted',
       studentName,
       studentUid,
-      quizId:quizId,
+      quizId,
       quizTitle:quiz.title||'Daily Quiz',
       quizDate:quiz.quizDate||today(),
       right:result.right,
@@ -3022,226 +3067,104 @@ async function saveAttemptResult(result){
       skipped:result.skipped,
       total:result.total,
       accuracy:result.accuracy,
+      score:result.score,
+      maxMarks:result.maxMarks,
+      marksPerQuestion:result.marksPerQuestion,
+      negativeMarkingEnabled:result.negativeMarkingEnabled,
+      negativeNumerator:result.negativeNumerator,
+      negativeDenominator:result.negativeDenominator,
+      negativeDeductionPerWrong:result.negativeDeductionPerWrong,
       autoSubmit:!!result.auto,
-      answers,
-      maxScrollPercent,
-      timeSpentSeconds:Math.max(0,Math.round((Date.now()-attemptStartedAt)/1000)),
+      timeSpentSeconds:result.timeTakenSeconds,
+      timeTakenSeconds:result.timeTakenSeconds,
       submittedAt:serverTimestamp(),
-      lastActiveAt:serverTimestamp()
-    });
+      submittedAtMs:Date.now()
+    };
+
+    const leaderboardId = `${quizId}_${studentUid}`;
+    await setDoc(
+      doc(db,'quizLeaderboard',leaderboardId),
+      leaderboardPayload,
+      {merge:false}
+    );
+
+    console.log('[ExamDarpan leaderboard] Public mirror write OK');
   }catch(e){
-    console.error('Attempt save failed',e);
+    console.error('[ExamDarpan leaderboard] Public mirror write FAILED',e);
   }
 }
 
-function showStudentStart(){
-  const saved=esc(getStudentName());
-  $('quizApp').hidden=false;
-  $('quizApp').innerHTML=`<div class="card quiz-start-card" style="max-width:650px;margin:20px auto;padding:28px">
-    <span class="eyebrow">STUDENT TEST</span>
-    <h1>${esc(quiz.title||'Daily Quiz')}</h1>
-    <p>${esc(quiz.description||'आज की practice quiz')}</p>
-    <div class="field" style="margin:20px 0">
-      <label for="studentNameInput"><strong>Student Name</strong></label>
-      <input id="studentNameInput" value="${saved}" placeholder="अपना नाम लिखें" maxlength="80" autocomplete="name"
-        style="width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:10px">
-    </div>
-    <div class="card" style="padding:14px;background:#f8fafc;margin-bottom:18px">
-      <strong>Test details</strong>
-      <p style="margin:6px 0 0">${quiz.questions.length} Questions · ${quiz.durationMinutes||10} Minutes</p>
-    </div>
-    <button type="button" id="startStudentQuiz" class="btn btn-primary">Start Test →</button>
-    <p id="studentStartMsg" class="meta"></p>
-  </div>`;
-  $('startStudentQuiz').onclick=async()=>{
-    const name=$('studentNameInput').value.trim();
-    if(!name){$('studentStartMsg').textContent='कृपया अपना नाम भरें.';return}
-    const btn=$('startStudentQuiz');
-    btn.disabled=true;btn.textContent='Starting…';
-    try{
-      studentName=name;
-      saveStudentName(name);
-      await createAttempt();
-      current=0;submitted=false;
-      answers=quiz.questions.map(()=>null);
-      renderQuiz();
-      startTimer(quiz.durationMinutes||10);
-    }catch(e){
-      console.error(e);
-      $('studentStartMsg').textContent='Test start नहीं हुआ: '+(e.message||e);
-      btn.disabled=false;btn.textContent='Start Test →';
-    }
-  };
+
+function injectQuizRuntimeStyles(){
+  if(document.getElementById('ed-quiz-runtime-style'))return;
+  const s=document.createElement('style');s.id='ed-quiz-runtime-style';
+  s.textContent=`
+    .ed-quiz-start{padding:28px}.ed-quiz-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.ed-quiz-meta>div{padding:12px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc}.ed-quiz-meta b{display:block;font-size:18px;color:#0f172a}.ed-quiz-meta span{font-size:12px;color:#64748b}.ed-negative{margin:14px 0;padding:12px 14px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:13px}.ed-quiz-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.ed-timer{font-weight:900;color:#b91c1c;background:#fef2f2;padding:8px 12px;border-radius:999px}.ed-progress{height:7px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:10px 0 18px}.ed-progress i{display:block;height:100%;background:#2563eb}.ed-dots{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 18px}.ed-dot{border:1px solid #cbd5e1;background:#fff;border-radius:9px;min-width:34px;height:32px;cursor:pointer}.ed-dot.active{background:#2563eb;color:#fff;border-color:#2563eb}.ed-dot.done{box-shadow:inset 0 -3px 0 #16a34a}.ed-q-card{padding:22px;border:1px solid #e2e8f0;border-radius:18px;background:#fff}.ed-q-title{font-size:19px;font-weight:850;line-height:1.55;margin:0 0 18px}.ed-option{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;padding:14px;margin:9px 0;border:1px solid #cbd5e1;border-radius:13px;background:#fff;cursor:pointer}.ed-option.selected{border-color:#2563eb;background:#eff6ff}.ed-option input{margin-top:3px}.ed-nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.ed-result-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}.ed-result-summary>div{padding:13px;border:1px solid #e2e8f0;border-radius:13px;background:#f8fafc;text-align:center}.ed-result-summary b{display:block;font-size:20px}.ed-result-summary span{font-size:11px;color:#64748b}.ed-review{margin-top:18px}.ed-review-item{padding:15px;border:1px solid #e2e8f0;border-radius:14px;margin:10px 0}.ed-review-ok{border-left:4px solid #16a34a}.ed-review-bad{border-left:4px solid #dc2626}.ed-submit-note{margin-top:10px;color:#64748b;font-size:12px}@media(max-width:700px){.ed-quiz-meta,.ed-result-summary{grid-template-columns:repeat(2,1fr)}.ed-quiz-head{align-items:flex-start}.ed-q-title{font-size:17px}}
+  `;document.head.appendChild(s);
 }
 
-function renderQuiz(){
-  const q=quiz.questions[current],total=quiz.questions.length,chosen=answers[current];
-
-  $('quizApp').innerHTML=`<div class="quiz-top card">
-    <div>
-      <span class="eyebrow">EXAM DARPAN QUIZ</span>
-      <h1>${esc(quiz.title||'Daily Quiz')}</h1>
-      <p>${esc(quiz.description||'आज की practice quiz')}</p>
-    </div>
-    <div class="quiz-timer">
-      <small>TIME LEFT</small>
-      <strong id="timerValue">--:--</strong>
-    </div>
-  </div>
-
-  <div class="quiz-progress card">
-    <div class="quiz-progress-row">
-      <strong>Question ${current+1} of ${total}</strong>
-      <span>${answers.filter(x=>x!==null).length}/${total} answered</span>
-    </div>
-    <div class="progress-track">
-      <i style="width:${((current+1)/total)*100}%"></i>
-    </div>
-  </div>
-
-  <div class="quiz-card card">
-    <div class="quiz-question-head">
-      <span>Q${current+1}</span>
-      <small>Choose one answer</small>
-    </div>
-
-    <h2>${esc(q.question||'')}</h2>
-
-    <div class="quiz-options">
-      ${(q.options||[]).map((o,i)=>`
-        <button
-          type="button"
-          class="quiz-option ${chosen===i?'selected':''}"
-          data-opt="${i}"
-          aria-pressed="${chosen===i?'true':'false'}">
-          <span class="option-letter">${String.fromCharCode(65+i)}</span>
-          <span>${esc(o)}</span>
-          <b>${chosen===i?'✓':''}</b>
-        </button>
-      `).join('')}
-    </div>
-  </div>
-
-  <div class="quiz-nav card">
-    <button type="button" id="prevQ" class="btn btn-light" ${current===0?'disabled':''}>← Previous</button>
-
-    <div class="quiz-dots">
-      ${quiz.questions.map((_,i)=>`
-        <button
-          type="button"
-          class="${i===current?'active ':''}${answers[i]!==null?'answered':''}"
-          data-q="${i}"
-          aria-label="Question ${i+1}">
-          ${i+1}
-        </button>
-      `).join('')}
-    </div>
-
-    <button type="button" id="nextQ" class="btn btn-primary">
-      ${current===total-1?'Submit Quiz':'Next →'}
-    </button>
-  </div>`;
-
-  document.querySelectorAll('[data-opt]').forEach(b=>{
-    b.onclick=()=>{
-      if(submitted)return;
-      answers[current]=Number(b.dataset.opt);
-      renderQuiz();
-    };
-  });
-
-  document.querySelectorAll('[data-q]').forEach(b=>{
-    b.onclick=()=>{
-      if(submitted)return;
-      const target=Number(b.dataset.q);
-      if(target===current)return;
-      current=target;
-      renderQuiz();
-    };
-  });
-
-  $('prevQ').onclick=()=>{
-    if(current>0){
-      current--;
-      renderQuiz();
-    }
-  };
-
-  $('nextQ').onclick=()=>{
-    if(current<total-1){
-      current++;
-      renderQuiz();
-    }else{
-      submitQuiz(false);
-    }
-  };
+function renderQuizQuestion(){
+  if(!quiz||!started||submitted)return;
+  const app=$('quizApp');if(!app)return;
+  const total=quiz.questions.length,q=quiz.questions[current],selected=answers[current];
+  app.hidden=false;
+  app.innerHTML=`<div class="card ed-quiz-head"><div><strong>${esc(quiz.title||'Daily Quiz')}</strong><div class="meta">Question ${current+1} of ${total} · ${answers.filter(x=>x!==null).length}/${total} answered</div></div><div id="quizTimer" class="ed-timer">⏱️ ${fmtTime(Math.max(0,(quiz.durationMinutes||10)*60-Math.round((Date.now()-attemptStartedAt)/1000)))}</div></div><div class="ed-progress"><i style="width:${Math.round(((current+1)/total)*100)}%"></i></div><div class="ed-dots">${quiz.questions.map((_,i)=>`<button type="button" class="ed-dot ${i===current?'active':''} ${answers[i]!==null?'done':''}" data-q="${i}">${i+1}</button>`).join('')}</div><div class="ed-q-card"><p class="ed-q-title">${current+1}. ${esc(q.question)}</p><div>${q.options.map((o,i)=>`<label class="ed-option ${selected===i?'selected':''}"><input type="radio" name="quizOption" value="${i}" ${selected===i?'checked':''}><span><b>${String.fromCharCode(65+i)}.</b> ${esc(o)}</span></label>`).join('')}</div><div class="ed-nav"><button type="button" class="btn" id="prevQ" ${current===0?'disabled':''}>← Previous</button>${current<total-1?'<button type="button" class="btn btn-primary" id="nextQ">Next →</button>':'<button type="button" class="btn btn-primary" id="submitQuizBtn">Submit Test</button>'}</div>${current===total-1?'<div class="ed-submit-note">सब answers check करके फिर Submit Test दबाएँ।</div>':''}</div>`;
+  app.querySelectorAll('input[name="quizOption"]').forEach(el=>el.addEventListener('change',()=>{answers[current]=Number(el.value);renderQuizQuestion()}));
+  app.querySelectorAll('[data-q]').forEach(el=>el.addEventListener('click',()=>{current=Number(el.dataset.q);renderQuizQuestion()}));
+  $('prevQ')?.addEventListener('click',()=>{current=Math.max(0,current-1);renderQuizQuestion()});
+  $('nextQ')?.addEventListener('click',()=>{current=Math.min(total-1,current+1);renderQuizQuestion()});
+  $('submitQuizBtn')?.addEventListener('click',()=>finishQuiz(false));
 }
-function startTimer(minutes){
-  let left=Math.max(1,Number(minutes||10))*60;
-  const tick=()=>{const el=$('timerValue');if(!el)return;const mm=Math.floor(left/60),ss=left%60;el.textContent=`${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;if(left<=0){clearInterval(timer);submitQuiz(true);return}left--};
-  tick();timer=setInterval(tick,1000);
+
+function startQuizTimer(){
+  clearInterval(timer);
+  timer=setInterval(()=>{
+    if(!started||submitted){clearInterval(timer);return}
+    const totalSec=Math.max(1,Number(quiz.durationMinutes)||10)*60;
+    const left=Math.max(0,totalSec-Math.round((Date.now()-attemptStartedAt)/1000));
+    const el=$('quizTimer');if(el)el.textContent=`⏱️ ${fmtTime(left)}`;
+    if(left<=0)finishQuiz(true);
+  },500);
 }
-function submitQuiz(auto=false){
-  if(submitted)return;
+
+async function finishQuiz(auto=false){
+  if(submitted||!started)return;
   submitted=true;clearInterval(timer);window.removeEventListener('scroll',updateScroll);clearTimeout(scrollTimer);
-  const total=quiz.questions.length;
-  let right=0;quiz.questions.forEach((q,i)=>{if(answers[i]===Number(q.answerIndex))right++});
-  const attempted=answers.filter(x=>x!==null).length,wrong=attempted-right,skipped=total-attempted,accuracy=attempted?Math.round(right/attempted*100):0;
-  const result={right,wrong,skipped,total,accuracy,auto,date:new Date().toISOString(),studentName,maxScrollPercent};
+  const result=calculateResult();result.auto=!!auto;
   try{localStorage.setItem(`examDarpanQuiz:${quizId}`,JSON.stringify({...result,answers}))}catch{}
-  saveAttemptResult(result);
-  $('quizApp').hidden=true;$('quizResult').hidden=false;
-  $('quizResult').innerHTML=`<div class="result-hero"><span class="result-check">✓</span><div><span class="eyebrow">QUIZ COMPLETE</span><h1>${auto?'Time Up — ':''}${esc(quiz.title||'Daily Quiz')}</h1><p>${right} सही · ${wrong} गलत · ${skipped} छोड़े गए</p></div><div class="score-ring"><strong>${right}/${total}</strong><span>${accuracy}% accuracy</span></div></div>
-  <div class="result-stats"><div><strong>${right}</strong><span>सही</span></div><div><strong>${wrong}</strong><span>गलत</span></div><div><strong>${skipped}</strong><span>छोड़े</span></div><div><strong>${accuracy}%</strong><span>Accuracy</span></div></div>
-  <div class="result-actions"><button id="retry" class="btn btn-primary">Try Again</button><a class="btn btn-light" href="#previous">Previous Quizzes</a></div>
-  <div class="answer-review"><div class="section-title"><div><span class="eyebrow">ANSWER REVIEW</span><h2>सभी Answers &amp; Explanations</h2></div></div>${quiz.questions.map((q,i)=>{const correct=Number(q.answerIndex),a=answers[i];return `<article class="review-item ${a===correct?'review-correct':a===null?'review-skipped':'review-wrong'}"><div class="review-q"><span>Q${i+1}</span><strong>${esc(q.question||'')}</strong></div><p><b>आपका answer:</b> ${a===null?'नहीं दिया':esc(q.options?.[a]||'—')}</p><p><b>सही answer:</b> ${esc(q.options?.[correct]||'—')}</p>${q.explanation?`<div class="explanation"><b>💡 Explanation</b><p>${esc(q.explanation)}</p></div>`:''}</article>`}).join('')}</div>`;
-  $('retry').onclick=()=>{
-  submitted=false;
-  current=0;
-  answers=quiz.questions.map(()=>null);
-  $('quizResult').hidden=true;
-  $('quizApp').hidden=false;
-  renderQuiz();
-  startTimer(quiz.durationMinutes);
-  requestAnimationFrame(()=>window.scrollTo({top:0,behavior:'smooth'}));
-};
-  /* Keep the user's reading position stable after submission.
-     Do not force a jump to the top on mobile. */
-  requestAnimationFrame(()=>{
-    const resultEl=$('quizResult');
-    if(resultEl && !resultEl.hidden){
-      const rect=resultEl.getBoundingClientRect();
-      const visible=rect.top < window.innerHeight && rect.bottom > 0;
-      if(!visible){
-        resultEl.scrollIntoView({behavior:'smooth',block:'nearest'});
-      }
-    }
-  });
+  const app=$('quizApp'),box=$('quizResult');if(app)app.hidden=true;if(!box)return;
+  box.hidden=false;injectQuizRuntimeStyles();
+  const scoreText=fmtScore(result.score),maxText=fmtScore(result.maxMarks),deductText=fmtScore(result.negativeDeductionPerWrong);
+  box.innerHTML=`<div style="padding:24px"><div class="eyebrow">TEST RESULT</div><h2>${esc(quiz.title||'Quiz')} — ${auto?'Time Up':'Submitted'}</h2><div class="ed-result-summary"><div><b>${scoreText}/${maxText}</b><span>Score</span></div><div><b>${result.right}/${result.total}</b><span>Correct</span></div><div><b>${result.wrong}</b><span>Wrong</span></div><div><b>${result.skipped}</b><span>Skipped</span></div><div><b>${result.accuracy}%</b><span>Accuracy</span></div></div>${result.negativeMarkingEnabled?`<div class="ed-negative"><strong>Negative marking:</strong> −${deductText} marks per wrong answer (${result.negativeNumerator}/${result.negativeDenominator} of ${result.marksPerQuestion}). Total deduction: −${fmtScore(result.wrong*result.negativeDeductionPerWrong)}.</div>`:'<div class="ed-negative" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534"><strong>Negative marking:</strong> OFF — wrong answers have no deduction.</div>'}<p class="meta">Time taken: ${fmtTime(result.timeTakenSeconds)}${auto?' · Test auto-submitted':''}</p><div class="ed-review"><h3>Answer Review</h3>${quiz.questions.map((q,i)=>{const chosen=answers[i],correct=Number(q.answerIndex),ok=chosen===correct;return `<div class="ed-review-item ${ok?'ed-review-ok':'ed-review-bad'}"><strong>${i+1}. ${esc(q.question)}</strong><div class="meta">Your answer: ${chosen===null?'Not answered':esc(q.options[chosen]??'')}</div><div class="meta">Correct answer: ${esc(q.options[correct]??'')}</div>${q.explanation?`<div style="margin-top:7px">${esc(q.explanation)}</div>`:''}</div>`}).join('')}</div><div class="result-actions" style="margin-top:18px"><button type="button" id="retry" class="btn btn-primary">Try Again</button><a class="btn btn-light" href="#previous">Previous Quizzes</a></div></div>`;
+  await saveAttemptResult(result);
+  window.quiz=quiz;window.quizId=quizId;
+  if(quiz.leaderboardEnabled!==false&&quiz.showRankAfterSubmit!==false){window.dispatchEvent(new CustomEvent('examDarpan:quizSubmitted',{detail:{quizId}}))}
+  $('retry')?.addEventListener('click',async()=>{try{clearInterval(timer);submitted=false;started=false;await createAttempt();started=true;current=0;answers=quiz.questions.map(()=>null);$('quizResult').hidden=true;renderQuizQuestion();startQuizTimer();window.scrollTo({top:0,behavior:'smooth'})}catch(e){alert('Test restart नहीं हो पाया: '+(e.message||e))}});
 }
+
+async function showStudentStart(){
+  injectQuizRuntimeStyles();$('quizApp').hidden=false;$('quizResult').hidden=true;
+  $('quizApp').innerHTML=`<div class="card ed-quiz-start"><span class="eyebrow">STUDENT TEST</span><h1>${esc(quiz.title||'Daily Quiz')}</h1><p>${esc(quiz.description||'आज की practice quiz')}</p><div class="ed-quiz-meta"><div><b>${quiz.questions.length}</b><span>Questions</span></div><div><b>${quiz.durationMinutes||10} min</b><span>Time</span></div><div><b>${fmtScore(quiz.marksPerQuestion)}</b><span>Marks / Question</span></div><div><b>${quiz.negativeMarkingEnabled?'ON':'OFF'}</b><span>Negative Marking</span></div></div>${quiz.negativeMarkingEnabled?`<div class="ed-negative"><strong>Negative marking:</strong> ${fmtScore(quiz.negativeNumerator)}/${fmtScore(quiz.negativeDenominator)} marks of ${fmtScore(quiz.marksPerQuestion)} will be deducted for each wrong answer.</div>`:'<div class="ed-negative" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534"><strong>Negative marking is OFF.</strong></div>'}<label class="field" style="display:block;margin:18px 0"><strong>Student Name</strong><input id="studentNameInput" value="${esc(getStudentName())}" maxlength="80" autocomplete="name" style="width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:10px"></label><button type="button" id="startStudentQuiz" class="btn btn-primary">Start Test →</button><p id="studentStartMsg" class="meta"></p></div>`;
+  $('startStudentQuiz').onclick=async()=>{const name=$('studentNameInput').value.trim();if(!name){$('studentStartMsg').textContent='कृपया अपना नाम भरें.';return}const btn=$('startStudentQuiz');btn.disabled=true;btn.textContent='Starting…';try{studentName=name;saveStudentName(name);await createAttempt();started=true;submitted=false;current=0;answers=quiz.questions.map(()=>null);window.quiz=quiz;window.quizId=quizId;renderQuizQuestion();startQuizTimer()}catch(e){btn.disabled=false;btn.textContent='Start Test →';$('studentStartMsg').textContent='Test start नहीं हुआ: '+(e.message||e)}};
+}
+
 async function loadQuiz(){
   const id=new URLSearchParams(location.search).get('id');
   try{
-    if(id){const s=await getDoc(doc(db,'quizzes',id));if(s.exists()&&s.data().status==='published'){quizId=s.id;quiz={id:s.id,...s.data()}}}
-    if(!quiz){
-      const q=query(collection(db,'quizzes'),where('status','==','published'),where('quizDate','==',today()),limit(1));
-      const snap=await getDocs(q);if(snap.docs[0]){quizId=snap.docs[0].id;quiz={id:quizId,...snap.docs[0].data()}}
-    }
+    if(id){const s=await getDoc(doc(db,'quizzes',id));if(s.exists()&&s.data().status==='published'){quizId=s.id;quiz=normalizeQuizConfig({id:s.id,...s.data()})}}
+    if(!quiz){const q=query(collection(db,'quizzes'),where('status','==','published'),where('quizDate','==',today()),limit(1));const snap=await getDocs(q);if(snap.docs[0]){quizId=snap.docs[0].id;quiz=normalizeQuizConfig({id:quizId,...snap.docs[0].data()})}}
     $('quizLoading').hidden=true;
     if(!quiz){$('quizApp').hidden=false;$('quizApp').innerHTML='<div class="card empty"><h2>आज का quiz अभी publish नहीं हुआ है।</h2><p>Previous Quizzes नीचे उपलब्ध हैं।</p></div>';loadPrevious();return}
     quiz.questions=Array.isArray(quiz.questions)?quiz.questions.filter(q=>q&&q.question&&Array.isArray(q.options)&&q.options.length>=2):[];
-    answers=quiz.questions.map(()=>null);
-    showStudentStart();
-    loadPrevious();
-  }catch(e){$('quizLoading').innerHTML=`<div class="empty"><strong>Quiz load नहीं हुआ.</strong><br>${esc(e.message||'Firestore error')}</div>`;loadPrevious()}
+    if(!quiz.questions.length){$('quizApp').hidden=false;$('quizApp').innerHTML='<div class="card empty"><h2>इस quiz में अभी questions उपलब्ध नहीं हैं।</h2></div>';loadPrevious();return}
+    answers=quiz.questions.map(()=>null);window.quiz=quiz;window.quizId=quizId;showStudentStart();loadPrevious();
+  }catch(e){console.error(e);$('quizLoading').innerHTML=`<div class="empty"><strong>Quiz load नहीं हुआ.</strong><br>${esc(e.message||'Firestore error')}</div>`;loadPrevious()}
 }
+
 async function loadPrevious(){
-  try{
-    const q=query(collection(db,'quizzes'),where('status','==','published'),orderBy('quizDate','desc'),limit(12));
-    const snap=await getDocs(q);
-    const rows=snap.docs.map(s=>({id:s.id,...s.data()})).filter(x=>x.id!==quizId);
-    $('previousList').innerHTML=rows.length?rows.map(x=>{let attempt=null;try{attempt=JSON.parse(localStorage.getItem(`examDarpanQuiz:${x.id}`)||'null')}catch{};return `<a class="previous-quiz" href="/quiz?id=${encodeURIComponent(x.id)}"><div><strong>${esc(x.title||'Daily Quiz')}</strong><span>${fmtDate(x.quizDate)} · ${(x.questions||[]).length} Questions · ${x.durationMinutes||10} min${attempt?` · Last score: ${attempt.right}/${attempt.total}`:''}</span></div><b>→</b></a>`}).join(''):'<div class="empty">अभी previous quizzes उपलब्ध नहीं हैं।</div>';
-  }catch(e){$('previousList').innerHTML='<div class="empty">Previous quizzes अभी load नहीं हो पाए।</div>'}
+  try{const q=query(collection(db,'quizzes'),where('status','==','published'),orderBy('quizDate','desc'),limit(12));const snap=await getDocs(q);const rows=snap.docs.map(s=>({id:s.id,...s.data()})).filter(x=>x.id!==quizId);$('previousList').innerHTML=rows.length?rows.map(x=>{let attempt=null;try{attempt=JSON.parse(localStorage.getItem(`examDarpanQuiz:${x.id}`)||'null')}catch{};return `<a class="previous-quiz" href="/quiz.html?id=${encodeURIComponent(x.id)}"><div><strong>${esc(x.title||'Daily Quiz')}</strong><span>${fmtDate(x.quizDate)} · ${(x.questions||[]).length} Questions · ${x.durationMinutes||10} min${attempt?` · Last score: ${fmtScore(attempt.score??attempt.right)}/${fmtScore(attempt.maxMarks??attempt.total)}`:''}</span></div><b>→</b></a>`}).join(''):'<div class="empty">अभी previous quizzes उपलब्ध नहीं हैं।</div>'}catch(e){console.warn('Previous quizzes load failed',e);$('previousList').innerHTML='<div class="empty">Previous quizzes अभी load नहीं हो पाए।</div>'}
 }
+
 loadQuiz();
 </script>
 
