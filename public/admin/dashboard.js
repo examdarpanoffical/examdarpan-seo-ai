@@ -156,7 +156,33 @@ function quizData(status){
   if(clean.some(q=>!q.question||q.options.some(x=>!x)||q.options.length!==4))throw new Error('हर question में question text और चारों options भरें.');
   if(clean.some(q=>q.answerIndex<0||q.answerIndex>3))throw new Error('हर question का correct answer select करें.');
   const date=$('quizDate').value;if(!date)throw new Error('Quiz date required.');
-  return {title:$('quizTitle').value.trim()||`Daily Quiz — ${date}`,description:$('quizDescription').value.trim(),quizDate:date,durationMinutes:Math.min(180,Math.max(1,Number($('quizDuration').value)||10)),questions:clean,status,updatedAt:serverTimestamp()};
+  const ratio=$('quizNegativeRatio')?.value||'1/3';
+  let negativeNumerator=1,negativeDenominator=3;
+  if(ratio==='custom'){
+    negativeNumerator=Math.max(1,Number($('quizNegativeNumerator')?.value)||1);
+    negativeDenominator=Math.max(1,Number($('quizNegativeDenominator')?.value)||3);
+  }else{
+    const parts=ratio.split('/');
+    negativeNumerator=Number(parts[0])||1;
+    negativeDenominator=Number(parts[1])||3;
+  }
+
+  return {
+    title:$('quizTitle').value.trim()||`Daily Quiz — ${date}`,
+    description:$('quizDescription').value.trim(),
+    quizDate:date,
+    durationMinutes:Math.min(300,Math.max(1,Number($('quizDuration').value)||10)),
+    testType:$('quizTestType')?.value||'daily',
+    marksPerQuestion:Math.max(0.01,Number($('quizMarks')?.value)||1),
+    negativeMarkingEnabled:($('quizNegativeEnabled')?.value||'on')==='on',
+    negativeNumerator,
+    negativeDenominator,
+    leaderboardEnabled:($('quizLeaderboard')?.value||'on')==='on',
+    showRankAfterSubmit:($('quizShowRank')?.value||'on')==='on',
+    questions:clean,
+    status,
+    updatedAt:serverTimestamp()
+  };
 }
 async function saveQuiz(status){
   try{
@@ -184,7 +210,22 @@ async function loadQuizzes(){
   }catch(e){el.innerHTML='<div class="empty">Quiz list load नहीं हुई.<br>'+escapeHtml(e.message||'Firestore error')+'</div>'}
 }
 function fillQuiz(q){
-  $('quizId').value=q.id;$('quizDate').value=q.quizDate||todayISO();$('quizDuration').value=q.durationMinutes||10;$('quizTitle').value=q.title||'';$('quizDescription').value=q.description||'';
+  $('quizId').value=q.id;
+  $('quizDate').value=q.quizDate||todayISO();
+  $('quizDuration').value=q.durationMinutes||10;
+  $('quizTestType').value=q.testType||'daily';
+  $('quizMarks').value=q.marksPerQuestion??1;
+  $('quizNegativeEnabled').value=q.negativeMarkingEnabled===false?'off':'on';
+  $('quizNegativeNumerator').value=q.negativeNumerator??1;
+  $('quizNegativeDenominator').value=q.negativeDenominator??3;
+  $('quizNegativeRatio').value=(q.negativeNumerator&&q.negativeDenominator)
+    ? `${q.negativeNumerator}/${q.negativeDenominator}` : '1/3';
+  if(!['1/3','1/4','1/5'].includes($('quizNegativeRatio').value))
+    $('quizNegativeRatio').value='custom';
+  $('quizLeaderboard').value=q.leaderboardEnabled===false?'off':'on';
+  $('quizShowRank').value=q.showRankAfterSubmit===false?'off':'on';
+  $('quizTitle').value=q.title||'';
+  $('quizDescription').value=q.description||'';
   quizQuestions=(q.questions||[]).map(x=>({question:x.question||'',options:Array.isArray(x.options)&&x.options.length===4?x.options:['','','',''],answerIndex:Number(x.answerIndex)||0,explanation:x.explanation||''}));
   renderQuizEditor();$('quizMsg').textContent='Quiz loaded for editing.';document.querySelector('.admin-quiz-box')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
