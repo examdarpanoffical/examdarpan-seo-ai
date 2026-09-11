@@ -6471,3 +6471,53 @@ body {
 .article-page table {
   max-width:100%;
 }
+
+/* ============================================================
+   ARTICLE CARD TAP / OPEN STATE
+   Dashboard cards stay WHITE.
+   Article interaction uses BLUE, not GOLD.
+   ============================================================ */
+
+/* Article read/open links */
+.main .post .read-more,
+.main .post .read-more:link,
+.main .post .read-more:visited {
+  color:#2563eb !important;
+}
+
+/* Tap / click state */
+.main .post .read-more:hover,
+.main .post .read-more:focus,
+.main .post .read-more:active {
+  color:#1d4ed8 !important;
+}
+
+/* Whole article card interaction */
+.main .post a:active,
+.main .featured-post a:active,
+.main .matrix-card a:active {
+  color:#2563eb !important;
+}
+
+/* Featured/article title links */
+.main .post h2 a:hover,
+.main .post h2 a:focus,
+.main .post h2 a:active,
+.main .featured-post h2 a:hover,
+.main .featured-post h2 a:focus,
+.main .featured-post h2 a:active {
+  color:#2563eb !important;
+}
+
+/* Remove gold interaction from article cards */
+.main .post .read-more,
+.main .featured-post .read-more {
+  text-decoration-color:#2563eb !important;
+}
+
+/* Mobile tap highlight: blue instead of browser/gold-looking highlight */
+.main .post a,
+.main .featured-post a,
+.main .matrix-card a {
+  -webkit-tap-highlight-color:rgba(37,99,235,.14);
+}
