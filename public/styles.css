@@ -6003,3 +6003,215 @@ input:focus-visible{
     border-radius:15px;
   }
 }
+
+/* ============================================================
+   EXAM DARPAN — FINAL MOBILE ALIGNMENT + CONTAINMENT FIX
+   Hero premium | Content cards clean | No horizontal overflow
+   ============================================================ */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.container,
+.main,
+.main > *,
+.grid3,
+.layout,
+.posts-grid,
+.footer-grid,
+.admin-grid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.grid3 > *,
+.layout > *,
+.posts-grid > *,
+.footer-grid > *,
+.admin-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.card,
+.post,
+.matrix-card,
+.side,
+.article,
+.featured-post,
+.editor-card,
+.trust-card,
+.daily-quiz-teaser,
+.hero {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.hero h1,
+.hero p,
+.post h2,
+.post p,
+.matrix-item,
+.section-title h2,
+.card-head h2,
+.side h3,
+.side p,
+.editor-copy {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.post-top,
+.post-copy,
+.hero-trust,
+.hero-trust > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Desktop: article image never pushes text */
+.post img {
+  max-width: 40%;
+  height: auto;
+}
+
+/* Buttons always stay inside their parent */
+.hero-actions,
+.hero-actions .btn,
+.btn {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.hero-actions .btn {
+  white-space: normal;
+}
+
+/* Official-source verification = genuine green signal */
+.main > .hero .hero-trust-icon {
+  background: #dcfce7 !important;
+  border: 1px solid #86efac !important;
+  color: #15803d !important;
+  box-shadow: 0 0 0 4px rgba(34,197,94,.08);
+}
+
+.main > .hero .hero-trust strong {
+  color: #14532d !important;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 850px) {
+
+  .main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .main > .hero.card {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 18px;
+  }
+
+  /* Hero buttons: same width, same height, perfectly stacked */
+  .hero-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    gap: 10px;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  /* Verification card stays inside hero */
+  .hero-trust {
+    width: 100%;
+    align-items: flex-start;
+    padding: 13px;
+  }
+
+  .hero-trust-icon {
+    margin-top: 1px;
+    flex: 0 0 40px;
+  }
+
+  /* Every grid becomes one clean column */
+  .grid3 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Prevent article image from squeezing text sideways */
+  .post-top {
+    display: block;
+  }
+
+  .post img,
+  .featured-post .post img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 210px;
+    margin-top: 12px;
+  }
+
+  /* Card headers remain aligned */
+  .card-head {
+    gap: 10px;
+    align-items: center;
+  }
+
+  .card-head h2 {
+    min-width: 0;
+  }
+
+  .card-head .pill {
+    flex: 0 0 auto;
+  }
+
+  .matrix-item {
+    min-width: 0;
+  }
+
+  .btn {
+    max-width: 100%;
+  }
+}
+
+/* Desktop hero buttons remain balanced */
+@media (min-width: 851px) {
+  .hero-actions .btn {
+    min-width: 170px;
+  }
+}
