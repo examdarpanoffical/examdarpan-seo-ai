@@ -6215,3 +6215,259 @@ button {
     min-width: 170px;
   }
 }
+
+/* ============================================================
+   EXAM DARPAN — FINAL ARTICLE BLUE SYSTEM
+   Homepage hero remains Navy + Gold.
+   Article pages use Blue/Indigo.
+   ============================================================ */
+
+.article-page,
+.article-page * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.article-page {
+  overflow:hidden;
+}
+
+/* Article identity */
+.article-page .badge {
+  background:#eff6ff !important;
+  color:#1d4ed8 !important;
+  border-color:#bfdbfe !important;
+}
+
+.article-page h1 {
+  color:#0f172a !important;
+}
+
+.article-page .breadcrumbs a {
+  color:#2563eb !important;
+}
+
+/* Blue section accents instead of homepage gold */
+.article-page .article-content h2 {
+  border-left:4px solid #2563eb !important;
+  color:#0f172a !important;
+}
+
+.article-page .article-content h3 {
+  color:#172554 !important;
+}
+
+.article-page .article-content a {
+  color:#2563eb !important;
+}
+
+.article-page .article-content a:hover {
+  color:#1d4ed8 !important;
+}
+
+/* Article cover stays premium blue */
+.article-page .article-cover-card {
+  background:
+    radial-gradient(circle at 88% 12%,rgba(96,165,250,.25),transparent 28%),
+    linear-gradient(135deg,#07152f 0%,#123b83 55%,#2563eb 100%) !important;
+}
+
+.article-page .article-cover-kicker {
+  background:#2563eb !important;
+  color:#fff !important;
+}
+
+.article-page .article-cover-brand {
+  border-top-color:rgba(147,197,253,.45) !important;
+}
+
+.article-page .article-cover-brand span {
+  color:#bfdbfe !important;
+}
+
+/* Tables = blue article identity */
+.article-page .article-content th {
+  background:#172554 !important;
+  color:#dbeafe !important;
+}
+
+.article-page .article-content td {
+  border-color:#dbe4f0 !important;
+}
+
+/* Notice should not look like homepage gold */
+.article-page .notice,
+.article-page .notice-card {
+  background:#eff6ff !important;
+  border-color:#bfdbfe !important;
+  color:#334155 !important;
+}
+
+.article-page .notice strong {
+  color:#1e3a8a !important;
+}
+
+/* Article actions */
+.article-page .article-actions {
+  border-top-color:#e2e8f0 !important;
+}
+
+.article-page .article-actions .btn-primary,
+.article-page .article-actions .btn-blue {
+  background:#2563eb !important;
+  border-color:#2563eb !important;
+  color:#fff !important;
+  box-shadow:0 8px 20px rgba(37,99,235,.20) !important;
+}
+
+.article-page .article-actions .btn-primary:hover,
+.article-page .article-actions .btn-blue:hover {
+  background:#1d4ed8 !important;
+}
+
+/* Community/editorial blocks on article pages */
+.article-page .community-card,
+.article-page .ed-editorial-desk,
+.article-page .editor-card {
+  background:#fff !important;
+  border-color:#dbe4f0 !important;
+}
+
+.article-page .community-card h2,
+.article-page .ed-editorial-desk h2,
+.article-page .editor-card h3 {
+  color:#172554 !important;
+}
+
+.article-page .community-card p,
+.article-page .ed-editorial-desk p,
+.article-page .editor-copy {
+  color:#475569 !important;
+}
+
+/* Verified signal remains genuinely green */
+.article-page .ed-verified,
+.article-page .verified-line {
+  background:#ecfdf5 !important;
+  border-color:#a7f3d0 !important;
+  color:#047857 !important;
+}
+
+/* ---------- MOBILE ARTICLE CONTAINMENT ---------- */
+
+@media (max-width:850px) {
+
+  .article-page {
+    width:100%;
+    max-width:100%;
+    margin-left:0;
+    margin-right:0;
+    padding:18px 14px !important;
+    overflow:hidden !important;
+  }
+
+  .article-page h1,
+  .article-page h2,
+  .article-page h3,
+  .article-page p,
+  .article-page li,
+  .article-page a,
+  .article-page strong,
+  .article-page span {
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:normal;
+  }
+
+  .article-content {
+    width:100%;
+    max-width:850px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .article-content table {
+    width:100%;
+    max-width:100%;
+    overflow-x:auto;
+    display:block;
+  }
+
+  .article-content img,
+  .article-cover,
+  .article-cover-card {
+    width:100%;
+    max-width:100%;
+  }
+
+  .article-cover-inner {
+    width:100%;
+    max-width:100%;
+  }
+
+  .article-actions {
+    width:100%;
+    max-width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .article-actions .btn {
+    width:100%;
+    min-width:0 !important;
+  }
+
+  .community-card {
+    width:100%;
+    max-width:100%;
+  }
+}
+
+/* ---------- SMALL PHONE ---------- */
+
+@media (max-width:480px) {
+
+  .article-page {
+    padding:16px 12px !important;
+    border-radius:18px !important;
+  }
+
+  .article-page h1 {
+    font-size:27px !important;
+    line-height:1.18 !important;
+  }
+
+  .article-content {
+    font-size:15px !important;
+    line-height:1.8 !important;
+  }
+
+  .article-content h2 {
+    font-size:21px !important;
+    padding-left:11px !important;
+  }
+
+  .article-cover-card {
+    border-radius:16px !important;
+  }
+
+  .article-cover-inner {
+    padding:19px 16px !important;
+  }
+}
+
+/* Never allow article page to create horizontal viewport overflow */
+html,
+body {
+  max-width:100%;
+  overflow-x:hidden !important;
+}
+
+.article-page,
+.article-page * {
+  max-width:100%;
+}
+
+.article-page table {
+  max-width:100%;
+}
