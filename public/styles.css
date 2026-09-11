@@ -5677,3 +5677,88 @@ input:focus-visible{
     border-radius:18px;
   }
 }
+
+/* ============================================================
+   FINAL HOMEPAGE CARD FIX
+   Hero keeps premium theme.
+   Content/article cards remain clean white.
+   ============================================================ */
+
+.main > .grid3 > .card,
+.main > .layout .post,
+.main > .layout .featured-post,
+.main > .layout .article,
+.main > .layout .card {
+  background: #fff !important;
+}
+
+/* Article cards: white surface, subtle border only */
+.main .post {
+  background: #fff !important;
+  border-color: var(--border) !important;
+}
+
+/* Latest/featured article should NOT inherit hero/theme background */
+.main .featured-post {
+  background: #fff !important;
+  border-color: var(--border) !important;
+}
+
+/* Notifications / category cards */
+.main .matrix-card {
+  background: #fff !important;
+}
+
+/* Keep the hero as the only main premium visual surface */
+.main > .hero {
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(37,99,235,.09),
+      transparent 34%
+    ),
+    linear-gradient(145deg,#fff,#f8fbff) !important;
+}
+
+
+/* ============================================================
+   FINAL HOMEPAGE CARD FIX
+   Hero keeps premium theme.
+   Content/article cards remain clean white.
+   ============================================================ */
+
+.main > .grid3 > .card,
+.main > .layout .post,
+.main > .layout .featured-post,
+.main > .layout .article,
+.main > .layout .card {
+  background: #fff !important;
+}
+
+/* Article cards: white surface, subtle border only */
+.main .post {
+  background: #fff !important;
+  border-color: var(--border) !important;
+}
+
+/* Latest/featured article should NOT inherit hero/theme background */
+.main .featured-post {
+  background: #fff !important;
+  border-color: var(--border) !important;
+}
+
+/* Notifications / category cards */
+.main .matrix-card {
+  background: #fff !important;
+}
+
+/* Keep the hero as the only main premium visual surface */
+.main > .hero {
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(37,99,235,.09),
+      transparent 34%
+    ),
+    linear-gradient(145deg,#fff,#f8fbff) !important;
+}
