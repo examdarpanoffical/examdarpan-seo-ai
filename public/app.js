@@ -390,37 +390,18 @@ function isRajasthanPost(p={}){
 
   const title=String(p.title||'');
   const excerpt=String(p.excerpt||'');
-  const tags=Array.isArray(p.tags)?p.tags.join(' '):String(p.tags||'');
-
-  /*
-   * Do NOT scan the complete article body here.
-   * A national article can mention Rajasthan in passing and
-   * accidentally enter the Rajasthan matrix.
-   */
+  const tags=Array.isArray(p.tags)
+    ? p.tags.join(' ')
+    : String(p.tags||'');
 
   if(/rajasthan jobs|राजस्थान\s*jobs/i.test(category)){
     return true;
   }
 
-  const signalText=
-    `${title} ${excerpt} ${tags}`;
+  const signalText=`${title} ${excerpt} ${tags}`;
 
   return /(?:\brajasthan\b|\brpsc\b|\brssb\b|\brsmssb\b|\breet\b|\brajasthan police\b|\brajasthan cet\b|\brvunl\b|\banuprati\b|\brajcrb\b|राजस्थान|अनुप्रति)/i
     .test(signalText);
-}){
-  const text=postText(p);
-  const category=String(p.category||'').toLowerCase();
-
-  // Explicit Rajasthan category is useful only when the article itself
-  // also contains a Rajasthan signal. This prevents SSC JE etc. from
-  // leaking into Rajasthan just because an old CMS badge was wrong.
-  const rajasthanSignal=
-    /\b(rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl|anuprati)\b|राजस्थान|अनुप्रति/i
-      .test(text);
-
-  if(!rajasthanSignal) return false;
-
-  return true;
 }
 
 function toDateValue(v){
@@ -765,8 +746,11 @@ function renderExamCalendar(){
 
   if(!el) return;
 
-  const live=getMatrixPosts()
-    .filter(p=>isRajasthanPost(p))
+  const rajasthanPosts=getMatrixPosts()
+    .filter(p=>isRajasthanPost(p));
+
+  // Primary source: future application deadlines.
+  let live=rajasthanPosts
     .map(p=>({
       post:p,
       deadline:getDeadline(p)
@@ -774,6 +758,25 @@ function renderExamCalendar(){
     .filter(x=>x.deadline && daysRemaining(x.deadline)>=0)
     .sort((a,b)=>a.deadline-b.deadline)
     .slice(0,6);
+
+  // IMPORTANT:
+  // Never leave the LIVE calendar empty merely because application
+  // deadlines are missing/past. Fall back to Rajasthan articles so
+  // the section remains useful until fresh deadline data arrives.
+  if(!live.length){
+    live=rajasthanPosts
+      .map(p=>({
+        post:p,
+        deadline:getDeadline(p)
+      }))
+      .filter(x=>x.post && x.post.title)
+      .sort((a,b)=>{
+        const ad=a.deadline?.getTime?.() || Number.MAX_SAFE_INTEGER;
+        const bd=b.deadline?.getTime?.() || Number.MAX_SAFE_INTEGER;
+        return ad-bd;
+      })
+      .slice(0,6);
+  }
 
   el.innerHTML=live.map(({post,deadline})=>{
     const days=daysRemaining(deadline);
