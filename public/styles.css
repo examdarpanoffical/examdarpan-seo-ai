@@ -6521,3 +6521,377 @@ body {
 .main .matrix-card a {
   -webkit-tap-highlight-color:rgba(37,99,235,.14);
 }
+
+/* ============================================================
+   EXAM DARPAN — FINAL HOMEPAGE VISUAL SYSTEM
+   Scope: homepage visual layer only.
+   Quiz / leaderboard / admin are intentionally excluded.
+   ============================================================ */
+
+:root{
+  --ed-navy:#0f172a;
+  --ed-navy-2:#172554;
+  --ed-blue:#2563eb;
+  --ed-blue-dark:#1d4ed8;
+  --ed-gold:#d4a72c;
+  --ed-green:#16a34a;
+  --ed-text:#172033;
+  --ed-muted:#64748b;
+  --ed-border:#e2e8f0;
+  --ed-surface:#ffffff;
+  --ed-soft:#f8fafc;
+}
+
+/* ---------- Global overflow protection ---------- */
+html,
+body{
+  max-width:100%;
+  overflow-x:hidden !important;
+}
+
+.main,
+.main *{
+  box-sizing:border-box;
+}
+
+.main img{
+  max-width:100%;
+}
+
+.main a{
+  overflow-wrap:anywhere;
+}
+
+/* ---------- Hero ---------- */
+.main > .hero{
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+  position:relative;
+  background:
+    radial-gradient(circle at 85% 15%,rgba(37,99,235,.12),transparent 32%),
+    linear-gradient(145deg,#ffffff 0%,#f8fafc 58%,#eef4ff 100%) !important;
+  border:1px solid var(--ed-border);
+  border-radius:24px;
+  box-shadow:0 12px 32px rgba(15,23,42,.07);
+}
+
+.main > .hero *{
+  min-width:0;
+}
+
+.main > .hero .btn,
+.main > .hero button,
+.main > .hero a{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ---------- Main content grid ---------- */
+.main > .grid3,
+.main > .layout{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+
+.main > .grid3 > *,
+.main > .layout > *,
+.main > .layout .post,
+.main > .layout .featured-post,
+.main > .layout .card{
+  min-width:0;
+  max-width:100%;
+}
+
+/* ---------- Content cards remain WHITE ---------- */
+.main > .grid3 > .card,
+.main > .layout .post,
+.main > .layout .featured-post,
+.main > .layout .article,
+.main > .layout .card,
+.main .matrix-card{
+  background:#fff !important;
+  border:1px solid var(--ed-border) !important;
+  color:var(--ed-text);
+  border-radius:18px;
+  box-shadow:0 6px 18px rgba(15,23,42,.045);
+  overflow:hidden;
+}
+
+/* ---------- Card internals ---------- */
+.main .post,
+.main .matrix-card{
+  display:flex;
+  flex-direction:column;
+}
+
+.main .post .post-copy{
+  min-width:0;
+}
+
+.main .post h2,
+.main .post h3,
+.main .matrix-card h2,
+.main .matrix-card h3{
+  overflow-wrap:anywhere;
+}
+
+.main .post-meta{
+  color:var(--ed-muted);
+  line-height:1.45;
+}
+
+/* ---------- Article interaction = BLUE ---------- */
+.main .post a,
+.main .featured-post a{
+  transition:
+    color .18s ease,
+    background-color .18s ease,
+    border-color .18s ease,
+    transform .18s ease;
+}
+
+.main .post h2 a,
+.main .featured-post h2 a{
+  color:var(--ed-text);
+}
+
+.main .post h2 a:hover,
+.main .post h2 a:focus,
+.main .post h2 a:active,
+.main .featured-post h2 a:hover,
+.main .featured-post h2 a:focus,
+.main .featured-post h2 a:active{
+  color:var(--ed-blue) !important;
+}
+
+.main .post .read-more,
+.main .post .read-more:link,
+.main .post .read-more:visited{
+  color:var(--ed-blue) !important;
+}
+
+.main .post .read-more:hover,
+.main .post .read-more:focus,
+.main .post .read-more:active{
+  color:var(--ed-blue-dark) !important;
+  text-decoration-color:var(--ed-blue) !important;
+}
+
+.main .post a,
+.main .featured-post a,
+.main .matrix-card a{
+  -webkit-tap-highlight-color:rgba(37,99,235,.14);
+}
+
+/* ---------- Rajasthan hub link ---------- */
+.main .post .post-category-link{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  margin:4px 0 8px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#eff6ff;
+  color:var(--ed-blue) !important;
+  border:1px solid #bfdbfe;
+  font-size:.78rem;
+  font-weight:700;
+  text-decoration:none;
+}
+
+.main .post .post-category-link:hover{
+  background:#dbeafe;
+  color:var(--ed-blue-dark) !important;
+}
+
+/* ---------- Buttons: consistent geometry ---------- */
+.main .btn,
+.main button,
+.main .button,
+.main input[type="button"],
+.main input[type="submit"]{
+  min-height:42px;
+  border-radius:10px;
+  font-weight:700;
+  line-height:1.2;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  white-space:normal;
+  max-width:100%;
+}
+
+/* Primary action */
+.main .btn-primary,
+.main .primary,
+.main .btn-blue{
+  background:var(--ed-blue) !important;
+  border-color:var(--ed-blue) !important;
+  color:#fff !important;
+}
+
+.main .btn-primary:hover,
+.main .primary:hover,
+.main .btn-blue:hover{
+  background:var(--ed-blue-dark) !important;
+  border-color:var(--ed-blue-dark) !important;
+}
+
+/* Gold only as accent */
+.main .gold,
+.main .accent-gold{
+  color:#8a6500;
+}
+
+/* ---------- Verified / official source ---------- */
+.main .verified,
+.main .official,
+.main .source-verified{
+  color:var(--ed-green) !important;
+}
+
+.main .verified-badge,
+.main .official-badge,
+.main .source-verified{
+  border-color:#bbf7d0 !important;
+  background:#f0fdf4 !important;
+}
+
+/* ---------- Community cards ---------- */
+.main .ed-social-whatsapp,
+.main .ed-social-telegram{
+  min-width:0;
+  min-height:100%;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+.main .ed-social-whatsapp{
+  border:1px solid #bbf7d0 !important;
+  background:linear-gradient(145deg,#ffffff,#f0fdf4) !important;
+}
+
+.main .ed-social-telegram{
+  border:1px solid #bfdbfe !important;
+  background:linear-gradient(145deg,#ffffff,#eff6ff) !important;
+}
+
+.main .ed-social-whatsapp a,
+.main .ed-social-telegram a{
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+/* ---------- Editorial desk ---------- */
+.main .ed-editorial-card{
+  background:#fff !important;
+  border:1px solid var(--ed-border) !important;
+  border-radius:18px;
+  box-shadow:0 6px 18px rgba(15,23,42,.045);
+  overflow:hidden;
+}
+
+.main .ed-editorial-card *{
+  max-width:100%;
+}
+
+/* ---------- Category / filter controls ---------- */
+.main .category-tabs,
+.main .filters,
+.main .filter-row{
+  max-width:100%;
+  min-width:0;
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+
+.main .category-tabs a,
+.main .filters button,
+.main .filter-row button{
+  flex:0 0 auto;
+  min-height:40px;
+}
+
+/* ---------- Equal visual rhythm ---------- */
+.main .post,
+.main .matrix-card,
+.main .ed-social-whatsapp,
+.main .ed-social-telegram,
+.main .ed-editorial-card{
+  margin-bottom:0;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width:768px){
+
+  .main{
+    width:100%;
+    max-width:100%;
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .main > .hero{
+    border-radius:18px;
+    padding-left:16px;
+    padding-right:16px;
+  }
+
+  .main > .grid3,
+  .main > .layout{
+    width:100%;
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+
+  .main .post,
+  .main .matrix-card,
+  .main .ed-editorial-card,
+  .main .ed-social-whatsapp,
+  .main .ed-social-telegram{
+    width:100%;
+    max-width:100%;
+  }
+
+  .main .post .read-more,
+  .main .post .post-category-link{
+    max-width:100%;
+  }
+
+  .main .btn,
+  .main button,
+  .main .button{
+    max-width:100%;
+  }
+
+  .main .hero .btn{
+    width:100%;
+  }
+}
+
+/* ---------- Very small screens ---------- */
+@media (max-width:420px){
+
+  .main{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .main > .hero{
+    border-radius:16px;
+  }
+
+  .main .post,
+  .main .matrix-card,
+  .main .ed-editorial-card{
+    border-radius:15px;
+  }
+}
