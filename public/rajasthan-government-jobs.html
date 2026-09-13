@@ -51,6 +51,88 @@
   ]
 }
 </script>
+
+<style>
+.seo-raj-clusters{
+  margin:28px 0;
+  padding:26px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+}
+
+.seo-raj-clusters h2{
+  margin:0 0 10px;
+  color:#0f172a;
+}
+
+.seo-raj-clusters p{
+  color:#475569;
+  line-height:1.75;
+}
+
+.seo-raj-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-top:20px;
+}
+
+.seo-raj-grid a{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  padding:15px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:13px;
+  color:#0f172a;
+  text-decoration:none;
+  transition:.18s ease;
+}
+
+.seo-raj-grid a:hover{
+  border-color:#2563eb;
+  color:#2563eb;
+  transform:translateY(-1px);
+}
+
+.seo-raj-grid span{
+  color:#64748b;
+  font-size:.88rem;
+}
+
+.seo-raj-official{
+  margin-top:20px;
+  padding:14px 16px;
+  background:#f0fdf4;
+  border-left:4px solid #16a34a;
+  border-radius:8px;
+  color:#14532d;
+}
+
+.seo-raj-official a{
+  color:#166534;
+  font-weight:700;
+}
+
+@media(max-width:800px){
+  .seo-raj-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:520px){
+  .seo-raj-clusters{
+    padding:18px;
+  }
+
+  .seo-raj-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -316,6 +398,68 @@ Latest Updates <b>→</b>
 
 </aside>
 
+</section>
+
+
+<section class="seo-raj-clusters" aria-labelledby="raj-seo-heading">
+  <h2 id="raj-seo-heading">राजस्थान सरकारी नौकरी — भर्ती, परीक्षा, एडमिट कार्ड और रिजल्ट</h2>
+
+  <p>
+    राजस्थान की सरकारी भर्तियों और प्रतियोगी परीक्षाओं की नवीनतम जानकारी
+    Exam Darpan पर एक जगह देखें। आवेदन करने से पहले संबंधित विभाग की
+    आधिकारिक अधिसूचना और वेबसाइट पर जानकारी जरूर verify करें।
+  </p>
+
+  <div class="seo-raj-grid">
+    <a href="#rpsc">
+      <strong>RPSC Recruitment</strong>
+      <span>RPSC भर्ती, परीक्षा और परिणाम अपडेट</span>
+    </a>
+
+    <a href="#rssb">
+      <strong>RSSB / RSMSSB</strong>
+      <span>कर्मचारी चयन बोर्ड की भर्ती जानकारी</span>
+    </a>
+
+    <a href="#police">
+      <strong>Rajasthan Police</strong>
+      <span>पुलिस भर्ती और परीक्षा अपडेट</span>
+    </a>
+
+    <a href="#teacher">
+      <strong>Teacher Jobs</strong>
+      <span>REET और शिक्षक भर्ती अपडेट</span>
+    </a>
+
+    <a href="#cet">
+      <strong>Rajasthan CET</strong>
+      <span>CET परीक्षा और संबंधित भर्ती अपडेट</span>
+    </a>
+
+    <a href="#clerical">
+      <strong>LDC / Clerk</strong>
+      <span>क्लर्क और जूनियर असिस्टेंट भर्ती</span>
+    </a>
+
+    <a href="#technical">
+      <strong>JE / Technical Jobs</strong>
+      <span>JE और तकनीकी भर्ती अपडेट</span>
+    </a>
+
+    <a href="#results">
+      <strong>Admit Card & Result</strong>
+      <span>एडमिट कार्ड, आंसर की और रिजल्ट</span>
+    </a>
+  </div>
+
+  <div class="seo-raj-official">
+    <strong>Official Rajasthan Sources:</strong>
+    <a href="https://recruitment.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">Recruitment Portal</a>
+    ·
+    <a href="https://rpsc.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">RPSC</a>
+    ·
+    <a href="https://rssb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">RSSB</a>
+  </div>
 </section>
 
 </main>
