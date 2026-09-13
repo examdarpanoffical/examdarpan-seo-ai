@@ -6523,30 +6523,33 @@ body {
 }
 
 /* ============================================================
-   EXAM DARPAN — FINAL HOMEPAGE VISUAL SYSTEM
-   Scope: homepage visual layer only.
-   Quiz / leaderboard / admin are intentionally excluded.
+   EXAM DARPAN — FINAL HOMEPAGE / ARTICLE VISUAL SYSTEM
+   Clean single-layer UI.
+   Quiz / Leaderboard / Admin intentionally untouched.
    ============================================================ */
 
 :root{
-  --ed-navy:#0f172a;
-  --ed-navy-2:#172554;
-  --ed-blue:#2563eb;
-  --ed-blue-dark:#1d4ed8;
-  --ed-gold:#d4a72c;
-  --ed-green:#16a34a;
-  --ed-text:#172033;
-  --ed-muted:#64748b;
-  --ed-border:#e2e8f0;
-  --ed-surface:#ffffff;
-  --ed-soft:#f8fafc;
+  --ed-blue:#1E40AF;
+  --ed-blue-hover:#1D4ED8;
+  --ed-navy:#0F172A;
+  --ed-slate:#334155;
+  --ed-muted:#64748B;
+  --ed-bg:#F8FAFC;
+  --ed-white:#FFFFFF;
+  --ed-border:#E2E8F0;
+  --ed-border-strong:#CBD5E1;
+  --ed-amber:#D97706;
+  --ed-amber-soft:#FEF3C7;
+  --ed-amber-text:#92400E;
+  --ed-green:#16A34A;
+  --ed-green-soft:#F0FDF4;
 }
 
-/* ---------- Global overflow protection ---------- */
+/* Base */
 html,
 body{
   max-width:100%;
-  overflow-x:hidden !important;
+  overflow-x:hidden;
 }
 
 .main,
@@ -6554,579 +6557,306 @@ body{
   box-sizing:border-box;
 }
 
+.main{
+  color:var(--ed-navy);
+  background:var(--ed-bg);
+}
+
 .main img{
   max-width:100%;
+  height:auto;
 }
 
 .main a{
+  text-decoration:none;
   overflow-wrap:anywhere;
 }
 
-/* ---------- Hero ---------- */
+/* ------------------------------------------------------------
+   HERO — premium, bright, trustworthy
+   ------------------------------------------------------------ */
+
 .main > .hero{
+  position:relative;
+  overflow:hidden;
   width:100%;
   max-width:100%;
-  overflow:hidden;
-  position:relative;
-  background:
-    radial-gradient(circle at 85% 15%,rgba(37,99,235,.12),transparent 32%),
-    linear-gradient(145deg,#ffffff 0%,#f8fafc 58%,#eef4ff 100%) !important;
-  border:1px solid var(--ed-border);
-  border-radius:24px;
-  box-shadow:0 12px 32px rgba(15,23,42,.07);
+  background:#fff !important;
+  border:1px solid #D8E2F0 !important;
+  border-radius:22px !important;
+  box-shadow:0 8px 28px rgba(15,23,42,.055) !important;
 }
 
-.main > .hero *{
+.main > .hero::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  background:var(--ed-blue);
+  border-radius:22px 0 0 22px;
+}
+
+.main > .hero > *{
+  position:relative;
+  z-index:1;
   min-width:0;
 }
 
-.main > .hero .btn,
-.main > .hero button,
-.main > .hero a{
-  min-height:44px;
+.main > .hero h1{
+  color:var(--ed-navy) !important;
+  line-height:1.16;
+  letter-spacing:-.025em;
+}
+
+.main > .hero h1 span{
+  color:var(--ed-blue) !important;
+}
+
+.main > .hero p{
+  color:var(--ed-muted) !important;
+  line-height:1.7;
+}
+
+.main .hero-kicker-group{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.main .hero-kicker{
   display:inline-flex;
   align-items:center;
-  justify-content:center;
+  min-height:28px;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.04em;
 }
 
-/* ---------- Main content grid ---------- */
-.main > .grid3,
-.main > .layout{
-  width:100%;
-  max-width:100%;
-  min-width:0;
+.main .hero-kicker-rajasthan{
+  background:var(--ed-amber-soft) !important;
+  color:var(--ed-amber-text) !important;
+  border:1px solid #FDE68A;
 }
 
-.main > .grid3 > *,
-.main > .layout > *,
-.main > .layout .post,
-.main > .layout .featured-post,
-.main > .layout .card{
-  min-width:0;
-  max-width:100%;
+.main .hero-kicker-india{
+  background:#EFF6FF !important;
+  color:var(--ed-blue) !important;
+  border:1px solid #BFDBFE;
 }
 
-/* ---------- Content cards remain WHITE ---------- */
-.main > .grid3 > .card,
-.main > .layout .post,
-.main > .layout .featured-post,
-.main > .layout .article,
-.main > .layout .card,
-.main .matrix-card{
-  background:#fff !important;
+.main .hero-trust{
+  background:#F8FAFC !important;
   border:1px solid var(--ed-border) !important;
-  color:var(--ed-text);
-  border-radius:18px;
-  box-shadow:0 6px 18px rgba(15,23,42,.045);
-  overflow:hidden;
+  border-radius:14px;
 }
 
-/* ---------- Card internals ---------- */
-.main .post,
-.main .matrix-card{
-  display:flex;
-  flex-direction:column;
+.main .hero-trust-icon{
+  background:var(--ed-green) !important;
+  color:#fff !important;
 }
 
-.main .post .post-copy{
-  min-width:0;
+.main .hero-trust strong{
+  color:var(--ed-navy) !important;
 }
 
-.main .post h2,
-.main .post h3,
-.main .matrix-card h2,
-.main .matrix-card h3{
-  overflow-wrap:anywhere;
+.main .hero-trust p{
+  color:var(--ed-muted) !important;
 }
 
-.main .post-meta{
-  color:var(--ed-muted);
-  line-height:1.45;
-}
+/* ------------------------------------------------------------
+   BUTTON SYSTEM
+   ------------------------------------------------------------ */
 
-/* ---------- Article interaction = BLUE ---------- */
-.main .post a,
-.main .featured-post a{
+.main .btn,
+.main .button,
+.main button{
+  font-family:inherit;
+  border-radius:11px;
+  min-height:42px;
+  font-weight:700;
+  line-height:1.2;
   transition:
-    color .18s ease,
     background-color .18s ease,
     border-color .18s ease,
+    color .18s ease,
+    box-shadow .18s ease,
     transform .18s ease;
 }
 
-.main .post h2 a,
-.main .featured-post h2 a{
-  color:var(--ed-text);
-}
-
-.main .post h2 a:hover,
-.main .post h2 a:focus,
-.main .post h2 a:active,
-.main .featured-post h2 a:hover,
-.main .featured-post h2 a:focus,
-.main .featured-post h2 a:active{
-  color:var(--ed-blue) !important;
-}
-
-.main .post .read-more,
-.main .post .read-more:link,
-.main .post .read-more:visited{
-  color:var(--ed-blue) !important;
-}
-
-.main .post .read-more:hover,
-.main .post .read-more:focus,
-.main .post .read-more:active{
-  color:var(--ed-blue-dark) !important;
-  text-decoration-color:var(--ed-blue) !important;
-}
-
-.main .post a,
-.main .featured-post a,
-.main .matrix-card a{
-  -webkit-tap-highlight-color:rgba(37,99,235,.14);
-}
-
-/* ---------- Rajasthan hub link ---------- */
-.main .post .post-category-link{
-  display:inline-flex;
-  align-items:center;
-  width:max-content;
-  max-width:100%;
-  margin:4px 0 8px;
-  padding:6px 10px;
-  border-radius:999px;
-  background:#eff6ff;
-  color:var(--ed-blue) !important;
-  border:1px solid #bfdbfe;
-  font-size:.78rem;
-  font-weight:700;
-  text-decoration:none;
-}
-
-.main .post .post-category-link:hover{
-  background:#dbeafe;
-  color:var(--ed-blue-dark) !important;
-}
-
-/* ---------- Buttons: consistent geometry ---------- */
-.main .btn,
-.main button,
-.main .button,
-.main input[type="button"],
-.main input[type="submit"]{
-  min-height:42px;
-  border-radius:10px;
-  font-weight:700;
-  line-height:1.2;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  white-space:normal;
-  max-width:100%;
-}
-
-/* Primary action */
 .main .btn-primary,
 .main .primary,
 .main .btn-blue{
+  background:var(--ed-blue) !important;
+  border:1px solid var(--ed-blue) !important;
+  color:#fff !important;
+  box-shadow:0 4px 12px rgba(30,64,175,.14);
+}
+
+.main .btn-primary:hover,
+.main .primary:hover,
+.main .btn-blue:hover{
+  background:var(--ed-blue-hover) !important;
+  border-color:var(--ed-blue-hover) !important;
+  transform:translateY(-1px);
+  box-shadow:0 7px 16px rgba(30,64,175,.18);
+}
+
+.main .btn-light{
+  background:#fff !important;
+  color:var(--ed-slate) !important;
+  border:1px solid var(--ed-border-strong) !important;
+  box-shadow:none !important;
+}
+
+.main .btn-light:hover{
+  background:#F8FAFC !important;
+  color:var(--ed-navy) !important;
+  border-color:#94A3B8 !important;
+}
+
+/* Remove mustard from generic actions */
+.main .btn-gold,
+.main .gold-button{
   background:var(--ed-blue) !important;
   border-color:var(--ed-blue) !important;
   color:#fff !important;
 }
 
-.main .btn-primary:hover,
-.main .primary:hover,
-.main .btn-blue:hover{
-  background:var(--ed-blue-dark) !important;
-  border-color:var(--ed-blue-dark) !important;
-}
+/* ------------------------------------------------------------
+   NOTIFICATION MATRIX
+   ------------------------------------------------------------ */
 
-/* Gold only as accent */
-.main .gold,
-.main .accent-gold{
-  color:#8a6500;
-}
-
-/* ---------- Verified / official source ---------- */
-.main .verified,
-.main .official,
-.main .source-verified{
-  color:var(--ed-green) !important;
-}
-
-.main .verified-badge,
-.main .official-badge,
-.main .source-verified{
-  border-color:#bbf7d0 !important;
-  background:#f0fdf4 !important;
-}
-
-/* ---------- Community cards ---------- */
-.main .ed-social-whatsapp,
-.main .ed-social-telegram{
-  min-width:0;
-  min-height:100%;
-  border-radius:18px;
-  overflow:hidden;
-}
-
-.main .ed-social-whatsapp{
-  border:1px solid #bbf7d0 !important;
-  background:linear-gradient(145deg,#ffffff,#f0fdf4) !important;
-}
-
-.main .ed-social-telegram{
-  border:1px solid #bfdbfe !important;
-  background:linear-gradient(145deg,#ffffff,#eff6ff) !important;
-}
-
-.main .ed-social-whatsapp a,
-.main .ed-social-telegram a{
-  min-height:44px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-/* ---------- Editorial desk ---------- */
-.main .ed-editorial-card{
-  background:#fff !important;
-  border:1px solid var(--ed-border) !important;
-  border-radius:18px;
-  box-shadow:0 6px 18px rgba(15,23,42,.045);
-  overflow:hidden;
-}
-
-.main .ed-editorial-card *{
-  max-width:100%;
-}
-
-/* ---------- Category / filter controls ---------- */
-.main .category-tabs,
-.main .filters,
-.main .filter-row{
-  max-width:100%;
-  min-width:0;
-  overflow-x:auto;
-  scrollbar-width:thin;
-}
-
-.main .category-tabs a,
-.main .filters button,
-.main .filter-row button{
-  flex:0 0 auto;
-  min-height:40px;
-}
-
-/* ---------- Equal visual rhythm ---------- */
-.main .post,
-.main .matrix-card,
-.main .ed-social-whatsapp,
-.main .ed-social-telegram,
-.main .ed-editorial-card{
-  margin-bottom:0;
-}
-
-/* ---------- Mobile ---------- */
-@media (max-width:768px){
-
-  .main{
-    width:100%;
-    max-width:100%;
-    padding-left:12px;
-    padding-right:12px;
-  }
-
-  .main > .hero{
-    border-radius:18px;
-    padding-left:16px;
-    padding-right:16px;
-  }
-
-  .main > .grid3,
-  .main > .layout{
-    width:100%;
-    grid-template-columns:minmax(0,1fr) !important;
-  }
-
-  .main .post,
-  .main .matrix-card,
-  .main .ed-editorial-card,
-  .main .ed-social-whatsapp,
-  .main .ed-social-telegram{
-    width:100%;
-    max-width:100%;
-  }
-
-  .main .post .read-more,
-  .main .post .post-category-link{
-    max-width:100%;
-  }
-
-  .main .btn,
-  .main button,
-  .main .button{
-    max-width:100%;
-  }
-
-  .main .hero .btn{
-    width:100%;
-  }
-}
-
-/* ---------- Very small screens ---------- */
-@media (max-width:420px){
-
-  .main{
-    padding-left:10px;
-    padding-right:10px;
-  }
-
-  .main > .hero{
-    border-radius:16px;
-  }
-
-  .main .post,
-  .main .matrix-card,
-  .main .ed-editorial-card{
-    border-radius:15px;
-  }
-}
-
-/* =========================================================
-   EXAM DARPAN — CLEAN HOMEPAGE UI SYSTEM
-   Homepage visual layer only.
-   Quiz / Leaderboard / Admin intentionally untouched.
-   ========================================================= */
-
-:root{
-  --ed-blue:#1E40AF;
-  --ed-blue-hover:#1D4ED8;
-  --ed-navy:#0F172A;
-  --ed-slate:#475569;
-  --ed-muted:#64748B;
-  --ed-bg:#F8FAFC;
-  --ed-white:#FFFFFF;
-  --ed-border:#E2E8F0;
-  --ed-amber:#D97706;
-  --ed-amber-soft:#FEF3C7;
-  --ed-amber-text:#92400E;
-  --ed-green:#16A34A;
-  --ed-green-hover:#15803D;
-}
-
-/* ---------- Homepage base ---------- */
-
-.main{
-  background:var(--ed-bg);
-  color:var(--ed-navy);
-}
-
-.main .card{
-  background:var(--ed-white);
-  border:1px solid var(--ed-border);
-  box-shadow:0 2px 10px rgba(15,23,42,.045);
-  border-radius:18px;
-}
-
-.main a{
-  text-decoration:none;
-}
-
-.main button,
-.main .btn,
-.main .button{
-  font-family:inherit;
-}
-
-/* ---------- Hero ---------- */
-
-.main > .hero{
-  background:
-    radial-gradient(circle at 92% 8%,rgba(30,64,175,.09),transparent 32%),
-    linear-gradient(145deg,#fff 0%,#f8fbff 100%);
-  border:1px solid #DBE5F5;
-  box-shadow:0 8px 28px rgba(15,23,42,.055);
-  border-radius:22px;
-}
-
-.main > .hero h1{
-  color:var(--ed-navy);
-  line-height:1.14;
-  letter-spacing:-.035em;
-}
-
-.main > .hero h1 span{
-  color:var(--ed-blue);
-}
-
-.main > .hero p{
-  color:var(--ed-muted);
-  line-height:1.7;
-}
-
-.main .hero-kicker{
-  color:var(--ed-blue);
-  font-weight:800;
-}
-
-.main .hero-kicker-rajasthan{
-  background:var(--ed-amber-soft);
-  color:var(--ed-amber-text);
-  border-radius:999px;
-  padding:5px 9px;
-}
-
-.main .hero-kicker-india{
-  background:#EFF6FF;
-  color:#1E40AF;
-  border-radius:999px;
-  padding:5px 9px;
-}
-
-/* ---------- Primary / secondary buttons ---------- */
-
-.main .btn-primary,
-.main .primary,
-.main .btn-blue{
-  background:var(--ed-blue);
-  color:#fff;
-  border:1px solid var(--ed-blue);
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(30,64,175,.16);
-}
-
-.main .btn-primary:hover,
-.main .primary:hover,
-.main .btn-blue:hover{
-  background:var(--ed-blue-hover);
-  border-color:var(--ed-blue-hover);
-  transform:translateY(-1px);
-}
-
-.main .btn-light{
-  background:#fff;
-  color:#334155;
-  border:1px solid #CBD5E1;
-  border-radius:12px;
-  box-shadow:none;
-}
-
-.main .btn-light:hover{
-  background:#F8FAFC;
-  border-color:#94A3B8;
-  color:var(--ed-navy);
-}
-
-/* Never use mustard as a generic primary button. */
-.main .btn-gold{
-  background:var(--ed-blue);
-  color:#fff;
-}
-
-/* ---------- Notification matrix ---------- */
-
-.main .grid3{
+.main > .grid3{
   gap:16px;
 }
 
 .main .matrix-card{
-  background:#fff;
-  border:1px solid var(--ed-border);
-  border-radius:18px;
-  box-shadow:0 2px 10px rgba(15,23,42,.04);
+  background:#fff !important;
+  border:1px solid var(--ed-border) !important;
+  border-radius:17px !important;
+  box-shadow:0 3px 12px rgba(15,23,42,.045) !important;
   overflow:hidden;
 }
 
 .main .matrix-card .card-head{
-  padding-bottom:12px;
   border-bottom:1px solid #EEF2F7;
 }
 
 .main .matrix-card h2{
-  color:var(--ed-navy);
+  color:var(--ed-navy) !important;
 }
 
 .main .matrix-card .matrix-item{
-  color:#334155;
-  border-bottom:1px solid #F1F5F9;
-  line-height:1.5;
-  padding:11px 2px;
+  color:var(--ed-slate) !important;
+  border-bottom:1px solid #F1F5F9 !important;
+  line-height:1.48;
 }
 
 .main .matrix-card .matrix-item:hover{
-  color:var(--ed-blue);
-  transform:none;
+  color:var(--ed-blue) !important;
+  background:#F8FAFC;
 }
 
 .main .matrix-card .matrix-item small{
-  color:#94A3B8;
+  color:#94A3B8 !important;
 }
 
-/* ---------- Article cards ---------- */
+/* ------------------------------------------------------------
+   ARTICLE CARDS
+   ------------------------------------------------------------ */
 
-.main .post{
-  background:#fff;
-  border:1px solid var(--ed-border);
-  border-radius:18px;
-  box-shadow:0 2px 10px rgba(15,23,42,.04);
-  transition:box-shadow .18s ease,border-color .18s ease,transform .18s ease;
+.main .post,
+.main .featured-post{
+  background:#fff !important;
+  border:1px solid var(--ed-border) !important;
+  border-radius:18px !important;
+  box-shadow:0 3px 14px rgba(15,23,42,.045) !important;
+  transition:
+    box-shadow .18s ease,
+    border-color .18s ease,
+    transform .18s ease;
 }
 
-.main .post:hover{
-  border-color:#CBD5E1;
-  box-shadow:0 10px 26px rgba(15,23,42,.075);
+.main .post:hover,
+.main .featured-post:hover{
+  border-color:#CBD5E1 !important;
+  box-shadow:0 10px 26px rgba(15,23,42,.075) !important;
   transform:translateY(-1px);
 }
 
 .main .post h2,
 .main .post h3{
-  color:var(--ed-navy);
+  color:var(--ed-navy) !important;
   line-height:1.38;
 }
 
 .main .post h2 a,
 .main .post h3 a{
-  color:inherit;
+  color:inherit !important;
 }
 
 .main .post h2 a:hover,
 .main .post h3 a:hover{
-  color:var(--ed-blue);
+  color:var(--ed-blue) !important;
 }
 
 .main .post p{
-  color:#64748B;
-  line-height:1.68;
+  color:var(--ed-slate) !important;
+  line-height:1.65;
 }
 
 .main .post-meta{
-  color:#94A3B8;
+  color:var(--ed-muted) !important;
 }
 
+/* Article category badges */
 .main .post .badge{
-  background:var(--ed-amber-soft);
-  color:var(--ed-amber-text);
-  border:1px solid #FDE68A;
-  border-radius:999px;
-  padding:5px 9px;
-  font-weight:800;
-}
-
-.main .post .read-more{
   display:inline-flex;
   align-items:center;
-  gap:5px;
-  color:var(--ed-blue);
+  width:max-content;
+  max-width:100%;
+  padding:5px 10px;
+  border-radius:999px !important;
+  background:#EFF6FF !important;
+  border:1px solid #BFDBFE !important;
+  color:var(--ed-blue) !important;
+  font-size:.75rem;
   font-weight:800;
-  text-decoration:none;
+  line-height:1.2;
+}
+
+/* Rajasthan gets amber — only as accent */
+.main .post .badge{
+  /* default remains blue; JS/category text may still vary */
+}
+
+/* Read article action */
+.main .post .read-more{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  width:max-content;
+  max-width:100%;
+  min-height:38px;
+  padding:8px 13px;
+  border-radius:10px;
+  background:#EFF6FF !important;
+  border:1px solid #BFDBFE !important;
+  color:var(--ed-blue) !important;
+  font-weight:750;
+  text-decoration:none !important;
 }
 
 .main .post .read-more:hover{
-  color:var(--ed-blue-hover);
+  background:#DBEAFE !important;
+  border-color:#93C5FD !important;
+  color:var(--ed-blue-hover) !important;
 }
 
 .main .post .read-more b{
@@ -7137,253 +6867,338 @@ body{
   transform:translateX(3px);
 }
 
-.main .featured-post{
-  border-color:#BFDBFE;
-  background:linear-gradient(145deg,#fff,#FAFCFF);
+/* Rajasthan hub link inside article card */
+.main .post .post-category-link{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  padding:5px 9px;
+  margin:3px 0 8px;
+  border-radius:999px;
+  background:var(--ed-amber-soft) !important;
+  border:1px solid #FDE68A !important;
+  color:var(--ed-amber-text) !important;
+  font-size:.74rem;
+  font-weight:800;
+  text-decoration:none !important;
 }
 
-/* ---------- Rajasthan hub / special blocks ---------- */
-
-.main [class*="rajasthan-hub"]{
-  background:#fff;
-  border:1px solid #FDE68A;
-  border-radius:18px;
-  box-shadow:0 4px 18px rgba(15,23,42,.045);
+.main .post .post-category-link:hover{
+  background:#FEF3C7 !important;
+  color:#78350F !important;
 }
 
-.main [class*="rajasthan-hub"] a{
-  color:var(--ed-navy);
-  border:1px solid #E2E8F0;
-  background:#fff;
-  border-radius:14px;
-  transition:.18s ease;
+/* ------------------------------------------------------------
+   FILTER PILLS
+   ------------------------------------------------------------ */
+
+.main .tabs{
+  background:#fff !important;
+  border:1px solid var(--ed-border) !important;
+  border-radius:14px !important;
 }
 
-.main [class*="rajasthan-hub"] a:hover{
-  border-color:#93C5FD;
-  color:var(--ed-blue);
-  background:#F8FBFF;
-  transform:translateY(-1px);
+.main .tabs .tab{
+  background:#fff !important;
+  color:#475569 !important;
+  border:1px solid #CBD5E1 !important;
+  border-radius:999px !important;
+  min-height:38px;
+  white-space:nowrap;
 }
 
-/* ---------- Verified / official source ---------- */
-
-.main .source-verified{
-  background:#ECFDF5;
-  color:#065F46;
-  border:1px solid #A7F3D0;
-  border-radius:14px;
+.main .tabs .tab:hover{
+  background:#F8FAFC !important;
+  color:var(--ed-blue) !important;
+  border-color:#93C5FD !important;
 }
 
-.main .source-verified strong{
-  color:#065F46;
+.main .tabs .tab.active{
+  background:var(--ed-blue) !important;
+  color:#fff !important;
+  border-color:var(--ed-blue) !important;
+  box-shadow:0 3px 9px rgba(30,64,175,.14);
 }
 
-/* ---------- Community ---------- */
+/* ------------------------------------------------------------
+   OFFICIAL / VERIFIED
+   ------------------------------------------------------------ */
+
+.main .source-verified,
+.main .verified-badge,
+.main .official-badge{
+  background:var(--ed-green-soft) !important;
+  border:1px solid #BBF7D0 !important;
+  color:#166534 !important;
+}
+
+/* ------------------------------------------------------------
+   COMMUNITY
+   ------------------------------------------------------------ */
 
 .main .ed-social-whatsapp{
-  background:#F0FDF4;
-  border:1px solid #BBF7D0;
-  border-radius:16px;
+  background:#F0FDF4 !important;
+  border:1px solid #BBF7D0 !important;
+  border-radius:18px !important;
 }
 
 .main .ed-social-whatsapp a{
-  background:var(--ed-green);
-  color:#fff;
+  background:var(--ed-green) !important;
+  border-color:var(--ed-green) !important;
+  color:#fff !important;
   border-radius:10px;
 }
 
 .main .ed-social-whatsapp a:hover{
-  background:var(--ed-green-hover);
+  background:#15803D !important;
+  border-color:#15803D !important;
 }
 
 .main .ed-social-telegram{
-  background:#EFF6FF;
-  border:1px solid #BFDBFE;
-  border-radius:16px;
+  background:#EFF6FF !important;
+  border:1px solid #BFDBFE !important;
+  border-radius:18px !important;
 }
 
-.main .ed-social-telegram a{
-  background:var(--ed-blue);
-  color:#fff;
+/* ------------------------------------------------------------
+   RAJASTHAN GOVERNMENT JOBS SEO / HUB
+   ------------------------------------------------------------ */
+
+.main .raj-home-seo-link{
+  position:relative;
+  margin-top:22px;
+  padding:22px 22px 22px 24px;
+  background:#fff !important;
+  border:1px solid var(--ed-border) !important;
+  border-radius:18px !important;
+  box-shadow:0 5px 18px rgba(15,23,42,.045);
+  overflow:hidden;
+}
+
+.main .raj-home-seo-link::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  background:var(--ed-amber);
+}
+
+.main .raj-home-seo-link h2{
+  margin:0 0 8px;
+  color:var(--ed-navy) !important;
+  font-size:clamp(1.15rem,2.5vw,1.45rem);
+  line-height:1.3;
+}
+
+.main .raj-home-seo-link p{
+  margin:0 0 15px;
+  color:var(--ed-slate) !important;
+  line-height:1.65;
+  max-width:720px;
+}
+
+.main .raj-home-seo-link a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:9px 14px;
   border-radius:10px;
+  background:var(--ed-blue) !important;
+  border:1px solid var(--ed-blue) !important;
+  color:#fff !important;
+  font-weight:750;
+  box-shadow:0 4px 11px rgba(30,64,175,.13);
 }
 
-/* ---------- Editorial card ---------- */
+.main .raj-home-seo-link a:hover{
+  background:var(--ed-blue-hover) !important;
+  border-color:var(--ed-blue-hover) !important;
+  transform:translateY(-1px);
+}
 
-.main .ed-editorial-card{
-  background:#fff;
-  border:1px solid var(--ed-border);
-  border-radius:18px;
-  box-shadow:0 3px 14px rgba(15,23,42,.045);
+/* ------------------------------------------------------------
+   EDITORIAL DESK
+   ------------------------------------------------------------ */
+
+.main .ed-editorial-desk{
+  position:relative;
+  background:#fff !important;
+  border:1px solid var(--ed-border) !important;
+  border-radius:18px !important;
+  box-shadow:0 5px 18px rgba(15,23,42,.045);
+  overflow:hidden;
+}
+
+.main .ed-editorial-desk::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:4px;
+  background:var(--ed-blue);
+}
+
+.main .ed-editorial-label{
+  color:var(--ed-blue) !important;
+  font-weight:850;
+  letter-spacing:.06em;
+}
+
+.main .ed-verified{
+  background:var(--ed-green-soft) !important;
+  color:#166534 !important;
+  border:1px solid #BBF7D0 !important;
+  border-radius:999px;
+}
+
+.main .ed-editorial-avatar{
+  background:#EFF6FF !important;
+  border:1px solid #BFDBFE !important;
+  color:var(--ed-blue) !important;
+}
+
+.main .ed-editorial-profile h3{
+  color:var(--ed-navy) !important;
+}
+
+.main .ed-editorial-profile p,
+.main .ed-editorial-text{
+  color:var(--ed-muted) !important;
+}
+
+.main .ed-editorial-points span{
+  color:#475569 !important;
 }
 
 .main .ed-editorial-button{
-  background:var(--ed-navy);
-  color:#fff;
-  border-radius:11px;
-  text-decoration:none;
+  background:var(--ed-blue) !important;
+  border:1px solid var(--ed-blue) !important;
+  color:#fff !important;
+  border-radius:10px;
 }
 
 .main .ed-editorial-button:hover{
-  background:#1E293B;
+  background:var(--ed-blue-hover) !important;
+  border-color:var(--ed-blue-hover) !important;
 }
 
-/* ---------- Tabs / category chips ---------- */
+/* ------------------------------------------------------------
+   ARTICLE-PAGE CATEGORY / HEADER — safe global treatment
+   ------------------------------------------------------------ */
 
-.main .tabs{
-  gap:7px;
-  overflow-x:auto;
-  scrollbar-width:none;
-  padding:4px 1px 8px;
+.article-category,
+.category-badge,
+.article-header .badge,
+.post-header .badge,
+.article .category-badge,
+.article-page .category-badge{
+  background:#EFF6FF !important;
+  border:1px solid #BFDBFE !important;
+  color:var(--ed-blue) !important;
+  border-radius:999px !important;
+  text-decoration:none !important;
+  font-weight:800;
 }
 
-.main .tabs::-webkit-scrollbar{
-  display:none;
-}
-
-.main .tabs .tab{
-  flex:0 0 auto;
-  background:#fff;
-  color:#334155;
-  border:1px solid #CBD5E1;
-  border-radius:11px;
-  box-shadow:none;
-}
-
-.main .tabs .tab:hover{
-  border-color:#93C5FD;
-  color:var(--ed-blue);
-}
-
-.main .tabs .tab.active{
-  background:var(--ed-blue);
-  border-color:var(--ed-blue);
-  color:#fff;
-  box-shadow:0 4px 12px rgba(30,64,175,.16);
-}
-
-/* ---------- General overflow protection ---------- */
-
-.main,
-.main > *,
-.main .layout,
-.main .grid3,
-.main .post,
-.main .matrix-card{
-  min-width:0;
-  max-width:100%;
-}
-
-.main h1,
-.main h2,
-.main h3,
-.main p,
-.main a,
-.main span{
-  overflow-wrap:anywhere;
-}
-
-.main img{
-  max-width:100%;
-}
-
-/* ---------- Mobile ---------- */
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
 
 @media (max-width:768px){
 
   .main{
-    padding-top:16px;
-    padding-bottom:36px;
+    width:100%;
+    max-width:100%;
+    padding-left:12px;
+    padding-right:12px;
   }
 
   .main > .hero{
-    grid-template-columns:1fr;
-    gap:16px;
-    padding:20px;
-    border-radius:18px;
+    border-radius:17px !important;
   }
 
-  .main > .hero h1{
-    font-size:clamp(25px,8vw,34px);
+  .main > .hero::before{
+    width:4px;
+  }
+
+  .main > .grid3,
+  .main > .layout{
+    width:100%;
+    max-width:100%;
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+
+  .main .post,
+  .main .matrix-card,
+  .main .ed-editorial-desk,
+  .main .raj-home-seo-link{
+    width:100%;
+    max-width:100%;
   }
 
   .main .hero-actions{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:9px;
+    width:100%;
   }
 
   .main .hero-actions .btn{
     width:100%;
-    min-height:44px;
   }
 
-  .main > .grid3{
-    grid-template-columns:1fr;
-    gap:12px;
+  .main .tabs{
+    max-width:100%;
+    overflow-x:auto;
+    display:flex;
+    gap:7px;
+    scrollbar-width:none;
   }
 
-  .main > .layout{
-    grid-template-columns:1fr;
-    gap:16px;
-    margin-top:20px;
+  .main .tabs::-webkit-scrollbar{
+    display:none;
   }
 
-  .main .post{
-    padding:16px;
-    border-radius:16px;
-  }
-
-  .main .post h2{
-    font-size:17px;
-    line-height:1.4;
-  }
-
-  .main .post p{
-    font-size:12px;
-    line-height:1.65;
+  .main .tabs .tab{
+    flex:0 0 auto;
   }
 
   .main .post .read-more{
-    min-height:36px;
+    min-height:40px;
   }
 
-  .main .matrix-card{
-    min-height:0;
+  .main .raj-home-seo-link{
+    padding:20px 17px 20px 20px;
   }
 
-  .main .ed-editorial-card,
-  .main .ed-social-whatsapp,
-  .main .ed-social-telegram{
-    border-radius:16px;
+  .main .raj-home-seo-link a{
+    width:100%;
+  }
+
+  .main .ed-editorial-desk{
+    padding-left:16px;
+    padding-right:16px;
   }
 }
 
 @media (max-width:420px){
 
-  .main > .hero{
-    padding:17px;
+  .main{
+    padding-left:10px;
+    padding-right:10px;
   }
 
-  .main .post{
-    padding:14px;
+  .main > .hero,
+  .main .post,
+  .main .matrix-card,
+  .main .ed-editorial-desk,
+  .main .raj-home-seo-link{
+    border-radius:15px !important;
   }
 
-  .main .tabs{
-    margin-left:-2px;
-    margin-right:-2px;
+  .main > .hero h1{
+    letter-spacing:-.018em;
   }
-
-  .main .tabs .tab{
-    padding:8px 11px;
-    font-size:10px;
-  }
-}
-
-/* ---------- Touch ---------- */
-
-.main a,
-.main button{
-  -webkit-tap-highlight-color:rgba(30,64,175,.10);
 }
