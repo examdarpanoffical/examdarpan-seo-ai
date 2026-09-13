@@ -497,7 +497,7 @@ function extractExplicitDeadline(text){
   // "7 अक्टूबर 2026 तक"
   // "25 September 2026 by"
   const monthNamePattern=
-    /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+(20\d{2}))?[^0-9]{0,20}(?:तक|until|by)\b/i;
+    /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+(20\d{2}))?[^0-9]{0,20}(?:तक|until|by)(?=\s|[.,;:!?)]|$)/i;
 
   const m=source.match(monthNamePattern);
 
