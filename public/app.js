@@ -98,10 +98,68 @@ function getStaticPostsFromDOM(){
 }
 
 function getMatrixPosts(){
-  return posts.length
-    ? posts
-    : getStaticPostsFromDOM();
+  const firestorePosts=Array.isArray(posts)?posts:[];
+
+  // The article grid is the final visible source of truth after render().
+  // It already contains the category badge and canonical article URL.
+  const container=$('#postsContainer');
+
+  const domPosts=container
+    ? [...container.querySelectorAll('article.post')]
+        .map((article,index)=>{
+          const titleEl=article.querySelector('h2 a');
+          const excerptEl=article.querySelector('.post-copy > p');
+          const badgeEl=article.querySelector('.badge');
+          const href=
+            titleEl?.getAttribute('href') ||
+            article.querySelector('.read-more')?.getAttribute('href') ||
+            '';
+
+          const slug=String(href||'')
+            .replace(/^\//,'')
+            .split('?')[0]
+            .split('#')[0];
+
+          return {
+            id:`dom-${index}`,
+            title:titleEl?.textContent?.trim()||'',
+            slug:decodeURIComponent(slug),
+            category:badgeEl?.textContent?.trim()||'',
+            excerpt:excerptEl?.textContent?.trim()||'',
+            content:excerptEl?.textContent?.trim()||'',
+            publishedAt:
+              article.querySelector('.post-meta span')?.textContent?.trim()||''
+          };
+        })
+        .filter(p=>p.title && p.slug)
+    : [];
+
+  // Prefer Firestore records because they contain the full article body,
+  // but use the visible DOM category/title/slug as a reliable fallback.
+  if(firestorePosts.length){
+    const domBySlug=new Map(domPosts.map(p=>[p.slug,p]));
+
+    return firestorePosts.map(p=>{
+      const slug=String(p.slug||'').replace(/^\//,'');
+      const dom=domBySlug.get(slug)||{};
+
+      return {
+        ...dom,
+        ...p,
+        slug:p.slug||dom.slug,
+        title:p.title||dom.title,
+        category:p.category||dom.category,
+        excerpt:p.excerpt||dom.excerpt,
+        content:p.content||dom.content,
+        publishedAt:p.publishedAt||dom.publishedAt
+      };
+    });
+  }
+
+  return domPosts;
 }
+
+
 
 async function loadPosts(){
   try{
@@ -306,16 +364,18 @@ function postText(p={}){
 
 function isRajasthanPost(p={}){
   const text=postText(p);
+  const category=String(p.category||'').toLowerCase();
 
-  const national=
-    /\b(ssc|upsc|sbi|ibps|bank of india|india post|rrb|railway|rrb ntpc|central government|defence|army|air force|navy)\b/
+  // Explicit Rajasthan category is useful only when the article itself
+  // also contains a Rajasthan signal. This prevents SSC JE etc. from
+  // leaking into Rajasthan just because an old CMS badge was wrong.
+  const rajasthanSignal=
+    /\b(rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl|anuprati)\b|राजस्थान|अनुप्रति/i
       .test(text);
 
-  if(national && !/rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl|राजस्थान/.test(text)){
-    return false;
-  }
+  if(!rajasthanSignal) return false;
 
-  return /\b(rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl)\b|राजस्थान/.test(text);
+  return true;
 }
 
 function toDateValue(v){
@@ -401,71 +461,74 @@ function makeDate(day,month,year){
 }
 
 function extractExplicitDeadline(text){
-  const source=String(text||'');
+  const source=String(text||'').replace(/\s+/g,' ').trim();
 
-  const patterns=[
-    /(?:अंतिम\s*तिथि|अंतिम\s*तारीख|आवेदन\s*की\s*अंतिम\s*तिथि|आवेदन\s*की\s*अंतिम\s*तारीख)\s*(?:है|:|-)?\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i,
+  const months={
+    जनवरी:1,फरवरी:2,मार्च:3,अप्रैल:4,मई:5,जून:6,
+    जुलाई:7,अगस्त:8,सितंबर:9,अक्टूबर:10,नवंबर:11,दिसंबर:12,
+    january:1,february:2,march:3,april:4,may:5,june:6,
+    july:7,august:8,september:9,october:10,november:11,december:12
+  };
 
-    /(?:last\s*date|last\s*date\s*to\s*apply|application\s*last\s*date|closing\s*date|deadline)\s*(?:is|:|-)?\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i,
+  const yearMatch=source.match(/\b(20\d{2})\b/);
+  const contextYear=yearMatch ? Number(yearMatch[1]) : new Date().getFullYear();
 
-    /(?:अंतिम\s*तिथि|अंतिम\s*तारीख|last\s*date|deadline)[^0-9]{0,80}(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/i,
+  const make=(day,month,year=contextYear)=>{
+    const d=makeDate(day,month,year);
+    return d;
+  };
 
-    // Conservative fallback for common article wording:
-    // "22 सितंबर 2026 तक", "7 अक्टूबर 2026 तक", "apply by 25 September 2026".
-    /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})[^0-9]{0,15}(?:तक|until|by)\b/i,
+  // DD/MM/YYYY / DD-MM-YYYY / DD.MM.YYYY
+  const numericPatterns=[
+    /(?:अंतिम\s*तिथि|अंतिम\s*तारीख|आवेदन\s*की\s*अंतिम\s*तिथि|आवेदन\s*की\s*अंतिम\s*तारीख|last\s*date|deadline|closing\s*date)[^0-9]{0,60}(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i,
 
-    /(?:apply|applications?|form|registration)[^0-9]{0,40}(?:by|until|upto)\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i
+    /(?:apply|application|applications|form|registration)[^0-9]{0,50}(?:by|until|upto|तक)\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i
   ];
 
-  for(const pattern of patterns){
+  for(const pattern of numericPatterns){
     const m=source.match(pattern);
+    if(m){
+      const d=makeDate(m[1],m[2],m[3]);
+      if(d) return d;
+    }
+  }
 
-    if(!m) continue;
+  // "22 सितंबर 2026 तक"
+  // "7 अक्टूबर 2026 तक"
+  // "25 September 2026 by"
+  const monthNamePattern=
+    /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+(20\d{2}))?[^0-9]{0,20}(?:तक|until|by)\b/i;
 
-    if(/जनवरी|january/i.test(m[2])){
-      return makeDate(m[1],1,m[3]);
-    }
-    if(/फरवरी|february/i.test(m[2])){
-      return makeDate(m[1],2,m[3]);
-    }
-    if(/मार्च|march/i.test(m[2])){
-      return makeDate(m[1],3,m[3]);
-    }
-    if(/अप्रैल|april/i.test(m[2])){
-      return makeDate(m[1],4,m[3]);
-    }
-    if(/मई|may/i.test(m[2])){
-      return makeDate(m[1],5,m[3]);
-    }
-    if(/जून|june/i.test(m[2])){
-      return makeDate(m[1],6,m[3]);
-    }
-    if(/जुलाई|july/i.test(m[2])){
-      return makeDate(m[1],7,m[3]);
-    }
-    if(/अगस्त|august/i.test(m[2])){
-      return makeDate(m[1],8,m[3]);
-    }
-    if(/सितंबर|september/i.test(m[2])){
-      return makeDate(m[1],9,m[3]);
-    }
-    if(/अक्टूबर|october/i.test(m[2])){
-      return makeDate(m[1],10,m[3]);
-    }
-    if(/नवंबर|november/i.test(m[2])){
-      return makeDate(m[1],11,m[3]);
-    }
-    if(/दिसंबर|december/i.test(m[2])){
-      return makeDate(m[1],12,m[3]);
-    }
+  const m=source.match(monthNamePattern);
 
-    const d=makeDate(m[1],m[2],m[3]);
+  if(m){
+    const month=months[String(m[2]).toLowerCase()] ||
+      months[m[2]];
 
-    if(d) return d;
+    if(month){
+      const d=make(m[1],month,m[3]||contextYear);
+      if(d) return d;
+    }
+  }
+
+  // "आवेदन 10 सितंबर से 25 सितंबर 2026 तक"
+  const rangePattern=
+    /\d{1,2}\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+से\s+(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+(20\d{2}))?\s+तक/i;
+
+  const r=source.match(rangePattern);
+
+  if(r){
+    const month=months[String(r[3]).toLowerCase()] || months[r[3]];
+    if(month){
+      const d=make(r[2],month,r[4]||contextYear);
+      if(d) return d;
+    }
   }
 
   return null;
 }
+
+
 
 function getDeadline(p={}){
   // Explicit CMS/Firestore fields are authoritative.
@@ -589,12 +652,16 @@ function matrix(id,cat){
 
   if(!el) return;
 
-  const arr=getMatrixPosts()
-    .filter(p=>
-      cat==='Rajasthan Jobs'
-        ? isRajasthanPost(p)
-        : displayCategory(p)===cat
-    )
+  const source=getMatrixPosts();
+
+  const arr=source
+    .filter(p=>{
+      if(cat==='Rajasthan Jobs'){
+        return isRajasthanPost(p);
+      }
+
+      return displayCategory(p)===cat;
+    })
     .slice(0,5);
 
   el.innerHTML=arr.map(p=>`
@@ -645,7 +712,7 @@ function renderExamCalendar(){
       post:p,
       deadline:getDeadline(p)
     }))
-    .filter(x=>isLiveVacancy(x.post))
+    .filter(x=>x.deadline && daysRemaining(x.deadline)>=0)
     .sort((a,b)=>a.deadline-b.deadline)
     .slice(0,6);
 
