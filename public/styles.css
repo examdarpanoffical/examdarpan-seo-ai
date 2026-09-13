@@ -7202,3 +7202,18 @@ body{
     letter-spacing:-.018em;
   }
 }
+/* All India Government Jobs navigation */
+.all-india-jobs-nav{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  padding:7px 12px;
+  border-radius:9px;
+  text-decoration:none;
+  font-weight:800;
+  color:#2563eb;
+}
+.all-india-jobs-nav:hover{
+  background:#eff6ff;
+}
