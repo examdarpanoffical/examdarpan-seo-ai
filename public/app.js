@@ -30,6 +30,31 @@ const formatDate=v=>{
 
 const articleUrl=slug=>'/'+encodeURIComponent(String(slug||'').trim());
 
+
+function isRajasthanPost(p={}){
+  const text = `${p.title||''} ${p.category||''} ${(p.tags||[]).join(' ')}`
+    .toLowerCase();
+
+  // Clearly national organisations/topics always stay All India.
+  const national =
+    /\b(ssc|upsc|sbi|ibps|bank of india|india post|rrb|railway|rrb ntpc|central government|defence|army|air force|navy)\b/.test(text);
+
+  if(national) return false;
+
+  // Rajasthan-specific authority/state/topic signals.
+  return /\b(rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl)\b|राजस्थान/.test(text);
+}
+
+function displayCategory(p={}){
+  if(isRajasthanPost(p)) return 'Rajasthan Jobs';
+
+  const c=String(p.category||'').trim();
+
+  return c === 'Rajasthan Jobs'
+    ? 'Government Jobs'
+    : (c || 'Latest Update');
+}
+
 const readingTime=html=>{
   const text=String(html||'')
     .replace(/<[^>]*>/g,' ')
@@ -119,7 +144,10 @@ function render(){
   const cat=window.currentCategory||'All';
 
   let list=posts.filter(
-    p=>cat==='All'||p.category===cat
+    p=>cat==='All' ||
+      (cat==='Rajasthan Jobs'
+        ? isRajasthanPost(p)
+        : displayCategory(p)===cat)
   );
 
   if(search){
@@ -159,11 +187,15 @@ function render(){
       ? `<img loading="lazy" decoding="async" src="${esc(p.featuredImage)}" alt="${esc(p.title||'Exam Darpan article image')}">`
       : '';
 
+    const rajasthanHub = isRajasthanPost(p)
+      ? '<a class="post-category-link" href="/rajasthan-government-jobs">Rajasthan Jobs Hub →</a>'
+      : '';
+
     return `
       <article class="card post ${featured?'featured-post':''}">
         <div class="post-top">
           <div class="post-copy">
-            <span class="badge">${esc(p.category||'Latest Update')}</span>
+            <span class="badge">${esc(displayCategory(p))}</span>
 
             <h2>
               <a href="${articleUrl(p.slug)}">
@@ -183,6 +215,8 @@ function render(){
               <span>•</span>
               <span>${readingTime(p.content)} min read</span>
             </div>
+
+            ${rajasthanHub}
 
             <a class="read-more" href="${articleUrl(p.slug)}">
               पूरा article पढ़ें <b>→</b>
@@ -213,7 +247,11 @@ function matrix(id,cat){
   if(!el) return;
 
   const arr=posts
-    .filter(p=>p.category===cat)
+    .filter(p=>
+      cat==='Rajasthan Jobs'
+        ? isRajasthanPost(p)
+        : displayCategory(p)===cat
+    )
     .slice(0,5);
 
   el.innerHTML=arr.map(p=>`
