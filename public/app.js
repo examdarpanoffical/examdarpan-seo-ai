@@ -496,10 +496,24 @@ function extractExplicitDeadline(text){
   // "22 सितंबर 2026 तक"
   // "7 अक्टूबर 2026 तक"
   // "25 September 2026 by"
-  const monthNamePattern=
+  // "Apply by 25 September 2026"
+  const monthNameAfterPattern=
     /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+(20\d{2}))?[^0-9]{0,20}(?:तक|until|by)(?=\s|[.,;:!?)]|$)/i;
 
-  const m=source.match(monthNamePattern);
+  const monthNameBeforePattern=
+    /(?:apply|applications?|application|form|registration)[^0-9]{0,30}(?:by|until)\s*(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/i;
+
+  const mBefore=source.match(monthNameBeforePattern);
+
+  if(mBefore){
+    const month=months[String(mBefore[2]).toLowerCase()] || months[mBefore[2]];
+    if(month){
+      const d=make(mBefore[1],month,mBefore[3]);
+      if(d) return d;
+    }
+  }
+
+  const m=source.match(monthNameAfterPattern);
 
   if(m){
     const month=months[String(m[2]).toLowerCase()] ||
