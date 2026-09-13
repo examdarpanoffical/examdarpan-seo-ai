@@ -63,6 +63,46 @@ async function loadFirebase(){
   return db;
 }
 
+function getStaticPostsFromDOM(){
+  const container=$('#postsContainer');
+
+  if(!container) return [];
+
+  return [...container.querySelectorAll('article.post')]
+    .map((article,index)=>{
+      const titleEl=article.querySelector('h2 a');
+      const excerptEl=article.querySelector('.post-copy > p');
+      const badgeEl=article.querySelector('.badge');
+      const metaEls=article.querySelectorAll('.post-meta span');
+      const href=
+        titleEl?.getAttribute('href') ||
+        article.querySelector('.read-more')?.getAttribute('href') ||
+        '';
+
+      const slug=String(href||'')
+        .replace(/^\//,'')
+        .split('?')[0]
+        .split('#')[0];
+
+      return {
+        id:`static-${index}`,
+        title:titleEl?.textContent?.trim()||'',
+        slug:decodeURIComponent(slug),
+        category:badgeEl?.textContent?.trim()||'',
+        excerpt:excerptEl?.textContent?.trim()||'',
+        content:excerptEl?.textContent?.trim()||'',
+        publishedAt:metaEls[0]?.textContent?.trim()||''
+      };
+    })
+    .filter(p=>p.title && p.slug);
+}
+
+function getMatrixPosts(){
+  return posts.length
+    ? posts
+    : getStaticPostsFromDOM();
+}
+
 async function loadPosts(){
   try{
     await loadFirebase();
@@ -76,19 +116,42 @@ async function loadPosts(){
       limit
     }=window.__ED_FIREBASE;
 
-    const q=query(
-      collection(db,'posts'),
-      where('status','==','published'),
-      orderBy('publishedAt','desc'),
-      limit(60)
-    );
+    let snap;
 
-    const snap=await getDocs(q);
+    try{
+      const q=query(
+        collection(db,'posts'),
+        where('status','==','published'),
+        orderBy('publishedAt','desc'),
+        limit(60)
+      );
+
+      snap=await getDocs(q);
+    }catch(queryError){
+      console.warn(
+        'Ordered posts query failed; using published-only fallback:',
+        queryError
+      );
+
+      const fallbackQuery=query(
+        collection(db,'posts'),
+        where('status','==','published'),
+        limit(60)
+      );
+
+      snap=await getDocs(fallbackQuery);
+    }
 
     posts=snap.docs.map(d=>({
       id:d.id,
       ...d.data()
     }));
+
+    // If Firestore has no usable published posts, use the
+    // already-rendered static article cards as the source.
+    if(!posts.length){
+      posts=getStaticPostsFromDOM();
+    }
 
     postsLoaded=true;
     postsLoadFailed=false;
@@ -97,21 +160,15 @@ async function loadPosts(){
   }catch(e){
     console.error('Posts load failed:',e);
 
-    posts=[];
+    posts=getStaticPostsFromDOM();
     postsLoaded=true;
-    postsLoadFailed=true;
+    postsLoadFailed=!posts.length;
 
-    const el=$('#postsContainer');
-
-    if(el && !el.querySelector('[href]')){
-      el.innerHTML=
-        '<div class="card empty">'+
-        '<strong>Updates अभी load नहीं हो पाए.</strong><br>'+
-        '<span>'+esc(e.message||'Firestore error')+'</span>'+
-        '</div>';
+    if(posts.length){
+      render();
+    }else{
+      renderMatrix();
     }
-
-    renderMatrix();
   }
 }
 
@@ -351,7 +408,13 @@ function extractExplicitDeadline(text){
 
     /(?:last\s*date|last\s*date\s*to\s*apply|application\s*last\s*date|closing\s*date|deadline)\s*(?:is|:|-)?\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i,
 
-    /(?:अंतिम\s*तिथि|अंतिम\s*तारीख|last\s*date|deadline)[^0-9]{0,80}(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/i
+    /(?:अंतिम\s*तिथि|अंतिम\s*तारीख|last\s*date|deadline)[^0-9]{0,80}(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/i,
+
+    // Conservative fallback for common article wording:
+    // "22 सितंबर 2026 तक", "7 अक्टूबर 2026 तक", "apply by 25 September 2026".
+    /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})[^0-9]{0,15}(?:तक|until|by)\b/i,
+
+    /(?:apply|applications?|form|registration)[^0-9]{0,40}(?:by|until|upto)\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i
   ];
 
   for(const pattern of patterns){
@@ -526,7 +589,7 @@ function matrix(id,cat){
 
   if(!el) return;
 
-  const arr=posts
+  const arr=getMatrixPosts()
     .filter(p=>
       cat==='Rajasthan Jobs'
         ? isRajasthanPost(p)
@@ -549,7 +612,7 @@ function renderCareerHub(){
     .forEach(tile=>{
       const key=tile.dataset.hubKey;
 
-      const post=posts
+      const post=getMatrixPosts()
         .filter(p=>categoryMatch(p,key))
         .sort((a,b)=>{
           const ad=toDateValue(a.publishedAt)?.getTime()||0;
@@ -576,7 +639,7 @@ function renderExamCalendar(){
 
   if(!el) return;
 
-  const live=posts
+  const live=getMatrixPosts()
     .filter(p=>isRajasthanPost(p))
     .map(p=>({
       post:p,
