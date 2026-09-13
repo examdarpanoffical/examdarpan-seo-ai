@@ -6895,3 +6895,495 @@ body{
     border-radius:15px;
   }
 }
+
+/* =========================================================
+   EXAM DARPAN — CLEAN HOMEPAGE UI SYSTEM
+   Homepage visual layer only.
+   Quiz / Leaderboard / Admin intentionally untouched.
+   ========================================================= */
+
+:root{
+  --ed-blue:#1E40AF;
+  --ed-blue-hover:#1D4ED8;
+  --ed-navy:#0F172A;
+  --ed-slate:#475569;
+  --ed-muted:#64748B;
+  --ed-bg:#F8FAFC;
+  --ed-white:#FFFFFF;
+  --ed-border:#E2E8F0;
+  --ed-amber:#D97706;
+  --ed-amber-soft:#FEF3C7;
+  --ed-amber-text:#92400E;
+  --ed-green:#16A34A;
+  --ed-green-hover:#15803D;
+}
+
+/* ---------- Homepage base ---------- */
+
+.main{
+  background:var(--ed-bg);
+  color:var(--ed-navy);
+}
+
+.main .card{
+  background:var(--ed-white);
+  border:1px solid var(--ed-border);
+  box-shadow:0 2px 10px rgba(15,23,42,.045);
+  border-radius:18px;
+}
+
+.main a{
+  text-decoration:none;
+}
+
+.main button,
+.main .btn,
+.main .button{
+  font-family:inherit;
+}
+
+/* ---------- Hero ---------- */
+
+.main > .hero{
+  background:
+    radial-gradient(circle at 92% 8%,rgba(30,64,175,.09),transparent 32%),
+    linear-gradient(145deg,#fff 0%,#f8fbff 100%);
+  border:1px solid #DBE5F5;
+  box-shadow:0 8px 28px rgba(15,23,42,.055);
+  border-radius:22px;
+}
+
+.main > .hero h1{
+  color:var(--ed-navy);
+  line-height:1.14;
+  letter-spacing:-.035em;
+}
+
+.main > .hero h1 span{
+  color:var(--ed-blue);
+}
+
+.main > .hero p{
+  color:var(--ed-muted);
+  line-height:1.7;
+}
+
+.main .hero-kicker{
+  color:var(--ed-blue);
+  font-weight:800;
+}
+
+.main .hero-kicker-rajasthan{
+  background:var(--ed-amber-soft);
+  color:var(--ed-amber-text);
+  border-radius:999px;
+  padding:5px 9px;
+}
+
+.main .hero-kicker-india{
+  background:#EFF6FF;
+  color:#1E40AF;
+  border-radius:999px;
+  padding:5px 9px;
+}
+
+/* ---------- Primary / secondary buttons ---------- */
+
+.main .btn-primary,
+.main .primary,
+.main .btn-blue{
+  background:var(--ed-blue);
+  color:#fff;
+  border:1px solid var(--ed-blue);
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(30,64,175,.16);
+}
+
+.main .btn-primary:hover,
+.main .primary:hover,
+.main .btn-blue:hover{
+  background:var(--ed-blue-hover);
+  border-color:var(--ed-blue-hover);
+  transform:translateY(-1px);
+}
+
+.main .btn-light{
+  background:#fff;
+  color:#334155;
+  border:1px solid #CBD5E1;
+  border-radius:12px;
+  box-shadow:none;
+}
+
+.main .btn-light:hover{
+  background:#F8FAFC;
+  border-color:#94A3B8;
+  color:var(--ed-navy);
+}
+
+/* Never use mustard as a generic primary button. */
+.main .btn-gold{
+  background:var(--ed-blue);
+  color:#fff;
+}
+
+/* ---------- Notification matrix ---------- */
+
+.main .grid3{
+  gap:16px;
+}
+
+.main .matrix-card{
+  background:#fff;
+  border:1px solid var(--ed-border);
+  border-radius:18px;
+  box-shadow:0 2px 10px rgba(15,23,42,.04);
+  overflow:hidden;
+}
+
+.main .matrix-card .card-head{
+  padding-bottom:12px;
+  border-bottom:1px solid #EEF2F7;
+}
+
+.main .matrix-card h2{
+  color:var(--ed-navy);
+}
+
+.main .matrix-card .matrix-item{
+  color:#334155;
+  border-bottom:1px solid #F1F5F9;
+  line-height:1.5;
+  padding:11px 2px;
+}
+
+.main .matrix-card .matrix-item:hover{
+  color:var(--ed-blue);
+  transform:none;
+}
+
+.main .matrix-card .matrix-item small{
+  color:#94A3B8;
+}
+
+/* ---------- Article cards ---------- */
+
+.main .post{
+  background:#fff;
+  border:1px solid var(--ed-border);
+  border-radius:18px;
+  box-shadow:0 2px 10px rgba(15,23,42,.04);
+  transition:box-shadow .18s ease,border-color .18s ease,transform .18s ease;
+}
+
+.main .post:hover{
+  border-color:#CBD5E1;
+  box-shadow:0 10px 26px rgba(15,23,42,.075);
+  transform:translateY(-1px);
+}
+
+.main .post h2,
+.main .post h3{
+  color:var(--ed-navy);
+  line-height:1.38;
+}
+
+.main .post h2 a,
+.main .post h3 a{
+  color:inherit;
+}
+
+.main .post h2 a:hover,
+.main .post h3 a:hover{
+  color:var(--ed-blue);
+}
+
+.main .post p{
+  color:#64748B;
+  line-height:1.68;
+}
+
+.main .post-meta{
+  color:#94A3B8;
+}
+
+.main .post .badge{
+  background:var(--ed-amber-soft);
+  color:var(--ed-amber-text);
+  border:1px solid #FDE68A;
+  border-radius:999px;
+  padding:5px 9px;
+  font-weight:800;
+}
+
+.main .post .read-more{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  color:var(--ed-blue);
+  font-weight:800;
+  text-decoration:none;
+}
+
+.main .post .read-more:hover{
+  color:var(--ed-blue-hover);
+}
+
+.main .post .read-more b{
+  transition:transform .18s ease;
+}
+
+.main .post .read-more:hover b{
+  transform:translateX(3px);
+}
+
+.main .featured-post{
+  border-color:#BFDBFE;
+  background:linear-gradient(145deg,#fff,#FAFCFF);
+}
+
+/* ---------- Rajasthan hub / special blocks ---------- */
+
+.main [class*="rajasthan-hub"]{
+  background:#fff;
+  border:1px solid #FDE68A;
+  border-radius:18px;
+  box-shadow:0 4px 18px rgba(15,23,42,.045);
+}
+
+.main [class*="rajasthan-hub"] a{
+  color:var(--ed-navy);
+  border:1px solid #E2E8F0;
+  background:#fff;
+  border-radius:14px;
+  transition:.18s ease;
+}
+
+.main [class*="rajasthan-hub"] a:hover{
+  border-color:#93C5FD;
+  color:var(--ed-blue);
+  background:#F8FBFF;
+  transform:translateY(-1px);
+}
+
+/* ---------- Verified / official source ---------- */
+
+.main .source-verified{
+  background:#ECFDF5;
+  color:#065F46;
+  border:1px solid #A7F3D0;
+  border-radius:14px;
+}
+
+.main .source-verified strong{
+  color:#065F46;
+}
+
+/* ---------- Community ---------- */
+
+.main .ed-social-whatsapp{
+  background:#F0FDF4;
+  border:1px solid #BBF7D0;
+  border-radius:16px;
+}
+
+.main .ed-social-whatsapp a{
+  background:var(--ed-green);
+  color:#fff;
+  border-radius:10px;
+}
+
+.main .ed-social-whatsapp a:hover{
+  background:var(--ed-green-hover);
+}
+
+.main .ed-social-telegram{
+  background:#EFF6FF;
+  border:1px solid #BFDBFE;
+  border-radius:16px;
+}
+
+.main .ed-social-telegram a{
+  background:var(--ed-blue);
+  color:#fff;
+  border-radius:10px;
+}
+
+/* ---------- Editorial card ---------- */
+
+.main .ed-editorial-card{
+  background:#fff;
+  border:1px solid var(--ed-border);
+  border-radius:18px;
+  box-shadow:0 3px 14px rgba(15,23,42,.045);
+}
+
+.main .ed-editorial-button{
+  background:var(--ed-navy);
+  color:#fff;
+  border-radius:11px;
+  text-decoration:none;
+}
+
+.main .ed-editorial-button:hover{
+  background:#1E293B;
+}
+
+/* ---------- Tabs / category chips ---------- */
+
+.main .tabs{
+  gap:7px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  padding:4px 1px 8px;
+}
+
+.main .tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.main .tabs .tab{
+  flex:0 0 auto;
+  background:#fff;
+  color:#334155;
+  border:1px solid #CBD5E1;
+  border-radius:11px;
+  box-shadow:none;
+}
+
+.main .tabs .tab:hover{
+  border-color:#93C5FD;
+  color:var(--ed-blue);
+}
+
+.main .tabs .tab.active{
+  background:var(--ed-blue);
+  border-color:var(--ed-blue);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(30,64,175,.16);
+}
+
+/* ---------- General overflow protection ---------- */
+
+.main,
+.main > *,
+.main .layout,
+.main .grid3,
+.main .post,
+.main .matrix-card{
+  min-width:0;
+  max-width:100%;
+}
+
+.main h1,
+.main h2,
+.main h3,
+.main p,
+.main a,
+.main span{
+  overflow-wrap:anywhere;
+}
+
+.main img{
+  max-width:100%;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width:768px){
+
+  .main{
+    padding-top:16px;
+    padding-bottom:36px;
+  }
+
+  .main > .hero{
+    grid-template-columns:1fr;
+    gap:16px;
+    padding:20px;
+    border-radius:18px;
+  }
+
+  .main > .hero h1{
+    font-size:clamp(25px,8vw,34px);
+  }
+
+  .main .hero-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+
+  .main .hero-actions .btn{
+    width:100%;
+    min-height:44px;
+  }
+
+  .main > .grid3{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .main > .layout{
+    grid-template-columns:1fr;
+    gap:16px;
+    margin-top:20px;
+  }
+
+  .main .post{
+    padding:16px;
+    border-radius:16px;
+  }
+
+  .main .post h2{
+    font-size:17px;
+    line-height:1.4;
+  }
+
+  .main .post p{
+    font-size:12px;
+    line-height:1.65;
+  }
+
+  .main .post .read-more{
+    min-height:36px;
+  }
+
+  .main .matrix-card{
+    min-height:0;
+  }
+
+  .main .ed-editorial-card,
+  .main .ed-social-whatsapp,
+  .main .ed-social-telegram{
+    border-radius:16px;
+  }
+}
+
+@media (max-width:420px){
+
+  .main > .hero{
+    padding:17px;
+  }
+
+  .main .post{
+    padding:14px;
+  }
+
+  .main .tabs{
+    margin-left:-2px;
+    margin-right:-2px;
+  }
+
+  .main .tabs .tab{
+    padding:8px 11px;
+    font-size:10px;
+  }
+}
+
+/* ---------- Touch ---------- */
+
+.main a,
+.main button{
+  -webkit-tap-highlight-color:rgba(30,64,175,.10);
+}
