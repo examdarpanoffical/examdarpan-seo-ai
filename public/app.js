@@ -217,6 +217,32 @@ function render(){
   renderMatrix();
 }
 
+function displayCategory(p={}){
+  const text=postText(p);
+
+  if(categoryMatch(p,'admit')){
+    return 'Admit Card';
+  }
+
+  if(categoryMatch(p,'results')){
+    return 'Results';
+  }
+
+  if(/\b(answer key|answer-key|उत्तर कुंजी|उत्तरकुंजी)\b/i.test(text)){
+    return 'Answer Key';
+  }
+
+  if(/\b(syllabus|पाठ्यक्रम|सिलेबस)\b/i.test(text)){
+    return 'Syllabus';
+  }
+
+  if(isRajasthanPost(p)){
+    return 'Rajasthan Jobs';
+  }
+
+  return 'Government Jobs';
+}
+
 function postText(p={}){
   return `${p.title||''} ${p.category||''} ${(p.tags||[]).join(' ')} ${p.excerpt||''} ${p.content||''}`.toLowerCase();
 }
