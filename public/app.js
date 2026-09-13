@@ -100,8 +100,6 @@ function getStaticPostsFromDOM(){
 function getMatrixPosts(){
   const firestorePosts=Array.isArray(posts)?posts:[];
 
-  // The article grid is the final visible source of truth after render().
-  // It already contains the category badge and canonical article URL.
   const container=$('#postsContainer');
 
   const domPosts=container
@@ -110,6 +108,8 @@ function getMatrixPosts(){
           const titleEl=article.querySelector('h2 a');
           const excerptEl=article.querySelector('.post-copy > p');
           const badgeEl=article.querySelector('.badge');
+          const metaEl=article.querySelector('.post-meta span');
+
           const href=
             titleEl?.getAttribute('href') ||
             article.querySelector('.read-more')?.getAttribute('href') ||
@@ -127,31 +127,54 @@ function getMatrixPosts(){
             category:badgeEl?.textContent?.trim()||'',
             excerpt:excerptEl?.textContent?.trim()||'',
             content:excerptEl?.textContent?.trim()||'',
-            publishedAt:
-              article.querySelector('.post-meta span')?.textContent?.trim()||''
+            publishedAt:metaEl?.textContent?.trim()||''
           };
         })
         .filter(p=>p.title && p.slug)
     : [];
 
-  // Prefer Firestore records because they contain the full article body,
-  // but use the visible DOM category/title/slug as a reliable fallback.
-  if(firestorePosts.length){
-    const domBySlug=new Map(domPosts.map(p=>[p.slug,p]));
+  /*
+   * DOM is authoritative for:
+   * - visible title
+   * - visible category
+   * - canonical slug
+   *
+   * Firestore is used only to enrich:
+   * - full content
+   * - excerpt
+   * - published date
+   */
 
-    return firestorePosts.map(p=>{
-      const slug=String(p.slug||'').replace(/^\//,'');
-      const dom=domBySlug.get(slug)||{};
+  if(firestorePosts.length){
+    const firestoreBySlug=new Map();
+
+    firestorePosts.forEach(p=>{
+      const slug=String(p.slug||'')
+        .replace(/^\//,'')
+        .split('?')[0]
+        .split('#')[0];
+
+      if(slug){
+        firestoreBySlug.set(slug,p);
+      }
+    });
+
+    return domPosts.map(dom=>{
+      const firestore=firestoreBySlug.get(dom.slug)||{};
 
       return {
-        ...dom,
-        ...p,
-        slug:p.slug||dom.slug,
-        title:p.title||dom.title,
-        category:p.category||dom.category,
-        excerpt:p.excerpt||dom.excerpt,
-        content:p.content||dom.content,
-        publishedAt:p.publishedAt||dom.publishedAt
+        ...firestore,
+
+        // Visible homepage classification wins.
+        id:dom.id,
+        title:dom.title,
+        slug:dom.slug,
+        category:dom.category,
+
+        // Firestore rich data wins when available.
+        excerpt:firestore.excerpt||dom.excerpt,
+        content:firestore.content||dom.content,
+        publishedAt:firestore.publishedAt||dom.publishedAt
       };
     });
   }
@@ -363,6 +386,28 @@ function postText(p={}){
 }
 
 function isRajasthanPost(p={}){
+  const category=String(p.category||'').trim().toLowerCase();
+
+  const title=String(p.title||'');
+  const excerpt=String(p.excerpt||'');
+  const tags=Array.isArray(p.tags)?p.tags.join(' '):String(p.tags||'');
+
+  /*
+   * Do NOT scan the complete article body here.
+   * A national article can mention Rajasthan in passing and
+   * accidentally enter the Rajasthan matrix.
+   */
+
+  if(/rajasthan jobs|राजस्थान\s*jobs/i.test(category)){
+    return true;
+  }
+
+  const signalText=
+    `${title} ${excerpt} ${tags}`;
+
+  return /(?:\brajasthan\b|\brpsc\b|\brssb\b|\brsmssb\b|\breet\b|\brajasthan police\b|\brajasthan cet\b|\brvunl\b|\banuprati\b|\brajcrb\b|राजस्थान|अनुप्रति)/i
+    .test(signalText);
+}){
   const text=postText(p);
   const category=String(p.category||'').toLowerCase();
 
