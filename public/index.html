@@ -582,6 +582,93 @@
 }
 </style>
 
+
+<style id="exam-darpan-live-calendar">
+.exam-calendar-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.exam-calendar-item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:10px;
+  border:1px solid #e8edf4;
+  border-radius:12px;
+  background:#fbfdff;
+  text-decoration:none;
+  color:#0f172a;
+}
+
+.exam-calendar-item:hover{
+  border-color:#c7d2fe;
+  background:#fff;
+}
+
+.exam-calendar-main{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.exam-calendar-main strong{
+  font-size:10px;
+  line-height:1.4;
+}
+
+.exam-calendar-main small{
+  font-size:8px;
+  line-height:1.4;
+  color:#64748b;
+}
+
+.exam-calendar-date{
+  text-align:right;
+  white-space:nowrap;
+}
+
+.exam-calendar-date b{
+  display:block;
+  color:#7c3aed;
+  font-size:9px;
+}
+
+.exam-calendar-date span{
+  display:block;
+  margin-top:2px;
+  color:#64748b;
+  font-size:7px;
+}
+
+.exam-calendar-date.soon b{
+  color:#dc2626;
+}
+
+.calendar-more{
+  display:block;
+  margin-top:10px;
+  text-align:right;
+  color:#1e40af;
+  text-decoration:none;
+  font-size:8.5px;
+  font-weight:900;
+}
+
+@media(max-width:600px){
+  .exam-calendar-item{
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .exam-calendar-date{
+    text-align:left;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी और परीक्षाओं की भरोसेमंद जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
@@ -656,18 +743,43 @@
   </div>
 </section><!-- EXAM-DARPAN-DAILY-QUIZ -->
   <section class="grid3">
-    <div class="card pad matrix-card"><div class="card-head"><h2><i class="dot blue"></i>Latest Notifications</h2><span class="pill blue-pill pulse-soft">LIVE</span></div><div id="matrixLatestJobs" class="matrix-list"><!-- STATIC-MATRIX --><a class="matrix-item" href="/rajasthan-rvunl-recruitment-2026-junior-engineer-junior-accountant-junior-assistant"><span>Rajasthan RVUNL Recruitment 2026: JE, Junior Accountant और Junior Assistant भर्ती, आवेदन की अंतिम तिथि 31 अगस्त तक आवेदन, Junior Engineer, Junior Accountant और Junior Assistant पदों पर भर्ती</span><small>03 सितंबर 2026</small></a><a class="matrix-item" href="/ssc-je-recruitment-2026"><span>SSC JE Recruitment 2026: 1748 पदों पर भर्ती, आज से आवेदन शुरू, जानें योग्यता, सैलरी और पूरी जानकारी</span><small>03 सितंबर 2026</small></a></div></div></div>
-    <div class="card pad matrix-card"><div class="card-head"><h2><i class="dot purple"></i>Admit Cards</h2><span class="pill purple-pill">UPDATES</span></div><div id="matrixAdmitCards" class="matrix-list">
-<a class="matrix-item" href="/rajasthan-set-admit-card-2026">
-  <span>Rajasthan SET Admit Card 2026 जारी, R-SET परीक्षा 13 सितंबर को, यहां से डाउनलोड करें</span>
-  <small>08 सितंबर 2026</small>
-</a>
-<a class="matrix-item" href="/rajasthan-police-si-2021-re-exam-2026-exam-city-admit-card">
-  <span>Rajasthan Police SI 2021 Re-Exam 2026: Exam City और Admit Card की जरूरी जानकारी</span>
-  <small>10 सितंबर 2026</small>
-</a>
-</div></div></div>
-    <div class="card pad matrix-card"><div class="card-head"><h2><i class="dot green"></i>Sarkari Results</h2><span class="pill green-pill">RESULT</span></div><div id="matrixResults" class="matrix-list"><!-- STATIC-MATRIX --><a class="matrix-item" href="/rscit-result-2026-declared-check-your-result-online"><span>RSCIT Result 2026 Declared – Check Your Result Online</span><small>02 सितंबर 2026</small></a><a class="matrix-item" href="/rajasthan-cet-senior-secondary-2026-28-august-se-23-october-tak-56-din-mein-clerk-ldc-exam-ki-taiyari-kaise-kare"><span>Rajasthan CET Senior Secondary 2026: 28 August se 23 October tak 56 din mein Clerk/LDC exam ki taiyari kaise kare?</span><small>02 सितंबर 2026</small></a></div></div></div>
+
+    <div class="card pad matrix-card">
+      <div class="card-head">
+        <h2><i class="dot blue"></i>Latest Rajasthan Updates</h2>
+        <span class="pill blue-pill pulse-soft">LIVE</span>
+      </div>
+      <div id="matrixLatestJobs" class="matrix-list">
+        <div class="empty">Loading Rajasthan updates…</div>
+      </div>
+    </div>
+
+    <div class="card pad matrix-card exam-calendar-card">
+      <div class="card-head">
+        <h2><i class="dot purple"></i>Rajasthan Exam Calendar</h2>
+        <span class="pill purple-pill">LIVE</span>
+      </div>
+
+      <div id="matrixExamCalendar" class="exam-calendar-list">
+        <div class="empty">Live vacancies load हो रही हैं…</div>
+      </div>
+
+      <a class="calendar-more" href="/exam-calendar.html">
+        पूरा Exam Calendar देखें →
+      </a>
+    </div>
+
+    <div class="card pad matrix-card">
+      <div class="card-head">
+        <h2><i class="dot green"></i>Admit Cards</h2>
+        <span class="pill green-pill">UPDATES</span>
+      </div>
+
+      <div id="matrixAdmitCards" class="matrix-list">
+        <div class="empty">Admit Card updates load हो रहे हैं…</div>
+      </div>
+    </div>
+
   </section>
 
   <section class="layout" id="updates">
@@ -806,7 +918,7 @@
 
   <div class="raj-career-grid">
 
-    <a class="raj-career-tile" href="https://rpsc.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">
+    <a class="raj-career-tile" href="/rajasthan-government-jobs" data-hub-key="rpsc">
       <span class="raj-career-icon rpsc">R</span>
       <span class="raj-career-copy">
         <strong>RPSC Recruitment</strong>
@@ -815,7 +927,7 @@
       <b class="raj-career-arrow">↗</b>
     </a>
 
-    <a class="raj-career-tile" href="https://rssb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">
+    <a class="raj-career-tile" href="/rajasthan-government-jobs" data-hub-key="rssb">
       <span class="raj-career-icon rssb">R</span>
       <span class="raj-career-copy">
         <strong>RSSB / RSMSSB</strong>
@@ -824,7 +936,7 @@
       <b class="raj-career-arrow">↗</b>
     </a>
 
-    <a class="raj-career-tile" href="https://police.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">
+    <a class="raj-career-tile" href="/rajasthan-government-jobs" data-hub-key="police">
       <span class="raj-career-icon police">P</span>
       <span class="raj-career-copy">
         <strong>Rajasthan Police</strong>
@@ -860,7 +972,7 @@
       <b class="raj-career-arrow">→</b>
     </a>
 
-    <a class="raj-career-tile" href="https://rajshaladarpan.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">
+    <a class="raj-career-tile" href="/rajasthan-government-jobs" data-hub-key="teacher">
       <span class="raj-career-icon teacher">T</span>
       <span class="raj-career-copy">
         <strong>Teacher Jobs</strong>

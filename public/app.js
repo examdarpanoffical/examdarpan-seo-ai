@@ -31,30 +31,6 @@ const formatDate=v=>{
 const articleUrl=slug=>'/'+encodeURIComponent(String(slug||'').trim());
 
 
-function isRajasthanPost(p={}){
-  const text = `${p.title||''} ${p.category||''} ${(p.tags||[]).join(' ')}`
-    .toLowerCase();
-
-  // Clearly national organisations/topics always stay All India.
-  const national =
-    /\b(ssc|upsc|sbi|ibps|bank of india|india post|rrb|railway|rrb ntpc|central government|defence|army|air force|navy)\b/.test(text);
-
-  if(national) return false;
-
-  // Rajasthan-specific authority/state/topic signals.
-  return /\b(rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl)\b|राजस्थान/.test(text);
-}
-
-function displayCategory(p={}){
-  if(isRajasthanPost(p)) return 'Rajasthan Jobs';
-
-  const c=String(p.category||'').trim();
-
-  return c === 'Rajasthan Jobs'
-    ? 'Government Jobs'
-    : (c || 'Latest Update');
-}
-
 const readingTime=html=>{
   const text=String(html||'')
     .replace(/<[^>]*>/g,' ')
@@ -104,7 +80,7 @@ async function loadPosts(){
       collection(db,'posts'),
       where('status','==','published'),
       orderBy('publishedAt','desc'),
-      limit(36)
+      limit(60)
     );
 
     const snap=await getDocs(q);
@@ -241,6 +217,284 @@ function render(){
   renderMatrix();
 }
 
+function postText(p={}){
+  return `${p.title||''} ${p.category||''} ${(p.tags||[]).join(' ')} ${p.excerpt||''} ${p.content||''}`.toLowerCase();
+}
+
+function isRajasthanPost(p={}){
+  const text=postText(p);
+
+  const national=
+    /\b(ssc|upsc|sbi|ibps|bank of india|india post|rrb|railway|rrb ntpc|central government|defence|army|air force|navy)\b/
+      .test(text);
+
+  if(national && !/rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl|राजस्थान/.test(text)){
+    return false;
+  }
+
+  return /\b(rajasthan|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl)\b|राजस्थान/.test(text);
+}
+
+function toDateValue(v){
+  if(!v) return null;
+
+  try{
+    if(v instanceof Date){
+      return isNaN(v.getTime()) ? null : v;
+    }
+
+    if(typeof v === 'object' && typeof v.toDate === 'function'){
+      const d=v.toDate();
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    if(typeof v === 'number'){
+      const d=new Date(v);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    if(typeof v === 'string'){
+      const raw=v.trim();
+
+      if(!raw) return null;
+
+      // Date-only YYYY-MM-DD → local calendar date.
+      const ymd=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+      if(ymd){
+        return makeDate(ymd[3],ymd[2],ymd[1]);
+      }
+
+      // ISO date-time / timezone-aware strings.
+      const iso=new Date(raw);
+
+      if(!isNaN(iso.getTime())){
+        return iso;
+      }
+
+      // Controlled DD-MM-YYYY / DD/MM/YYYY / DD.MM.YYYY
+      const m=raw.match(
+        /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})$/
+      );
+
+      if(m){
+        const day=Number(m[1]);
+        const month=Number(m[2]);
+        const year=Number(m[3]);
+
+        const d=new Date(year,month-1,day);
+
+        if(
+          d.getFullYear()===year &&
+          d.getMonth()===month-1 &&
+          d.getDate()===day
+        ){
+          return d;
+        }
+      }
+    }
+  }catch{}
+
+  return null;
+}
+
+function makeDate(day,month,year){
+  const d=new Date(
+    Number(year),
+    Number(month)-1,
+    Number(day)
+  );
+
+  if(
+    isNaN(d.getTime()) ||
+    d.getFullYear()!==Number(year) ||
+    d.getMonth()!==Number(month)-1 ||
+    d.getDate()!==Number(day)
+  ){
+    return null;
+  }
+
+  return d;
+}
+
+function extractExplicitDeadline(text){
+  const source=String(text||'');
+
+  const patterns=[
+    /(?:अंतिम\s*तिथि|अंतिम\s*तारीख|आवेदन\s*की\s*अंतिम\s*तिथि|आवेदन\s*की\s*अंतिम\s*तारीख)\s*(?:है|:|-)?\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i,
+
+    /(?:last\s*date|last\s*date\s*to\s*apply|application\s*last\s*date|closing\s*date|deadline)\s*(?:is|:|-)?\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i,
+
+    /(?:अंतिम\s*तिथि|अंतिम\s*तारीख|last\s*date|deadline)[^0-9]{0,80}(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर|january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/i
+  ];
+
+  for(const pattern of patterns){
+    const m=source.match(pattern);
+
+    if(!m) continue;
+
+    if(/जनवरी|january/i.test(m[2])){
+      return makeDate(m[1],1,m[3]);
+    }
+    if(/फरवरी|february/i.test(m[2])){
+      return makeDate(m[1],2,m[3]);
+    }
+    if(/मार्च|march/i.test(m[2])){
+      return makeDate(m[1],3,m[3]);
+    }
+    if(/अप्रैल|april/i.test(m[2])){
+      return makeDate(m[1],4,m[3]);
+    }
+    if(/मई|may/i.test(m[2])){
+      return makeDate(m[1],5,m[3]);
+    }
+    if(/जून|june/i.test(m[2])){
+      return makeDate(m[1],6,m[3]);
+    }
+    if(/जुलाई|july/i.test(m[2])){
+      return makeDate(m[1],7,m[3]);
+    }
+    if(/अगस्त|august/i.test(m[2])){
+      return makeDate(m[1],8,m[3]);
+    }
+    if(/सितंबर|september/i.test(m[2])){
+      return makeDate(m[1],9,m[3]);
+    }
+    if(/अक्टूबर|october/i.test(m[2])){
+      return makeDate(m[1],10,m[3]);
+    }
+    if(/नवंबर|november/i.test(m[2])){
+      return makeDate(m[1],11,m[3]);
+    }
+    if(/दिसंबर|december/i.test(m[2])){
+      return makeDate(m[1],12,m[3]);
+    }
+
+    const d=makeDate(m[1],m[2],m[3]);
+
+    if(d) return d;
+  }
+
+  return null;
+}
+
+function getDeadline(p={}){
+  // Explicit CMS/Firestore fields are authoritative.
+  const direct=[
+    'lastDate',
+    'last_date',
+    'applicationLastDate',
+    'application_last_date',
+    'applicationDeadline',
+    'application_deadline',
+    'closingDate',
+    'closing_date',
+    'deadline'
+  ];
+
+  for(const key of direct){
+    const d=toDateValue(p[key]);
+
+    if(d) return d;
+  }
+
+  // Conservative article fallback:
+  // only accept dates explicitly associated with deadline wording.
+  return extractExplicitDeadline(`
+    ${p.title||''}
+    ${p.excerpt||''}
+    ${p.content||''}
+  `);
+}
+
+function getExamDate(p={}){
+  const direct=[
+    'examDate',
+    'exam_date',
+    'examDateTime',
+    'exam_date_time'
+  ];
+
+  for(const key of direct){
+    const d=toDateValue(p[key]);
+
+    if(d) return d;
+  }
+
+  const text=`
+    ${p.title||''}
+    ${p.excerpt||''}
+    ${p.content||''}
+  `;
+
+  const patterns=[
+    /(?:परीक्षा\s*तिथि|परीक्षा\s*की\s*तिथि|परीक्षा\s*तारीख)\s*(?:है|:|-)?\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i,
+
+    /(?:exam\s*date|exam\s*on|examination\s*date)\s*(?:is|:|-)?\s*(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/i
+  ];
+
+  for(const pattern of patterns){
+    const m=text.match(pattern);
+
+    if(!m) continue;
+
+    const d=makeDate(m[1],m[2],m[3]);
+
+    if(d) return d;
+  }
+
+  return null;
+}
+
+function daysRemaining(date){
+  if(!date) return null;
+
+  const today=new Date();
+  today.setHours(0,0,0,0);
+
+  const target=new Date(date);
+  target.setHours(0,0,0,0);
+
+  return Math.ceil(
+    (target.getTime()-today.getTime())/86400000
+  );
+}
+
+function isLiveVacancy(p={}){
+  const deadline=getDeadline(p);
+
+  // Calendar only treats a post as live when a reliable deadline exists.
+  return !!deadline && daysRemaining(deadline)>=0;
+}
+
+function categoryMatch(p,key){
+  const text=postText(p);
+
+  const rules={
+    admit:/admit card|admit-card|hall ticket|exam city|call letter|प्रवेश पत्र/i,
+
+    results:/result|results|परिणाम|रिजल्ट/i,
+
+    rpsc:/\brpsc\b|ras\b|public service commission/i,
+
+    rssb:/\brssb\b|\brsmssb\b|staff selection board/i,
+
+    police:/rajasthan police|police si|sub inspector|constable.*rajasthan/i,
+
+    cet:/rajasthan cet|cet senior secondary|cet graduation/i,
+
+    ldc:/\bldc\b|clerk|junior assistant/i,
+
+    je:/junior engineer|\bjen\b|\bje recruitment\b|technical recruitment|rvunl/i,
+
+    teacher:/reet|teacher recruitment|school lecturer|grade iii teacher|third grade teacher/i,
+
+    university:/university result|college result|विश्वविद्यालय|यूनिवर्सिटी/i
+  };
+
+  return rules[key] ? rules[key].test(text) : false;
+}
+
 function matrix(id,cat){
   const el=$('#'+id);
 
@@ -259,13 +513,90 @@ function matrix(id,cat){
       <span>${esc(p.title||'Untitled')}</span>
       <small>${formatDate(p.publishedAt)}</small>
     </a>
-  `).join('') || '<div class="empty">No updates</div>';
+  `).join('') || '<div class="empty">No published updates</div>';
+}
+
+
+function renderCareerHub(){
+  document
+    .querySelectorAll('.raj-career-tile[data-hub-key]')
+    .forEach(tile=>{
+      const key=tile.dataset.hubKey;
+
+      const post=posts
+        .filter(p=>categoryMatch(p,key))
+        .sort((a,b)=>{
+          const ad=toDateValue(a.publishedAt)?.getTime()||0;
+          const bd=toDateValue(b.publishedAt)?.getTime()||0;
+
+          return bd-ad;
+        })[0];
+
+      if(post && post.slug){
+        tile.href=articleUrl(post.slug);
+
+        const arrow=
+          tile.querySelector('.raj-career-arrow');
+
+        if(arrow){
+          arrow.textContent='→';
+        }
+      }
+    });
+}
+
+function renderExamCalendar(){
+  const el=$('#matrixExamCalendar');
+
+  if(!el) return;
+
+  const live=posts
+    .filter(p=>isRajasthanPost(p))
+    .map(p=>({
+      post:p,
+      deadline:getDeadline(p)
+    }))
+    .filter(x=>isLiveVacancy(x.post))
+    .sort((a,b)=>a.deadline-b.deadline)
+    .slice(0,6);
+
+  el.innerHTML=live.map(({post,deadline})=>{
+    const days=daysRemaining(deadline);
+    const exam=getExamDate(post);
+
+    const remaining=
+      days===0
+        ? 'आज अंतिम दिन'
+        : days===1
+          ? 'कल अंतिम दिन'
+          : `${days} दिन बाकी`;
+
+    return `
+      <a class="exam-calendar-item" href="${articleUrl(post.slug)}">
+        <span class="exam-calendar-main">
+          <strong>${esc(post.title||'Rajasthan Vacancy')}</strong>
+          <small>
+            Rajasthan Jobs
+            ${exam ? ` • Exam ${formatDate(exam)}` : ' • Live Vacancy'}
+          </small>
+        </span>
+
+        <span class="exam-calendar-date ${days<=3?'soon':''}">
+          <b>${formatDate(deadline)}</b>
+          <span>${remaining}</span>
+        </span>
+      </a>
+    `;
+  }).join('') ||
+  '<div class="empty">अभी published articles में verified live vacancy deadline उपलब्ध नहीं है।</div>';
 }
 
 function renderMatrix(){
   matrix('matrixLatestJobs','Rajasthan Jobs');
   matrix('matrixAdmitCards','Admit Card');
   matrix('matrixResults','Results');
+  renderExamCalendar();
+  renderCareerHub();
 }
 
 window.setCategory=c=>{
