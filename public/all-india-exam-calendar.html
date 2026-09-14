@@ -296,6 +296,7 @@ footer a{
   }
 }
 </style>
+<script src="/firebase-config.js"></script>
 </head>
 
 <body>
@@ -356,318 +357,194 @@ footer a{
   </div>
 </footer>
 
-<script>
-(function(){
+
+
+
+
+
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+const calendar = document.getElementById("calendar");
+const filters = document.getElementById("calendar-filters");
+
+if (calendar && window.FIREBASE_CONFIG) {
+  const app = initializeApp(window.FIREBASE_CONFIG);
+  const db = getFirestore(app);
 
   const today = new Date();
-  today.setHours(0,0,0,0);
+  today.setHours(0, 0, 0, 0);
 
-  const items = [...document.querySelectorAll(".item")];
-  const filters = [...document.querySelectorAll(".filter")];
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
 
-  function dateValue(value){
-    if(!value) return null;
+  const dateOnly = v => {
+    if (!v) return null;
 
-    const d = new Date(value + "T23:59:59");
-    return Number.isNaN(d.getTime()) ? null : d;
-  }
-
-  function refresh(filter="all"){
-
-    let visible = 0;
-
-    items.forEach(item => {
-
-      const category = item.dataset.category || "";
-      const lastDate = dateValue(item.dataset.lastDate);
-      const examDate = dateValue(item.dataset.examDate);
-
-      /*
-       * Primary expiry:
-       * application last date.
-       *
-       * If no last date exists, exam date is used.
-       */
-      const expiry = lastDate || examDate;
-
-      const expired = expiry && expiry < today;
-      const categoryMatch =
-        filter === "all" || category === filter;
-
-      const show = !expired && categoryMatch;
-
-      item.hidden = !show;
-
-      if(show) visible++;
-    });
-
-    let empty = document.querySelector(".empty");
-
-    if(!visible){
-
-      if(!empty){
-        empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent =
-          "इस category में अभी कोई active calendar update उपलब्ध नहीं है।";
-        document.getElementById("calendar").appendChild(empty);
-      }
-
-    }else if(empty){
-
-      empty.remove();
+    if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+      const d = new Date(v + "T23:59:59");
+      return Number.isNaN(d.getTime()) ? null : d;
     }
-  }
 
-  filters.forEach(button => {
-
-    button.addEventListener("click", function(){
-
-      filters.forEach(x => x.classList.remove("active"));
-      this.classList.add("active");
-
-      refresh(this.dataset.filter);
-    });
-
-  });
-
-  refresh();
-
-})();
-</script>
-
-
-
-<script>
-(function () {
-  "use strict";
-
-  const calendar = document.getElementById("calendar");
-  if (!calendar) return;
-
-  const filters = Array.from(
-    document.querySelectorAll(".filter")
-  );
-
-  const TODAY = new Date();
-  TODAY.setHours(0, 0, 0, 0);
-
-  /*
-   * ALL INDIA ONLY.
-   * Rajasthan is deliberately not included here.
-   */
-  const ALL_INDIA_ARTICLES = [
-    {
-      slug: "rrb-paramedical-recruitment-2026",
-      url: "/rrb-paramedical-recruitment-2026",
-      category: "Railway",
-      title: "RRB Paramedical Recruitment 2026",
-      start: "2026-09-15",
-      last: "2026-10-14",
-      exam: "",
-      apply: ""
-    },
-
-    {
-      slug: "bank-of-india-so-recruitment-2026-205-posts",
-      url: "/bank-of-india-so-recruitment-2026-205-posts.html",
-      category: "Banking",
-      title: "Bank of India SO Recruitment 2026",
-      start: "2026-09-10",
-      last: "2026-09-25",
-      exam: "",
-      apply: ""
-    },
-
-    {
-      slug: "ssc-je-recruitment-2026",
-      url: "/ssc-je-recruitment-2026.html",
-      category: "SSC",
-      title: "SSC JE Recruitment 2026",
-      start: "2026-09-02",
-      last: "2026-09-22",
-      exam: "",
-      apply: ""
-    },
-
-    {
-      slug: "east-coast-railway-apprentice-1-599-posts",
-      url: "/east-coast-railway-apprentice-1-599-posts.html",
-      category: "Railway",
-      title: "East Coast Railway Apprentice Recruitment 2026",
-      start: "2026-08-26",
-      last: "2026-09-15",
-      exam: "",
-      apply: "https://rrcbbs.org.in"
-    },
-
-    {
-      slug: "india-post-gds-recruitment-2026-bpm-25-000",
-      url: "/india-post-gds-recruitment-2026-bpm-25-000.html",
-      category: "India Post",
-      title: "India Post GDS Recruitment 2026",
-      start: "2026-09-02",
-      last: "2026-09-21",
-      exam: "",
-      apply: ""
+    if (v && typeof v.toDate === "function") {
+      const d = v.toDate();
+      d.setHours(23,59,59,999);
+      return d;
     }
-  ];
 
-  function parseDate(value) {
-    if (!value) return null;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    return null;
+  };
 
-    const d = new Date(value + "T23:59:59");
-    return Number.isNaN(d.getTime()) ? null : d;
-  }
+  const formatDate = v => {
+    const d = dateOnly(v);
+    return d
+      ? d.toLocaleDateString("en-IN", {
+          day:"2-digit",
+          month:"short",
+          year:"numeric"
+        })
+      : "To be announced";
+  };
 
-  function formatDate(value) {
-    const d = parseDate(value);
+  const regionOf = post => {
+    const region = String(post.region || "").toLowerCase().trim();
 
-    if (!d) return "To be announced";
+    if (region === "rajasthan") return "rajasthan";
+    if (region === "all-india") return "all-india";
 
-    return d.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    });
-  }
+    return String(post.category || "").toLowerCase().trim() ===
+      "rajasthan jobs"
+      ? "rajasthan"
+      : "all-india";
+  };
 
-  function isExpired(item) {
-    const last = parseDate(item.last);
-    const exam = parseDate(item.exam);
-    const expiry = last || exam;
+  const categoryOf = post =>
+    String(post.category || "Latest Updates").trim();
 
-    return expiry ? expiry < TODAY : false;
-  }
+  const expiryOf = post =>
+    dateOnly(post.applicationLastDate) ||
+    dateOnly(post.examDate);
 
-  function daysLeft(value) {
-    const d = parseDate(value);
+  const isExpired = post => {
+    const d = expiryOf(post);
+    return d ? d < today : false;
+  };
+
+  const daysLeft = v => {
+    const d = dateOnly(v);
     if (!d) return "";
 
-    const n = Math.ceil(
-      (d - TODAY) / 86400000
-    );
+    const n = Math.ceil((d - today) / 86400000);
 
     if (n < 0) return "";
     if (n === 0) return "Today";
 
     return n + " days left";
+  };
+
+  let posts = [];
+  let activeCategory = "all";
+
+  function createFilters() {
+    if (!filters) return;
+
+    const categories = [
+      ...new Set(
+        posts
+          .filter(p => regionOf(p) === "all-india")
+          .map(categoryOf)
+          .filter(Boolean)
+      )
+    ].sort();
+
+    filters.innerHTML =
+      '<button class="filter active" data-filter="all">All</button>' +
+      categories.map(c =>
+        '<button class="filter" data-filter="' +
+        esc(c) +
+        '">' +
+        esc(c) +
+        "</button>"
+      ).join("");
+
+    filters.querySelectorAll(".filter").forEach(btn => {
+      btn.addEventListener("click", () => {
+        filters.querySelectorAll(".filter")
+          .forEach(x => x.classList.remove("active"));
+
+        btn.classList.add("active");
+        activeCategory = btn.dataset.filter || "all";
+
+        render();
+      });
+    });
   }
 
-  function esc(value) {
-    return String(value || "").replace(
-      /[&<>"']/g,
-      function (c) {
-        return {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        }[c];
-      }
-    );
-  }
-
-  function render(filter) {
-
-    const records = ALL_INDIA_ARTICLES
-      .filter(function (item) {
-
-        /*
-         * Final Rajasthan isolation barrier.
-         */
-        return (
-          item.category &&
-          !/rajasthan/i.test(item.category) &&
-          !/rajasthan/i.test(item.title) &&
-          !/rajasthan/i.test(item.url)
-        );
-
-      })
-      .filter(function (item) {
-        return !isExpired(item);
-      })
-      .filter(function (item) {
-        return (
-          filter === "all" ||
-          item.category === filter
-        );
-      })
-      .sort(function (a, b) {
-
-        const ad =
-          parseDate(a.last) ||
-          parseDate(a.exam) ||
-          new Date(8640000000000000);
-
-        const bd =
-          parseDate(b.last) ||
-          parseDate(b.exam) ||
-          new Date(8640000000000000);
-
+  function render() {
+    const rows = posts
+      .filter(p => p.status === "published")
+      .filter(p => regionOf(p) === "all-india")
+      .filter(p => !isExpired(p))
+      .filter(p =>
+        activeCategory === "all" ||
+        categoryOf(p) === activeCategory
+      )
+      .sort((a,b) => {
+        const ad = expiryOf(a) || new Date(8640000000000000);
+        const bd = expiryOf(b) || new Date(8640000000000000);
         return ad - bd;
       });
 
-    if (!records.length) {
+    if (!rows.length) {
       calendar.innerHTML =
-        '<div class="empty">' +
-        'इस category में अभी कोई active All India update उपलब्ध नहीं है।' +
-        '</div>';
+        '<div class="empty">अभी कोई active All India exam update उपलब्ध नहीं है.</div>';
       return;
     }
 
-    calendar.innerHTML = records.map(function (item) {
+    calendar.innerHTML = rows.map(post => {
+      const start = post.applicationStartDate || "";
+      const last = post.applicationLastDate || "";
+      const exam = post.examDate || "";
+      const countdown = daysLeft(last || exam);
 
-      const start =
-        item.start
-          ? formatDate(item.start)
-          : "Not announced";
+      const apply =
+        post.applyOnlineUrl ||
+        post.officialWebsiteUrl ||
+        "";
 
-      const last =
-        item.last
-          ? formatDate(item.last)
-          : "Not announced";
-
-      const exam =
-        item.exam
-          ? formatDate(item.exam)
-          : "To be announced";
-
-      const countdown =
-        daysLeft(item.last || item.exam);
-
-      const applyButton =
-        item.apply
-          ? '<a class="apply" href="' +
-            esc(item.apply) +
-            '" target="_blank" rel="noopener">' +
-            'Apply / Official Link →' +
-            '</a>'
-          : "";
+      const slug = post.slug || "";
+      const articleUrl =
+        "/article.html?slug=" + encodeURIComponent(slug);
 
       return `
         <article
           class="item"
           data-calendar="all-india"
           data-calendar-entry="all-india"
-          data-category="${esc(item.category)}"
-          data-application-start="${esc(item.start)}"
-          data-application-last-date="${esc(item.last)}"
-          data-exam-date="${esc(item.exam)}"
-          data-apply-url="${esc(item.apply)}"
-          data-details-url="${esc(item.url)}">
+          data-region="all-india"
+          data-category="${esc(categoryOf(post))}">
 
           <div class="item-top">
             <div>
-              <span class="category">
-                ${esc(item.category)}
-              </span>
+              <span class="category">${esc(categoryOf(post))}</span>
 
               <h2>
-                <a href="${esc(item.url)}">
-                  ${esc(item.title)}
+                <a href="${articleUrl}">
+                  ${esc(post.title || "Untitled")}
                 </a>
               </h2>
             </div>
@@ -676,21 +553,22 @@ footer a{
           </div>
 
           <div class="meta">
-
             <div class="meta-box">
               <small>Application Starts</small>
-              <strong>${esc(start)}</strong>
+              <strong>${esc(
+                start ? formatDate(start) : "Not announced"
+              )}</strong>
             </div>
 
             <div class="meta-box">
               <small>Last Date</small>
               <strong>
-                ${esc(last)}
+                ${esc(
+                  last ? formatDate(last) : "Not announced"
+                )}
                 ${
                   countdown
-                    ? "<br><small>" +
-                      esc(countdown) +
-                      "</small>"
+                    ? "<br><small>" + esc(countdown) + "</small>"
                     : ""
                 }
               </strong>
@@ -698,54 +576,66 @@ footer a{
 
             <div class="meta-box">
               <small>Exam Date</small>
-              <strong>${esc(exam)}</strong>
+              <strong>${esc(
+                exam ? formatDate(exam) : "To be announced"
+              )}</strong>
             </div>
-
           </div>
 
           <div class="actions">
-
-            <a
-              class="details"
-              href="${esc(item.url)}">
+            <a class="details" href="${articleUrl}">
               Details →
             </a>
 
-            ${applyButton}
-
+            ${
+              apply
+                ? '<a class="apply" href="' +
+                  esc(apply) +
+                  '" target="_blank" rel="noopener">' +
+                  'Apply / Official Link →' +
+                  '</a>'
+                : ""
+            }
           </div>
         </article>
       `;
-
     }).join("");
   }
 
-  filters.forEach(function (button) {
+  async function loadPosts() {
+    calendar.innerHTML =
+      '<div class="empty">Loading live All India updates…</div>';
 
-    button.addEventListener(
-      "click",
-      function () {
+    try {
+      const q = query(
+        collection(db, "posts"),
+        where("status", "==", "published")
+      );
 
-        filters.forEach(function (x) {
-          x.classList.remove("active");
-        });
+      const snap = await getDocs(q);
 
-        button.classList.add("active");
+      posts = snap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      }));
 
-        render(
-          button.dataset.filter || "all"
-        );
-      }
-    );
+      createFilters();
+      render();
 
-  });
+    } catch (error) {
+      console.error("EXAM DARPAN calendar:", error);
 
-  window.__EXAM_DARPAN_ALL_INDIA_RECORDS__ =
-    ALL_INDIA_ARTICLES.slice();
+      calendar.innerHTML =
+        '<div class="empty">All India updates load नहीं हो पाए।</div>';
+    }
+  }
 
-  render("all");
+  loadPosts();
 
-})();
+} else if (calendar) {
+  calendar.innerHTML =
+    '<div class="empty">Firebase configuration unavailable.</div>';
+}
 </script>
 
 </body>
