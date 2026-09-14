@@ -331,202 +331,18 @@ footer a{
   <button class="filter" data-filter="Defence">Defence</button>
 </div>
 
-<section id="calendar" class="calendar">
 
-<!--
-  ARTICLE-DRIVEN CALENDAR
+<section id="calendar"
+  class="calendar"
+  data-calendar="all-india"
+  data-calendar-source="explicit-all-india">
 
-  Future implementation:
-  Articles expose structured exam/application metadata.
-  This page reads that metadata and filters expired entries.
-
-  Data attributes:
-  data-category
-  data-apply-start
-  data-last-date
-  data-exam-date
--->
-
-<article class="item"
-  data-category="Railway"
-  data-apply-start="2026-09-15"
-  data-last-date="2026-10-14"
-  data-exam-date="">
-
-  <div class="item-top">
-    <div>
-      <span class="category">Railway</span>
-      <h2>
-        <a href="/rrb-paramedical-recruitment-2026">
-          RRB Paramedical Recruitment 2026
-        </a>
-      </h2>
-    </div>
-    <span class="status">LIVE</span>
+  <div class="empty" id="calendar-loading">
+    Loading live All India updates…
   </div>
-
-  <div class="meta">
-    <div class="meta-box">
-      <small>Application Starts</small>
-      <strong>15 Sept 2026</strong>
-    </div>
-    <div class="meta-box">
-      <small>Last Date</small>
-      <strong>14 Oct 2026</strong>
-    </div>
-    <div class="meta-box">
-      <small>Exam Date</small>
-      <strong>To be announced</strong>
-    </div>
-  </div>
-
-  <div class="actions">
-    <a class="details" href="/rrb-paramedical-recruitment-2026">
-      Details →
-    </a>
-    <a class="apply"
-       href="/rrb-paramedical-recruitment-2026">
-      Apply / Official Link →
-    </a>
-  </div>
-</article>
-
-<article class="item"
-  data-category="Banking"
-  data-apply-start="2026-09-10"
-  data-last-date="2026-09-25"
-  data-exam-date="">
-
-  <div class="item-top">
-    <div>
-      <span class="category">Banking</span>
-      <h2>
-        <a href="/bank-of-india-so-recruitment-2026-205-posts">
-          Bank of India SO Recruitment 2026
-        </a>
-      </h2>
-    </div>
-    <span class="status">LIVE</span>
-  </div>
-
-  <div class="meta">
-    <div class="meta-box">
-      <small>Application Starts</small>
-      <strong>10 Sept 2026</strong>
-    </div>
-    <div class="meta-box">
-      <small>Last Date</small>
-      <strong>25 Sept 2026</strong>
-    </div>
-    <div class="meta-box">
-      <small>Exam Date</small>
-      <strong>To be announced</strong>
-    </div>
-  </div>
-
-  <div class="actions">
-    <a class="details"
-       href="/bank-of-india-so-recruitment-2026-205-posts">
-      Details →
-    </a>
-    <a class="apply"
-       href="/bank-of-india-so-recruitment-2026-205-posts">
-      Apply / Official Link →
-    </a>
-  </div>
-</article>
-
-<article class="item"
-  data-category="Railway"
-  data-apply-start=""
-  data-last-date=""
-  data-exam-date="">
-
-  <div class="item-top">
-    <div>
-      <span class="category">Railway</span>
-      <h2>
-        <a href="/east-coast-railway-apprentice-1-599-posts">
-          East Coast Railway Apprentice Recruitment 2026
-        </a>
-      </h2>
-    </div>
-    <span class="status">UPDATE</span>
-  </div>
-
-  <div class="meta">
-    <div class="meta-box">
-      <small>Application Starts</small>
-      <strong>See article</strong>
-    </div>
-    <div class="meta-box">
-      <small>Last Date</small>
-      <strong>See article</strong>
-    </div>
-    <div class="meta-box">
-      <small>Exam Date</small>
-      <strong>No exam</strong>
-    </div>
-  </div>
-
-  <div class="actions">
-    <a class="details"
-       href="/east-coast-railway-apprentice-1-599-posts">
-      Details →
-    </a>
-    <a class="apply"
-       href="/east-coast-railway-apprentice-1-599-posts">
-      Apply / Official Link →
-    </a>
-  </div>
-</article>
-
-<article class="item"
-  data-category="India Post"
-  data-apply-start=""
-  data-last-date=""
-  data-exam-date="">
-
-  <div class="item-top">
-    <div>
-      <span class="category">India Post</span>
-      <h2>
-        <a href="/india-post-gds-recruitment-2026-bpm-25-000">
-          India Post GDS Recruitment 2026
-        </a>
-      </h2>
-    </div>
-    <span class="status">UPDATE</span>
-  </div>
-
-  <div class="meta">
-    <div class="meta-box">
-      <small>Application Starts</small>
-      <strong>See article</strong>
-    </div>
-    <div class="meta-box">
-      <small>Last Date</small>
-      <strong>See article</strong>
-    </div>
-    <div class="meta-box">
-      <small>Exam Date</small>
-      <strong>No exam</strong>
-    </div>
-  </div>
-
-  <div class="actions">
-    <a class="details"
-       href="/india-post-gds-recruitment-2026-bpm-25-000">
-      Details →
-    </a>
-    <a class="apply"
-       href="/india-post-gds-recruitment-2026-bpm-25-000">
-      Apply / Official Link →
-    </a>
-  </div>
-</article>
 
 </section>
+
 
 </main>
 
@@ -616,6 +432,318 @@ footer a{
   });
 
   refresh();
+
+})();
+</script>
+
+
+
+<script>
+(function () {
+  "use strict";
+
+  const calendar = document.getElementById("calendar");
+  if (!calendar) return;
+
+  const filters = Array.from(
+    document.querySelectorAll(".filter")
+  );
+
+  const TODAY = new Date();
+  TODAY.setHours(0, 0, 0, 0);
+
+  /*
+   * ALL INDIA ONLY.
+   * Rajasthan is deliberately not included here.
+   */
+  const ALL_INDIA_ARTICLES = [
+    {
+      slug: "rrb-paramedical-recruitment-2026",
+      url: "/rrb-paramedical-recruitment-2026",
+      category: "Railway",
+      title: "RRB Paramedical Recruitment 2026",
+      start: "2026-09-15",
+      last: "2026-10-14",
+      exam: "",
+      apply: ""
+    },
+
+    {
+      slug: "bank-of-india-so-recruitment-2026-205-posts",
+      url: "/bank-of-india-so-recruitment-2026-205-posts.html",
+      category: "Banking",
+      title: "Bank of India SO Recruitment 2026",
+      start: "2026-09-10",
+      last: "2026-09-25",
+      exam: "",
+      apply: ""
+    },
+
+    {
+      slug: "ssc-je-recruitment-2026",
+      url: "/ssc-je-recruitment-2026.html",
+      category: "SSC",
+      title: "SSC JE Recruitment 2026",
+      start: "2026-09-02",
+      last: "2026-09-22",
+      exam: "",
+      apply: ""
+    },
+
+    {
+      slug: "east-coast-railway-apprentice-1-599-posts",
+      url: "/east-coast-railway-apprentice-1-599-posts.html",
+      category: "Railway",
+      title: "East Coast Railway Apprentice Recruitment 2026",
+      start: "2026-08-26",
+      last: "2026-09-15",
+      exam: "",
+      apply: "https://rrcbbs.org.in"
+    },
+
+    {
+      slug: "india-post-gds-recruitment-2026-bpm-25-000",
+      url: "/india-post-gds-recruitment-2026-bpm-25-000.html",
+      category: "India Post",
+      title: "India Post GDS Recruitment 2026",
+      start: "2026-09-02",
+      last: "2026-09-21",
+      exam: "",
+      apply: ""
+    }
+  ];
+
+  function parseDate(value) {
+    if (!value) return null;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+    const d = new Date(value + "T23:59:59");
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  function formatDate(value) {
+    const d = parseDate(value);
+
+    if (!d) return "To be announced";
+
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  }
+
+  function isExpired(item) {
+    const last = parseDate(item.last);
+    const exam = parseDate(item.exam);
+    const expiry = last || exam;
+
+    return expiry ? expiry < TODAY : false;
+  }
+
+  function daysLeft(value) {
+    const d = parseDate(value);
+    if (!d) return "";
+
+    const n = Math.ceil(
+      (d - TODAY) / 86400000
+    );
+
+    if (n < 0) return "";
+    if (n === 0) return "Today";
+
+    return n + " days left";
+  }
+
+  function esc(value) {
+    return String(value || "").replace(
+      /[&<>"']/g,
+      function (c) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[c];
+      }
+    );
+  }
+
+  function render(filter) {
+
+    const records = ALL_INDIA_ARTICLES
+      .filter(function (item) {
+
+        /*
+         * Final Rajasthan isolation barrier.
+         */
+        return (
+          item.category &&
+          !/rajasthan/i.test(item.category) &&
+          !/rajasthan/i.test(item.title) &&
+          !/rajasthan/i.test(item.url)
+        );
+
+      })
+      .filter(function (item) {
+        return !isExpired(item);
+      })
+      .filter(function (item) {
+        return (
+          filter === "all" ||
+          item.category === filter
+        );
+      })
+      .sort(function (a, b) {
+
+        const ad =
+          parseDate(a.last) ||
+          parseDate(a.exam) ||
+          new Date(8640000000000000);
+
+        const bd =
+          parseDate(b.last) ||
+          parseDate(b.exam) ||
+          new Date(8640000000000000);
+
+        return ad - bd;
+      });
+
+    if (!records.length) {
+      calendar.innerHTML =
+        '<div class="empty">' +
+        'इस category में अभी कोई active All India update उपलब्ध नहीं है।' +
+        '</div>';
+      return;
+    }
+
+    calendar.innerHTML = records.map(function (item) {
+
+      const start =
+        item.start
+          ? formatDate(item.start)
+          : "Not announced";
+
+      const last =
+        item.last
+          ? formatDate(item.last)
+          : "Not announced";
+
+      const exam =
+        item.exam
+          ? formatDate(item.exam)
+          : "To be announced";
+
+      const countdown =
+        daysLeft(item.last || item.exam);
+
+      const applyButton =
+        item.apply
+          ? '<a class="apply" href="' +
+            esc(item.apply) +
+            '" target="_blank" rel="noopener">' +
+            'Apply / Official Link →' +
+            '</a>'
+          : "";
+
+      return `
+        <article
+          class="item"
+          data-calendar="all-india"
+          data-calendar-entry="all-india"
+          data-category="${esc(item.category)}"
+          data-application-start="${esc(item.start)}"
+          data-application-last-date="${esc(item.last)}"
+          data-exam-date="${esc(item.exam)}"
+          data-apply-url="${esc(item.apply)}"
+          data-details-url="${esc(item.url)}">
+
+          <div class="item-top">
+            <div>
+              <span class="category">
+                ${esc(item.category)}
+              </span>
+
+              <h2>
+                <a href="${esc(item.url)}">
+                  ${esc(item.title)}
+                </a>
+              </h2>
+            </div>
+
+            <span class="status">LIVE</span>
+          </div>
+
+          <div class="meta">
+
+            <div class="meta-box">
+              <small>Application Starts</small>
+              <strong>${esc(start)}</strong>
+            </div>
+
+            <div class="meta-box">
+              <small>Last Date</small>
+              <strong>
+                ${esc(last)}
+                ${
+                  countdown
+                    ? "<br><small>" +
+                      esc(countdown) +
+                      "</small>"
+                    : ""
+                }
+              </strong>
+            </div>
+
+            <div class="meta-box">
+              <small>Exam Date</small>
+              <strong>${esc(exam)}</strong>
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            <a
+              class="details"
+              href="${esc(item.url)}">
+              Details →
+            </a>
+
+            ${applyButton}
+
+          </div>
+        </article>
+      `;
+
+    }).join("");
+  }
+
+  filters.forEach(function (button) {
+
+    button.addEventListener(
+      "click",
+      function () {
+
+        filters.forEach(function (x) {
+          x.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        render(
+          button.dataset.filter || "all"
+        );
+      }
+    );
+
+  });
+
+  window.__EXAM_DARPAN_ALL_INDIA_RECORDS__ =
+    ALL_INDIA_ARTICLES.slice();
+
+  render("all");
 
 })();
 </script>
