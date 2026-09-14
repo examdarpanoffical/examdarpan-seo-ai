@@ -720,7 +720,7 @@ function renderCareerHub(){
       const key=tile.dataset.hubKey;
 
       const post=getMatrixPosts()
-        .filter(p=>categoryMatch(p,key))
+        .filter(p=>isRajasthanPost(p) && categoryMatch(p,key))
         .sort((a,b)=>{
           const ad=toDateValue(a.publishedAt)?.getTime()||0;
           const bd=toDateValue(b.publishedAt)?.getTime()||0;
