@@ -802,30 +802,29 @@ footer a{
 
   function examDate(p) {
     /*
-     * EXAM DATE RULE:
-     * Never derive Exam Date from application start/end dates.
-     * Never scan the complete article for a generic date.
+     * EXAM DATE = ONLY an explicitly labelled exam date.
      *
-     * Exam Date is shown ONLY when:
-     * 1. a dedicated structured exam-date field exists AND it is explicitly
-     *    marked as an actual exam date, OR
-     * 2. article text contains an explicit exam-date label followed by a date.
-     *
-     * This prevents:
-     * "आवेदन शुरू 12 सितंबर 2026"
-     * from becoming:
-     * "Exam Date 12 सितंबर 2026"
+     * Never use:
+     * - application start date
+     * - application last date
+     * - registration date
+     * - generic dates found anywhere in the article
+     * - Firestore examDate fields (existing records are unreliable)
      */
 
     const text = calendarSourceText(p);
+    if (!text) return null;
+
+    const clean = htmlToCalendarText(text)
+      .replace(/[|]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
     /*
-     * Do NOT use p.examDate / p.exam_date here.
-     * Existing Firestore records contain incorrect values in those fields
-     * for some articles (application-start dates copied as exam dates).
+     * Explicit labels only.
+     * The date must occur immediately after one of these labels.
      */
-
-    const strictLabels = [
+    const labels = [
       "exam date",
       "exam dates",
       "examination date",
@@ -848,17 +847,62 @@ footer a{
       "परीक्षा आयोजित होगी",
       "परीक्षा आयोजित की जाएगी",
       "परीक्षा होगी दिनांक",
-      "परीक्षा कब होगी",
-      "परीक्षा का आयोजन"
+      "परीक्षा कब होगी"
     ];
 
-    /*
-     * extractDateNear() is allowed to work only around the explicit labels
-     * above. It must NOT receive the whole article as a generic date source.
-     */
-    const result = extractDateNear(text, strictLabels);
+    const label = labels
+      .map(x => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|");
 
-    return result || null;
+    let m;
+
+    // Explicit label + DD/MM/YYYY
+    m = clean.match(new RegExp(
+      "(?:" + label + ")\\s*[:\\-]?\\s*" +
+      "(\\d{1,2})[\\/\\.\\-](\\d{1,2})[\\/\\.\\-](20\\d{2})",
+      "i"
+    ));
+
+    if (m) {
+      return makeDate(+m[3], +m[2], +m[1]);
+    }
+
+    // Explicit label + DD Month YYYY
+    m = clean.match(new RegExp(
+      "(?:" + label + ")\\s*[:\\-]?\\s*" +
+      "(\\d{1,2})\\s+" +
+      "(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवंबर|नवम्बर|दिसंबर|दिसम्बर|" +
+      "January|February|March|April|May|June|July|August|September|October|November|December)" +
+      "(?:\\s*,?\\s*(20\\d{2}))?",
+      "i"
+    ));
+
+    if (m) {
+      return parseCalendarDate(
+        `${m[1]} ${m[2]} ${m[3] || 2026}`
+      );
+    }
+
+    // Explicit label + Month DD YYYY
+    m = clean.match(new RegExp(
+      "(?:" + label + ")\\s*[:\\-]?\\s*" +
+      "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+      "\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:,)?\\s*(20\\d{2})?",
+      "i"
+    ));
+
+    if (m) {
+      return parseCalendarDate(
+        `${m[1]} ${m[2]} ${m[3] || 2026}`
+      );
+    }
+
+    // CRITICAL:
+    // Do NOT call extractDateNear() here.
+    // It contains application-start/application-deadline natural
+    // fallbacks which can turn "12 सितंबर 2026" into a false exam date.
+
+    return null;
   }
 
   function isRajasthan(p) {
