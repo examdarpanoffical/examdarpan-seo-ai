@@ -521,11 +521,48 @@ if (calendar && window.FIREBASE_CONFIG) {
       आरपीएससी|
       आरएसएसबी|
       आरएसएमएसएसबी
-    )/ix.test(text);
+    )/i.test(text);
   }
 
   function isAllIndia(post) {
     return !isRajasthan(post);
+  }
+
+  function isGovernmentRecruitment(post) {
+    const category = String(post.category || "").trim().toLowerCase();
+    const text = textOf(post).toLowerCase();
+
+    if (
+      category === "government jobs" ||
+      category === "government job" ||
+      category === "recruitment"
+    ) return true;
+
+    return /(
+      recruitment|
+      recruit|
+      vacancy|
+      vacancies|
+      bharti|
+      भर्ती|
+      government\s+job|
+      govt\s+job|
+      सरकारी\s+नौकरी|
+      ssc|
+      upsc|
+      railway|
+      rrb|
+      bank|
+      banking|
+      ibps|
+      sbi|
+      defence|
+      defense|
+      armed\s+forces|
+      police|
+      central\s+government|
+      central\s+govt
+    )/i.test(text);
   }
 
   function firstDate(post, keys) {
@@ -705,6 +742,7 @@ if (calendar && window.FIREBASE_CONFIG) {
       ...new Set(
         posts
           .filter(isAllIndia)
+          .filter(isGovernmentRecruitment)
           .filter(isActive)
           .map(categoryOf)
       )
@@ -738,6 +776,7 @@ if (calendar && window.FIREBASE_CONFIG) {
     const rows = posts
       .filter(p => p.status === "published")
       .filter(isAllIndia)
+      .filter(isGovernmentRecruitment)
       .filter(isActive)
       .filter(p =>
         activeCategory === "all" ||
