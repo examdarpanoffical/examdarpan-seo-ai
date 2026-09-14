@@ -511,42 +511,96 @@ footer a{
   }
 
   function parseCalendarDate(value) {
-    if (!value) return null;
+    if (value === null || value === undefined || value === "") return null;
 
     if (value && typeof value.toDate === "function") {
       const d = value.toDate();
-      return valid(d) ? d : null;
+      return validDate(d) ? d : null;
     }
 
     if (value && typeof value.seconds === "number") {
-      const d = new Date(value.seconds * 1000);
-      return valid(d) ? d : null;
+      const d = new Date(
+        Number(value.seconds) * 1000 +
+        Math.floor(Number(value.nanoseconds || 0) / 1000000)
+      );
+      return validDate(d) ? d : null;
+    }
+
+    if (typeof value === "number") {
+      const d = new Date(
+        Math.abs(value) < 100000000000 ? value * 1000 : value
+      );
+      return validDate(d) ? d : null;
+    }
+
+    if (value instanceof Date) {
+      return validDate(value) ? new Date(value.getTime()) : null;
     }
 
     const x = String(value).trim();
     if (!x) return null;
 
-    let m = x.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})/);
-    if (m) return makeDate(m[1], m[2], m[3]);
+    const months = {
+      jan:1,january:1,
+      feb:2,february:2,
+      mar:3,march:3,
+      apr:4,april:4,
+      may:5,
+      jun:6,june:6,
+      jul:7,july:7,
+      aug:8,august:8,
+      sep:9,sept:9,september:9,
+      oct:10,october:10,
+      nov:11,november:11,
+      dec:12,december:12,
 
+      "जनवरी":1,
+      "फरवरी":2,
+      "मार्च":3,
+      "अप्रैल":4,
+      "मई":5,
+      "जून":6,
+      "जुलाई":7,
+      "अगस्त":8,
+      "सितंबर":9,
+      "सितम्बर":9,
+      "अक्टूबर":10,
+      "नवंबर":11,
+      "नवम्बर":11,
+      "दिसंबर":12,
+      "दिसम्बर":12
+    };
+
+    let m;
+
+    // YYYY-MM-DD / YYYY/MM/DD / YYYY.MM.DD
+    m = x.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})/);
+    if (m) return makeDate(+m[1], +m[2], +m[3]);
+
+    // DD-MM-YYYY / DD/MM/YYYY / DD.MM.YYYY
     m = x.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/);
-    if (m) return makeDate(m[3], m[2], m[1]);
+    if (m) return makeDate(+m[3], +m[2], +m[1]);
 
-    m = x.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(20\d{2})$/);
+    // DD Month YYYY
+    m = x.match(
+      /^(\d{1,2})\s+([A-Za-z]+|जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवंबर|नवम्बर|दिसंबर|दिसम्बर)(?:\s*,?\s*(20\d{2}))?$/i
+    );
     if (m) {
-      const months = {
-        jan:1,january:1,feb:2,february:2,mar:3,march:3,
-        apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,
-        aug:8,august:8,sep:9,september:9,sept:9,
-        oct:10,october:10,nov:11,november:11,
-        dec:12,december:12
-      };
-      const mo = months[m[2].toLowerCase()];
-      if (mo) return makeDate(m[3], mo, m[1]);
+      const mo = months[String(m[2]).toLowerCase()];
+      if (mo) return makeDate(m[3] ? +m[3] : 2026, mo, +m[1]);
+    }
+
+    // Month DD YYYY
+    m = x.match(
+      /^([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*)?(20\d{2})?$/i
+    );
+    if (m) {
+      const mo = months[String(m[1]).toLowerCase()];
+      if (mo) return makeDate(m[3] ? +m[3] : 2026, mo, +m[2]);
     }
 
     const d = new Date(x);
-    return valid(d) ? d : null;
+    return validDate(d) ? d : null;
   }
 
   function fieldDate(p, keys) {
@@ -557,45 +611,124 @@ footer a{
     return null;
   }
 
+  function htmlToCalendarText(value) {
+    if (!value) return "";
+
+    let raw = String(value);
+
+    // Remove scripts/styles first.
+    raw = raw
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ");
+
+    // Convert HTML to readable text.
+    const holder = document.createElement("div");
+    holder.innerHTML = raw;
+
+    return String(holder.textContent || holder.innerText || raw)
+      .replace(/\u00a0/g, " ")
+      .replace(/\r/g, " ")
+      .replace(/\n+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function calendarSourceText(p) {
     return [
       p.title,
       p.excerpt,
+
+      // Common article/body fields.
       p.content,
+      p.articleContent,
       p.description,
       p.summary,
+      p.body,
+      p.articleBody,
+      p.text,
+      p.html,
+      p.articleHtml,
+      p.postContent,
+      p.post_body,
+
+      // Metadata fields.
       p.category,
       p.region,
       p.state,
+      p.organization,
+      p.department,
+
       ...(Array.isArray(p.tags) ? p.tags : [])
-    ].filter(Boolean).join(" ");
+    ]
+      .filter(v => v !== null && v !== undefined && String(v).trim())
+      .map(htmlToCalendarText)
+      .join(" ");
   }
 
   function extractDateNear(text, labels) {
     if (!text) return null;
 
-    const label = labels.join("|");
+    const clean = htmlToCalendarText(text)
+      .replace(/[|]+/g, " ")
+      .replace(/\s+/g, " ");
 
-    let m = text.match(new RegExp(
-      "(?:" + label + ")\\D{0,40}" +
-      "(\\d{1,2})[\\\\/.\\-](\\d{1,2})[\\\\/.\\-](20\\d{2})",
+    const label = labels
+      .map(x => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|");
+
+    let m;
+
+    // Label + numeric date.
+    m = clean.match(new RegExp(
+      "(?:" + label + ")[^\\d]{0,100}" +
+      "(\\d{1,2})[\\/\\.\\-](\\d{1,2})[\\/\\.\\-](20\\d{2})",
       "i"
     ));
-    if (m) return makeDate(m[3], m[2], m[1]);
+    if (m) return makeDate(+m[3], +m[2], +m[1]);
 
-    m = text.match(new RegExp(
-      "(?:" + label + ")\\D{0,40}" +
-      "(\\d{1,2})\\s+([A-Za-z]+)\\s+(20\\d{2})",
+    // Label + DD Month YYYY
+    m = clean.match(new RegExp(
+      "(?:" + label + ")[^\\dA-Za-z\\u0900-\\u097F]{0,100}" +
+      "(\\d{1,2})\\s+" +
+      "([A-Za-z]+|जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवंबर|नवम्बर|दिसंबर|दिसम्बर)" +
+      "(?:\\s*,?\\s*(20\\d{2}))?",
       "i"
     ));
-    if (m) return parseCalendarDate(`${m[1]} ${m[2]} ${m[3]}`);
+    if (m) {
+      return parseCalendarDate(
+        m[3]
+          ? `${m[1]} ${m[2]} ${m[3]}`
+          : `${m[1]} ${m[2]} 2026`
+      );
+    }
 
-    m = text.match(new RegExp(
-      "(?:" + label + ")\\D{0,40}" +
-      "([A-Za-z]+)\\s+(\\d{1,2}),?\\s+(20\\d{2})",
+    // Label + Month DD YYYY
+    m = clean.match(new RegExp(
+      "(?:" + label + ")[^\\dA-Za-z\\u0900-\\u097F]{0,100}" +
+      "([A-Za-z]+)\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:,)?\\s*(20\\d{2})?",
       "i"
     ));
-    if (m) return parseCalendarDate(`${m[2]} ${m[1]} ${m[3]}`);
+    if (m) {
+      return parseCalendarDate(
+        `${m[1]} ${m[2]} ${m[3] || 2026}`
+      );
+    }
+
+    // Hindi/English natural sentence fallbacks.
+    const natural = [
+      /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवंबर|नवम्बर|दिसंबर|दिसम्बर)\s*(20\d{2})?\s*(?:से|से आवेदन|से शुरू)/i,
+      /(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवंबर|नवम्बर|दिसंबर|दिसम्बर)\s*(20\d{2})?\s*(?:तक|तक आवेदन|तक Apply|तक करें)/i,
+      /(?:परीक्षा|exam)[^।\n]{0,100}?(\d{1,2})\s+(जनवरी|फरवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवंबर|नवम्बर|दिसंबर|दिसम्बर|January|February|March|April|May|June|July|August|September|October|November|December)\s*(20\d{2})?\s*(?:को|on)?/i
+    ];
+
+    for (const re of natural) {
+      m = clean.match(re);
+      if (m) {
+        return parseCalendarDate(
+          `${m[1]} ${m[2]} ${m[3] || 2026}`
+        );
+      }
+    }
 
     return null;
   }
@@ -609,16 +742,24 @@ footer a{
       "applyStartDate",
       "apply_start_date",
       "registrationStartDate",
-      "registration_start_date"
+      "registration_start_date",
+      "applicationFrom",
+      "application_from"
     ]) || extractDateNear(calendarSourceText(p), [
       "application start",
       "application starts",
+      "application starting",
       "apply from",
       "registration starts",
       "registration start",
+      "registration begins",
       "आवेदन शुरू",
       "आवेदन प्रारंभ",
-      "आवेदन आरंभ"
+      "आवेदन आरंभ",
+      "आवेदन शुरू होने",
+      "आवेदन शुरू होगा",
+      "आवेदन शुरू होंगे",
+      "से आवेदन"
     ]);
   }
 
@@ -638,7 +779,8 @@ footer a{
       "application_deadline",
       "closingDate",
       "closing_date",
-      "deadline"
+      "deadline",
+      "lastDay"
     ]) || extractDateNear(calendarSourceText(p), [
       "last date",
       "last date to apply",
@@ -646,10 +788,16 @@ footer a{
       "application deadline",
       "deadline",
       "closing date",
+      "closing date for application",
       "अंतिम तिथि",
       "अंतिम तारीख",
       "आवेदन की अंतिम तिथि",
-      "आवेदन की अंतिम तारीख"
+      "आवेदन की अंतिम तारीख",
+      "आवेदन करने की अंतिम",
+      "आवेदन की आखिरी तिथि",
+      "आवेदन की आखिरी तारीख",
+      "तक करें apply",
+      "तक आवेदन"
     ]);
   }
 
@@ -660,15 +808,22 @@ footer a{
       "examDateTime",
       "exam_date_time",
       "examinationDate",
-      "examination_date"
+      "examination_date",
+      "examStartDate",
+      "exam_start_date"
     ]) || extractDateNear(calendarSourceText(p), [
       "exam date",
       "exam on",
       "examination date",
+      "exam will be held",
       "exam will be held on",
+      "examination will be held",
       "परीक्षा तिथि",
       "परीक्षा की तिथि",
-      "परीक्षा तारीख"
+      "परीक्षा तारीख",
+      "परीक्षा आयोजित",
+      "परीक्षा होगी",
+      "परीक्षा होगी"
     ]);
   }
 
