@@ -296,6 +296,7 @@ footer a{
   }
 }
 </style>
+
 <script src="/firebase-config.js"></script>
 </head>
 
@@ -364,6 +365,9 @@ footer a{
 
 
 
+
+
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
 import {
@@ -381,8 +385,15 @@ if (calendar && window.FIREBASE_CONFIG) {
   const app = initializeApp(window.FIREBASE_CONFIG);
   const db = getFirestore(app);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const startOfToday = () => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  let today = startOfToday();
+  let posts = [];
+  let activeCategory = "all";
 
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;",
@@ -392,72 +403,300 @@ if (calendar && window.FIREBASE_CONFIG) {
     "'":"&#39;"
   }[c]));
 
-  const dateOnly = v => {
-    if (!v) return null;
+  function validDate(d) {
+    return d instanceof Date && !Number.isNaN(d.getTime());
+  }
 
-    if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
-      const d = new Date(v + "T23:59:59");
-      return Number.isNaN(d.getTime()) ? null : d;
-    }
+  function endOfDay(y, m, d) {
+    const out = new Date(Number(y), Number(m) - 1, Number(d), 23, 59, 59, 999);
+    if (
+      !validDate(out) ||
+      out.getFullYear() !== Number(y) ||
+      out.getMonth() !== Number(m) - 1 ||
+      out.getDate() !== Number(d)
+    ) return null;
+    return out;
+  }
+
+  function parseDateValue(v) {
+    if (v === null || v === undefined || v === "") return null;
 
     if (v && typeof v.toDate === "function") {
       const d = v.toDate();
-      d.setHours(23,59,59,999);
-      return d;
+      return validDate(d) ? d : null;
     }
 
+    if (v && typeof v.seconds === "number") {
+      const d = new Date(
+        v.seconds * 1000 +
+        Math.floor((Number(v.nanoseconds) || 0) / 1000000)
+      );
+      return validDate(d) ? d : null;
+    }
+
+    if (typeof v === "number") {
+      const ms = Math.abs(v) < 100000000000 ? v * 1000 : v;
+      const d = new Date(ms);
+      return validDate(d) ? d : null;
+    }
+
+    if (v instanceof Date) {
+      return validDate(v) ? new Date(v.getTime()) : null;
+    }
+
+    if (typeof v !== "string") return null;
+
+    const value = v.trim();
+    if (!value) return null;
+
+    let m;
+
+    if ((m = value.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})$/))) {
+      return endOfDay(m[1], m[2], m[3]);
+    }
+
+    if ((m = value.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})$/))) {
+      return endOfDay(m[3], m[2], m[1]);
+    }
+
+    if ((m = value.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(20\d{2})$/))) {
+      const months = {
+        jan:1,january:1,feb:2,february:2,mar:3,march:3,
+        apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,
+        aug:8,august:8,sep:9,sept:9,september:9,
+        oct:10,october:10,nov:11,november:11,dec:12,december:12
+      };
+      const month = months[m[2].toLowerCase()];
+      if (month) return endOfDay(m[3], month, m[1]);
+    }
+
+    if ((m = value.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(20\d{2})$/))) {
+      const months = {
+        jan:1,january:1,feb:2,february:2,mar:3,march:3,
+        apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,
+        aug:8,august:8,sep:9,sept:9,september:9,
+        oct:10,october:10,nov:11,november:11,dec:12,december:12
+      };
+      const month = months[m[1].toLowerCase()];
+      if (month) return endOfDay(m[3], month, m[2]);
+    }
+
+    const iso = new Date(value);
+    if (validDate(iso)) return iso;
+
     return null;
-  };
+  }
 
-  const formatDate = v => {
-    const d = dateOnly(v);
-    return d
-      ? d.toLocaleDateString("en-IN", {
-          day:"2-digit",
-          month:"short",
-          year:"numeric"
-        })
-      : "To be announced";
-  };
+  function textOf(post) {
+    return [
+      post.title,
+      post.excerpt,
+      post.content,
+      ...(Array.isArray(post.tags) ? post.tags : [])
+    ].filter(Boolean).join(" ");
+  }
 
-  const regionOf = post => {
-    const region = String(post.region || "").toLowerCase().trim();
+  function isRajasthan(post) {
+    const region = String(post.region || "").trim().toLowerCase();
+    const category = String(post.category || "").trim().toLowerCase();
+    const text = textOf(post);
 
-    if (region === "rajasthan") return "rajasthan";
-    if (region === "all-india") return "all-india";
+    if (region === "rajasthan") return true;
+    if (/rajasthan\s*jobs/.test(category)) return true;
 
-    return String(post.category || "").toLowerCase().trim() ===
-      "rajasthan jobs"
-      ? "rajasthan"
-      : "all-india";
-  };
+    return /(
+      \brajasthan\b|
+      \brpsc\b|
+      \brssb\b|
+      \brsmssb\b|
+      \breet\b|
+      \brajasthan\s+police\b|
+      \brajasthan\s+cet\b|
+      \brvunl\b|
+      \brajcrb\b|
+      \banuprati\b|
+      राजस्थान|
+      राजस्थानी|
+      अनुप्रति|
+      आरपीएससी|
+      आरएसएसबी|
+      आरएसएमएसएसबी
+    )/ix.test(text);
+  }
 
-  const categoryOf = post =>
-    String(post.category || "Latest Updates").trim();
+  function isAllIndia(post) {
+    return !isRajasthan(post);
+  }
 
-  const expiryOf = post =>
-    dateOnly(post.applicationLastDate) ||
-    dateOnly(post.examDate);
+  function firstDate(post, keys) {
+    for (const key of keys) {
+      const d = parseDateValue(post[key]);
+      if (d) return d;
+    }
+    return null;
+  }
 
-  const isExpired = post => {
-    const d = expiryOf(post);
-    return d ? d < today : false;
-  };
+  function textDate(text, labels) {
+    const escaped = labels.join("|");
 
-  const daysLeft = v => {
-    const d = dateOnly(v);
+    let m = text.match(
+      new RegExp(
+        "(?:" + escaped + ")\\\\s*(?:is|:|-|to|on|from)?\\\\s*" +
+        "(\\\\d{1,2})[\\\\/.-](\\\\d{1,2})[\\\\/.-](20\\\\d{2})",
+        "i"
+      )
+    );
+    if (m) return endOfDay(m[3], m[2], m[1]);
+
+    m = text.match(
+      new RegExp(
+        "(?:" + escaped + ")\\\\D{0,30}" +
+        "(\\\\d{1,2})\\\\s+([A-Za-z]+)\\\\s+(20\\\\d{2})",
+        "i"
+      )
+    );
+    if (m) return parseDateValue(`${m[1]} ${m[2]} ${m[3]}`);
+
+    return null;
+  }
+
+  function getStartDate(post) {
+    const d = firstDate(post, [
+      "applicationStartDate",
+      "application_start_date",
+      "startDate",
+      "start_date",
+      "applyStartDate",
+      "apply_start_date"
+    ]);
+    if (d) return d;
+
+    return textDate(textOf(post), [
+      "application start",
+      "application starts",
+      "apply from",
+      "registration starts",
+      "आवेदन शुरू",
+      "आवेदन प्रारंभ",
+      "आवेदन आरंभ"
+    ]);
+  }
+
+  function getDeadline(post) {
+    const d = firstDate(post, [
+      "applicationLastDate",
+      "application_last_date",
+      "lastDate",
+      "last_date",
+      "lastDateTime",
+      "last_date_time",
+      "applyLastDate",
+      "apply_last_date",
+      "deadline",
+      "applicationDeadline",
+      "application_deadline",
+      "closingDate",
+      "closing_date",
+      "lastDateToApply",
+      "last_date_to_apply"
+    ]);
+    if (d) return d;
+
+    return textDate(textOf(post), [
+      "last date",
+      "last date to apply",
+      "application last date",
+      "deadline",
+      "closing date",
+      "अंतिम तिथि",
+      "अंतिम तारीख",
+      "आवेदन की अंतिम तिथि",
+      "आवेदन की अंतिम तारीख"
+    ]);
+  }
+
+  function getExamDate(post) {
+    const d = firstDate(post, [
+      "examDate",
+      "exam_date",
+      "examDateTime",
+      "exam_date_time"
+    ]);
+    if (d) return d;
+
+    return textDate(textOf(post), [
+      "exam date",
+      "exam on",
+      "examination date",
+      "परीक्षा तिथि",
+      "परीक्षा की तिथि",
+      "परीक्षा तारीख"
+    ]);
+  }
+
+  function expiryOf(post) {
+    return getDeadline(post) || getExamDate(post);
+  }
+
+  function isActive(post) {
+    const expiry = expiryOf(post);
+    return !!expiry && expiry >= today;
+  }
+
+  function formatDate(d) {
+    if (!d) return "To be announced";
+    return d.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  }
+
+  function daysLeft(d) {
     if (!d) return "";
+    const target = new Date(d);
+    target.setHours(0, 0, 0, 0);
 
-    const n = Math.ceil((d - today) / 86400000);
+    const n = Math.ceil(
+      (target.getTime() - today.getTime()) / 86400000
+    );
 
     if (n < 0) return "";
     if (n === 0) return "Today";
-
     return n + " days left";
-  };
+  }
 
-  let posts = [];
-  let activeCategory = "all";
+  function categoryOf(post) {
+    const raw = String(post.category || "").trim();
+
+    if ([
+      "Government Jobs",
+      "Admit Card",
+      "Results",
+      "Answer Key",
+      "Syllabus",
+      "Latest Updates"
+    ].includes(raw)) return raw;
+
+    const combined = textOf(post).toLowerCase();
+
+    if (/admit\s*card|hall\s*ticket|exam\s*city|city\s*intimation|प्रवेश\s*पत्र|एडमिट\s*कार्ड/i.test(combined))
+      return "Admit Card";
+
+    if (/answer\s*key|उत्तर\s*कुंजी/i.test(combined))
+      return "Answer Key";
+
+    if (/result|score\s*card|परिणाम|रिजल्ट/i.test(combined))
+      return "Results";
+
+    if (/syllabus|पाठ्यक्रम/i.test(combined))
+      return "Syllabus";
+
+    if (/recruitment|recruit|vacancy|vacancies|bharti|भर्ती|posts?|पदों|apply\s*online|आवेदन\s*शुरू|आवेदन\s*करें/i.test(combined))
+      return "Government Jobs";
+
+    return "Latest Updates";
+  }
 
   function createFilters() {
     if (!filters) return;
@@ -465,19 +704,19 @@ if (calendar && window.FIREBASE_CONFIG) {
     const categories = [
       ...new Set(
         posts
-          .filter(p => regionOf(p) === "all-india")
+          .filter(isAllIndia)
+          .filter(isActive)
           .map(categoryOf)
-          .filter(Boolean)
       )
     ].sort();
 
     filters.innerHTML =
       '<button class="filter active" data-filter="all">All</button>' +
-      categories.map(c =>
+      categories.map(category =>
         '<button class="filter" data-filter="' +
-        esc(c) +
+        esc(category) +
         '">' +
-        esc(c) +
+        esc(category) +
         "</button>"
       ).join("");
 
@@ -488,22 +727,23 @@ if (calendar && window.FIREBASE_CONFIG) {
 
         btn.classList.add("active");
         activeCategory = btn.dataset.filter || "all";
-
         render();
       });
     });
   }
 
   function render() {
+    today = startOfToday();
+
     const rows = posts
       .filter(p => p.status === "published")
-      .filter(p => regionOf(p) === "all-india")
-      .filter(p => !isExpired(p))
+      .filter(isAllIndia)
+      .filter(isActive)
       .filter(p =>
         activeCategory === "all" ||
         categoryOf(p) === activeCategory
       )
-      .sort((a,b) => {
+      .sort((a, b) => {
         const ad = expiryOf(a) || new Date(8640000000000000);
         const bd = expiryOf(b) || new Date(8640000000000000);
         return ad - bd;
@@ -511,24 +751,27 @@ if (calendar && window.FIREBASE_CONFIG) {
 
     if (!rows.length) {
       calendar.innerHTML =
-        '<div class="empty">अभी कोई active All India exam update उपलब्ध नहीं है.</div>';
+        '<div class="empty">अभी कोई active All India government exam update उपलब्ध नहीं है।</div>';
       return;
     }
 
     calendar.innerHTML = rows.map(post => {
-      const start = post.applicationStartDate || "";
-      const last = post.applicationLastDate || "";
-      const exam = post.examDate || "";
+      const start = getStartDate(post);
+      const last = getDeadline(post);
+      const exam = getExamDate(post);
       const countdown = daysLeft(last || exam);
 
       const apply =
         post.applyOnlineUrl ||
         post.officialWebsiteUrl ||
+        post.officialNotificationUrl ||
         "";
 
-      const slug = post.slug || "";
+      const slug = String(post.slug || "").trim();
       const articleUrl =
         "/article.html?slug=" + encodeURIComponent(slug);
+
+      const category = categoryOf(post);
 
       return `
         <article
@@ -536,11 +779,11 @@ if (calendar && window.FIREBASE_CONFIG) {
           data-calendar="all-india"
           data-calendar-entry="all-india"
           data-region="all-india"
-          data-category="${esc(categoryOf(post))}">
+          data-category="${esc(category)}">
 
           <div class="item-top">
             <div>
-              <span class="category">${esc(categoryOf(post))}</span>
+              <span class="category">${esc(category)}</span>
 
               <h2>
                 <a href="${articleUrl}">
@@ -592,8 +835,8 @@ if (calendar && window.FIREBASE_CONFIG) {
                 ? '<a class="apply" href="' +
                   esc(apply) +
                   '" target="_blank" rel="noopener">' +
-                  'Apply / Official Link →' +
-                  '</a>'
+                  "Apply / Official Link →" +
+                  "</a>"
                 : ""
             }
           </div>
@@ -614,9 +857,9 @@ if (calendar && window.FIREBASE_CONFIG) {
 
       const snap = await getDocs(q);
 
-      posts = snap.docs.map(d => ({
-        id: d.id,
-        ...d.data()
+      posts = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
       }));
 
       createFilters();
@@ -631,8 +874,8 @@ if (calendar && window.FIREBASE_CONFIG) {
   }
 
   loadPosts();
-
-} else if (calendar) {
+}
+else if (calendar) {
   calendar.innerHTML =
     '<div class="empty">Firebase configuration unavailable.</div>';
 }
