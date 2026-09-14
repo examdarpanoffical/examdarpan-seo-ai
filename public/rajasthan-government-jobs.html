@@ -13,6 +13,7 @@
 <link rel="canonical" href="https://examdarpan.in/rajasthan-government-jobs">
 <link rel="icon" href="/assets/favicon.webp">
 <link rel="stylesheet" href="/styles.css">
+<script src="/firebase-config.js"></script>
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Exam Darpan">
@@ -133,6 +134,203 @@
 }
 </style>
 
+
+<style id="ed-rajasthan-live-hub-fix">
+
+.ed-raj-live-hub{
+  margin:18px 0;
+  padding:20px;
+  border:1px solid #e2e8f0;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(15,23,42,.055);
+}
+
+.ed-raj-live-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:15px;
+}
+
+.ed-raj-live-head h2{
+  margin:0;
+  color:#0f172a;
+  font-size:22px;
+  line-height:1.25;
+}
+
+.ed-raj-live-head p{
+  margin:6px 0 0;
+  color:#64748b;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.ed-raj-live-count{
+  flex:0 0 auto;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#eff6ff;
+  border:1px solid #dbeafe;
+  color:#1d4ed8;
+  font-size:9px;
+  font-weight:900;
+}
+
+.ed-raj-live-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.ed-raj-live-card{
+  min-width:0;
+  padding:16px;
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  background:#fff;
+  transition:.18s ease;
+}
+
+.ed-raj-live-card:hover{
+  transform:translateY(-2px);
+  border-color:#bfdbfe;
+  box-shadow:0 9px 22px rgba(30,64,175,.08);
+}
+
+.ed-raj-live-card .badge{
+  display:inline-flex;
+  margin-bottom:8px;
+}
+
+.ed-raj-live-card h3{
+  margin:0;
+  font-size:16px;
+  line-height:1.4;
+}
+
+.ed-raj-live-card h3 a{
+  color:#0f172a;
+  text-decoration:none;
+}
+
+.ed-raj-live-card h3 a:hover{
+  color:#1d4ed8;
+}
+
+.ed-raj-live-card p{
+  margin:8px 0;
+  color:#64748b;
+  font-size:11px;
+  line-height:1.65;
+}
+
+.ed-raj-live-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:9px;
+  color:#64748b;
+  font-size:9px;
+  font-weight:750;
+}
+
+.ed-raj-live-read{
+  display:inline-flex;
+  margin-top:10px;
+  color:#1d4ed8;
+  font-size:10px;
+  font-weight:900;
+  text-decoration:none;
+}
+
+.ed-raj-live-empty{
+  grid-column:1/-1;
+  padding:22px;
+  text-align:center;
+  border:1px dashed #cbd5e1;
+  border-radius:15px;
+  color:#64748b;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.ed-raj-active-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:18px;
+}
+
+.ed-raj-active-link{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  padding:14px;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  background:#fff;
+  color:#0f172a;
+  text-decoration:none;
+  transition:.18s ease;
+}
+
+.ed-raj-active-link:hover{
+  transform:translateY(-2px);
+  border-color:#93c5fd;
+  box-shadow:0 8px 18px rgba(30,64,175,.08);
+}
+
+.ed-raj-active-link strong{
+  font-size:11px;
+  line-height:1.3;
+}
+
+.ed-raj-active-link span{
+  color:#64748b;
+  font-size:8.5px;
+  line-height:1.45;
+}
+
+.ed-raj-active-link b{
+  margin-top:2px;
+  color:#1d4ed8;
+  font-size:10px;
+}
+
+@media(max-width:800px){
+  .ed-raj-live-grid{
+    grid-template-columns:1fr;
+  }
+
+  .ed-raj-active-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:520px){
+  .ed-raj-live-hub{
+    padding:16px;
+    border-radius:17px;
+  }
+
+  .ed-raj-live-head{
+    align-items:flex-start;
+  }
+
+  .ed-raj-live-head h2{
+    font-size:19px;
+  }
+
+  .ed-raj-active-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+</style>
+
 </head>
 
 <body>
@@ -236,52 +434,27 @@
   </div>
 </div>
 
-<div class="posts-grid">
+<div class="ed-raj-live-hub" id="rajasthan-live-vacancies">
 
-<article class="card post">
-  <div class="post-copy">
-    <span class="badge">Rajasthan Jobs</span>
+  <div class="ed-raj-live-head">
+    <div>
+      <span class="eyebrow">LIVE RAJASTHAN VACANCIES</span>
+      <h2 id="rajasthanHubHeading">Latest Rajasthan Government Jobs</h2>
+      <p>
+        Published Rajasthan government job updates automatically यहाँ दिखाई जाएंगी।
+      </p>
+    </div>
 
-    <h2>
-      <a href="/rajasthan-rvunl-recruitment-2026-junior-engineer-junior-accountant-junior-assistant">
-        Rajasthan RVUNL Recruitment 2026: JE, Junior Accountant और Junior Assistant
-      </a>
-    </h2>
-
-    <p>
-      Rajasthan power companies से जुड़ी भर्ती की जानकारी,
-      पद और आवेदन से संबंधित details Exam Darpan पर देखें और
-      official notification से अंतिम जानकारी verify करें।
-    </p>
-
-    <a class="read-more"
-       href="/rajasthan-rvunl-recruitment-2026-junior-engineer-junior-accountant-junior-assistant">
-       पूरा article पढ़ें <b>→</b>
-    </a>
+    <span class="ed-raj-live-count" id="rajasthanHubCount">
+      Loading…
+    </span>
   </div>
-</article>
 
-<article class="card post">
-  <div class="post-copy">
-    <span class="badge">Rajasthan Exam</span>
-
-    <h2>
-      <a href="/rajasthan-cet-senior-secondary-2026-28-august-se-23-october-tak-56-din-mein-clerk-ldc-exam-ki-taiyari-kaise-kare">
-        Rajasthan CET Senior Secondary 2026: Clerk/LDC तैयारी
-      </a>
-    </h2>
-
-    <p>
-      Rajasthan CET और उससे जुड़े Clerk/LDC preparation topics
-      के लिए exam-focused guidance और महत्वपूर्ण तैयारी points देखें।
-    </p>
-
-    <a class="read-more"
-       href="/rajasthan-cet-senior-secondary-2026-28-august-se-23-october-tak-56-din-mein-clerk-ldc-exam-ki-taiyari-kaise-kare">
-       तैयारी article पढ़ें <b>→</b>
-    </a>
+  <div id="rajasthanHubPosts" class="ed-raj-live-grid">
+    <div class="ed-raj-live-empty">
+      Rajasthan की latest vacancies load हो रही हैं…
+    </div>
   </div>
-</article>
 
 </div>
 
@@ -402,64 +575,74 @@ Latest Updates <b>→</b>
 
 
 <section class="seo-raj-clusters" aria-labelledby="raj-seo-heading">
-  <h2 id="raj-seo-heading">राजस्थान सरकारी नौकरी — भर्ती, परीक्षा, एडमिट कार्ड और रिजल्ट</h2>
+
+  <h2 id="raj-seo-heading">
+    राजस्थान सरकारी नौकरी — भर्ती, परीक्षा, एडमिट कार्ड और रिजल्ट
+  </h2>
 
   <p>
-    राजस्थान की सरकारी भर्तियों और प्रतियोगी परीक्षाओं की नवीनतम जानकारी
-    Exam Darpan पर एक जगह देखें। आवेदन करने से पहले संबंधित विभाग की
-    आधिकारिक अधिसूचना और वेबसाइट पर जानकारी जरूर verify करें।
+    राजस्थान की सरकारी भर्तियों और प्रतियोगी परीक्षाओं की latest published
+    जानकारी एक जगह देखें। किसी category पर click करने पर working Rajasthan
+    Jobs Hub उसी category की available updates दिखाएगा।
   </p>
 
-  <div class="seo-raj-grid">
-    <a href="#rpsc">
+  <div class="ed-raj-active-grid">
+
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=rpsc">
       <strong>RPSC Recruitment</strong>
-      <span>RPSC भर्ती, परीक्षा और परिणाम अपडेट</span>
+      <span>RPSC भर्ती, परीक्षा और परिणाम updates</span>
+      <b>देखें →</b>
     </a>
 
-    <a href="#rssb">
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=rssb">
       <strong>RSSB / RSMSSB</strong>
-      <span>कर्मचारी चयन बोर्ड की भर्ती जानकारी</span>
+      <span>RSSB, LDC, Patwari, VDO और अन्य updates</span>
+      <b>देखें →</b>
     </a>
 
-    <a href="#police">
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=police">
       <strong>Rajasthan Police</strong>
-      <span>पुलिस भर्ती और परीक्षा अपडेट</span>
+      <span>Police SI, Constable और police exams</span>
+      <b>देखें →</b>
     </a>
 
-    <a href="#teacher">
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=teacher">
       <strong>Teacher Jobs</strong>
-      <span>REET और शिक्षक भर्ती अपडेट</span>
+      <span>REET और Rajasthan teacher recruitment</span>
+      <b>देखें →</b>
     </a>
 
-    <a href="#cet">
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=cet">
       <strong>Rajasthan CET</strong>
-      <span>CET परीक्षा और संबंधित भर्ती अपडेट</span>
+      <span>CET और related recruitment updates</span>
+      <b>देखें →</b>
     </a>
 
-    <a href="#clerical">
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=ldc">
       <strong>LDC / Clerk</strong>
-      <span>क्लर्क और जूनियर असिस्टेंट भर्ती</span>
+      <span>LDC, Clerk और Junior Assistant</span>
+      <b>देखें →</b>
     </a>
 
-    <a href="#technical">
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=je">
       <strong>JE / Technical Jobs</strong>
-      <span>JE और तकनीकी भर्ती अपडेट</span>
+      <span>Junior Engineer और technical recruitment</span>
+      <b>देखें →</b>
     </a>
 
-    <a href="#results">
+    <a class="ed-raj-active-link" href="/rajasthan-government-jobs?hub=admit">
       <strong>Admit Card & Result</strong>
-      <span>एडमिट कार्ड, आंसर की और रिजल्ट</span>
+      <span>Admit Card, Answer Key और Result</span>
+      <b>देखें →</b>
     </a>
+
   </div>
 
   <div class="seo-raj-official">
-    <strong>Official Rajasthan Sources:</strong>
-    <a href="https://recruitment.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">Recruitment Portal</a>
-    ·
-    <a href="https://rpsc.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">RPSC</a>
-    ·
-    <a href="https://rssb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer">RSSB</a>
+    आवेदन करने से पहले संबंधित भर्ती की official notification और recruitment
+    portal पर eligibility, fee, dates और application status जरूर verify करें।
   </div>
+
 </section>
 
 </main>
@@ -489,6 +672,306 @@ Latest Updates <b>→</b>
 
 </div>
 </footer>
+
+
+<script id="ed-rajasthan-live-hub-script" type="module">
+
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  limit
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+const esc = (value = '') =>
+  String(value).replace(/[&<>'"]/g, c => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    "'":'&#39;',
+    '"':'&quot;'
+  }[c]));
+
+const textOf = post => {
+  const tags = Array.isArray(post.tags)
+    ? post.tags.join(' ')
+    : String(post.tags || '');
+
+  return [
+    post.title,
+    post.category,
+    post.excerpt,
+    post.content,
+    tags,
+    post.slug
+  ].filter(Boolean).join(' ').toLowerCase();
+};
+
+function isRajasthan(post){
+
+  const t = textOf(post);
+
+  return /rajasthan|राजस्थान|rpsc|rssb|rsmssb|reet|rajasthan police|rajasthan cet|rvunl|rajcrb|safai karmchari|patwari|vdo|ldc|junior assistant|junior engineer/i.test(t);
+}
+
+function matchesHub(post, key){
+
+  const t = textOf(post);
+
+  if(!key) return true;
+
+  if(key === 'rpsc')
+    return /rpsc|rajasthan public service commission/i.test(t);
+
+  if(key === 'rssb')
+    return /rssb|rsmssb|safai karmchari|patwari|vdo|junior assistant|lab assistant|forest guard|agriculture supervisor/i.test(t);
+
+  if(key === 'police')
+    return /rajasthan police|police si|sub inspector|constable/i.test(t);
+
+  if(key === 'teacher')
+    return /reet|teacher|school lecturer|senior teacher|grade iii|third grade/i.test(t);
+
+  if(key === 'cet')
+    return /rajasthan cet|cet senior secondary|cet graduation/i.test(t);
+
+  if(key === 'ldc')
+    return /\bldc\b|clerk|junior assistant/i.test(t);
+
+  if(key === 'je')
+    return /\bje\b|junior engineer|technical recruitment|rvunl/i.test(t);
+
+  if(key === 'admit')
+    return /admit card|answer key|result|exam city|exam district/i.test(t);
+
+  return true;
+}
+
+function timeOf(v){
+
+  try{
+    if(v && typeof v.toDate === 'function')
+      return v.toDate().getTime();
+
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? 0 : d.getTime();
+
+  }catch{
+    return 0;
+  }
+}
+
+function dateOf(v){
+
+  try{
+
+    const d =
+      v && typeof v.toDate === 'function'
+        ? v.toDate()
+        : new Date(v);
+
+    if(isNaN(d.getTime())) return '—';
+
+    return new Intl.DateTimeFormat('hi-IN',{
+      day:'2-digit',
+      month:'short',
+      year:'numeric'
+    }).format(d);
+
+  }catch{
+    return '—';
+  }
+}
+
+function slugUrl(post){
+
+  const slug = String(post.slug || '').trim();
+
+  if(slug) return '/' + encodeURIComponent(slug);
+
+  if(post.id) return '/post/' + encodeURIComponent(post.id);
+
+  return '/rajasthan-government-jobs';
+}
+
+function render(posts){
+
+  const box = document.getElementById('rajasthanHubPosts');
+  const count = document.getElementById('rajasthanHubCount');
+  const heading = document.getElementById('rajasthanHubHeading');
+
+  if(!box) return;
+
+  const params = new URLSearchParams(location.search);
+  const hub = String(params.get('hub') || '').toLowerCase();
+
+  const names = {
+    rpsc:'RPSC Recruitment',
+    rssb:'RSSB / RSMSSB',
+    police:'Rajasthan Police',
+    teacher:'Teacher Jobs',
+    cet:'Rajasthan CET',
+    ldc:'LDC / Clerk',
+    je:'JE / Technical Jobs',
+    admit:'Admit Card & Result'
+  };
+
+  const filtered = posts
+    .filter(isRajasthan)
+    .filter(post => matchesHub(post, hub))
+    .sort((a,b) => timeOf(b.publishedAt) - timeOf(a.publishedAt));
+
+  if(heading){
+    heading.textContent =
+      names[hub] || 'Latest Rajasthan Government Jobs';
+  }
+
+  if(count){
+    count.textContent =
+      `${filtered.length} ${filtered.length === 1 ? 'Update' : 'Updates'}`;
+  }
+
+  if(!filtered.length){
+
+    box.innerHTML = `
+      <div class="ed-raj-live-empty">
+        इस category में अभी कोई published Rajasthan update उपलब्ध नहीं है।
+        <br>
+        <a href="/rajasthan-government-jobs"
+           style="color:#1d4ed8;font-weight:900;text-decoration:none;">
+          सभी Rajasthan Jobs देखें →
+        </a>
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = filtered.map(post => {
+
+    const title =
+      post.title || 'Rajasthan Government Job Update';
+
+    const excerpt =
+      post.excerpt ||
+      'Rajasthan government recruitment से जुड़ी verified information देखें।';
+
+    return `
+      <article class="ed-raj-live-card">
+
+        <span class="badge">Rajasthan Jobs</span>
+
+        <h3>
+          <a href="${slugUrl(post)}">
+            ${esc(title)}
+          </a>
+        </h3>
+
+        <p>${esc(excerpt)}</p>
+
+        <div class="ed-raj-live-meta">
+          <span>${dateOf(post.publishedAt)}</span>
+          <span>•</span>
+          <span>Verified update</span>
+        </div>
+
+        <a class="ed-raj-live-read"
+           href="${slugUrl(post)}">
+          पूरा article पढ़ें →
+        </a>
+
+      </article>
+    `;
+
+  }).join('');
+}
+
+async function boot(){
+
+  const box = document.getElementById('rajasthanHubPosts');
+
+  if(!box) return;
+
+  try{
+
+    if(!window.FIREBASE_CONFIG)
+      throw new Error('FIREBASE_CONFIG missing');
+
+    const app = initializeApp(window.FIREBASE_CONFIG);
+    const db = getFirestore(app);
+
+    const q = query(
+      collection(db, 'posts'),
+      where('status', '==', 'published')
+    );
+
+    const snap = await getDocs(q);
+
+    const posts = snap.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(post => {
+        const text = [
+          post.title,
+          post.category,
+          post.slug,
+          post.excerpt,
+          post.description,
+          post.content,
+          post.tags
+        ]
+          .flat()
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        return /(?:\brajasthan\b|\brpsc\b|\brssb\b|\brsmssb\b|\breet\b|\brajasthan police\b|\brajasthan cet\b|\brvunl\b|\banuprati\b|\brajcrb\b|राजस्थान|अनुप्रति|सफाई\s*कर्मचारी|safai\s*karmchari|patwari|vdo|ldc|junior assistant|junior engineer|lab assistant|forest guard|agriculture supervisor)/i.test(text);
+      })
+      .sort((a, b) => {
+        const dateValue = post => {
+          const v = post.publishedAt;
+
+          if (v && typeof v.seconds === 'number') {
+            return v.seconds * 1000;
+          }
+
+          const t = new Date(v || 0).getTime();
+          return Number.isFinite(t) ? t : 0;
+        };
+
+        return dateValue(b) - dateValue(a);
+      });
+
+    render(posts);
+
+  }catch(error){
+
+    console.error('Rajasthan Hub:', error);
+
+    box.innerHTML = `
+      <div class="ed-raj-live-empty">
+        Latest Rajasthan updates अभी load नहीं हो पाए।
+        <br>
+        कृपया थोड़ी देर बाद फिर try करें।
+      </div>
+    `;
+
+    const count = document.getElementById('rajasthanHubCount');
+
+    if(count) count.textContent = '—';
+  }
+}
+
+boot();
+
+</script>
 
 </body>
 </html>
