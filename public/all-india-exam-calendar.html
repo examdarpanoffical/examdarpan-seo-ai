@@ -802,38 +802,63 @@ footer a{
 
   function examDate(p) {
     /*
-     * IMPORTANT:
-     * Do NOT trust generic Firestore examDate fields here.
-     * Some posts have those fields populated with application-start
-     * dates even when no exam date is announced.
+     * EXAM DATE RULE:
+     * Never derive Exam Date from application start/end dates.
+     * Never scan the complete article for a generic date.
      *
-     * Exam Date must come from an explicitly labelled date in the
-     * article/content.
+     * Exam Date is shown ONLY when:
+     * 1. a dedicated structured exam-date field exists AND it is explicitly
+     *    marked as an actual exam date, OR
+     * 2. article text contains an explicit exam-date label followed by a date.
+     *
+     * This prevents:
+     * "आवेदन शुरू 12 सितंबर 2026"
+     * from becoming:
+     * "Exam Date 12 सितंबर 2026"
      */
 
     const text = calendarSourceText(p);
 
+    /*
+     * Do NOT use p.examDate / p.exam_date here.
+     * Existing Firestore records contain incorrect values in those fields
+     * for some articles (application-start dates copied as exam dates).
+     */
+
     const strictLabels = [
       "exam date",
-      "exam on",
+      "exam dates",
       "examination date",
+      "examination dates",
+      "exam on",
       "examination on",
       "exam will be held on",
       "examination will be held on",
       "exam scheduled on",
       "examination scheduled on",
       "exam is scheduled on",
+      "examination is scheduled on",
+
       "परीक्षा तिथि",
       "परीक्षा की तिथि",
       "परीक्षा तारीख",
       "परीक्षा की तारीख",
       "परीक्षा दिनांक",
+      "परीक्षा की दिनांक",
       "परीक्षा आयोजित होगी",
       "परीक्षा आयोजित की जाएगी",
-      "परीक्षा होगी दिनांक"
+      "परीक्षा होगी दिनांक",
+      "परीक्षा कब होगी",
+      "परीक्षा का आयोजन"
     ];
 
-    return extractDateNear(text, strictLabels);
+    /*
+     * extractDateNear() is allowed to work only around the explicit labels
+     * above. It must NOT receive the whole article as a generic date source.
+     */
+    const result = extractDateNear(text, strictLabels);
+
+    return result || null;
   }
 
   function isRajasthan(p) {
