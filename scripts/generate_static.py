@@ -702,6 +702,18 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     urls: list[tuple[str, str | None, str | None]] = []
     for path, _ in STATIC_PAGES:
         urls.append((path, None, None))
+
+    # Important manually-maintained hub pages.
+    # Keep these as single canonical URLs; do not create duplicate articles.
+    hub_paths = (
+        "/rajasthan-government-jobs",
+        "/all-india-government-jobs",
+    )
+    existing_paths = {path for path, _, _ in urls}
+    for hub_path in hub_paths:
+        if hub_path not in existing_paths:
+            urls.append((hub_path, None, None))
+
     for cslug in category_slugs:
         cname = next((name for name, slug_name, _, _ in CATEGORIES if slug_name == cslug), None)
         cposts = [p for p in posts if normalized_category(p) == cname] if cname else []
