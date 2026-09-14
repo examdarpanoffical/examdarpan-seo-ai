@@ -934,6 +934,36 @@ footer a{
     return /(?:^|[^\w])upsc(?:$|[^\w])|(?:^|[^\w])ssc(?:$|[^\w])|(?:^|[^\w])rrb(?:$|[^\w])|(?:^|[^\w])rrc(?:$|[^\w])|railway|indian\s+railways|ibps|sbi|rbi|nabard|lic|sebi|esic|epfo|capf|cds|nda|afcat|agniveer|army|navy|air\s+force|defence|defense|central\s+government|central\s+govt|government\s+of\s+india|govt\.?\s+of\s+india|ministry\s+of|government\s+job|govt\.?\s+job|government\s+recruitment|recruitment|vacanc(?:y|ies)|bharti|भर्ती|सरकारी\s+नौकरी|केंद्रीय\s+सरकार/i.test(text);
   }
 
+  function isCalendarEligible(p) {
+    /*
+     * Calendar = actual All India Government Jobs / Exams only.
+     * Explicitly exclude non-recruitment content.
+     */
+    const text = calendarSourceText(p).toLowerCase();
+    const title = String(p.title || p.name || "").toLowerCase();
+    const combined = (title + " " + text).replace(/\s+/g, " ").trim();
+
+    // RSCIT / RKCL results and certificates are NOT government jobs.
+    if (
+      /\brscit\b/i.test(combined) ||
+      /\brkcl\b/i.test(combined) ||
+      /rscit\s+result/i.test(combined) ||
+      /rscit\s+certificate/i.test(combined)
+    ) {
+      return false;
+    }
+
+    // Results, scholarships, admissions and certificates are not recruitment.
+    if (
+      /scholarship|स्कॉलरशिप|admission|प्रवेश|certificate|प्रमाणपत्र|result|परिणाम/i.test(combined) &&
+      !/recruitment|भर्ती|vacancy|vacancies|पदों|सरकारी\s+नौकरी|government\s+job/i.test(combined)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   function isActive(p) {
     const last = lastDate(p);
     const exam = examDate(p);
@@ -1025,7 +1055,8 @@ footer a{
   function render() {
     const rows = posts
       .filter(p => String(p.status || "").toLowerCase() === "published")
-      .filter(isAllIndiaGovernment)
+      .filter(isCalendarEligible)
+                    .filter(isAllIndiaGovernment)
       .filter(isActive)
       .filter(p => active === "all" || categoryOf(p) === active)
       .sort((a, b) => {
@@ -1041,7 +1072,7 @@ footer a{
 
     console.log("EXAM DARPAN All India calendar", {
       fetched: posts.length,
-      eligible: posts.filter(isAllIndiaGovernment).length,
+      eligible: posts.filter(isCalendarEligible).filter(isAllIndiaGovernment).filter(isActive).length,
       visible: rows.length,
       categories: [...new Set(rows.map(categoryOf))],
       sample: rows.slice(0, 10).map(p => ({
@@ -1197,6 +1228,7 @@ footer a{
     }));
 
     const eligible = posts
+      .filter(isCalendarEligible)
       .filter(isAllIndiaGovernment)
       .filter(isActive);
 
