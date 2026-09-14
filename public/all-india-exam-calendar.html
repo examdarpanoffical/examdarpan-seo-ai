@@ -802,26 +802,18 @@ footer a{
   }
 
   function examDate(p) {
-    // First use an explicitly stored Firestore exam date.
-    const direct = fieldDate(p, [
-      "examDate",
-      "exam_date",
-      "examDateTime",
-      "exam_date_time",
-      "examinationDate",
-      "examination_date",
-      "examStartDate",
-      "exam_start_date"
-    ]);
-
-    if (direct) return direct;
+    /*
+     * IMPORTANT:
+     * Do NOT trust generic Firestore examDate fields here.
+     * Some posts have those fields populated with application-start
+     * dates even when no exam date is announced.
+     *
+     * Exam Date must come from an explicitly labelled date in the
+     * article/content.
+     */
 
     const text = calendarSourceText(p);
 
-    // IMPORTANT:
-    // Never infer an exam date from generic words like "परीक्षा".
-    // This prevents phrases such as "बिना परीक्षा" from producing
-    // a false exam date.
     const strictLabels = [
       "exam date",
       "exam on",
@@ -831,13 +823,15 @@ footer a{
       "examination will be held on",
       "exam scheduled on",
       "examination scheduled on",
+      "exam is scheduled on",
       "परीक्षा तिथि",
       "परीक्षा की तिथि",
       "परीक्षा तारीख",
       "परीक्षा की तारीख",
       "परीक्षा दिनांक",
       "परीक्षा आयोजित होगी",
-      "परीक्षा आयोजित की जाएगी"
+      "परीक्षा आयोजित की जाएगी",
+      "परीक्षा होगी दिनांक"
     ];
 
     return extractDateNear(text, strictLabels);
@@ -1006,7 +1000,7 @@ footer a{
 
       const slug = String(p.slug || "").trim();
       const url = slug
-        ? "/article.html?slug=" + encodeURIComponent(slug)
+        ? "/" + encodeURIComponent(slug)
         : "#";
 
       const apply =
