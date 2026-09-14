@@ -860,8 +860,10 @@ footer a{
     const last = lastDate(p);
     const exam = examDate(p);
 
-    if (last && last < today() && (!exam || exam < today())) return false;
-    if (exam && exam < today() && (!last || last < today())) return false;
+    // Expire an entry only when BOTH application deadline
+    // and exam date are already past.
+    if (last && last < today && (!exam || exam < today)) return false;
+    if (exam && exam < today && (!last || last < today)) return false;
 
     return true;
   }
