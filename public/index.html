@@ -669,6 +669,221 @@
 }
 </style>
 
+
+/* =========================================================
+   EXAM DARPAN — HOMEPAGE QUIZ TEASER V2
+   Compact • Premium • Student-focused
+   UI ONLY — quiz logic untouched
+   ========================================================= */
+
+#daily-quiz.ed-premium-quiz-section{
+  position:relative;
+  overflow:hidden;
+  display:grid !important;
+  grid-template-columns:minmax(250px,.78fr) minmax(0,1.22fr);
+  align-items:center;
+  gap:22px;
+  margin:18px 0 !important;
+  padding:20px !important;
+  border:1px solid #dbe4f0 !important;
+  border-radius:24px !important;
+  background:
+    radial-gradient(circle at 0% 100%,rgba(37,83,196,.10),transparent 32%),
+    radial-gradient(circle at 100% 0%,rgba(104,70,217,.10),transparent 30%),
+    linear-gradient(135deg,#ffffff 0%,#f7f9ff 100%) !important;
+  box-shadow:0 14px 34px rgba(24,45,86,.09) !important;
+}
+
+#daily-quiz.ed-premium-quiz-section::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:4px;
+  background:linear-gradient(90deg,#2453c4,#6846d9);
+}
+
+#daily-quiz .quiz-visual{
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  display:flex !important;
+  justify-content:center;
+  align-items:center;
+}
+
+#daily-quiz .quiz-device{
+  width:min(100%,330px) !important;
+  margin:0 auto !important;
+  transform:scale(.82);
+  transform-origin:center center;
+}
+
+#daily-quiz .quiz-device-top{
+  min-height:48px !important;
+}
+
+#daily-quiz .quiz-device-body{
+  padding:22px 18px !important;
+}
+
+#daily-quiz .quiz-device-body .quiz-mini-label{
+  font-size:10px !important;
+  letter-spacing:.08em;
+}
+
+#daily-quiz .quiz-device-body>strong{
+  font-size:25px !important;
+}
+
+#daily-quiz .quiz-mini-stats{
+  grid-template-columns:repeat(2,1fr) !important;
+  gap:8px !important;
+}
+
+#daily-quiz .quiz-mini-stats span{
+  padding:10px 8px !important;
+}
+
+#daily-quiz .quiz-mini-stats b{
+  font-size:17px !important;
+}
+
+#daily-quiz .quiz-teaser-copy{
+  min-width:0;
+  padding:3px 4px 3px 0;
+}
+
+#daily-quiz .quiz-kicker-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:9px;
+}
+
+#daily-quiz .quiz-kicker-row .eyebrow{
+  margin:0 !important;
+  font-size:10px !important;
+  letter-spacing:.13em;
+}
+
+#daily-quiz .quiz-live-badge{
+  font-size:9px !important;
+  padding:6px 9px !important;
+}
+
+#daily-quiz .quiz-teaser-copy h2{
+  margin:0 !important;
+  color:#101d38 !important;
+  font-size:clamp(28px,3vw,38px) !important;
+  line-height:1.12 !important;
+  letter-spacing:-.03em;
+}
+
+#daily-quiz #dailyQuizSummary{
+  max-width:600px;
+  margin:9px 0 14px !important;
+  color:#647287 !important;
+  font-size:14px !important;
+  line-height:1.65 !important;
+}
+
+#daily-quiz .quiz-feature-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:0 0 14px !important;
+}
+
+#daily-quiz .quiz-feature-row span{
+  padding:7px 10px !important;
+  border:1px solid #e0e7f2 !important;
+  border-radius:999px !important;
+  background:#fff !important;
+  color:#334155 !important;
+  font-size:10px !important;
+  font-weight:800;
+}
+
+#daily-quiz .quiz-teaser-meta{
+  display:flex !important;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+#daily-quiz #dailyQuizMeta{
+  color:#718096 !important;
+  font-size:11px !important;
+  font-weight:700;
+}
+
+#daily-quiz .quiz-main-cta{
+  min-height:45px !important;
+  padding:0 17px !important;
+  border-radius:13px !important;
+  font-size:13px !important;
+  font-weight:850 !important;
+  background:linear-gradient(135deg,#2453c4,#5b45d6) !important;
+  box-shadow:0 8px 18px rgba(43,76,180,.20);
+}
+
+@media(max-width:760px){
+  #daily-quiz.ed-premium-quiz-section{
+    display:block !important;
+    padding:16px !important;
+    border-radius:21px !important;
+  }
+
+  #daily-quiz .quiz-visual{
+    margin:0 0 10px !important;
+  }
+
+  #daily-quiz .quiz-device{
+    width:min(100%,360px) !important;
+    transform:scale(.72);
+    margin:-28px auto !important;
+  }
+
+  #daily-quiz .quiz-teaser-copy{
+    padding:0 !important;
+  }
+
+  #daily-quiz .quiz-teaser-copy h2{
+    font-size:29px !important;
+  }
+
+  #daily-quiz #dailyQuizSummary{
+    font-size:13px !important;
+    line-height:1.65 !important;
+  }
+
+  #daily-quiz .quiz-feature-row{
+    gap:6px;
+  }
+
+  #daily-quiz .quiz-feature-row span{
+    font-size:9px !important;
+    padding:6px 9px !important;
+  }
+
+  #daily-quiz .quiz-teaser-meta{
+    display:block !important;
+  }
+
+  #daily-quiz #dailyQuizMeta{
+    display:block;
+    margin-bottom:9px;
+  }
+
+  #daily-quiz .quiz-main-cta{
+    width:100%;
+    justify-content:center;
+  }
+}
+
 </head>
 <body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी और परीक्षाओं की भरोसेमंद जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
@@ -704,12 +919,12 @@
       </div>
 
       <div class="quiz-device-body">
-        <span class="quiz-mini-label">QUESTION 01 · TODAY</span>
-        <strong>आज का Daily Test</strong>
+        <span class="quiz-mini-label">LIVE PRACTICE · TODAY</span>
+        <strong>आज का Practice Test</strong>
 
         <div class="quiz-mini-stats">
-          <span><b>10</b>Questions</span>
-          <span><b>10</b>Minutes</span>
+          <span><b>Flexible</b>Practice</span>
+          <span><b>Timed</b>Test</span>
           <span><b>★</b>Score</span>
         </div>
 
@@ -726,10 +941,10 @@
       <span class="quiz-live-badge"><i></i> LIVE TEST</span>
     </div>
 
-    <h2>आज का Daily Test</h2>
+    <h2>आज का Practice Test</h2>
 
     <p id="dailyQuizSummary">
-      रोज़ के important questions solve करें, अपना score तुरंत देखें और preparation में अपनी weak areas पहचानें।
+      Daily practice, Mock Tests और Previous Papers solve करें, अपना score देखें और अपनी preparation को मजबूत करें।
     </p>
 
     <div class="quiz-feature-row">
