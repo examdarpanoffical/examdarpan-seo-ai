@@ -510,19 +510,112 @@ footer a{
     return null;
   }
 
+  function parseCalendarDate(value) {
+    if (!value) return null;
+
+    if (value && typeof value.toDate === "function") {
+      const d = value.toDate();
+      return valid(d) ? d : null;
+    }
+
+    if (value && typeof value.seconds === "number") {
+      const d = new Date(value.seconds * 1000);
+      return valid(d) ? d : null;
+    }
+
+    const x = String(value).trim();
+    if (!x) return null;
+
+    let m = x.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})/);
+    if (m) return makeDate(m[1], m[2], m[3]);
+
+    m = x.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})/);
+    if (m) return makeDate(m[3], m[2], m[1]);
+
+    m = x.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(20\d{2})$/);
+    if (m) {
+      const months = {
+        jan:1,january:1,feb:2,february:2,mar:3,march:3,
+        apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,
+        aug:8,august:8,sep:9,september:9,sept:9,
+        oct:10,october:10,nov:11,november:11,
+        dec:12,december:12
+      };
+      const mo = months[m[2].toLowerCase()];
+      if (mo) return makeDate(m[3], mo, m[1]);
+    }
+
+    const d = new Date(x);
+    return valid(d) ? d : null;
+  }
+
+  function fieldDate(p, keys) {
+    for (const key of keys) {
+      const d = parseCalendarDate(p[key]);
+      if (d) return d;
+    }
+    return null;
+  }
+
+  function calendarSourceText(p) {
+    return [
+      p.title,
+      p.excerpt,
+      p.content,
+      p.description,
+      p.summary,
+      p.category,
+      p.region,
+      p.state,
+      ...(Array.isArray(p.tags) ? p.tags : [])
+    ].filter(Boolean).join(" ");
+  }
+
+  function extractDateNear(text, labels) {
+    if (!text) return null;
+
+    const label = labels.join("|");
+
+    let m = text.match(new RegExp(
+      "(?:" + label + ")\\D{0,40}" +
+      "(\\d{1,2})[\\\\/.\\-](\\d{1,2})[\\\\/.\\-](20\\d{2})",
+      "i"
+    ));
+    if (m) return makeDate(m[3], m[2], m[1]);
+
+    m = text.match(new RegExp(
+      "(?:" + label + ")\\D{0,40}" +
+      "(\\d{1,2})\\s+([A-Za-z]+)\\s+(20\\d{2})",
+      "i"
+    ));
+    if (m) return parseCalendarDate(`${m[1]} ${m[2]} ${m[3]}`);
+
+    m = text.match(new RegExp(
+      "(?:" + label + ")\\D{0,40}" +
+      "([A-Za-z]+)\\s+(\\d{1,2}),?\\s+(20\\d{2})",
+      "i"
+    ));
+    if (m) return parseCalendarDate(`${m[2]} ${m[1]} ${m[3]}`);
+
+    return null;
+  }
+
   function startDate(p) {
-    return firstDate(p, [
+    return fieldDate(p, [
       "applicationStartDate",
       "application_start_date",
       "startDate",
       "start_date",
       "applyStartDate",
-      "apply_start_date"
-    ]) || textDate(textOf(p), [
+      "apply_start_date",
+      "registrationStartDate",
+      "registration_start_date"
+    ]) || extractDateNear(calendarSourceText(p), [
       "application start",
       "application starts",
       "apply from",
       "registration starts",
+      "registration start",
       "आवेदन शुरू",
       "आवेदन प्रारंभ",
       "आवेदन आरंभ"
@@ -530,7 +623,7 @@ footer a{
   }
 
   function lastDate(p) {
-    return firstDate(p, [
+    return fieldDate(p, [
       "applicationLastDate",
       "application_last_date",
       "lastDate",
@@ -546,7 +639,7 @@ footer a{
       "closingDate",
       "closing_date",
       "deadline"
-    ]) || textDate(textOf(p), [
+    ]) || extractDateNear(calendarSourceText(p), [
       "last date",
       "last date to apply",
       "application last date",
@@ -561,15 +654,18 @@ footer a{
   }
 
   function examDate(p) {
-    return firstDate(p, [
+    return fieldDate(p, [
       "examDate",
       "exam_date",
       "examDateTime",
-      "exam_date_time"
-    ]) || textDate(textOf(p), [
+      "exam_date_time",
+      "examinationDate",
+      "examination_date"
+    ]) || extractDateNear(calendarSourceText(p), [
       "exam date",
       "exam on",
       "examination date",
+      "exam will be held on",
       "परीक्षा तिथि",
       "परीक्षा की तिथि",
       "परीक्षा तारीख"
@@ -580,102 +676,39 @@ footer a{
     const region = String(p.region || "").trim().toLowerCase();
     const state = String(p.state || "").trim().toLowerCase();
     const category = String(p.category || "").trim().toLowerCase();
-    const text = textOf(p);
+    const text = calendarSourceText(p);
 
-    if (
-      region === "rajasthan" ||
-      state === "rajasthan" ||
-      /rajasthan\s*jobs/i.test(category)
-    ) return true;
+    if (region === "rajasthan" || state === "rajasthan") return true;
+    if (/rajasthan\s+jobs?/.test(category)) return true;
 
-    return /(
-      \brajasthan\b|
-      \brpsc\b|
-      \brssb\b|
-      \brsmssb\b|
-      \breet\b|
-      \brajasthan\s+police\b|
-      \brajasthan\s+cet\b|
-      \brvunl\b|
-      \brajcrb\b|
-      \banuprati\b|
-      राजस्थान|
-      आरपीएससी|
-      आरएसएसबी|
-      आरएसएमएसएसबी|
-      अनुप्रति
-    )/ix.test(text);
+    return /(?:^|[^\w])rajasthan(?:$|[^\w])|rpsc|rssb|rsmssb|reet|rajasthan\s+police|rajasthan\s+cet|rvunl|rajcrb|anuprati|राजस्थान|आरपीएससी|आरएसएसबी|आरएसएमएसएसबी|अनुप्रति/i.test(text);
   }
 
   function isAllIndiaGovernment(p) {
     if (isRajasthan(p)) return false;
 
-    const text = textOf(p);
-
-    /*
-     * Explicit national/central exam bodies.
-     */
-    if (/(^|[^a-z])(upsc|ssc|rrb|rrc|ibps|sbi|rbi|nabard|lic|sebi|epfo|esic|capf|nda|cds|afcat)([^a-z]|$)/i.test(text))
-      return true;
-
-    /*
-     * Railway / Defence / Central Government.
-     */
-    if (/railway|indian railways|armed forces|defence|defense|army|navy|air force|agniveer|central government|central govt|government of india|govt\.?\s+of\s+india|ministry of/i.test(text))
-      return true;
-
-    /*
-     * Explicit government/recruitment wording.
-     */
-    if (/government\s+job|govt\.?\s+job|government\s+recruitment|recruitment|vacanc(?:y|ies)|bharti|सरकारी\s+नौकरी|सरकारी\s+भर्ती|केंद्रीय\s+सरकार/i.test(text))
-      return true;
-
-    /*
-     * Strong category values.
-     */
     const category = String(p.category || "").trim().toLowerCase();
-    return [
-      "upsc",
-      "ssc",
-      "railway",
-      "rrb",
-      "rrc",
-      "banking",
-      "ibps",
-      "sbi",
-      "rbi",
-      "defence",
-      "defense",
-      "central government",
-      "central govt",
-      "government jobs",
-      "government job",
-      "govt jobs",
-      "govt job",
+
+    if ([
+      "upsc","ssc","railway","rrb","banking","ibps","sbi",
+      "defence","defense","central government","central govt",
+      "government jobs","government job","govt jobs","govt job",
       "recruitment"
-    ].includes(category);
+    ].includes(category)) return true;
+
+    const text = calendarSourceText(p);
+
+    return /(?:^|[^\w])upsc(?:$|[^\w])|(?:^|[^\w])ssc(?:$|[^\w])|(?:^|[^\w])rrb(?:$|[^\w])|(?:^|[^\w])rrc(?:$|[^\w])|railway|indian\s+railways|ibps|sbi|rbi|nabard|lic|sebi|esic|epfo|capf|cds|nda|afcat|agniveer|army|navy|air\s+force|defence|defense|central\s+government|central\s+govt|government\s+of\s+india|govt\.?\s+of\s+india|ministry\s+of|government\s+job|govt\.?\s+job|government\s+recruitment|recruitment|vacanc(?:y|ies)|bharti|भर्ती|सरकारी\s+नौकरी|केंद्रीय\s+सरकार/i.test(text);
   }
 
   function isActive(p) {
     const last = lastDate(p);
     const exam = examDate(p);
 
-    /*
-     * Application deadline has priority.
-     * If application is closed but exam is still upcoming,
-     * keep the exam on the calendar.
-     */
-    if (last && last >= today) return true;
-    if (exam && exam >= today) return true;
+    if (last && last < today() && (!exam || exam < today())) return false;
+    if (exam && exam < today() && (!last || last < today())) return false;
 
-    /*
-     * No dates: keep valid government/exam updates visible.
-     * This prevents the calendar becoming empty merely because
-     * a post stores dates in another field.
-     */
-    if (!last && !exam) return true;
-
-    return false;
+    return true;
   }
 
   function categoryOf(p) {
