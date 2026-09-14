@@ -368,62 +368,43 @@ footer a{
 
 
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  where
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+<script>
+(async function () {
+  const calendar = document.getElementById("calendar");
+  const filters = document.querySelector(".filters");
+  if (!calendar) return;
 
-const calendar = document.getElementById("calendar");
-const filters = document.getElementById("calendar-filters");
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
 
-if (calendar && window.FIREBASE_CONFIG) {
-  const app = initializeApp(window.FIREBASE_CONFIG);
-  const db = getFirestore(app);
-
-  const startOfToday = () => {
+  const today = () => {
     const d = new Date();
-    d.setHours(0, 0, 0, 0);
+    d.setHours(0,0,0,0);
     return d;
   };
 
-  let today = startOfToday();
-  let posts = [];
-  let activeCategory = "all";
-
-  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[c]));
-
-  function validDate(d) {
+  function valid(d) {
     return d instanceof Date && !Number.isNaN(d.getTime());
   }
 
-  function endOfDay(y, m, d) {
-    const out = new Date(Number(y), Number(m) - 1, Number(d), 23, 59, 59, 999);
-    if (
-      !validDate(out) ||
-      out.getFullYear() !== Number(y) ||
-      out.getMonth() !== Number(m) - 1 ||
-      out.getDate() !== Number(d)
-    ) return null;
+  function makeDate(y,m,d) {
+    const out = new Date(Number(y), Number(m)-1, Number(d), 23,59,59,999);
+    if (!valid(out) ||
+        out.getFullYear() !== Number(y) ||
+        out.getMonth() !== Number(m)-1 ||
+        out.getDate() !== Number(d)) return null;
     return out;
   }
 
-  function parseDateValue(v) {
+  function parseDate(v) {
     if (v === null || v === undefined || v === "") return null;
+
+    if (v instanceof Date) return valid(v) ? new Date(v) : null;
 
     if (v && typeof v.toDate === "function") {
       const d = v.toDate();
-      return validDate(d) ? d : null;
+      return valid(d) ? d : null;
     }
 
     if (v && typeof v.seconds === "number") {
@@ -431,493 +412,269 @@ if (calendar && window.FIREBASE_CONFIG) {
         v.seconds * 1000 +
         Math.floor((Number(v.nanoseconds) || 0) / 1000000)
       );
-      return validDate(d) ? d : null;
+      return valid(d) ? d : null;
     }
 
     if (typeof v === "number") {
-      const ms = Math.abs(v) < 100000000000 ? v * 1000 : v;
-      const d = new Date(ms);
-      return validDate(d) ? d : null;
-    }
-
-    if (v instanceof Date) {
-      return validDate(v) ? new Date(v.getTime()) : null;
+      const d = new Date(Math.abs(v) < 100000000000 ? v * 1000 : v);
+      return valid(d) ? d : null;
     }
 
     if (typeof v !== "string") return null;
 
-    const value = v.trim();
-    if (!value) return null;
+    const x = v.trim();
+    if (!x) return null;
 
     let m;
 
-    if ((m = value.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})$/))) {
-      return endOfDay(m[1], m[2], m[3]);
+    if ((m = x.match(/^(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})$/)))
+      return makeDate(m[1],m[2],m[3]);
+
+    if ((m = x.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})$/)))
+      return makeDate(m[3],m[2],m[1]);
+
+    if ((m = x.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(20\d{2})$/))) {
+      const months={jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,aug:8,august:8,sep:9,september:9,sept:9,oct:10,october:10,nov:11,november:11,dec:12,december:12};
+      const mo=months[m[2].toLowerCase()];
+      if (mo) return makeDate(m[3],mo,m[1]);
     }
 
-    if ((m = value.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2})$/))) {
-      return endOfDay(m[3], m[2], m[1]);
-    }
-
-    if ((m = value.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(20\d{2})$/))) {
-      const months = {
-        jan:1,january:1,feb:2,february:2,mar:3,march:3,
-        apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,
-        aug:8,august:8,sep:9,sept:9,september:9,
-        oct:10,october:10,nov:11,november:11,dec:12,december:12
-      };
-      const month = months[m[2].toLowerCase()];
-      if (month) return endOfDay(m[3], month, m[1]);
-    }
-
-    if ((m = value.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(20\d{2})$/))) {
-      const months = {
-        jan:1,january:1,feb:2,february:2,mar:3,march:3,
-        apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,
-        aug:8,august:8,sep:9,sept:9,september:9,
-        oct:10,october:10,nov:11,november:11,dec:12,december:12
-      };
-      const month = months[m[1].toLowerCase()];
-      if (month) return endOfDay(m[3], month, m[2]);
-    }
-
-    const iso = new Date(value);
-    if (validDate(iso)) return iso;
-
-    return null;
+    const d = new Date(x);
+    return valid(d) ? d : null;
   }
 
-  function textOf(post) {
+  function textOf(p) {
     return [
-      post.title,
-      post.excerpt,
-      post.content,
-      ...(Array.isArray(post.tags) ? post.tags : [])
+      p.title,p.excerpt,p.content,p.category,p.region,
+      ...(Array.isArray(p.tags) ? p.tags : [])
     ].filter(Boolean).join(" ");
   }
 
-  function isRajasthan(post) {
-    const region = String(post.region || "").trim().toLowerCase();
-    const category = String(post.category || "").trim().toLowerCase();
-    const text = textOf(post);
+  function isRajasthan(p) {
+    const region=String(p.region||"").trim().toLowerCase();
+    const category=String(p.category||"").trim().toLowerCase();
+    const text=textOf(p);
 
     if (region === "rajasthan") return true;
     if (/rajasthan\s*jobs/.test(category)) return true;
 
-    return /(
-      \brajasthan\b|
-      \brpsc\b|
-      \brssb\b|
-      \brsmssb\b|
-      \breet\b|
-      \brajasthan\s+police\b|
-      \brajasthan\s+cet\b|
-      \brvunl\b|
-      \brajcrb\b|
-      \banuprati\b|
-      राजस्थान|
-      राजस्थानी|
-      अनुप्रति|
-      आरपीएससी|
-      आरएसएसबी|
-      आरएसएमएसएसबी
-    )/i.test(text);
+    return /\bRajasthan\b|\bRPSC\b|\bRSSB\b|\bRSMSSB\b|\bREET\b|\bRajasthan Police\b|\bRajasthan CET\b|\bRVUNL\b|\bRAJCRB\b|\bAnuprati\b|राजस्थान|आरपीएससी|आरएसएसबी|आरएसएमएसएसबी|अनुप्रति/i.test(text);
   }
 
-  function isAllIndia(post) {
-    return !isRajasthan(post);
-  }
-
-  function isGovernmentRecruitment(post) {
-    const category = String(post.category || "").trim().toLowerCase();
-    const text = textOf(post).toLowerCase();
-
-    if (
-      category === "government jobs" ||
-      category === "government job" ||
-      category === "recruitment"
-    ) return true;
-
-    return /(
-      recruitment|
-      recruit|
-      vacancy|
-      vacancies|
-      bharti|
-      भर्ती|
-      government\s+job|
-      govt\s+job|
-      सरकारी\s+नौकरी|
-      ssc|
-      upsc|
-      railway|
-      rrb|
-      bank|
-      banking|
-      ibps|
-      sbi|
-      defence|
-      defense|
-      armed\s+forces|
-      police|
-      central\s+government|
-      central\s+govt
-    )/i.test(text);
-  }
-
-  function firstDate(post, keys) {
+  function firstDate(p, keys) {
     for (const key of keys) {
-      const d = parseDateValue(post[key]);
+      const d=parseDate(p[key]);
       if (d) return d;
     }
     return null;
   }
 
   function textDate(text, labels) {
-    const escaped = labels.join("|");
+    const label=labels.join("|");
 
-    let m = text.match(
-      new RegExp(
-        "(?:" + escaped + ")\\\\s*(?:is|:|-|to|on|from)?\\\\s*" +
-        "(\\\\d{1,2})[\\\\/.-](\\\\d{1,2})[\\\\/.-](20\\\\d{2})",
-        "i"
-      )
-    );
-    if (m) return endOfDay(m[3], m[2], m[1]);
+    let m=text.match(new RegExp(
+      "(?:"+label+")\\D{0,30}(\\d{1,2})[\\\\/.\\-](\\d{1,2})[\\\\/.\\-](20\\d{2})","i"
+    ));
+    if (m) return makeDate(m[3],m[2],m[1]);
 
-    m = text.match(
-      new RegExp(
-        "(?:" + escaped + ")\\\\D{0,30}" +
-        "(\\\\d{1,2})\\\\s+([A-Za-z]+)\\\\s+(20\\\\d{2})",
-        "i"
-      )
-    );
-    if (m) return parseDateValue(`${m[1]} ${m[2]} ${m[3]}`);
+    m=text.match(new RegExp(
+      "(?:"+label+")\\D{0,30}(\\d{1,2})\\s+([A-Za-z]+)\\s+(20\\d{2})","i"
+    ));
+    if (m) return parseDate(`${m[1]} ${m[2]} ${m[3]}`);
 
     return null;
   }
 
-  function getStartDate(post) {
-    const d = firstDate(post, [
-      "applicationStartDate",
-      "application_start_date",
-      "startDate",
-      "start_date",
-      "applyStartDate",
-      "apply_start_date"
-    ]);
-    if (d) return d;
-
-    return textDate(textOf(post), [
-      "application start",
-      "application starts",
-      "apply from",
-      "registration starts",
-      "आवेदन शुरू",
-      "आवेदन प्रारंभ",
-      "आवेदन आरंभ"
+  function startDate(p) {
+    return firstDate(p,[
+      "applicationStartDate","application_start_date",
+      "startDate","start_date",
+      "applyStartDate","apply_start_date"
+    ]) || textDate(textOf(p),[
+      "application start","application starts","apply from",
+      "registration starts","आवेदन शुरू","आवेदन प्रारंभ","आवेदन आरंभ"
     ]);
   }
 
-  function getDeadline(post) {
-    const d = firstDate(post, [
-      "applicationLastDate",
-      "application_last_date",
-      "lastDate",
-      "last_date",
-      "lastDateTime",
-      "last_date_time",
-      "applyLastDate",
-      "apply_last_date",
-      "deadline",
-      "applicationDeadline",
-      "application_deadline",
-      "closingDate",
-      "closing_date",
-      "lastDateToApply",
-      "last_date_to_apply"
-    ]);
-    if (d) return d;
-
-    return textDate(textOf(post), [
-      "last date",
-      "last date to apply",
-      "application last date",
-      "deadline",
-      "closing date",
-      "अंतिम तिथि",
-      "अंतिम तारीख",
-      "आवेदन की अंतिम तिथि",
-      "आवेदन की अंतिम तारीख"
+  function lastDate(p) {
+    return firstDate(p,[
+      "applicationLastDate","application_last_date",
+      "lastDate","last_date",
+      "lastDateTime","last_date_time",
+      "applyLastDate","apply_last_date",
+      "lastDateToApply","last_date_to_apply",
+      "applicationDeadline","application_deadline",
+      "closingDate","closing_date","deadline"
+    ]) || textDate(textOf(p),[
+      "last date","last date to apply","application last date",
+      "deadline","closing date","अंतिम तिथि","अंतिम तारीख",
+      "आवेदन की अंतिम तिथि","आवेदन की अंतिम तारीख"
     ]);
   }
 
-  function getExamDate(post) {
-    const d = firstDate(post, [
-      "examDate",
-      "exam_date",
-      "examDateTime",
-      "exam_date_time"
-    ]);
-    if (d) return d;
-
-    return textDate(textOf(post), [
-      "exam date",
-      "exam on",
-      "examination date",
-      "परीक्षा तिथि",
-      "परीक्षा की तिथि",
-      "परीक्षा तारीख"
+  function examDate(p) {
+    return firstDate(p,[
+      "examDate","exam_date","examDateTime","exam_date_time"
+    ]) || textDate(textOf(p),[
+      "exam date","exam on","examination date",
+      "परीक्षा तिथि","परीक्षा की तिथि","परीक्षा तारीख"
     ]);
   }
 
-  function expiryOf(post) {
-    return getDeadline(post) || getExamDate(post);
+  function isGovernmentJob(p) {
+    const category=String(p.category||"").trim().toLowerCase();
+    const text=textOf(p);
+
+    if ([
+      "government jobs","government job","recruitment",
+      "govt jobs","govt job"
+    ].includes(category)) return true;
+
+    return /government\s+job|govt\.?\s+job|government\s+recruitment|recruitment|vacanc(?:y|ies)|bharti|भर्ती|सरकारी\s+नौकरी|आवेदन\s+शुरू|apply\s+online|ssc|upsc|rrb|railway|ibps|sbi|banking|defence|defense|armed\s+forces|central\s+government|central\s+govt/i.test(text);
   }
 
-  function isActive(post) {
-    const expiry = expiryOf(post);
-    return !!expiry && expiry >= today;
+  function isActive(p) {
+    const last=lastDate(p);
+    const exam=examDate(p);
+    const expiry=last || exam;
+    return !!expiry && expiry >= today();
+  }
+
+  function category(p) {
+    const t=textOf(p);
+    if (/admit\s*card|hall\s*ticket|exam\s*city|city\s*intimation|प्रवेश\s*पत्र|एडमिट\s*कार्ड/i.test(t)) return "Admit Card";
+    if (/answer\s*key|उत्तर\s*कुंजी/i.test(t)) return "Answer Key";
+    if (/result|score\s*card|परिणाम|रिजल्ट/i.test(t)) return "Results";
+    if (/syllabus|पाठ्यक्रम/i.test(t)) return "Syllabus";
+    return "Government Jobs";
   }
 
   function formatDate(d) {
-    if (!d) return "To be announced";
-    return d.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    });
+    return d ? d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "Not announced";
   }
 
   function daysLeft(d) {
     if (!d) return "";
-    const target = new Date(d);
-    target.setHours(0, 0, 0, 0);
-
-    const n = Math.ceil(
-      (target.getTime() - today.getTime()) / 86400000
-    );
-
-    if (n < 0) return "";
-    if (n === 0) return "Today";
-    return n + " days left";
+    const a=today();
+    const b=new Date(d); b.setHours(0,0,0,0);
+    const n=Math.ceil((b-a)/86400000);
+    if(n<0) return "";
+    if(n===0) return "Today";
+    return n+" days left";
   }
 
-  function categoryOf(post) {
-    const raw = String(post.category || "").trim();
+  let posts=[];
+  let active="all";
 
-    if ([
-      "Government Jobs",
-      "Admit Card",
-      "Results",
-      "Answer Key",
-      "Syllabus",
-      "Latest Updates"
-    ].includes(raw)) return raw;
-
-    const combined = textOf(post).toLowerCase();
-
-    if (/admit\s*card|hall\s*ticket|exam\s*city|city\s*intimation|प्रवेश\s*पत्र|एडमिट\s*कार्ड/i.test(combined))
-      return "Admit Card";
-
-    if (/answer\s*key|उत्तर\s*कुंजी/i.test(combined))
-      return "Answer Key";
-
-    if (/result|score\s*card|परिणाम|रिजल्ट/i.test(combined))
-      return "Results";
-
-    if (/syllabus|पाठ्यक्रम/i.test(combined))
-      return "Syllabus";
-
-    if (/recruitment|recruit|vacancy|vacancies|bharti|भर्ती|posts?|पदों|apply\s*online|आवेदन\s*शुरू|आवेदन\s*करें/i.test(combined))
-      return "Government Jobs";
-
-    return "Latest Updates";
-  }
-
-  function createFilters() {
+  function renderFilters(rows) {
     if (!filters) return;
 
-    const categories = [
-      ...new Set(
-        posts
-          .filter(isAllIndia)
-          .filter(isGovernmentRecruitment)
-          .filter(isActive)
-          .map(categoryOf)
-      )
-    ].sort();
+    const cats=[...new Set(rows.map(category))].sort();
 
     filters.innerHTML =
       '<button class="filter active" data-filter="all">All</button>' +
-      categories.map(category =>
-        '<button class="filter" data-filter="' +
-        esc(category) +
-        '">' +
-        esc(category) +
-        "</button>"
+      cats.map(c =>
+        '<button class="filter" data-filter="'+esc(c)+'">'+esc(c)+'</button>'
       ).join("");
 
-    filters.querySelectorAll(".filter").forEach(btn => {
-      btn.addEventListener("click", () => {
-        filters.querySelectorAll(".filter")
-          .forEach(x => x.classList.remove("active"));
-
+    filters.querySelectorAll(".filter").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        filters.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
         btn.classList.add("active");
-        activeCategory = btn.dataset.filter || "all";
+        active=btn.dataset.filter||"all";
         render();
       });
     });
   }
 
   function render() {
-    today = startOfToday();
+    const rows=posts
+      .filter(p=>p.status==="published")
+      .filter(p=>!isRajasthan(p))
+      .filter(p=>isGovernmentJob(p))
+      .filter(p=>isActive(p))
+      .filter(p=>active==="all" || category(p)===active)
+      .sort((a,b)=>(lastDate(a)||examDate(a))-(lastDate(b)||examDate(b)));
 
-    const rows = posts
-      .filter(p => p.status === "published")
-      .filter(isAllIndia)
-      .filter(isGovernmentRecruitment)
-      .filter(isActive)
-      .filter(p =>
-        activeCategory === "all" ||
-        categoryOf(p) === activeCategory
-      )
-      .sort((a, b) => {
-        const ad = expiryOf(a) || new Date(8640000000000000);
-        const bd = expiryOf(b) || new Date(8640000000000000);
-        return ad - bd;
-      });
-
-    if (!rows.length) {
-      calendar.innerHTML =
-        '<div class="empty">अभी कोई active All India government exam update उपलब्ध नहीं है।</div>';
+    if(!rows.length) {
+      calendar.innerHTML='<div class="empty">अभी कोई active All India Government Job / Exam update उपलब्ध नहीं है।</div>';
       return;
     }
 
-    calendar.innerHTML = rows.map(post => {
-      const start = getStartDate(post);
-      const last = getDeadline(post);
-      const exam = getExamDate(post);
-      const countdown = daysLeft(last || exam);
+    calendar.innerHTML=rows.map(p=>{
+      const start=startDate(p);
+      const last=lastDate(p);
+      const exam=examDate(p);
+      const countdown=daysLeft(last||exam);
+      const slug=String(p.slug||"").trim();
+      const url="/article.html?slug="+encodeURIComponent(slug);
+      const apply=p.applyOnlineUrl||p.officialWebsiteUrl||p.officialNotificationUrl||"";
+      const cat=category(p);
 
-      const apply =
-        post.applyOnlineUrl ||
-        post.officialWebsiteUrl ||
-        post.officialNotificationUrl ||
-        "";
-
-      const slug = String(post.slug || "").trim();
-      const articleUrl =
-        "/article.html?slug=" + encodeURIComponent(slug);
-
-      const category = categoryOf(post);
-
-      return `
-        <article
-          class="item"
-          data-calendar="all-india"
-          data-calendar-entry="all-india"
-          data-region="all-india"
-          data-category="${esc(category)}">
-
-          <div class="item-top">
-            <div>
-              <span class="category">${esc(category)}</span>
-
-              <h2>
-                <a href="${articleUrl}">
-                  ${esc(post.title || "Untitled")}
-                </a>
-              </h2>
-            </div>
-
-            <span class="status">LIVE</span>
+      return `<article class="item" data-calendar="all-india" data-calendar-entry="all-india" data-region="all-india" data-category="${esc(cat)}">
+        <div class="item-top">
+          <div>
+            <span class="category">${esc(cat)}</span>
+            <h2><a href="${url}">${esc(p.title||"Untitled")}</a></h2>
           </div>
-
-          <div class="meta">
-            <div class="meta-box">
-              <small>Application Starts</small>
-              <strong>${esc(
-                start ? formatDate(start) : "Not announced"
-              )}</strong>
-            </div>
-
-            <div class="meta-box">
-              <small>Last Date</small>
-              <strong>
-                ${esc(
-                  last ? formatDate(last) : "Not announced"
-                )}
-                ${
-                  countdown
-                    ? "<br><small>" + esc(countdown) + "</small>"
-                    : ""
-                }
-              </strong>
-            </div>
-
-            <div class="meta-box">
-              <small>Exam Date</small>
-              <strong>${esc(
-                exam ? formatDate(exam) : "To be announced"
-              )}</strong>
-            </div>
-          </div>
-
-          <div class="actions">
-            <a class="details" href="${articleUrl}">
-              Details →
-            </a>
-
-            ${
-              apply
-                ? '<a class="apply" href="' +
-                  esc(apply) +
-                  '" target="_blank" rel="noopener">' +
-                  "Apply / Official Link →" +
-                  "</a>"
-                : ""
-            }
-          </div>
-        </article>
-      `;
+          <span class="status">LIVE</span>
+        </div>
+        <div class="meta">
+          <div class="meta-box"><small>Application Starts</small><strong>${esc(formatDate(start))}</strong></div>
+          <div class="meta-box"><small>Last Date</small><strong>${esc(formatDate(last))}${countdown?'<br><small>'+esc(countdown)+'</small>':""}</strong></div>
+          <div class="meta-box"><small>Exam Date</small><strong>${esc(exam?formatDate(exam):"To be announced")}</strong></div>
+        </div>
+        <div class="actions">
+          <a class="details" href="${url}">Details →</a>
+          ${apply?'<a class="apply" href="'+esc(apply)+'" target="_blank" rel="noopener">Apply / Official Link →</a>':""}
+        </div>
+      </article>`;
     }).join("");
   }
 
-  async function loadPosts() {
-    calendar.innerHTML =
-      '<div class="empty">Loading live All India updates…</div>';
+  try {
+    calendar.innerHTML='<div class="empty">Loading live All India updates…</div>';
 
+    if (!window.FIREBASE_CONFIG)
+      throw new Error("Firebase configuration unavailable");
+
+    const [{initializeApp},{getFirestore,collection,getDocs,query,where,orderBy,limit}]
+      = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js")
+      ]);
+
+    const app=initializeApp(window.FIREBASE_CONFIG,"allIndiaCalendar");
+    const db=getFirestore(app);
+
+    let snap;
     try {
-      const q = query(
-        collection(db, "posts"),
-        where("status", "==", "published")
-      );
-
-      const snap = await getDocs(q);
-
-      posts = snap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      createFilters();
-      render();
-
-    } catch (error) {
-      console.error("EXAM DARPAN calendar:", error);
-
-      calendar.innerHTML =
-        '<div class="empty">All India updates load नहीं हो पाए।</div>';
+      snap=await getDocs(query(
+        collection(db,"posts"),
+        where("status","==","published"),
+        orderBy("publishedAt","desc"),
+        limit(100)
+      ));
+    } catch (e) {
+      console.warn("Calendar ordered query failed; fallback:",e);
+      snap=await getDocs(query(
+        collection(db,"posts"),
+        where("status","==","published"),
+        limit(100)
+      ));
     }
-  }
 
-  loadPosts();
-}
-else if (calendar) {
-  calendar.innerHTML =
-    '<div class="empty">Firebase configuration unavailable.</div>';
-}
+    posts=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const live=posts.filter(p=>!isRajasthan(p)&&isGovernmentJob(p)&&isActive(p));
+
+    renderFilters(live);
+    render();
+
+  } catch(e) {
+    console.error("EXAM DARPAN All India calendar failed:",e);
+    calendar.innerHTML='<div class="empty">All India calendar load नहीं हो पाया। Please refresh करें।</div>';
+  }
+})();
 </script>
 
 </body>
