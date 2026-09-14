@@ -802,7 +802,8 @@ footer a{
   }
 
   function examDate(p) {
-    return fieldDate(p, [
+    // First use an explicitly stored Firestore exam date.
+    const direct = fieldDate(p, [
       "examDate",
       "exam_date",
       "examDateTime",
@@ -811,20 +812,35 @@ footer a{
       "examination_date",
       "examStartDate",
       "exam_start_date"
-    ]) || extractDateNear(calendarSourceText(p), [
+    ]);
+
+    if (direct) return direct;
+
+    const text = calendarSourceText(p);
+
+    // IMPORTANT:
+    // Never infer an exam date from generic words like "परीक्षा".
+    // This prevents phrases such as "बिना परीक्षा" from producing
+    // a false exam date.
+    const strictLabels = [
       "exam date",
       "exam on",
       "examination date",
-      "exam will be held",
+      "examination on",
       "exam will be held on",
-      "examination will be held",
+      "examination will be held on",
+      "exam scheduled on",
+      "examination scheduled on",
       "परीक्षा तिथि",
       "परीक्षा की तिथि",
       "परीक्षा तारीख",
-      "परीक्षा आयोजित",
-      "परीक्षा होगी",
-      "परीक्षा होगी"
-    ]);
+      "परीक्षा की तारीख",
+      "परीक्षा दिनांक",
+      "परीक्षा आयोजित होगी",
+      "परीक्षा आयोजित की जाएगी"
+    ];
+
+    return extractDateNear(text, strictLabels);
   }
 
   function isRajasthan(p) {
@@ -860,10 +876,16 @@ footer a{
     const last = lastDate(p);
     const exam = examDate(p);
 
-    // Expire an entry only when BOTH application deadline
-    // and exam date are already past.
-    if (last && last < today && (!exam || exam < today)) return false;
-    if (exam && exam < today && (!last || last < today)) return false;
+    /*
+     * HARD EXPIRY RULE:
+     * Once the application last date has passed, hide the entry.
+     *
+     * If there is no application deadline, an already-passed exam
+     * date can still expire the entry.
+     */
+    if (last && last < today) return false;
+
+    if (!last && exam && exam < today) return false;
 
     return true;
   }
