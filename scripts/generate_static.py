@@ -698,21 +698,218 @@ def cleanup_generated_files() -> None:
             f.unlink()
 
 
+
+def _hub_category_posts(
+    posts: list[dict[str, Any]],
+    category_name: str,
+) -> list[dict[str, Any]]:
+    """Return published posts belonging to one explicit category."""
+    return [
+        p for p in posts
+        if normalized_category(p) == category_name
+    ]
+
+
+def _hub_crawl_card(p: dict[str, Any]) -> str:
+    s = slugify(p.get("slug"))
+    title = post_title(p)
+    desc = short_description(p)[:180]
+
+    return (
+        '<article class="ed-hub-crawl-card">'
+        f'<h3><a href="{esc(article_path(s))}">{esc(title)}</a></h3>'
+        f'<p>{esc(desc)}</p>'
+        '</article>'
+    )
+
+
+def update_hub_pages(posts: list[dict[str, Any]]) -> None:
+    """
+    Add server-rendered internal links to the two government-job hubs.
+
+    Hub membership is based only on the post's normalized category.
+    No keyword guessing is used.
+    """
+
+    start_marker = "<!-- EXAM-DARPAN-HUB-CRAWL-START -->"
+    end_marker = "<!-- EXAM-DARPAN-HUB-CRAWL-END -->"
+
+    css = """<style id="exam-darpan-hub-crawl-css">
+.ed-hub-crawl-section{
+  margin:28px 0;
+  padding:22px;
+  background:#fff;
+  border:1px solid #e5e9f0;
+  border-radius:16px;
+}
+.ed-hub-crawl-section h2{
+  margin:0 0 6px;
+  font-size:24px;
+  line-height:1.25;
+}
+.ed-hub-crawl-section>p{
+  margin:0 0 16px;
+  color:#667085;
+  font-size:13px;
+}
+.ed-hub-crawl-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.ed-hub-crawl-card{
+  padding:14px;
+  border:1px solid #e5e9f0;
+  border-radius:12px;
+  background:#f9fafb;
+}
+.ed-hub-crawl-card h3{
+  margin:0 0 6px;
+  font-size:16px;
+  line-height:1.4;
+}
+.ed-hub-crawl-card h3 a{
+  color:#172033;
+  text-decoration:none;
+}
+.ed-hub-crawl-card h3 a:hover{
+  color:#2563eb;
+}
+.ed-hub-crawl-card p{
+  margin:0;
+  color:#667085;
+  font-size:12px;
+  line-height:1.5;
+}
+@media(max-width:700px){
+  .ed-hub-crawl-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>"""
+
+    css_pattern = re.compile(
+        r'<style id="exam-darpan-hub-crawl-css">[\s\S]*?</style>',
+        flags=re.I,
+    )
+
+    hub_specs = (
+        (
+            "all-india-government-jobs.html",
+            "Latest All India Government Job Updates",
+            "Government Jobs",
+        ),
+        (
+            "rajasthan-government-jobs.html",
+            "Latest Rajasthan Government Job Updates",
+            "Rajasthan Jobs",
+        ),
+    )
+
+    for filename, heading, category_name in hub_specs:
+        path = PUBLIC / filename
+
+        if not path.exists():
+            continue
+
+        text = path.read_text(
+            encoding="utf-8",
+            errors="ignore",
+        )
+
+        hub_posts = _hub_category_posts(posts, category_name)[:40]
+
+        cards = "".join(
+            _hub_crawl_card(post)
+            for post in hub_posts
+        )
+
+        section = (
+            f"{start_marker}\n"
+            f'<section class="ed-hub-crawl-section" '
+            f'aria-labelledby="ed-hub-crawl-{category_name.lower().replace(" ", "-")}">'
+            f'<h2 id="ed-hub-crawl-{category_name.lower().replace(" ", "-")}">'
+            f'{esc(heading)}</h2>'
+            '<p>Latest published updates with direct internal links for easy navigation.</p>'
+            f'<div class="ed-hub-crawl-grid">{cards}</div>'
+            f'</section>\n'
+            f"{end_marker}"
+        )
+
+        marker_pattern = re.compile(
+            re.escape(start_marker)
+            + r"[\s\S]*?"
+            + re.escape(end_marker),
+            flags=re.I,
+        )
+
+        if marker_pattern.search(text):
+            text = marker_pattern.sub(
+                lambda _: section,
+                text,
+                count=1,
+            )
+        elif "</main>" in text:
+            text = text.replace(
+                "</main>",
+                section + "\n</main>",
+                1,
+            )
+
+        if css_pattern.search(text):
+            text = css_pattern.sub(
+                lambda _: css,
+                text,
+                count=1,
+            )
+        elif "</head>" in text:
+            text = text.replace(
+                "</head>",
+                css + "\n</head>",
+                1,
+            )
+
+        path.write_text(
+            text,
+            encoding="utf-8",
+        )
+
+
 def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], category_slugs: list[str]) -> None:
     urls: list[tuple[str, str | None, str | None]] = []
     for path, _ in STATIC_PAGES:
         urls.append((path, None, None))
 
-    # Important manually-maintained hub pages.
-    # Keep these as single canonical URLs; do not create duplicate articles.
-    hub_paths = (
-        "/rajasthan-government-jobs",
-        "/all-india-government-jobs",
+    # Important government-job hub pages.
+    # Hub membership comes from the explicit normalized category.
+    hub_specs = (
+        (
+            "/rajasthan-government-jobs",
+            _hub_category_posts(posts, "Rajasthan Jobs"),
+        ),
+        (
+            "/all-india-government-jobs",
+            _hub_category_posts(posts, "Government Jobs"),
+        ),
     )
+
     existing_paths = {path for path, _, _ in urls}
-    for hub_path in hub_paths:
+
+    for hub_path, hub_posts in hub_specs:
         if hub_path not in existing_paths:
-            urls.append((hub_path, None, None))
+            hub_lastmod = max(
+                (
+                    iso(p.get("updatedAt"))
+                    or iso(p.get("publishedAt"))
+                    or ""
+                    for p in hub_posts
+                ),
+                default=None,
+            ) or None
+
+            urls.append(
+                (hub_path, hub_lastmod, None)
+            )
 
     for cslug in category_slugs:
         cname = next((name for name, slug_name, _, _ in CATEGORIES if slug_name == cslug), None)
@@ -774,6 +971,41 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
+
+    for hub_file, hub_posts in (
+        (
+            "all-india-government-jobs.html",
+            _hub_category_posts(posts, "Government Jobs")[:40],
+        ),
+        (
+            "rajasthan-government-jobs.html",
+            _hub_category_posts(posts, "Rajasthan Jobs")[:40],
+        ),
+    ):
+        hub_path = PUBLIC / hub_file
+
+        if not hub_path.exists():
+            raise RuntimeError(
+                f"SEO verification failed: missing {hub_file}"
+            )
+
+        hub_html = hub_path.read_text(
+            encoding="utf-8",
+            errors="ignore",
+        )
+
+        for p in hub_posts:
+            href = article_path(
+                slugify(p.get("slug"))
+            )
+
+            if f'href="{href}"' not in hub_html:
+                raise RuntimeError(
+                    f"SEO verification failed: "
+                    f"hub link missing for {href} "
+                    f"in {hub_file}"
+                )
+
     for p in posts:
         url = article_url(slugify(p.get("slug")))
         if sitemap.count(f"<loc>{xml_esc(url)}</loc>") != 1:
@@ -790,6 +1022,7 @@ def main() -> int:
     # Remove only files previously generated by this builder; hand-authored pages stay untouched.
     cleanup_generated_files()
     update_home(posts)
+    update_hub_pages(posts)
 
     article_slugs: list[str] = []
     seen: set[str] = set()
