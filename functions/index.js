@@ -283,13 +283,25 @@ exports.articleSSR = onRequest(
         .limit(1)
         .get();
 
-      if (snap.empty && canonical !== requested) {
-        snap = await db
+      // Also recover legacy/malformed stored slugs such as
+      // "ruhs-medical-officer-recruitment-2026-600  posts".
+      if (snap.empty) {
+        const publishedSnap = await db
           .collection("posts")
-          .where("slug", "==", canonical)
           .where("status", "==", "published")
-          .limit(1)
           .get();
+
+        const legacyMatch = publishedSnap.docs.find(doc => {
+          const data = doc.data() || {};
+          return slugify(data.slug || "") === canonical;
+        });
+
+        if (legacyMatch) {
+          snap = {
+            empty: false,
+            docs: [legacyMatch]
+          };
+        }
       }
 
       if (snap.empty) {
@@ -313,7 +325,8 @@ exports.articleSSR = onRequest(
       const p = snap.docs[0].data();
       const storedSlug = slugify(p.slug || requested);
 
-      if (canonical !== storedSlug) {
+      // Always normalize malformed/legacy URLs to one canonical URL.
+      if (requested !== storedSlug) {
         return res.redirect(
           301,
           `/${encodeURIComponent(storedSlug)}`
