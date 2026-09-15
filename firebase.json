@@ -88,6 +88,10 @@
       {
         "source": "/article/:slug",
         "destination": "/article.html"
+      },
+      {
+        "source": "/:slug",
+        "destination": "/article.html"
       }
     ]
   },
