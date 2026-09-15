@@ -87,17 +87,11 @@
       },
       {
         "source": "/article/:slug",
-        "function": {
-          "functionId": "articleSSR",
-          "region": "asia-east1"
-        }
+        "destination": "/article.html"
       },
       {
         "source": "/:slug",
-        "function": {
-          "functionId": "articleSSR",
-          "region": "asia-east1"
-        }
+        "destination": "/article.html"
       }
     ]
   },
