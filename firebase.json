@@ -91,12 +91,20 @@
       },
       {
         "source": "/:slug",
-        "destination": "/article.html"
+        "function": {
+          "functionId": "articleSSR",
+          "region": "asia-east1",
+          "pinTag": true
+        }
       }
     ]
   },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
   }
 }

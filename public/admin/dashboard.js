@@ -84,8 +84,15 @@ function articleData(status){
   const content=cleanContent($('content').value);
   const plain=content.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
   const excerpt=$('excerpt').value.trim()||plain.replace(/^AI-assisted draft — Human verification required before publication\.?/i,'').slice(0,155).trim();
+  const enteredSlug=$('slug').value.trim();
+  const canonicalSlug=slugify(enteredSlug||title);
+
+  if(status==='published' && !canonicalSlug){
+    throw new Error('Valid URL slug generate नहीं हो पाया।');
+  }
+
   const base={
-    title,slug:($('slug').value.trim()||slugify(title)),category:$('category').value||'Latest Updates',
+    title,slug:canonicalSlug,category:$('category').value||'Latest Updates',
     excerpt,content,featuredImage:$('image').value.trim(),
     officialNotificationUrl:$('notification').value.trim(),applyOnlineUrl:$('apply').value.trim(),
     officialWebsiteUrl:$('official').value.trim(),notificationPdfUrl:$('pdf').value.trim(),

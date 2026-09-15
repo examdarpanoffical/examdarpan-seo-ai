@@ -55,7 +55,7 @@ jobs:
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/firebase-service-account.json
           export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
           firebase use examdarpan-dd963
-          firebase deploy --only hosting --non-interactive
+          firebase deploy --only functions,hosting --non-interactive
 
       - name: Cleanup credentials
         if: always()
