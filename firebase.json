@@ -91,11 +91,7 @@
       },
       {
         "source": "/:slug",
-        "function": {
-          "functionId": "articleSSR",
-          "region": "asia-east1",
-          "pinTag": true
-        }
+        "destination": "/article.html"
       }
     ]
   },
