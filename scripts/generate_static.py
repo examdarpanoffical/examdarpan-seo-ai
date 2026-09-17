@@ -310,6 +310,29 @@ def reading_time(content: Any) -> int:
     return max(1, (words + 179) // 180)
 
 
+def seo_title(p: dict[str, Any]) -> str:
+    value = clean_text(p.get("seoTitle"))
+    if value:
+        return value[:65].strip()
+    return post_title(p)[:65].strip()
+
+
+def seo_description(p: dict[str, Any]) -> str:
+    value = clean_description(p.get("seoDescription"))
+    if value:
+        return value[:170].strip()
+    return short_description(p)[:170].strip()
+
+
+def search_keywords(p: dict[str, Any]) -> list[str]:
+    value = p.get("searchKeywords") or p.get("keywords") or []
+    if isinstance(value, str):
+        return [x.strip() for x in value.split(",") if x.strip()][:15]
+    if isinstance(value, list):
+        return [str(x).strip() for x in value if str(x).strip()][:15]
+    return []
+
+
 def short_description(p: dict[str, Any]) -> str:
     desc = clean_description(p.get("excerpt"))
     if not desc:
@@ -399,15 +422,16 @@ def related_posts(post: dict[str, Any], posts: list[dict[str, Any]], limit: int 
 
 def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
     title = post_title(p)
-    desc = short_description(p)
+    desc = seo_description(p)
     cat = normalized_category(p)
+    seo_headline = seo_title(p)
     pub = iso(p.get("publishedAt"))
     mod = iso(p.get("updatedAt")) or pub
     img = safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.webp"
     schema: dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "Article",
-        "headline": title[:110],
+        "headline": seo_headline[:110],
         "description": desc,
         "url": url,
         "mainEntityOfPage": {"@type": "WebPage", "@id": url},
@@ -446,10 +470,11 @@ def schema_breadcrumb(p: dict[str, Any], url: str) -> dict[str, Any]:
 
 def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     title = post_title(p)
+    search_title = seo_title(p)
     s = slugify(p.get("slug"))
     cat = normalized_category(p)
     cat_slug = CATEGORY_BY_NAME.get(cat, CATEGORY_BY_NAME["Latest Updates"])[0]
-    desc = short_description(p)
+    desc = seo_description(p)
     img = safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.webp"
     url = article_url(s)
     pub = iso(p.get("publishedAt"))
@@ -490,13 +515,13 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)} | Exam Darpan</title>
+<title>{esc(search_title)}</title>
 <meta name="description" content="{esc(desc)}">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="{esc(url)}">
 <link rel="alternate" type="application/rss+xml" title="Exam Darpan RSS" href="{BASE}/feed.xml">
-<meta property="og:type" content="article"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{esc(img)}">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(title)} | Exam Darpan"><meta name="twitter:description" content="{esc(desc)}"><meta name="twitter:image" content="{esc(img)}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(search_title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{esc(img)}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(search_title)}"><meta name="twitter:description" content="{esc(desc)}"><meta name="twitter:image" content="{esc(img)}">
 <link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css">
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>

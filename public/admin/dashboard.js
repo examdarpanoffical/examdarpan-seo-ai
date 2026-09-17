@@ -63,7 +63,11 @@ function renderList(){
 function fill(p){
   if(!p)return;
   $('postId').value=p.id;$('title').value=p.title||'';$('slug').value=p.slug||'';
-  $('category').value=p.category||'Rajasthan Jobs';$('excerpt').value=p.excerpt||'';$('content').value=p.content||'';
+  $('category').value=p.category||'Rajasthan Jobs';
+  $('seoTitle').value=p.seoTitle||'';
+  $('seoDescription').value=p.seoDescription||'';
+  $('searchKeywords').value=Array.isArray(p.searchKeywords)?p.searchKeywords.join(', '):(p.searchKeywords||'');
+  $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';
   $('image').value=p.featuredImage||'';$('notification').value=p.officialNotificationUrl||'';$('apply').value=p.applyOnlineUrl||'';
   $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';$('tags').value=(p.tags||[]).join(', ');
   $('formTitle').textContent='Edit Article';window.scrollTo({top:0,behavior:'smooth'});
@@ -91,8 +95,24 @@ function articleData(status){
     throw new Error('Valid URL slug generate नहीं हो पाया।');
   }
 
+  const seoTitle=$('seoTitle').value.trim()||title;
+  const seoDescription=$('seoDescription').value.trim()||excerpt;
+  const searchKeywords=$('searchKeywords').value
+    .split(',')
+    .map(x=>x.trim())
+    .filter(Boolean)
+    .slice(0,15);
+
+  if(seoTitle.length>65){
+    throw new Error('SEO Title 65 characters या उससे कम रखें.');
+  }
+  if(seoDescription.length>170){
+    throw new Error('SEO Description 170 characters या उससे कम रखें.');
+  }
+
   const base={
     title,slug:canonicalSlug,category:$('category').value||'Latest Updates',
+    seoTitle,seoDescription,searchKeywords,
     excerpt,content,featuredImage:$('image').value.trim(),
     officialNotificationUrl:$('notification').value.trim(),applyOnlineUrl:$('apply').value.trim(),
     officialWebsiteUrl:$('official').value.trim(),notificationPdfUrl:$('pdf').value.trim(),
@@ -119,7 +139,7 @@ async function remove(id){
 }
 function clearForm(){
   $('postId').value='';
-  ['title','slug','excerpt','content','image','notification','apply','official','pdf','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
+  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
   $('formTitle').textContent='New Article';
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
