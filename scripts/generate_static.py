@@ -47,10 +47,19 @@ STATIC_PAGES = [
 CATEGORIES = [
     ("Rajasthan Jobs", "rajasthan-jobs", "राजस्थान सरकारी नौकरी", "राजस्थान की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
     ("Government Jobs", "government-jobs", "सरकारी नौकरी", "Central और All India Government Jobs की नवीनतम जानकारी।"),
+    ("Police & Defence Jobs", "police-defence-jobs", "Police & Defence Jobs", "Police, Defence और सुरक्षा विभाग की सरकारी भर्ती की नवीनतम जानकारी।"),
+    ("Teaching Jobs", "teaching-jobs", "Teaching Jobs", "Teacher, REET, School और Education Department की भर्ती की जानकारी।"),
+    ("Railway Jobs", "railway-jobs", "Railway Jobs", "Indian Railway की भर्ती, eligibility, vacancy और application updates।"),
+    ("Banking Jobs", "banking-jobs", "Banking Jobs", "Banking sector की सरकारी भर्ती, परीक्षा और application updates।"),
+    ("SSC Jobs", "ssc-jobs", "SSC Jobs", "SSC की विभिन्न भर्ती परीक्षाओं और सरकारी नौकरी की जानकारी।"),
+    ("UPSC Jobs", "upsc-jobs", "UPSC Jobs", "UPSC Civil Services और अन्य UPSC examinations की जानकारी।"),
     ("Admit Card", "admit-card", "Admit Card", "नई परीक्षाओं के Admit Card और परीक्षा प्रवेश से जुड़ी अपडेट्स।"),
     ("Results", "results", "सरकारी परीक्षा Result", "सरकारी परीक्षा और भर्ती के नवीनतम Results की जानकारी।"),
     ("Answer Key", "answer-key", "Answer Key", "सरकारी परीक्षाओं की Answer Key और संबंधित अपडेट्स।"),
     ("Syllabus", "syllabus", "Exam Syllabus", "सरकारी परीक्षाओं के Syllabus और तैयारी से जुड़ी जानकारी।"),
+    ("Entrance Exams", "entrance-exams", "Entrance Exams", "Entrance और admission examinations की महत्वपूर्ण जानकारी और updates।"),
+    ("Scholarships", "scholarships", "Scholarships", "Students के लिए scholarship schemes, eligibility, dates और application updates।"),
+    ("University & College", "university-college", "University & College", "University, college admission, courses और education updates।"),
     ("Latest Updates", "latest-updates", "Latest Updates", "Exam Darpan की नवीनतम परीक्षा, भर्ती और शिक्षा अपडेट्स।"),
 ]
 CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CATEGORIES}
