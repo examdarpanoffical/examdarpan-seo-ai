@@ -13,69 +13,82 @@
 
     .ed-confetti{
       position:absolute;
-      top:-18px;
+      top:-22px;
       width:8px;
       height:14px;
-      border-radius:2px;
+      border-radius:3px;
       opacity:0;
+      will-change:transform,opacity;
       animation:edConfettiFall var(--dur) cubic-bezier(.18,.72,.25,1) var(--delay) forwards;
     }
 
     .ed-confetti.round{
       border-radius:50%;
-      width:7px;
-      height:7px;
+      width:8px;
+      height:8px;
     }
 
     .ed-confetti.ribbon{
       width:5px;
-      height:18px;
+      height:20px;
       border-radius:999px;
     }
 
     @keyframes edConfettiFall{
       0%{
         opacity:0;
-        transform:translate3d(0,-20px,0) rotate(0deg) scale(.7);
+        transform:translate3d(0,-24px,0) rotate(0deg) scale(.65);
       }
-      8%{opacity:1}
-      42%{
+      7%{opacity:1}
+      38%{
         opacity:1;
-        transform:translate3d(var(--x1),42vh,0) rotate(var(--r1)) scale(1);
+        transform:translate3d(var(--x1),38vh,0) rotate(var(--r1)) scale(1);
       }
-      78%{opacity:.95}
+      72%{
+        opacity:.98;
+        transform:translate3d(var(--x2),74vh,0) rotate(var(--r2)) scale(.95);
+      }
       100%{
         opacity:0;
-        transform:translate3d(var(--x2),112vh,0) rotate(var(--r2)) scale(.85);
+        transform:translate3d(var(--x3),112vh,0) rotate(var(--r3)) scale(.78);
       }
     }
 
-    .ed-result-pop{
-      animation:edResultPop .5s cubic-bezier(.2,.85,.25,1.15);
+    .ed-success-spark{
+      position:fixed;
+      left:50%;
+      top:42%;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      pointer-events:none;
+      z-index:10000;
+      opacity:0;
+      animation:edSpark .9s ease-out forwards;
     }
 
-    @keyframes edResultPop{
+    @keyframes edSpark{
       0%{
-        opacity:.35;
-        transform:scale(.985);
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.3);
       }
-      65%{
-        opacity:1;
-        transform:scale(1.012);
-      }
+      18%{opacity:1}
       100%{
-        opacity:1;
-        transform:none;
+        opacity:0;
+        transform:
+          translate(
+            calc(-50% + var(--sx)),
+            calc(-50% + var(--sy))
+          )
+          scale(1.8);
       }
     }
 
     @media(prefers-reduced-motion:reduce){
-      .ed-confetti{
+      .ed-confetti,
+      .ed-success-spark{
         animation:none!important;
-        display:none;
-      }
-      .ed-result-pop{
-        animation:none!important;
+        display:none!important;
       }
     }
   `;
@@ -93,7 +106,8 @@
     const layer=document.createElement('div');
     layer.className='ed-celebration-layer';
 
-    const count=window.innerWidth<600 ? 70 : 110;
+    const mobile=window.innerWidth<600;
+    const count=mobile?82:135;
 
     const colors=[
       '#22c55e',
@@ -102,7 +116,8 @@
       '#ef4444',
       '#8b5cf6',
       '#ec4899',
-      '#06b6d4'
+      '#06b6d4',
+      '#ffffff'
     ];
 
     for(let i=0;i<count;i++){
@@ -118,22 +133,27 @@
 
       piece.style.setProperty(
         '--dur',
-        `${2.5+Math.random()*1.8}s`
+        `${2.4+Math.random()*1.7}s`
       );
 
       piece.style.setProperty(
         '--delay',
-        `${Math.random()*.45}s`
+        `${Math.random()*.28}s`
       );
 
       piece.style.setProperty(
         '--x1',
-        `${-80+Math.random()*160}px`
+        `${-100+Math.random()*200}px`
       );
 
       piece.style.setProperty(
         '--x2',
-        `${-160+Math.random()*320}px`
+        `${-150+Math.random()*300}px`
+      );
+
+      piece.style.setProperty(
+        '--x3',
+        `${-220+Math.random()*440}px`
       );
 
       piece.style.setProperty(
@@ -143,7 +163,12 @@
 
       piece.style.setProperty(
         '--r2',
-        `${-900+Math.random()*1800}deg`
+        `${-720+Math.random()*1440}deg`
+      );
+
+      piece.style.setProperty(
+        '--r3',
+        `${-1080+Math.random()*2160}deg`
       );
 
       layer.appendChild(piece);
@@ -151,21 +176,36 @@
 
     document.body.appendChild(layer);
 
-    setTimeout(()=>{
-      layer.remove();
-    },5200);
-  }
+    for(let i=0;i<16;i++){
+      const spark=document.createElement('span');
 
-  function showResult(){
-    const box=document.getElementById('quizResult');
+      spark.className='ed-success-spark';
+      spark.style.background=colors[i%colors.length];
 
-    if(!box || box.hidden || !box.innerHTML.trim()) return;
+      spark.style.setProperty(
+        '--sx',
+        `${Math.cos(i*Math.PI/8)*90}px`
+      );
 
-    celebrate();
+      spark.style.setProperty(
+        '--sy',
+        `${Math.sin(i*Math.PI/8)*70}px`
+      );
 
-    box.classList.remove('ed-result-pop');
-    void box.offsetWidth;
-    box.classList.add('ed-result-pop');
+      spark.style.animationDelay=`${i*8}ms`;
+
+      document.body.appendChild(spark);
+
+      setTimeout(
+        ()=>spark.remove(),
+        1100+i*8
+      );
+    }
+
+    setTimeout(
+      ()=>layer.remove(),
+      4800
+    );
   }
 
   function watch(){
@@ -176,10 +216,20 @@
       return;
     }
 
+    let wasVisible=
+      !box.hidden &&
+      !!box.innerHTML.trim();
+
     const observer=new MutationObserver(()=>{
-      if(!box.hidden && box.innerHTML.trim()){
-        showResult();
+      const visible=
+        !box.hidden &&
+        !!box.innerHTML.trim();
+
+      if(visible && !wasVisible){
+        celebrate();
       }
+
+      wasVisible=visible;
     });
 
     observer.observe(box,{
