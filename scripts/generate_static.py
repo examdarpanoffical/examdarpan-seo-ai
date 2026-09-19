@@ -688,44 +688,25 @@ WhatsApp पर Follow करें →
 <div class="article-content">{content}</div>
 <div class="notice"><strong>महत्वपूर्ण:</strong> आवेदन, फीस, पात्रता, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई से पहले संबंधित विभाग की official notification जरूर verify करें।</div>
 {action_html}
-<section class="community-card whatsapp_links_cta">
+<section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
+{related_html}
+<section class="community-card article-community-cta article-community-cta-bottom">
 <div>
-<span class="section-label">IMPORTANT UPDATES</span>
+<span class="section-label">STAY UPDATED</span>
 <h2>नई भर्ती और परीक्षा अपडेट WhatsApp पर पाएं</h2>
-<p>Admit Card, Result, Vacancy और जरूरी सरकारी नौकरी alerts के लिए Exam Darpan WhatsApp Channel follow करें।</p>
+<p>{esc(community_copy(cat)[1])} नई vacancy, Admit Card और Result updates miss न हों — Exam Darpan WhatsApp Channel follow करें।</p>
 </div>
 <div class="community-actions">
 <a class="btn btn-whatsapp"
    href="{WHATSAPP}"
    target="_blank"
    rel="noopener"
-   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_important_links')">
+   aria-label="Exam Darpan WhatsApp Channel Follow करें"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_bottom')">
 WhatsApp Channel Follow करें →
 </a>
 </div>
-</section>
-<section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
-{related_html}
-<section class="community-card">
-<div>
-<span class="section-label">EXAM DARPAN COMMUNITY</span>
-<h2>{esc(community_copy(cat)[0])}</h2>
-<p>{esc(community_copy(cat)[1])}</p>
-</div>
-<div class="community-actions">
-<a class="btn btn-whatsapp"
-   href="{WHATSAPP}"
-   target="_blank"
-   rel="noopener"
-   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp')">WhatsApp Channel</a>
-<a class="btn btn-dark"
-   href="{TELEGRAM}"
-   target="_blank"
-   rel="noopener"
-   onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram')">Telegram Channel</a>
-</div>
-</section>
-</article></main>
+</section></article></main>
 <footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer>
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
 </body></html>
