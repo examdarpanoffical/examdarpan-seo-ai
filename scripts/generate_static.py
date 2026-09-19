@@ -33,6 +33,8 @@ ARTICLE_MARKER = "<!-- EXAM-DARPAN-GENERATED-ARTICLE -->"
 CATEGORY_MARKER = "<!-- EXAM-DARPAN-GENERATED-CATEGORY -->"
 WHATSAPP = "https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36"
 TELEGRAM = "https://t.me/examdarpanofficial"
+INSTAGRAM = "https://www.instagram.com/examdarpan_official/"
+WHATSAPP_GROUP = "https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
 GA4_ID = "G-FWB3YMTSDX"
 
 STATIC_PAGES = [
