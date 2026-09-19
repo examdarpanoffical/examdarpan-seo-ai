@@ -799,6 +799,249 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         quiz = """<section class="card daily-quiz-teaser" id="daily-quiz"><div class="quiz-teaser-icon">?</div><div class="quiz-teaser-copy"><span class="eyebrow">DAILY PRACTICE</span><h2>आज का Daily Quiz</h2><p id="dailyQuizSummary">आज के नए प्रश्नों के साथ अपनी तैयारी check करें। Timer के साथ quiz दें और अंत में score व explanations देखें।</p><div class="quiz-teaser-meta"><span id="dailyQuizMeta">Loading today’s quiz…</span><a id="dailyQuizCta" class="btn btn-primary" href="/quiz.html">Quiz खोलें →</a></div></div></section><!-- EXAM-DARPAN-DAILY-QUIZ -->"""
         text = text.replace('  <section class="layout" id="updates">', f'  {quiz}\n  <section class="layout" id="updates">', 1)
 
+
+    # High-visibility homepage community conversion band.
+    # WhatsApp is the primary action; Telegram is secondary.
+    if '<!-- EXAM-DARPAN-HOME-COMMUNITY-CTA -->' not in text:
+
+        home_community_css = """<style id="exam-darpan-home-community-cta">
+.ed-home-community{
+  position:relative;
+  overflow:hidden;
+  margin:18px 0;
+  padding:22px;
+  border:1px solid #d7e1ee;
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(37,99,235,.12),transparent 34%),
+    linear-gradient(135deg,#071426 0%,#10264a 58%,#17366d 100%);
+  color:#fff;
+  box-shadow:0 14px 34px rgba(8,25,55,.16);
+}
+.ed-home-community-head{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+.ed-home-community-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:7px;
+  color:#93c5fd;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.14em;
+}
+.ed-home-community-kicker i{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.13);
+}
+.ed-home-community h2{
+  margin:0;
+  max-width:760px;
+  color:#fff;
+  font-size:clamp(22px,3vw,32px);
+  line-height:1.16;
+  letter-spacing:-.025em;
+}
+.ed-home-community-head p{
+  margin:7px 0 0;
+  max-width:760px;
+  color:#cbd5e1;
+  font-size:12px;
+  line-height:1.65;
+}
+.ed-home-community-badge{
+  flex:0 0 auto;
+  padding:7px 9px;
+  border:1px solid rgba(147,197,253,.22);
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  color:#dbeafe;
+  font-size:8px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.ed-home-community-actions{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:1.35fr 1fr;
+  gap:10px;
+}
+.ed-home-community-action{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  min-height:64px;
+  padding:11px 13px;
+  border-radius:16px;
+  text-decoration:none;
+  color:#fff;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.ed-home-community-action:hover{
+  transform:translateY(-2px);
+}
+.ed-home-community-action.whatsapp{
+  background:linear-gradient(135deg,#16a34a,#059669);
+  box-shadow:0 10px 22px rgba(5,150,105,.22);
+}
+.ed-home-community-action.telegram{
+  background:linear-gradient(135deg,#0284c7,#2563eb);
+  box-shadow:0 10px 22px rgba(37,99,235,.22);
+}
+.ed-home-community-icon{
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.18);
+  font-size:19px;
+  font-weight:950;
+}
+.ed-home-community-copy{
+  min-width:0;
+  flex:1;
+}
+.ed-home-community-copy strong{
+  display:block;
+  font-size:12px;
+  line-height:1.25;
+  font-weight:950;
+}
+.ed-home-community-copy small{
+  display:block;
+  margin-top:3px;
+  color:rgba(255,255,255,.82);
+  font-size:8.5px;
+  line-height:1.35;
+  font-weight:700;
+}
+.ed-home-community-arrow{
+  font-size:18px;
+  font-weight:950;
+}
+.ed-home-community-foot{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px 14px;
+  margin-top:13px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.11);
+  color:#b7c4d8;
+  font-size:8.5px;
+  line-height:1.4;
+}
+.ed-home-community-foot span:first-child{
+  color:#bbf7d0;
+  font-weight:900;
+}
+@media(max-width:700px){
+  .ed-home-community{
+    margin:16px 0;
+    padding:16px;
+    border-radius:19px;
+  }
+  .ed-home-community-head{
+    display:block;
+    margin-bottom:13px;
+  }
+  .ed-home-community h2{
+    font-size:24px;
+  }
+  .ed-home-community-head p{
+    font-size:11px;
+  }
+  .ed-home-community-badge{
+    display:inline-flex;
+    margin-top:9px;
+  }
+  .ed-home-community-actions{
+    grid-template-columns:1fr;
+  }
+  .ed-home-community-action{
+    min-height:60px;
+  }
+}
+</style>"""
+
+        if 'id="exam-darpan-home-community-cta"' not in text:
+            text = text.replace(
+                "</head>",
+                home_community_css + "\n</head>",
+                1
+            )
+
+        home_community = """<!-- EXAM-DARPAN-HOME-COMMUNITY-CTA -->
+<section class="ed-home-community" aria-labelledby="ed-home-community-title">
+  <div class="ed-home-community-head">
+    <div>
+      <span class="ed-home-community-kicker"><i></i> DAILY ALERTS</span>
+      <h2 id="ed-home-community-title">सबसे जरूरी भर्ती और परीक्षा अपडेट सीधे WhatsApp पर पाएं</h2>
+      <p>नई Vacancy, Admit Card, Result और Exam Date की महत्वपूर्ण updates के लिए Exam Darpan community से जुड़े रहें।</p>
+    </div>
+    <span class="ed-home-community-badge">10वीं/12वीं + Graduate Updates</span>
+  </div>
+
+  <div class="ed-home-community-actions">
+    <a class="ed-home-community-action whatsapp"
+       href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Exam Darpan WhatsApp Channel Follow करें"
+       onclick="window.gtag&&window.gtag('event','community_cta_click',{platform:'whatsapp_home'})">
+      <span class="ed-home-community-icon" aria-hidden="true">◉</span>
+      <span class="ed-home-community-copy">
+        <strong>WhatsApp Channel — Follow करें →</strong>
+        <small>सबसे तेज भर्ती, Admit Card और Result alerts</small>
+      </span>
+      <b class="ed-home-community-arrow" aria-hidden="true">→</b>
+    </a>
+
+    <a class="ed-home-community-action telegram"
+       href="https://t.me/examdarpanofficial"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Exam Darpan Telegram Channel Join करें"
+       onclick="window.gtag&&window.gtag('event','community_cta_click',{platform:'telegram_home'})">
+      <span class="ed-home-community-icon" aria-hidden="true">➤</span>
+      <span class="ed-home-community-copy">
+        <strong>Telegram Channel — Join करें</strong>
+        <small>Fast alerts और exam updates</small>
+      </span>
+      <b class="ed-home-community-arrow" aria-hidden="true">→</b>
+    </a>
+  </div>
+
+  <div class="ed-home-community-foot">
+    <span>✓ Official-source based</span>
+    <span>✓ Free alerts</span>
+    <span>✓ Rajasthan + All India</span>
+  </div>
+</section>
+<!-- /EXAM-DARPAN-HOME-COMMUNITY-CTA -->"""
+
+        text = text.replace(
+            '  <section class="layout" id="updates">',
+            home_community + '\n  <section class="layout" id="updates">',
+            1
+        )
+
     # Add crawlable category hub immediately before the Latest Articles section once.
     if '<!-- EXAM-DARPAN-CATEGORY-HUB -->' not in text:
         hub = '<section class="card pad category-hub" id="categories"><div class="section-title"><div><span class="eyebrow">BROWSE BY TOPIC</span><h2>Popular Categories</h2></div></div><div class="category-links">'
