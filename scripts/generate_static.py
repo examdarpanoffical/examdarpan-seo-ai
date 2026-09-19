@@ -628,6 +628,30 @@ gtag('event','article_view',{{
   article_slug:{json.dumps(s, ensure_ascii=False)},
   article_category:{json.dumps(cat, ensure_ascii=False)}
 }});
+
+window.edScrollMarks={{25:false,50:false,75:false,90:false}};
+
+window.edTrackScroll=function(){{
+  const maxScroll=document.documentElement.scrollHeight-window.innerHeight;
+  if(maxScroll<=0) return;
+
+  const percent=Math.round((window.scrollY/maxScroll)*100);
+
+  [25,50,75,90].forEach(function(depth){{
+    if(percent>=depth && !window.edScrollMarks[depth]){{
+      window.edScrollMarks[depth]=true;
+
+      gtag('event','article_scroll',{{
+        depth_percent:depth,
+        article_title:{json.dumps(search_title, ensure_ascii=False)},
+        article_slug:{json.dumps(s, ensure_ascii=False)},
+        article_category:{json.dumps(cat, ensure_ascii=False)}
+      }});
+    }}
+  }});
+}};
+
+window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
 <link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css">
@@ -643,11 +667,43 @@ gtag('event','article_view',{{
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
 <div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div>
 {verification_line(p)}
+<section class="community-card" style="margin:16px 0">
+<div>
+<span class="section-label">WHATSAPP ALERTS</span>
+<h2>नई भर्ती और परीक्षा updates सीधे WhatsApp पर पाएं</h2>
+<p>Important vacancy, Admit Card, Result और exam alerts के लिए Exam Darpan WhatsApp Channel follow करें।</p>
+</div>
+<div class="community-actions">
+<a class="btn btn-whatsapp"
+   href="{WHATSAPP}"
+   target="_blank"
+   rel="noopener"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_top')">
+WhatsApp पर Follow करें →
+</a>
+</div>
+</section>
 {cover}
 {quick_facts(p)}
 <div class="article-content">{content}</div>
 <div class="notice"><strong>महत्वपूर्ण:</strong> आवेदन, फीस, पात्रता, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई से पहले संबंधित विभाग की official notification जरूर verify करें।</div>
 {action_html}
+<section class="community-card whatsapp_links_cta">
+<div>
+<span class="section-label">IMPORTANT UPDATES</span>
+<h2>नई भर्ती और परीक्षा अपडेट WhatsApp पर पाएं</h2>
+<p>Admit Card, Result, Vacancy और जरूरी सरकारी नौकरी alerts के लिए Exam Darpan WhatsApp Channel follow करें।</p>
+</div>
+<div class="community-actions">
+<a class="btn btn-whatsapp"
+   href="{WHATSAPP}"
+   target="_blank"
+   rel="noopener"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_important_links')">
+WhatsApp Channel Follow करें →
+</a>
+</div>
+</section>
 <section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
 {related_html}
 <section class="community-card">
