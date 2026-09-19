@@ -31,7 +31,9 @@ BASE = "https://examdarpan.in"
 MARKER = "<!-- EXAM-DARPAN-GENERATED-"
 ARTICLE_MARKER = "<!-- EXAM-DARPAN-GENERATED-ARTICLE -->"
 CATEGORY_MARKER = "<!-- EXAM-DARPAN-GENERATED-CATEGORY -->"
-WHATSAPP = "https://chat.whatsapp.com/FaPxhlfwwBWDSmTWmkOrBQ"
+WHATSAPP = "https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36"
+TELEGRAM = "https://t.me/examdarpanofficial"
+GA4_ID = "G-FWB3YMTSDX"
 
 STATIC_PAGES = [
     ("/", "Home"),
@@ -405,6 +407,79 @@ def fetch_posts() -> list[dict[str, Any]]:
     return posts
 
 
+def community_copy(category: str) -> tuple[str, str]:
+    """Return a useful community CTA based on article category."""
+    mapping = {
+        "Rajasthan Jobs": (
+            "राजस्थान की नई भर्ती और vacancy updates सबसे पहले पाएं",
+            "Rajasthan Jobs, application dates और important recruitment alerts के लिए community से जुड़ें।",
+        ),
+        "Government Jobs": (
+            "नई Government Jobs की updates सीधे पाएं",
+            "Central और All India government recruitment updates के लिए community से जुड़ें।",
+        ),
+        "Police & Defence Jobs": (
+            "Police और Defence भर्ती alerts से जुड़े रहें",
+            "Police, Defence और security recruitment की महत्वपूर्ण updates के लिए community से जुड़ें।",
+        ),
+        "Teaching Jobs": (
+            "Teaching और REET भर्ती updates पाएं",
+            "Teacher, REET और education department recruitment alerts के लिए community से जुड़ें।",
+        ),
+        "Railway Jobs": (
+            "Railway भर्ती की नई updates सबसे पहले पाएं",
+            "RRB, RRC और Railway recruitment alerts के लिए community से जुड़ें।",
+        ),
+        "Banking Jobs": (
+            "Banking Jobs और exam alerts पाएं",
+            "Banking recruitment और examination updates के लिए community से जुड़ें।",
+        ),
+        "SSC Jobs": (
+            "SSC भर्ती और exam updates से जुड़े रहें",
+            "SSC recruitment, exam dates और results की महत्वपूर्ण updates के लिए community से जुड़ें।",
+        ),
+        "UPSC Jobs": (
+            "UPSC exam और recruitment alerts पाएं",
+            "UPSC examinations और recruitment updates के लिए community से जुड़ें।",
+        ),
+        "Admit Card": (
+            "Admit Card जारी होते ही update पाएं",
+            "नई परीक्षाओं के Admit Card और exam alerts के लिए community से जुड़ें।",
+        ),
+        "Results": (
+            "Result जारी होते ही update पाएं",
+            "सरकारी exams और recruitment results की updates के लिए community से जुड़ें।",
+        ),
+        "Answer Key": (
+            "Answer Key और exam updates पाएं",
+            "नई Answer Key और परीक्षा से जुड़ी महत्वपूर्ण updates के लिए community से जुड़ें।",
+        ),
+        "Syllabus": (
+            "Syllabus और preparation updates पाएं",
+            "Exam syllabus और preparation से जुड़ी महत्वपूर्ण जानकारी के लिए community से जुड़ें।",
+        ),
+        "Entrance Exams": (
+            "Entrance Exam और admission alerts पाएं",
+            "Entrance examinations और admission updates के लिए community से जुड़ें।",
+        ),
+        "Scholarships": (
+            "Scholarship updates सबसे पहले पाएं",
+            "Scholarship schemes, eligibility और application dates की updates के लिए community से जुड़ें।",
+        ),
+        "University & College": (
+            "University और College admission updates पाएं",
+            "Admission, university results, courses और college updates के लिए community से जुड़ें।",
+        ),
+    }
+    return mapping.get(
+        category,
+        (
+            "Exam और Government Jobs updates से जुड़े रहें",
+            "Important education, exam और government job updates के लिए Exam Darpan community से जुड़ें।",
+        ),
+    )
+
+
 def related_posts(post: dict[str, Any], posts: list[dict[str, Any]], limit: int = 6) -> list[dict[str, Any]]:
     current_id = post.get("id")
     current_cat = normalized_category(post)
@@ -531,6 +606,30 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
 <link rel="alternate" type="application/rss+xml" title="Exam Darpan RSS" href="{BASE}/feed.xml">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(search_title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{esc(img)}">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(search_title)}"><meta name="twitter:description" content="{esc(desc)}"><meta name="twitter:image" content="{esc(img)}">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){{dataLayer.push(arguments);}}
+gtag('js',new Date());
+gtag('config','{GA4_ID}',{{send_page_view:true}});
+
+window.edTrackCommunity=function(platform){{
+  gtag('event','community_cta_click',{{
+    platform:platform,
+    article_title:{json.dumps(search_title, ensure_ascii=False)},
+    article_slug:{json.dumps(s, ensure_ascii=False)},
+    article_category:{json.dumps(cat, ensure_ascii=False)}
+  }});
+}};
+
+gtag('event','article_view',{{
+  article_title:{json.dumps(search_title, ensure_ascii=False)},
+  article_slug:{json.dumps(s, ensure_ascii=False)},
+  article_category:{json.dumps(cat, ensure_ascii=False)}
+}});
+</script>
+
 <link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css">
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
@@ -551,7 +650,25 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
 {action_html}
 <section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
 {related_html}
-<section class="community-card"><div><span class="section-label">EXAM DARPAN COMMUNITY</span><h2>नई vacancy और exam updates से जुड़े रहें</h2><p>Important updates के लिए Exam Darpan community से जुड़ें।</p></div><div class="community-actions"><a class="btn btn-whatsapp" href="{WHATSAPP}" target="_blank" rel="noopener">WhatsApp Channel</a></div></section>
+<section class="community-card">
+<div>
+<span class="section-label">EXAM DARPAN COMMUNITY</span>
+<h2>{esc(community_copy(cat)[0])}</h2>
+<p>{esc(community_copy(cat)[1])}</p>
+</div>
+<div class="community-actions">
+<a class="btn btn-whatsapp"
+   href="{WHATSAPP}"
+   target="_blank"
+   rel="noopener"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp')">WhatsApp Channel</a>
+<a class="btn btn-dark"
+   href="{TELEGRAM}"
+   target="_blank"
+   rel="noopener"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram')">Telegram Channel</a>
+</div>
+</section>
 </article></main>
 <footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer>
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
