@@ -808,15 +808,25 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 .ed-home-community{
   position:relative;
   overflow:hidden;
-  margin:18px 0;
+  margin:18px 0 22px;
   padding:22px;
-  border:1px solid #d7e1ee;
+  border:1px solid rgba(148,163,184,.22);
   border-radius:22px;
   background:
-    radial-gradient(circle at 100% 0%,rgba(37,99,235,.12),transparent 34%),
-    linear-gradient(135deg,#071426 0%,#10264a 58%,#17366d 100%);
+    radial-gradient(circle at 92% 0%,rgba(59,130,246,.24),transparent 32%),
+    radial-gradient(circle at 0% 100%,rgba(34,197,94,.12),transparent 28%),
+    linear-gradient(135deg,#06101f 0%,#10264a 55%,#174b86 100%);
   color:#fff;
-  box-shadow:0 14px 34px rgba(8,25,55,.16);
+  box-shadow:0 18px 40px rgba(2,12,30,.20);
+}
+.ed-home-community:before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  background:linear-gradient(180deg,#22c55e,#16a34a);
 }
 .ed-home-community-head{
   position:relative;
@@ -825,46 +835,46 @@ def update_home(posts: list[dict[str, Any]]) -> None:
   align-items:flex-start;
   justify-content:space-between;
   gap:16px;
-  margin-bottom:16px;
+  margin-bottom:15px;
 }
 .ed-home-community-kicker{
   display:inline-flex;
   align-items:center;
-  gap:6px;
+  gap:7px;
   margin-bottom:7px;
-  color:#93c5fd;
+  color:#86efac;
   font-size:9px;
   font-weight:950;
   letter-spacing:.14em;
 }
 .ed-home-community-kicker i{
-  width:6px;
-  height:6px;
+  width:7px;
+  height:7px;
   border-radius:50%;
   background:#22c55e;
-  box-shadow:0 0 0 4px rgba(34,197,94,.13);
+  box-shadow:0 0 0 5px rgba(34,197,94,.13);
 }
 .ed-home-community h2{
   margin:0;
-  max-width:760px;
+  max-width:800px;
   color:#fff;
-  font-size:clamp(22px,3vw,32px);
-  line-height:1.16;
-  letter-spacing:-.025em;
+  font-size:clamp(24px,3.1vw,34px);
+  line-height:1.14;
+  letter-spacing:-.03em;
 }
 .ed-home-community-head p{
-  margin:7px 0 0;
-  max-width:760px;
+  margin:8px 0 0;
+  max-width:780px;
   color:#cbd5e1;
   font-size:12px;
   line-height:1.65;
 }
 .ed-home-community-badge{
   flex:0 0 auto;
-  padding:7px 9px;
-  border:1px solid rgba(147,197,253,.22);
+  padding:8px 10px;
+  border:1px solid rgba(255,255,255,.14);
   border-radius:999px;
-  background:rgba(255,255,255,.06);
+  background:rgba(255,255,255,.065);
   color:#dbeafe;
   font-size:8px;
   font-weight:900;
@@ -874,7 +884,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
   position:relative;
   z-index:1;
   display:grid;
-  grid-template-columns:1.35fr 1fr;
+  grid-template-columns:1.3fr 1fr;
   gap:10px;
 }
 .ed-home-community-action{
@@ -882,11 +892,12 @@ def update_home(posts: list[dict[str, Any]]) -> None:
   display:flex;
   align-items:center;
   gap:11px;
-  min-height:64px;
-  padding:11px 13px;
+  min-height:66px;
+  padding:11px 14px;
   border-radius:16px;
-  text-decoration:none;
-  color:#fff;
+  color:#fff!important;
+  text-decoration:none!important;
+  border:1px solid rgba(255,255,255,.10);
   transition:transform .18s ease,box-shadow .18s ease;
 }
 .ed-home-community-action:hover{
@@ -894,22 +905,22 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 }
 .ed-home-community-action.whatsapp{
   background:linear-gradient(135deg,#16a34a,#059669);
-  box-shadow:0 10px 22px rgba(5,150,105,.22);
+  box-shadow:0 11px 24px rgba(5,150,105,.25);
 }
 .ed-home-community-action.telegram{
   background:linear-gradient(135deg,#0284c7,#2563eb);
-  box-shadow:0 10px 22px rgba(37,99,235,.22);
+  box-shadow:0 11px 24px rgba(37,99,235,.23);
 }
 .ed-home-community-icon{
-  width:38px;
-  height:38px;
-  flex:0 0 38px;
+  width:40px;
+  height:40px;
+  flex:0 0 40px;
   display:grid;
   place-items:center;
   border-radius:12px;
   background:rgba(255,255,255,.16);
   border:1px solid rgba(255,255,255,.18);
-  font-size:19px;
+  font-size:18px;
   font-weight:950;
 }
 .ed-home-community-copy{
@@ -919,7 +930,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 .ed-home-community-copy strong{
   display:block;
   font-size:12px;
-  line-height:1.25;
+  line-height:1.3;
   font-weight:950;
 }
 .ed-home-community-copy small{
@@ -927,12 +938,29 @@ def update_home(posts: list[dict[str, Any]]) -> None:
   margin-top:3px;
   color:rgba(255,255,255,.82);
   font-size:8.5px;
-  line-height:1.35;
-  font-weight:700;
+  line-height:1.4;
 }
 .ed-home-community-arrow{
   font-size:18px;
   font-weight:950;
+}
+.ed-home-community-topics{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+}
+.ed-home-community-topics a{
+  padding:6px 9px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  color:#dbeafe!important;
+  text-decoration:none!important;
+  font-size:8px;
+  font-weight:850;
 }
 .ed-home-community-foot{
   position:relative;
@@ -940,8 +968,8 @@ def update_home(posts: list[dict[str, Any]]) -> None:
   display:flex;
   flex-wrap:wrap;
   gap:7px 14px;
-  margin-top:13px;
-  padding-top:12px;
+  margin-top:12px;
+  padding-top:11px;
   border-top:1px solid rgba(255,255,255,.11);
   color:#b7c4d8;
   font-size:8.5px;
@@ -953,7 +981,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 }
 @media(max-width:700px){
   .ed-home-community{
-    margin:16px 0;
+    margin:14px 0 18px;
     padding:16px;
     border-radius:19px;
   }
@@ -980,6 +1008,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 }
 </style>"""
 
+
         if 'id="exam-darpan-home-community-cta"' not in text:
             text = text.replace(
                 "</head>",
@@ -991,11 +1020,11 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 <section class="ed-home-community" aria-labelledby="ed-home-community-title">
   <div class="ed-home-community-head">
     <div>
-      <span class="ed-home-community-kicker"><i></i> DAILY ALERTS</span>
-      <h2 id="ed-home-community-title">सबसे जरूरी भर्ती और परीक्षा अपडेट सीधे WhatsApp पर पाएं</h2>
-      <p>नई Vacancy, Admit Card, Result और Exam Date की महत्वपूर्ण updates के लिए Exam Darpan community से जुड़े रहें।</p>
+      <span class="ed-home-community-kicker"><i></i> EXAM DARPAN PRIORITY ALERTS</span>
+      <h2 id="ed-home-community-title">जरूरी भर्ती, Admit Card और Result की updates सबसे पहले पाएं</h2>
+      <p>Rajasthan + All India Government Jobs, Exam Dates, Admit Card और Results — important updates सीधे आपके WhatsApp और Telegram तक।</p>
     </div>
-    <span class="ed-home-community-badge">10वीं/12वीं + Graduate Updates</span>
+    <span class="ed-home-community-badge">FREE • DAILY UPDATES</span>
   </div>
 
   <div class="ed-home-community-actions">
@@ -1004,11 +1033,11 @@ def update_home(posts: list[dict[str, Any]]) -> None:
        target="_blank"
        rel="noopener noreferrer"
        aria-label="Exam Darpan WhatsApp Channel Follow करें"
-       onclick="window.gtag&&window.gtag('event','community_cta_click',{platform:'whatsapp_home'})">
+       onclick="window.gtag&&window.gtag('event','community_cta_click',{platform:'whatsapp_home_priority'})">
       <span class="ed-home-community-icon" aria-hidden="true">◉</span>
       <span class="ed-home-community-copy">
         <strong>WhatsApp Channel — Follow करें →</strong>
-        <small>सबसे तेज भर्ती, Admit Card और Result alerts</small>
+        <small>Daily Vacancy • Admit Card • Result Alerts</small>
       </span>
       <b class="ed-home-community-arrow" aria-hidden="true">→</b>
     </a>
@@ -1018,27 +1047,37 @@ def update_home(posts: list[dict[str, Any]]) -> None:
        target="_blank"
        rel="noopener noreferrer"
        aria-label="Exam Darpan Telegram Channel Join करें"
-       onclick="window.gtag&&window.gtag('event','community_cta_click',{platform:'telegram_home'})">
+       onclick="window.gtag&&window.gtag('event','community_cta_click',{platform:'telegram_home_priority'})">
       <span class="ed-home-community-icon" aria-hidden="true">➤</span>
       <span class="ed-home-community-copy">
         <strong>Telegram Channel — Join करें</strong>
-        <small>Fast alerts और exam updates</small>
+        <small>Fast Recruitment • Exam Updates</small>
       </span>
       <b class="ed-home-community-arrow" aria-hidden="true">→</b>
     </a>
+  </div>
+
+  <div class="ed-home-community-topics">
+    <a href="/category-rajasthan-jobs">Rajasthan Jobs</a>
+    <a href="/category-government-jobs">All India Jobs</a>
+    <a href="/category-admit-card">Admit Card</a>
+    <a href="/category-results">Results</a>
+    <a href="/exam-calendar.html">Exam Calendar</a>
   </div>
 
   <div class="ed-home-community-foot">
     <span>✓ Official-source based</span>
     <span>✓ Free alerts</span>
     <span>✓ Rajasthan + All India</span>
+    <span>✓ No unnecessary spam</span>
   </div>
 </section>
 <!-- /EXAM-DARPAN-HOME-COMMUNITY-CTA -->"""
 
+
         text = text.replace(
-            '  <section class="layout" id="updates">',
-            home_community + '\n  <section class="layout" id="updates">',
+            '  <!-- EXAM-DARPAN-DAILY-QUIZ -->',
+            home_community + '\n  <!-- EXAM-DARPAN-DAILY-QUIZ -->',
             1
         )
 
