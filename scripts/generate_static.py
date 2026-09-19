@@ -667,7 +667,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
 <div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div>
 {verification_line(p)}
-<section class="community-card" style="margin:16px 0">
+<section class="community-card article-community-cta article-community-cta-top">
 <div>
 <span class="section-label">WHATSAPP ALERTS</span>
 <h2>नई भर्ती और परीक्षा updates सीधे WhatsApp पर पाएं</h2>
@@ -678,6 +678,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
    href="{WHATSAPP}"
    target="_blank"
    rel="noopener"
+   aria-label="Exam Darpan WhatsApp Channel Follow करें"
    onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_top')">
 WhatsApp पर Follow करें →
 </a>
@@ -707,6 +708,23 @@ WhatsApp Channel Follow करें →
 </a>
 </div>
 </section></article></main>
+<a class="floating-whatsapp-group"
+   href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
+   target="_blank"
+   rel="noopener"
+   aria-label="WhatsApp Group Join Now"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_floating')">
+  <span class="floating-whatsapp-icon" aria-hidden="true">
+    <svg viewBox="0 0 32 32" role="img">
+      <path d="M16 3.5C9.1 3.5 3.5 8.9 3.5 15.6c0 2.3.7 4.6 2 6.5L4 28.5l6.6-1.5c1.7.9 3.5 1.4 5.4 1.4 6.9 0 12.5-5.6 12.5-12.6C28.5 8.9 22.9 3.5 16 3.5Zm0 22.8c-1.7 0-3.4-.4-4.9-1.3l-.4-.2-3.9.9.9-3.8-.3-.4c-1-1.6-1.5-3.5-1.5-5.4C5.9 10.7 10.4 6.4 16 6.4s10.1 4.3 10.1 9.7S21.6 26.3 16 26.3Zm5.6-7.3c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.5-1.7-1.7-2-.2-.3 0-.5.1-.7.1-.1.3-.4.4-.6.1-.2.1-.4.2-.6.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.8.6.8.2 1.5.2 2 .1.6-.1 1.9-.8 2.2-1.6.3-.8.3-1.5.2-1.6-.1-.1-.3-.2-.6-.3Z"/>
+    </svg>
+  </span>
+  <span class="floating-whatsapp-text">
+    <small>WhatsApp Group</small>
+    <strong>Join Now</strong>
+  </span>
+</a>
+
 <footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer>
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
 </body></html>
