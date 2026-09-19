@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Calendar Data Test</title>
+</head>
+<body>
+<pre id="out">Loading...</pre>
+
+<script src="./public/firebase-config.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  limit
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+const out = document.getElementById("out");
+
+try {
+  const app = initializeApp(window.FIREBASE_CONFIG, "calendarTest");
+  const db = getFirestore(app);
+
+  const snap = await getDocs(
+    query(
+      collection(db, "posts"),
+      where("status", "==", "published"),
+      limit(500)
+    )
+  );
+
+  let result = "TOTAL = " + snap.size + "\\n\\n";
+
+  for (const d of snap.docs) {
+    const p = d.data();
+
+    result +=
+      "========================================\\n" +
+      "TITLE: " + (p.title || "") + "\\n" +
+      "CATEGORY: " + (p.category || "") + "\\n" +
+      "START: " + (p.applicationStartDate || p.startDate || p.applyStartDate || "") + "\\n" +
+      "LAST: " + (p.applicationLastDate || p.lastDate || p.applyLastDate || "") + "\\n" +
+      "EXAM: " + (p.examDate || p.examDateTime || "") + "\\n" +
+      "CONTENT FIELDS:\\n" +
+      "content = " + String(p.content || "").length + " chars\\n" +
+      "articleContent = " + String(p.articleContent || "").length + " chars\\n" +
+      "body = " + String(p.body || "").length + " chars\\n" +
+      "description = " + String(p.description || "").length + " chars\\n" +
+      "excerpt = " + String(p.excerpt || "").length + " chars\\n\\n";
+  }
+
+  out.textContent = result;
+
+} catch (e) {
+  out.textContent = "ERROR\\n\\n" + (e.stack || e);
+}
+</script>
+<div id="ed-whatsapp-popup" style="position:fixed;right:16px;bottom:16px;z-index:99999;max-width:370px;width:calc(100% - 32px);background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 30px #0003;border:1px solid #ddd;display:none;align-items:center;gap:12px;font-family:Arial,sans-serif"><div style="width:46px;height:46px;min-width:46px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px">◉</div><div style="flex:1"><b style="display:block;font-size:14px">Exam Darpan WhatsApp</b><span style="font-size:12px;color:#667">Latest Jobs, Admit Card & Result Updates</span></div><a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" style="background:#16a34a;color:#fff!important;padding:9px 12px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:bold">Join Now</a><button onclick="this.parentElement.style.display='none'" style="position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0003;width:24px;height:24px;cursor:pointer">×</button></div><script>setTimeout(()=>{let p=document.getElementById('ed-whatsapp-popup');if(p)p.style.display='flex'},4500);</script></body>
+</html>

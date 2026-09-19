@@ -1,0 +1,29 @@
+HTTP/2 301 
+location: /all-india-exam-calendar
+content-type: text/plain; charset=utf-8
+accept-ranges: bytes
+date: Mon, 14 Sep 2026 07:25:32 GMT
+x-served-by: cache-del-vibw2260020-DEL
+x-cache: HIT
+x-cache-hits: 0
+x-timer: S1789370733.716115,VS0,VE1
+vary: x-fh-requested-host, accept-encoding
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+content-length: 39
+
+HTTP/2 200 
+cache-control: max-age=3600
+content-type: text/html; charset=utf-8
+etag: "dcf4d145c79a2374f8e8c6918ed81ec570cc90aafa642ed90426049ad158432a"
+last-modified: Mon, 14 Sep 2026 07:14:06 GMT
+strict-transport-security: max-age=31556926; includeSubDomains; preload
+accept-ranges: bytes
+date: Mon, 14 Sep 2026 07:25:33 GMT
+x-served-by: cache-del-vibw2260020-DEL
+x-cache: MISS
+x-cache-hits: 0
+x-timer: S1789370733.816067,VS0,VE345
+vary: x-fh-requested-host, accept-encoding
+alt-svc: h3=":443";ma=86400,h3-29=":443";ma=86400,h3-27=":443";ma=86400
+content-length: 20070
+

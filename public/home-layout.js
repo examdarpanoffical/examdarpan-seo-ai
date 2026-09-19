@@ -27,7 +27,7 @@
       <div class="ed-social-grid">
 
         <a class="ed-social-card ed-instagram"
-           href="https://www.instagram.com/examdarpanoffical/"
+           href="https://www.instagram.com/examdarpan_official/"
            target="_blank"
            rel="noopener noreferrer"
            aria-label="Visit Exam Darpan on Instagram">
@@ -43,7 +43,7 @@
           </span>
           <span>
             <strong>Instagram</strong>
-            <small>@examdarpanoffical</small>
+            <small>@examdarpan_official</small>
           </span>
           <b aria-hidden="true">→</b>
         </a>

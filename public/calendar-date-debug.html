@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Calendar Date Debug</title>
+</head>
+<body>
+<pre id="out">Loading…</pre>
+
+<script src="/firebase-config.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, query, where, limit
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+const out = document.getElementById("out");
+
+try {
+  const app = initializeApp(window.FIREBASE_CONFIG, "calendarDateDebug");
+  const db = getFirestore(app);
+
+  const snap = await getDocs(
+    query(
+      collection(db, "posts"),
+      where("status", "==", "published"),
+      limit(500)
+    )
+  );
+
+  const rows = snap.docs.map(d => {
+    const p = d.data();
+
+    return {
+      id: d.id,
+      title: p.title || "",
+      category: p.category || "",
+      applicationStartDate: p.applicationStartDate || "",
+      applicationLastDate: p.applicationLastDate || "",
+      lastDate: p.lastDate || "",
+      examDate: p.examDate || "",
+      startDate: p.startDate || "",
+      applyStartDate: p.applyStartDate || "",
+      applyLastDate: p.applyLastDate || "",
+      content: String(
+        p.content ||
+        p.articleContent ||
+        p.description ||
+        p.body ||
+        p.excerpt ||
+        ""
+      ).slice(0, 3000)
+    };
+  });
+
+  out.textContent =
+    "TOTAL PUBLISHED = " + rows.length +
+    "\\n\\n" +
+    rows.map((x, i) =>
+      "========== " + (i + 1) + " ==========" +
+      "\\nTITLE: " + x.title +
+      "\\nCATEGORY: " + x.category +
+      "\\napplicationStartDate: " + x.applicationStartDate +
+      "\\napplicationLastDate: " + x.applicationLastDate +
+      "\\nlastDate: " + x.lastDate +
+      "\\nexamDate: " + x.examDate +
+      "\\nstartDate: " + x.startDate +
+      "\\napplyStartDate: " + x.applyStartDate +
+      "\\napplyLastDate: " + x.applyLastDate +
+      "\\nCONTENT:\\n" + x.content +
+      "\\n"
+    ).join("\\n");
+
+} catch (e) {
+  console.error(e);
+  out.textContent = "ERROR:\\n" + (e.stack || e);
+}
+</script>
+<div id="ed-whatsapp-popup" style="position:fixed;right:16px;bottom:16px;z-index:99999;max-width:370px;width:calc(100% - 32px);background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 30px #0003;border:1px solid #ddd;display:none;align-items:center;gap:12px;font-family:Arial,sans-serif"><div style="width:46px;height:46px;min-width:46px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px">◉</div><div style="flex:1"><b style="display:block;font-size:14px">Exam Darpan WhatsApp</b><span style="font-size:12px;color:#667">Latest Jobs, Admit Card & Result Updates</span></div><a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" style="background:#16a34a;color:#fff!important;padding:9px 12px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:bold">Join Now</a><button onclick="this.parentElement.style.display='none'" style="position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0003;width:24px;height:24px;cursor:pointer">×</button></div><script>setTimeout(()=>{let p=document.getElementById('ed-whatsapp-popup');if(p)p.style.display='flex'},4500);</script></body>
+</html>
