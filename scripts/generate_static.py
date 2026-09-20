@@ -745,11 +745,12 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 .floating-whatsapp-group{{position:fixed;right:18px;bottom:18px;z-index:9999;display:flex;align-items:center;gap:10px;padding:9px 13px 9px 9px;border-radius:999px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff!important;text-decoration:none!important;box-shadow:0 10px 28px rgba(18,140,126,.34);border:2px solid rgba(255,255,255,.9);animation:edFloatPulse 2.8s ease-in-out infinite}}
 .floating-whatsapp-icon{{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#16a34a;box-shadow:0 3px 10px rgba(0,0,0,.14)}}
 .floating-whatsapp-icon svg{{width:23px;height:23px;fill:currentColor}}
-.floating-whatsapp-text{{display:flex;flex-direction:column;line-height:1.05}}.floating-whatsapp-text small{{font-size:8px;font-weight:700;opacity:.88}}.floating-whatsapp-text strong{{font-size:12px;margin-top:3px}}
-@keyframes edFloatPulse{{0%,100%{{box-shadow:0 10px 28px rgba(18,140,126,.34)}}50%{{box-shadow:0 10px 28px rgba(18,140,126,.34),0 0 0 7px rgba(37,211,102,.10)}}
-@media(max-width:560px){{.ed-community-card{{grid-template-columns:42px minmax(0,1fr) auto}}.ed-brand-icon{{width:42px;height:42px}}.floating-whatsapp-group{{right:12px;bottom:12px;padding:8px 11px 8px 8px}}.floating-whatsapp-icon{{width:36px;height:36px}}.floating-whatsapp-text strong{{font-size:11px}}
-@media(max-width:900px){{.ed-community-grid{{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){{.ed-community-panel{{padding:14px;border-radius:18px}}.ed-community-head{{align-items:flex-start;flex-direction:column}}.ed-community-live{{display:none}}.ed-community-grid{{grid-template-columns:1fr}}.ed-community-card{{padding:12px}}
+.floating-whatsapp-text{{display:flex;flex-direction:column;line-height:1.05}}
+.floating-whatsapp-text small{{font-size:8px;font-weight:700;opacity:.88}}
+.floating-whatsapp-text strong{{font-size:12px;margin-top:3px}}
+@keyframes edFloatPulse{{0%,100%{{box-shadow:0 10px 28px rgba(18,140,126,.34)}}50%{{box-shadow:0 10px 28px rgba(18,140,126,.34),0 0 0 7px rgba(37,211,102,.10)}}}}
+@media(max-width:900px){{.ed-community-grid{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
+@media(max-width:560px){{.ed-community-panel{{padding:14px;border-radius:18px}}.ed-community-head{{align-items:flex-start;flex-direction:column}}.ed-community-live{{display:none}}.ed-community-grid{{grid-template-columns:1fr}}.ed-community-card{{grid-template-columns:42px minmax(0,1fr) auto;padding:12px}}.ed-brand-icon{{width:42px;height:42px}}.floating-whatsapp-group{{right:12px;bottom:12px;padding:8px 11px 8px 8px}}.floating-whatsapp-icon{{width:36px;height:36px}}.floating-whatsapp-text strong{{font-size:11px}}}}
 </style>
 {cover}
 {quick_facts(p)}
@@ -798,6 +799,266 @@ WhatsApp Channel Follow करें →
 '''
 
 
+
+def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
+    """Compact homepage live ticker and category shelves from published posts."""
+    shelf_names = [
+        ("Rajasthan Jobs", "rajasthan-jobs", "राजस्थान Jobs", "राजस्थान की नई सरकारी भर्तियां"),
+        ("Government Jobs", "government-jobs", "All India Jobs", "Central और All India सरकारी भर्तियां"),
+        ("Admit Card", "admit-card", "Admit Card", "नई परीक्षा प्रवेश-पत्र updates"),
+        ("Results", "results", "Results", "नए सरकारी exam और भर्ती results"),
+        ("Answer Key", "answer-key", "Answer Key", "नई answer key और response updates"),
+        ("Syllabus", "syllabus", "Syllabus", "Exam syllabus और preparation updates"),
+        ("Railway Jobs", "railway-jobs", "Railway Jobs", "RRB और Railway recruitment"),
+        ("Teaching Jobs", "teaching-jobs", "Teaching Jobs", "Teacher और education recruitment"),
+    ]
+
+    css = """<style id="exam-darpan-home-shelves">
+.ed-home-live{
+  margin:0 0 18px;
+  background:#fff;
+  border:1px solid #e6eaf0;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:9px 12px;
+  overflow:hidden;
+  box-shadow:0 5px 16px rgba(15,23,42,.05)
+}
+.ed-home-live-label{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#172554;
+  color:#fff;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.08em
+}
+.ed-home-live-label i{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.13)
+}
+.ed-home-live-track{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap
+}
+.ed-home-live-move{
+  display:inline-block;
+  min-width:max-content;
+  padding-left:100%;
+  animation:edHomeTicker 38s linear infinite
+}
+.ed-home-live:hover .ed-home-live-move{
+  animation-play-state:paused
+}
+.ed-home-live-track a{
+  display:inline-block;
+  margin-right:34px;
+  color:#26334d!important;
+  font-size:11px;
+  font-weight:750
+}
+.ed-home-live-track a:hover{
+  color:#2563eb!important
+}
+@keyframes edHomeTicker{
+  to{transform:translateX(-100%)}
+}
+
+.ed-home-shelves{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  margin:0 0 24px
+}
+.ed-home-shelf{
+  background:#fff;
+  border:1px solid #e5e9f0;
+  border-radius:17px;
+  overflow:hidden;
+  box-shadow:0 7px 22px rgba(15,23,42,.055)
+}
+.ed-home-shelf-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:13px 15px;
+  border-bottom:1px solid #edf0f4;
+  background:linear-gradient(180deg,#fff,#fafcff)
+}
+.ed-home-shelf-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0
+}
+.ed-home-shelf-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#2563eb;
+  box-shadow:0 0 0 5px #eff6ff
+}
+.ed-home-shelf-title strong{
+  font-size:15px;
+  color:#172033
+}
+.ed-home-shelf-title small{
+  display:block;
+  color:#7b8798;
+  font-size:9px;
+  margin-top:1px
+}
+.ed-home-shelf-more{
+  flex:0 0 auto;
+  color:#2563eb!important;
+  font-size:10px;
+  font-weight:900
+}
+.ed-home-shelf-list{
+  display:grid;
+  grid-template-columns:1fr 1fr
+}
+.ed-home-shelf-item{
+  min-width:0;
+  padding:12px 13px;
+  border-right:1px solid #edf0f4;
+  border-bottom:1px solid #edf0f4
+}
+.ed-home-shelf-item:nth-child(2n){
+  border-right:0
+}
+.ed-home-shelf-item:nth-last-child(-n+2){
+  border-bottom:0
+}
+.ed-home-shelf-item a{
+  display:block;
+  color:#172033!important;
+  text-decoration:none!important;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.45
+}
+.ed-home-shelf-item a:hover{
+  color:#2563eb!important
+}
+.ed-home-shelf-meta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  color:#8a94a5;
+  font-size:8.5px
+}
+.ed-home-shelf-meta b{
+  color:#16a34a;
+  font-weight:900
+}
+@media(max-width:800px){
+  .ed-home-shelves{
+    grid-template-columns:1fr
+  }
+}
+@media(max-width:560px){
+  .ed-home-live{
+    align-items:flex-start
+  }
+  .ed-home-shelf-list{
+    grid-template-columns:1fr
+  }
+  .ed-home-shelf-item{
+    border-right:0
+  }
+  .ed-home-shelf-item:nth-last-child(-n+2){
+    border-bottom:1px solid #edf0f4
+  }
+  .ed-home-shelf-item:last-child{
+    border-bottom:0
+  }
+}
+</style>"""
+
+    latest = posts[:10]
+
+    ticker_links = "".join(
+        f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
+        f'{esc(post_title(p))}</a>'
+        for p in latest
+    )
+
+    ticker = (
+        '<div class="ed-home-live" aria-label="Live Updates">'
+        '<span class="ed-home-live-label"><i></i> LIVE UPDATES</span>'
+        f'<div class="ed-home-live-track">'
+        f'<div class="ed-home-live-move">{ticker_links}</div>'
+        f'</div></div>'
+    )
+
+    shelves = []
+
+    for category_name, category_slug, heading, subheading in shelf_names:
+        arr = [
+            p for p in posts
+            if normalized_category(p) == category_name
+        ][:4]
+
+        if not arr:
+            continue
+
+        cards = []
+
+        for post in arr:
+            status, _ = application_status(post)
+
+            cards.append(
+                '<div class="ed-home-shelf-item">'
+                f'<a href="{esc(article_path(slugify(post.get("slug"))))}">'
+                f'{esc(post_title(post))}</a>'
+                '<div class="ed-home-shelf-meta">'
+                f'<span>{esc(date_hi(post.get("publishedAt")))}</span>'
+                f'<b>{esc(status)}</b>'
+                '</div>'
+                '</div>'
+            )
+
+        shelves.append(
+            f'<section class="ed-home-shelf" aria-label="{esc(heading)}">'
+            '<div class="ed-home-shelf-head">'
+            '<div class="ed-home-shelf-title">'
+            '<span class="ed-home-shelf-dot"></span>'
+            '<div>'
+            f'<strong>{esc(heading)}</strong>'
+            f'<small>{esc(subheading)}</small>'
+            '</div>'
+            '</div>'
+            f'<a class="ed-home-shelf-more" href="{esc(category_path(category_slug))}">'
+            'View all →</a>'
+            '</div>'
+            '<div class="ed-home-shelf-list">'
+            + "".join(cards)
+            + '</div>'
+            '</section>'
+        )
+
+    return (
+        css
+        + ticker
+        + '<div class="ed-home-shelves" id="home-category-shelves">'
+        + "".join(shelves)
+        + '</div>'
+    )
+
+
 def update_home(posts: list[dict[str, Any]]) -> None:
     path = PUBLIC / "index.html"
     if not path.exists():
@@ -817,7 +1078,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         text = text.replace(old, new)
 
     items: list[str] = []
-    for i, p in enumerate(posts[:36]):
+    for i, p in enumerate(posts[:12]):
         s = slugify(p.get("slug"))
         title = post_title(p)
         cat = str(p.get("category") or "Latest Updates")
@@ -1153,6 +1414,20 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         hub += "".join(f'<a class="btn btn-light" href="{category_path(slug)}">{esc(title)}</a>' for name, slug, title, desc in CATEGORIES if name != "Latest Updates")
         hub += '</div></section><!-- EXAM-DARPAN-CATEGORY-HUB -->'
         text = text.replace('  <section class="layout" id="updates">', f'  {hub}\n  <section class="layout" id="updates">')
+
+
+    # Compact homepage live ticker + category shelves.
+    # All links come from the existing article_path/category_path helpers.
+    home_shelves = homepage_dynamic_sections(posts)
+
+    if '<!-- EXAM-DARPAN-HOME-SHELVES -->' not in text:
+        text = text.replace(
+            '<main',
+            '<!-- EXAM-DARPAN-HOME-SHELVES -->'
+            + home_shelves
+            + '<main',
+            1
+        )
 
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
     text = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="https://examdarpan.in/">', text, count=1)
