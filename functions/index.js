@@ -255,6 +255,23 @@ All India Jobs
 </div>
 </section>
 
+<section class="ed-article-community-top">
+  <div class="ed-article-community-grid">
+    <a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" class="ed-article-wa">
+      <b>WhatsApp</b><span>Daily Alerts</span><strong>Follow →</strong>
+    </a>
+    <a href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4" target="_blank" rel="noopener" class="ed-article-wa">
+      <b>WhatsApp Group</b><span>Join Community</span><strong>Join →</strong>
+    </a>
+    <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener" class="ed-article-tg">
+      <b>Telegram</b><span>Fast Updates</span><strong>Join →</strong>
+    </a>
+    <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener" class="ed-article-ig">
+      <b>Instagram</b><span>Latest Updates</span><strong>Follow →</strong>
+    </a>
+  </div>
+</section>
+
 <div class="article-content">
 ${content}
 </div>
