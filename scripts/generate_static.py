@@ -191,24 +191,39 @@ def post_title(p: dict[str, Any]) -> str:
 
 
 def normalized_category(p: dict[str, Any]) -> str:
-    """Normalize categories and prevent obvious cross-section contamination."""
+    """Return one deterministic public category for an article."""
     raw = str(p.get("category") or p.get("categoryName") or "").strip()
     aliases = {
-        "Rajasthan":"Rajasthan Jobs", "All India Jobs":"Government Jobs",
-        "Admit Cards":"Admit Card", "Result":"Results",
-        "Answer Keys":"Answer Key", "Exam Syllabus":"Syllabus",
+        "Rajasthan": "Rajasthan Jobs",
+        "All India Jobs": "Government Jobs",
+        "Admit Cards": "Admit Card",
+        "Result": "Results",
+        "Answer Keys": "Answer Key",
+        "Exam Syllabus": "Syllabus",
     }
     category = aliases.get(raw, raw if raw in CATEGORY_BY_NAME else "Latest Updates")
+
     title = clean_text(p.get("title")).lower()
-    required_terms = {
-        "Admit Card": ("admit card", "admitcard", "hall ticket", "प्रवेश पत्र", "प्रवेश-पत्र", "city intimation", "exam city"),
-        "Results": ("result", "परिणाम", "scorecard", "score card"),
-        "Answer Key": ("answer key", "answerkey", "उत्तर कुंजी"),
-        "Syllabus": ("syllabus", "पाठ्यक्रम"),
-    }
-    if category in required_terms and title and not any(term in title for term in required_terms[category]):
-        return "Latest Updates"
+
+    # High-confidence title signals override stale/manual Firestore categories.
+    # This prevents syllabus/result/admit-card articles from leaking into
+    # the wrong homepage shelf or category landing page.
+    title_signals = [
+        ("Results", ("result", "परिणाम", "scorecard", "score card")),
+        ("Answer Key", ("answer key", "answerkey", "उत्तर कुंजी")),
+        ("Admit Card", (
+            "admit card", "admitcard", "hall ticket", "प्रवेश पत्र",
+            "प्रवेश-पत्र", "city intimation", "exam city",
+        )),
+        ("Syllabus", ("syllabus", "पाठ्यक्रम")),
+    ]
+
+    for target, terms in title_signals:
+        if title and any(term in title for term in terms):
+            return target
+
     return category
+
 
 def date_value(p: dict[str, Any], *keys: str) -> Any:
     for key in keys:
@@ -574,7 +589,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
         for r in related:
             rs = slugify(r.get("slug"))
             cards.append(
-                f'<article class="card post"><div class="post-copy"><div class="post-badges"><span class="badge">{esc(r.get("category") or "Latest Updates")}</span><span class="status-badge {application_status(r)[1]}">{esc(application_status(r)[0])}</span></div>'
+                f'<article class="card post"><div class="post-copy"><div class="post-badges"><span class="badge">{esc(normalized_category(r))}</span><span class="status-badge {application_status(r)[1]}">{esc(application_status(r)[0])}</span></div>'
                 f'<h3><a href="{article_path(rs)}">{esc(post_title(r))}</a></h3>'
                 f'<p>{esc(short_description(r))}</p><div class="post-meta"><span>{date_hi(r.get("publishedAt"))}</span></div></div></article>'
             )
@@ -1079,7 +1094,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     for i, p in enumerate(posts[:12]):
         s = slugify(p.get("slug"))
         title = post_title(p)
-        cat = str(p.get("category") or "Latest Updates")
+        cat = normalized_category(p)
         desc = short_description(p)
         img = safe_url(p.get("featuredImage"))
         image = f'<img loading="lazy" decoding="async" src="{esc(img)}" alt="{esc(title)}" width="380" height="240">' if img else ""
@@ -1418,7 +1433,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     # All links come from the existing article_path/category_path helpers.
     home_shelves = homepage_dynamic_sections(posts)
 
-    if '<!-- EXAM-DARPAN-HOME-SHELVES -->' not in text:
+    if '<!-- EXAM-DARPAN-HOME-SHELVES v2-category-safe -->' not in text:
         text = text.replace(
             '<main',
             '<!-- EXAM-DARPAN-HOME-SHELVES -->'
