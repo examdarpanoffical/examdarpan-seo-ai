@@ -802,15 +802,13 @@ WhatsApp Channel Follow करें →
 
 def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     """Compact homepage live ticker and category shelves from published posts."""
+    # Rajasthan Jobs and All India Jobs already have dedicated hubs lower on the homepage.
+    # Keep the top area focused; do not duplicate those large hub sections.
     shelf_names = [
-        ("Rajasthan Jobs", "rajasthan-jobs", "राजस्थान Jobs", "राजस्थान की नई सरकारी भर्तियां"),
-        ("Government Jobs", "government-jobs", "All India Jobs", "Central और All India सरकारी भर्तियां"),
         ("Admit Card", "admit-card", "Admit Card", "नई परीक्षा प्रवेश-पत्र updates"),
         ("Results", "results", "Results", "नए सरकारी exam और भर्ती results"),
         ("Answer Key", "answer-key", "Answer Key", "नई answer key और response updates"),
         ("Syllabus", "syllabus", "Syllabus", "Exam syllabus और preparation updates"),
-        ("Railway Jobs", "railway-jobs", "Railway Jobs", "RRB और Railway recruitment"),
-        ("Teaching Jobs", "teaching-jobs", "Teaching Jobs", "Teacher और education recruitment"),
     ]
 
     css = """<style id="exam-darpan-home-shelves">
@@ -1447,15 +1445,31 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 def category_page(category_name: str, category_slug: str, title: str, description: str, posts: list[dict[str, Any]]) -> str:
     filtered = [p for p in posts if normalized_category(p) == category_name]
     url = f"{BASE}{category_path(category_slug)}"
-    items = []
-    for p in filtered:
+    def render_category_item(p: dict[str, Any]) -> str:
         s = slugify(p.get("slug"))
-        items.append(
-            f'<article class="ed-category-post"><div class="post-top"><div class="post-copy">'
-            f'<div class="post-badges"><span class="badge">{esc(category_name)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h2><a href="{article_path(s)}">{esc(post_title(p))}</a></h2>'
-            f'<p>{esc(short_description(p))}</p><div class="post-meta"><span>{date_hi(p.get("publishedAt"))}</span><span>•</span><span>{reading_time(p.get("content"))} min read</span></div>'
-            f'<a class="read-more" href="{article_path(s)}">पूरा article पढ़ें <b>→</b></a></div></div></article>'
+        return (
+            '<article class="ed-category-post">'
+            f'<h3><a href="{article_path(s)}">{esc(post_title(p))}</a></h3>'
+            f'<div class="ed-category-post-meta"><span>{date_hi(p.get("publishedAt"))}</span>'
+            f'<span>•</span><span>{esc(category_name)}</span></div>'
+            f'<p>{esc(short_description(p))}</p>'
+            f'<a class="ed-category-read" href="{article_path(s)}">पूरा article पढ़ें <b>→</b></a>'
+            '</article>'
         )
+
+    visible_items = filtered[:6]
+    more_items = filtered[6:]
+    items = [render_category_item(p) for p in visible_items]
+
+    if more_items:
+        items.append(
+            '<details class="ed-category-more">'
+            '<summary><span>View More</span><b>⌄</b></summary>'
+            '<div class="ed-category-more-grid">'
+            + "".join(render_category_item(p) for p in more_items)
+            + '</div></details>'
+        )
+
     item_list = {
         "@context": "https://schema.org",
         "@type": "ItemList",
@@ -1479,7 +1493,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 <script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
 <style id="exam-darpan-category-design">
 .ed-category-page{{max-width:1180px;margin:auto}}
-.ed-category-hero{{margin-bottom:24px;padding:30px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0f172a,#1d4ed8 62%,#2563eb);color:#fff;box-shadow:0 14px 35px rgba(15,23,42,.14)}}
+.ed-category-hero{{margin-bottom:22px;padding:28px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0f172a,#1d4ed8 62%,#2563eb);color:#fff;box-shadow:0 14px 35px rgba(15,23,42,.14)}}
 .ed-category-hero h1{{margin:4px 0 8px;color:#fff;font-size:clamp(28px,4vw,42px);line-height:1.1}}
 .ed-category-hero p{{margin:0;color:#dbeafe;line-height:1.7;max-width:760px}}
 .ed-category-kicker{{display:inline-block;color:#93c5fd;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:8px}}
@@ -1487,24 +1501,34 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 .ed-category-trust{{margin-top:18px;padding:13px 15px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(255,255,255,.08)}}
 .ed-category-layout{{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start}}
 .ed-category-toolbar{{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}}
+.ed-category-toolbar h2{{margin:3px 0 0;font-size:25px}}
 .ed-category-count{{white-space:nowrap;padding:7px 11px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:900}}
-.ed-category-posts{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
-.ed-category-post{{background:#fff;border:1px solid #e5e9f0;border-radius:16px;padding:17px;box-shadow:0 6px 20px rgba(15,23,42,.05);transition:transform .18s ease,box-shadow .18s ease}}
-.ed-category-post:hover{{transform:translateY(-2px);box-shadow:0 12px 28px rgba(15,23,42,.09)}}
-.ed-category-post h2{{margin:10px 0 7px;font-size:17px;line-height:1.45}}
-.ed-category-post h2 a{{color:#172033!important;text-decoration:none!important}}
-.ed-category-post h2 a:hover{{color:#2563eb!important}}
+.ed-category-posts{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}}
+.ed-category-post{{background:#fff;border:1px solid #e5e9f0;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(15,23,42,.05)}}
+.ed-category-post h3{{margin:0 0 7px;font-size:17px;line-height:1.42}}
+.ed-category-post h3 a{{color:#172033!important;text-decoration:none!important}}
+.ed-category-post h3 a:hover{{color:#2563eb!important}}
+.ed-category-post-meta{{display:flex;gap:7px;align-items:center;color:#8a94a5;font-size:9px;font-weight:800;margin-bottom:8px}}
+.ed-category-post p{{margin:0;color:#667085;font-size:11px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.ed-category-read{{display:inline-flex;align-items:center;gap:4px;margin-top:11px;color:#2563eb!important;text-decoration:none!important;font-size:10px;font-weight:900}}
+.ed-category-read b{{font-size:13px}}
+.ed-category-more{{grid-column:1/-1;margin-top:2px}}
+.ed-category-more summary{{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:1px solid #dbe4f0;border-radius:14px;background:linear-gradient(180deg,#fff,#f8fbff);color:#2563eb;font-size:13px;font-weight:950;box-shadow:0 5px 16px rgba(15,23,42,.05)}}
+.ed-category-more summary::-webkit-details-marker{{display:none}}
+.ed-category-more summary b{{font-size:18px;line-height:1;transition:transform .18s ease}}
+.ed-category-more[open] summary b{{transform:rotate(180deg)}}
+.ed-category-more-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:13px}}
 .ed-category-side{{display:grid;gap:14px}}
 .ed-category-side-card{{padding:18px}}
 @media(max-width:900px){{.ed-category-layout{{grid-template-columns:1fr}}}}
-@media(max-width:650px){{.ed-category-posts{{grid-template-columns:1fr}}.ed-category-toolbar{{align-items:flex-start;flex-direction:column}}}}
+@media(max-width:650px){{.ed-category-posts{{grid-template-columns:1fr}}.ed-category-more-grid{{grid-template-columns:1fr}}.ed-category-toolbar{{align-items:flex-start;flex-direction:column}}}}
 </style>
 
 </head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><div class="ed-category-page"><section class="ed-category-hero"><div><span class="ed-category-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="ed-category-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="ed-category-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
-<section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">{esc(category_name.upper())}</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} articles</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy.html">Editorial Policy <b>→</b></a></div></aside></section></div></main>
+<section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">IMPORTANT LATEST</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} updates</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy.html">Editorial Policy <b>→</b></a></div></aside></section></div></main>
 <footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>'''
 
 
