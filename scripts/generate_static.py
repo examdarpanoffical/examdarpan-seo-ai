@@ -1105,10 +1105,12 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         "Rajasthan Government Jobs Hub",
         "rajasthan-jobs",
         [
+            ("Government Jobs", "government-jobs"),
             ("Admit Card", "admit-card"),
             ("Results", "results"),
             ("Answer Key", "answer-key"),
             ("Syllabus", "syllabus"),
+            ("Entrance Exams", "entrance-exams"),
             ("Scholarships", "scholarships"),
             ("University & College", "university-college"),
             ("Yojana", "yojana"),
@@ -1124,6 +1126,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             ("Results", "results"),
             ("Answer Key", "answer-key"),
             ("Syllabus", "syllabus"),
+            ("Entrance Exams", "entrance-exams"),
             ("Scholarships", "scholarships"),
             ("University & College", "university-college"),
             ("Yojana", "yojana"),
@@ -1517,17 +1520,90 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 <!-- /EXAM-DARPAN-HOME-COMMUNITY-CTA -->"""
 
 
-        text = text.replace(
-            '  <!-- EXAM-DARPAN-DAILY-QUIZ -->',
-            home_community + '\n  <!-- EXAM-DARPAN-DAILY-QUIZ -->',
-            1
-        )
+        # Community CTA is inserted in the final homepage replacement below.
+        # Do not inject it near the legacy Daily Quiz marker.
 
-    # Homepage category layout is rendered by homepage_dynamic_sections().
-    # Do not inject a duplicate Popular Categories block.
+    # FINAL HOMEPAGE ORDER:
+    # LIVE -> Rajasthan Hub -> All India Hub -> Daily Test -> limited Latest Articles.
+    # Community CTA is already injected by the existing community block below
+    # and must not be duplicated here.
+    home_sections = homepage_dynamic_sections(posts)
 
-    # Homepage keeps the existing LIVE ticker/matrix/hub structure.
-    # Do not inject duplicate Admit Card/Results/Syllabus shelves above <main>.
+    # Final homepage order is controlled here:
+    # LIVE -> Rajasthan Hub -> All India Hub -> Daily Test
+    # -> Latest Articles -> Community -> Footer.
+    replacement = (
+        '<main class="main container">'
+        + home_sections
+        + home_community
+        + '</main>'
+    )
+
+    text = re.sub(
+        r'<main class="main container">.*?</main>',
+        lambda _: replacement,
+        text,
+        count=1,
+        flags=re.S,
+    )
+
+    if '<div class="ed-home-hubs">' not in text:
+        raise RuntimeError("FINAL HOME FIX FAILED: hubs not inserted")
+    if 'Rajasthan Government Jobs Hub' not in text:
+        raise RuntimeError("FINAL HOME FIX FAILED: Rajasthan hub missing")
+    if 'All India Government Jobs Hub' not in text:
+        raise RuntimeError("FINAL HOME FIX FAILED: All India hub missing")
+    if 'आज का Daily Test' not in text:
+        raise RuntimeError("FINAL HOME FIX FAILED: Daily Test missing")
+    if 'Latest Articles' not in text:
+        raise RuntimeError("FINAL HOME FIX FAILED: Latest Articles missing")
+
+    # Keep this marker for future maintenance.
+    # FINAL HOMEPAGE STRUCTURE:
+    # LIVE -> Rajasthan Hub -> All India Hub -> Daily Test
+    # -> Latest Articles -> Community -> Footer.
+    #
+    # Replace the old homepage <main> completely so the legacy
+    # 24-article/shelf layout cannot remain alongside the new structure.
+
+    community_match = re.search(
+        r'<!-- EXAM-DARPAN-HOME-COMMUNITY-CTA -->.*?<!-- /EXAM-DARPAN-HOME-COMMUNITY-CTA -->',
+        text,
+        flags=re.S,
+    )
+    home_community = community_match.group(0) if community_match else ""
+
+    home_sections = homepage_dynamic_sections(posts)
+
+    replacement = (
+        '<main class="main container">'
+        + home_sections
+        + home_community
+        + '</main>'
+    )
+
+    text = re.sub(
+        r'<main class="main container">.*?</main>',
+        lambda _: replacement,
+        text,
+        count=1,
+        flags=re.S,
+    )
+
+    required_home_sections = (
+        "LIVE UPDATES",
+        "Rajasthan Government Jobs Hub",
+        "All India Government Jobs Hub",
+        "आज का Daily Test",
+        "Latest Articles",
+    )
+
+    for marker in required_home_sections:
+        if marker not in text:
+            raise RuntimeError(
+                f"FINAL HOMEPAGE CHECK FAILED: missing {marker}"
+            )
+
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
     text = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="https://examdarpan.in/">', text, count=1)
     schema = {
