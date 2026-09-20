@@ -817,18 +817,147 @@ WhatsApp Channel Follow करें →
 
 
 def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
-    """Homepage: fixed editorial order — live updates, two hubs, daily test, latest articles."""
+    """Homepage with strict Rajasthan / All India separation."""
 
-    def category_posts(category_name: str, limit: int = 3) -> list[dict[str, Any]]:
-        return [
-            p for p in posts
-            if normalized_category(p) == category_name
-        ][:limit]
+    def text_blob(p: dict[str, Any]) -> str:
+        values = [
+            p.get("title"),
+            p.get("content"),
+            p.get("description"),
+            p.get("shortDescription"),
+            p.get("excerpt"),
+            p.get("category"),
+            p.get("categories"),
+            p.get("tags"),
+        ]
+        return " ".join(str(v or "") for v in values).lower()
 
-    def links(category_name: str, limit: int = 3) -> str:
-        arr = category_posts(category_name, limit)
+    def is_rajasthan(p: dict[str, Any]) -> bool:
+        blob = text_blob(p)
+        category = normalized_category(p).lower()
+
+        rajasthan_signals = [
+            "rajasthan",
+            "राजस्थान",
+            "rssb",
+            "rsmssb",
+            "rpsc",
+            "reet",
+            "rajasthan police",
+            "rajasthan high court",
+            "rajasthan university",
+            "rajasthan board",
+            "राजस्थान पुलिस",
+            "आरपीएससी",
+            "आरएसएसबी",
+        ]
+
+        central_signals = [
+            "ssc ",
+            "ssc-",
+            "upsc",
+            "rrb ",
+            "railway",
+            "indian railway",
+            "ibps",
+            "sbi ",
+            "india post",
+            "post office",
+            "capf",
+            "cisf",
+            "crpf",
+            "bsf",
+            "army",
+            "navy",
+            "air force",
+            "central government",
+            "all india",
+            "केंद्रीय सरकार",
+            "भारतीय रेलवे",
+        ]
+
+        return (
+            (
+                "rajasthan" in blob
+                or "राजस्थान" in blob
+                or category in {"rajasthan jobs", "rajasthan"}
+                or any(x in blob for x in rajasthan_signals)
+            )
+            and not any(x in blob for x in central_signals)
+        )
+
+    def is_all_india(p: dict[str, Any]) -> bool:
+        blob = text_blob(p)
+
+        if is_rajasthan(p):
+            return False
+
+        central_signals = [
+            "ssc",
+            "upsc",
+            "rrb",
+            "railway",
+            "ibps",
+            "sbi",
+            "india post",
+            "post office",
+            "capf",
+            "cisf",
+            "crpf",
+            "bsf",
+            "army",
+            "navy",
+            "air force",
+            "central government",
+            "all india",
+            "केंद्रीय सरकार",
+            "भारतीय रेलवे",
+        ]
+
+        category = normalized_category(p)
+
+        return (
+            any(x in blob for x in central_signals)
+            or category in {
+                "Government Jobs",
+                "Police & Defence Jobs",
+                "Teaching Jobs",
+                "Railway Jobs",
+                "Banking Jobs",
+                "SSC Jobs",
+                "UPSC Jobs",
+            }
+        )
+
+    def scoped_posts(scope: str, category_name: str, limit: int = 3):
+        result = []
+
+        for p in posts:
+            if normalized_category(p) != category_name:
+                continue
+
+            if scope == "rajasthan" and not is_rajasthan(p):
+                continue
+
+            if scope == "all_india" and not is_all_india(p):
+                continue
+
+            result.append(p)
+
+            if len(result) >= limit:
+                break
+
+        return result
+
+    def links(scope: str, category_name: str, limit: int = 3) -> str:
+        arr = scoped_posts(scope, category_name, limit)
+
         if not arr:
-            return '<li class="ed-home-empty">नई verified update जल्द यहाँ दिखाई देगी।</li>'
+            return (
+                '<li class="ed-home-empty">'
+                'नई verified update जल्द यहाँ दिखाई देगी।'
+                '</li>'
+            )
 
         return "".join(
             '<li>'
@@ -838,22 +967,30 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             for p in arr
         )
 
-    def hub_section(title: str, hub_slug: str, categories: list[tuple[str, str]]) -> str:
+    def hub_section(
+        title: str,
+        hub_slug: str,
+        scope: str,
+        categories: list[tuple[str, str]],
+    ) -> str:
         blocks = []
 
         for category_name, category_slug in categories:
             blocks.append(
                 '<div class="ed-home-hub-section">'
-                f'<h3><a href="{esc(category_path(category_slug))}">{esc(category_name)}</a></h3>'
-                f'<ul>{links(category_name, 3)}</ul>'
+                f'<h3><a href="{esc(category_path(category_slug))}">'
+                f'{esc(category_name)}</a></h3>'
+                f'<ul>{links(scope, category_name, 3)}</ul>'
                 '</div>'
             )
 
         return (
             '<section class="ed-home-hub">'
             '<div class="ed-home-hub-head">'
-            f'<div><span class="ed-home-hub-kicker">EXAM DARPAN HUB</span>'
-            f'<h2>{esc(title)}</h2></div>'
+            '<div>'
+            '<span class="ed-home-hub-kicker">EXAM DARPAN HUB</span>'
+            f'<h2>{esc(title)}</h2>'
+            '</div>'
             f'<a href="{esc(category_path(hub_slug))}">View all →</a>'
             '</div>'
             '<div class="ed-home-hub-grid">'
@@ -862,7 +999,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             '</section>'
         )
 
-    # 1. Existing live updates — always first after TOP NAV.
+    # 1. LIVE UPDATES
     latest = posts[:10]
 
     ticker_links = "".join(
@@ -880,230 +1017,11 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '</section>'
     )
 
-    # Shared visual system.
-    css = """<style id="exam-darpan-home-final-order">
-.ed-home-live{
-  margin:0 0 22px;
-  background:#fff;
-  border:1px solid #e5e9f0;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:9px 12px;
-  overflow:hidden;
-  box-shadow:0 5px 16px rgba(15,23,42,.05)
-}
-.ed-home-live-label{
-  flex:0 0 auto;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:5px 9px;
-  border-radius:999px;
-  background:#172554;
-  color:#fff;
-  font-size:9px;
-  font-weight:900
-}
-.ed-home-live-label i{
-  width:6px;height:6px;border-radius:50%;
-  background:#22c55e;
-  box-shadow:0 0 0 4px rgba(34,197,94,.13)
-}
-.ed-home-live-track{min-width:0;overflow:hidden;white-space:nowrap}
-.ed-home-live-move{
-  display:inline-block;
-  min-width:max-content;
-  padding-left:100%;
-  animation:edHomeTicker 38s linear infinite
-}
-.ed-home-live:hover .ed-home-live-move{animation-play-state:paused}
-.ed-home-live-track a{
-  display:inline-block;
-  margin-right:34px;
-  color:#26334d!important;
-  font-size:11px;
-  font-weight:750
-}
-@keyframes edHomeTicker{to{transform:translateX(-100%)}}
-
-.ed-home-hubs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-  margin:0 0 28px
-}
-.ed-home-hub{
-  background:#fff;
-  border:1px solid #e3e8ef;
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 8px 25px rgba(15,23,42,.06)
-}
-.ed-home-hub-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:18px;
-  background:linear-gradient(135deg,#f8fbff,#fff);
-  border-bottom:1px solid #edf0f4
-}
-.ed-home-hub-kicker{
-  display:block;
-  margin-bottom:5px;
-  color:#2563eb;
-  font-size:8px;
-  font-weight:950;
-  letter-spacing:.12em
-}
-.ed-home-hub-head h2{
-  margin:0;
-  color:#172033;
-  font-size:20px;
-  line-height:1.2
-}
-.ed-home-hub-head>a{
-  flex:0 0 auto;
-  color:#2563eb!important;
-  font-size:9px;
-  font-weight:900
-}
-.ed-home-hub-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr
-}
-.ed-home-hub-section{
-  min-width:0;
-  padding:13px;
-  border-bottom:1px solid #edf0f4;
-  border-right:1px solid #edf0f4
-}
-.ed-home-hub-section:nth-child(2n){border-right:0}
-.ed-home-hub-section h3{
-  margin:0 0 8px;
-  font-size:12px;
-  line-height:1.3
-}
-.ed-home-hub-section h3 a{color:#172033!important}
-.ed-home-hub-section ul{
-  list-style:none;
-  margin:0;
-  padding:0
-}
-.ed-home-hub-section li{
-  padding:5px 0;
-  border-bottom:1px solid #f0f2f5
-}
-.ed-home-hub-section li:last-child{border-bottom:0}
-.ed-home-hub-section li a{
-  color:#354156!important;
-  font-size:10px;
-  line-height:1.4
-}
-.ed-home-empty{
-  color:#98a2b3!important;
-  font-size:9px!important
-}
-
-.ed-home-daily{
-  margin:0 0 28px;
-  padding:20px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#101b35,#173b72);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  box-shadow:0 10px 28px rgba(15,23,42,.12)
-}
-.ed-home-daily h2{
-  margin:3px 0 5px;
-  color:#fff;
-  font-size:23px
-}
-.ed-home-daily p{
-  margin:0;
-  color:#cbd5e1;
-  font-size:10px
-}
-.ed-home-daily .eyebrow{
-  color:#93c5fd;
-  font-size:8px;
-  font-weight:900;
-  letter-spacing:.12em
-}
-.ed-home-daily .btn{
-  flex:0 0 auto
-}
-
-.ed-home-latest{
-  margin:0 0 28px
-}
-.ed-home-latest-head{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:12px
-}
-.ed-home-latest-head h2{
-  margin:0;
-  color:#172033;
-  font-size:21px
-}
-.ed-home-latest-head p{
-  margin:4px 0 0;
-  color:#7b8798;
-  font-size:9px
-}
-.ed-home-latest-head a{
-  color:#2563eb!important;
-  font-size:9px;
-  font-weight:900
-}
-.ed-home-latest-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px
-}
-.ed-home-latest-card{
-  padding:14px;
-  background:#fff;
-  border:1px solid #e4e9f0;
-  border-radius:14px
-}
-.ed-home-latest-card a{
-  color:#172033!important;
-  font-size:11px;
-  font-weight:850;
-  line-height:1.45
-}
-.ed-home-latest-card small{
-  display:block;
-  margin-top:7px;
-  color:#8a94a5;
-  font-size:8px
-}
-
-@media(max-width:850px){
-  .ed-home-hubs{grid-template-columns:1fr}
-  .ed-home-latest-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:560px){
-  .ed-home-hub-grid{grid-template-columns:1fr}
-  .ed-home-hub-section{border-right:0}
-  .ed-home-latest-grid{grid-template-columns:1fr}
-  .ed-home-daily{display:block}
-  .ed-home-daily .btn{display:inline-flex;margin-top:12px}
-}
-</style>"""
-
+    # 2. RAJASTHAN HUB
     rajasthan = hub_section(
         "Rajasthan Government Jobs Hub",
         "rajasthan-jobs",
+        "rajasthan",
         [
             ("Government Jobs", "government-jobs"),
             ("Admit Card", "admit-card"),
@@ -1117,23 +1035,46 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         ],
     )
 
+    # 3. ALL INDIA / CENTRAL HUB
     all_india = hub_section(
         "All India Government Jobs Hub",
         "government-jobs",
+        "all_india",
         [
             ("Government Jobs", "government-jobs"),
+            ("SSC Jobs", "ssc-jobs"),
+            ("UPSC Jobs", "upsc-jobs"),
+            ("Railway Jobs", "railway-jobs"),
+            ("Banking Jobs", "banking-jobs"),
+            ("Police & Defence Jobs", "police-defence-jobs"),
+            ("Teaching Jobs", "teaching-jobs"),
             ("Admit Card", "admit-card"),
             ("Results", "results"),
-            ("Answer Key", "answer-key"),
             ("Syllabus", "syllabus"),
-            ("Entrance Exams", "entrance-exams"),
-            ("Scholarships", "scholarships"),
-            ("University & College", "university-college"),
-            ("Yojana", "yojana"),
         ],
     )
 
-    # Daily Test sits AFTER both hubs.
+    # 4. EXAM CALENDARS
+    exam_calendars = (
+        '<section class="ed-home-calendar-grid">'
+        '<article class="ed-home-calendar-card">'
+        '<span class="ed-home-hub-kicker">RAJASTHAN EXAMS</span>'
+        '<h2>Rajasthan Exam Calendar</h2>'
+        '<p>RPSC, RSSB, CET, Police, Teacher और Rajasthan exams की महत्वपूर्ण dates एक जगह देखें।</p>'
+        '<a class="btn btn-light" href="/exam-calendar.html">'
+        'Rajasthan Calendar देखें →</a>'
+        '</article>'
+        '<article class="ed-home-calendar-card">'
+        '<span class="ed-home-hub-kicker">ALL INDIA EXAMS</span>'
+        '<h2>All India Exam Calendar</h2>'
+        '<p>SSC, UPSC, Railway, Banking और Central Government exams की important dates देखें।</p>'
+        '<a class="btn btn-light" href="/exam-calendar.html">'
+        'All India Calendar देखें →</a>'
+        '</article>'
+        '</section>'
+    )
+
+    # 5. DAILY TEST
     daily = (
         '<section class="ed-home-daily" id="daily-test">'
         '<div>'
@@ -1141,16 +1082,18 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '<h2>आज का Daily Test</h2>'
         '<p>Timer के साथ test दें और अंत में score व explanations देखें।</p>'
         '</div>'
-        '<a class="btn btn-primary" href="/quiz.html">Daily Test खोलें →</a>'
+        '<a class="btn btn-primary" href="/quiz.html">'
+        'Daily Test खोलें →</a>'
         '</section>'
     )
 
-    # Limited latest articles: 6 only.
+    # 6. LIMITED LATEST ARTICLES
     cards = "".join(
         '<article class="ed-home-latest-card">'
         f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
         f'{esc(post_title(p))}</a>'
-        f'<small>{esc(normalized_category(p))} • {date_hi(p.get("publishedAt"))}</small>'
+        f'<small>{esc(normalized_category(p))} • '
+        f'{date_hi(p.get("publishedAt"))}</small>'
         '</article>'
         for p in posts[:6]
     )
@@ -1158,12 +1101,47 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     latest_articles = (
         '<section class="ed-home-latest" id="latest-articles">'
         '<div class="ed-home-latest-head">'
-        '<div><h2>Latest Articles</h2><p>नवीनतम verified updates — limited और clean list.</p></div>'
+        '<div>'
+        '<h2>Latest Articles</h2>'
+        '<p>नवीनतम verified updates — limited और clean list.</p>'
+        '</div>'
         '<a href="/category-latest-updates">View all →</a>'
         '</div>'
         f'<div class="ed-home-latest-grid">{cards}</div>'
         '</section>'
     )
+
+    css = """<style id="exam-darpan-home-final-order">
+.ed-home-calendar-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin:0 0 28px;
+}
+.ed-home-calendar-card{
+  padding:18px;
+  background:#fff;
+  border:1px solid #e3e8ef;
+  border-radius:18px;
+  box-shadow:0 8px 25px rgba(15,23,42,.06);
+}
+.ed-home-calendar-card h2{
+  margin:4px 0 7px;
+  color:#172033;
+  font-size:18px;
+}
+.ed-home-calendar-card p{
+  margin:0 0 12px;
+  color:#68758a;
+  font-size:10px;
+  line-height:1.6;
+}
+@media(max-width:650px){
+  .ed-home-calendar-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>"""
 
     return (
         css
@@ -1172,10 +1150,10 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         + rajasthan
         + all_india
         + '</div>'
+        + exam_calendars
         + daily
         + latest_articles
     )
-
 
 def update_home(posts: list[dict[str, Any]]) -> None:
     path = PUBLIC / "index.html"
@@ -1522,41 +1500,6 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 
         # Community CTA is inserted in the final homepage replacement below.
         # Do not inject it near the legacy Daily Quiz marker.
-
-    # FINAL HOMEPAGE ORDER:
-    # LIVE -> Rajasthan Hub -> All India Hub -> Daily Test -> limited Latest Articles.
-    # Community CTA is already injected by the existing community block below
-    # and must not be duplicated here.
-    home_sections = homepage_dynamic_sections(posts)
-
-    # Final homepage order is controlled here:
-    # LIVE -> Rajasthan Hub -> All India Hub -> Daily Test
-    # -> Latest Articles -> Community -> Footer.
-    replacement = (
-        '<main class="main container">'
-        + home_sections
-        + home_community
-        + '</main>'
-    )
-
-    text = re.sub(
-        r'<main class="main container">.*?</main>',
-        lambda _: replacement,
-        text,
-        count=1,
-        flags=re.S,
-    )
-
-    if '<div class="ed-home-hubs">' not in text:
-        raise RuntimeError("FINAL HOME FIX FAILED: hubs not inserted")
-    if 'Rajasthan Government Jobs Hub' not in text:
-        raise RuntimeError("FINAL HOME FIX FAILED: Rajasthan hub missing")
-    if 'All India Government Jobs Hub' not in text:
-        raise RuntimeError("FINAL HOME FIX FAILED: All India hub missing")
-    if 'आज का Daily Test' not in text:
-        raise RuntimeError("FINAL HOME FIX FAILED: Daily Test missing")
-    if 'Latest Articles' not in text:
-        raise RuntimeError("FINAL HOME FIX FAILED: Latest Articles missing")
 
     # Keep this marker for future maintenance.
     # FINAL HOMEPAGE STRUCTURE:
