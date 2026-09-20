@@ -703,13 +703,13 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </div>
 </section>
 <style>
-.ed-article-community-grid{
+.ed-article-community-grid{{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:10px;
   margin-top:16px;
-}
-.ed-article-community-link{
+}}
+.ed-article-community-link{{
   display:flex;
   align-items:center;
   gap:9px;
@@ -719,8 +719,8 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   color:#fff!important;
   text-decoration:none!important;
   box-shadow:0 5px 14px rgba(15,23,42,.12);
-}
-.ed-article-community-link>b{
+}}
+.ed-article-community-link>b{{
   flex:0 0 auto;
   width:28px;
   height:28px;
@@ -729,38 +729,38 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   border-radius:50%;
   background:rgba(255,255,255,.18);
   font-size:16px;
-}
-.ed-article-community-link>span{
+}}
+.ed-article-community-link>span{{
   display:flex;
   flex-direction:column;
   min-width:0;
   flex:1;
-}
-.ed-article-community-link strong{
+}}
+.ed-article-community-link strong{{
   font-size:12px;
   line-height:1.25;
-}
-.ed-article-community-link small{
+}}
+.ed-article-community-link small{{
   margin-top:3px;
   font-size:9px;
   line-height:1.25;
   opacity:.9;
-}
-.ed-article-community-link>i{
+}}
+.ed-article-community-link>i{{
   flex:0 0 auto;
   font-style:normal;
   font-weight:900;
-}
-.ed-article-wa{background:linear-gradient(135deg,#16a34a,#059669);}
-.ed-article-wg{background:linear-gradient(135deg,#15803d,#166534);}
-.ed-article-tg{background:linear-gradient(135deg,#159bd7,#2563eb);}
-.ed-article-ig{background:linear-gradient(135deg,#7c3aed,#db2777,#f97316);}
-@media(max-width:800px){
-  .ed-article-community-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
-}
-@media(max-width:520px){
-  .ed-article-community-grid{grid-template-columns:1fr;}
-}
+}}
+.ed-article-wa{{background:linear-gradient(135deg,#16a34a,#059669);}}
+.ed-article-wg{{background:linear-gradient(135deg,#15803d,#166534);}}
+.ed-article-tg{{background:linear-gradient(135deg,#159bd7,#2563eb);}}
+.ed-article-ig{{background:linear-gradient(135deg,#7c3aed,#db2777,#f97316);}}
+@media(max-width:800px){{
+  .ed-article-community-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+}}
+@media(max-width:520px){{
+  .ed-article-community-grid{{grid-template-columns:1fr;}}
+}}
 </style>
 {cover}
 {quick_facts(p)}
