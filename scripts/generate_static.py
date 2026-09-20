@@ -671,21 +671,97 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 {verification_line(p)}
 <section class="community-card article-community-cta article-community-cta-top">
 <div>
-<span class="section-label">WHATSAPP ALERTS</span>
-<h2>नई भर्ती और परीक्षा updates सीधे WhatsApp पर पाएं</h2>
-<p>Important vacancy, Admit Card, Result और exam alerts के लिए Exam Darpan WhatsApp Channel follow करें।</p>
+<span class="section-label">JOIN EXAM DARPAN</span>
+<h2>हर जरूरी exam update से जुड़े रहें</h2>
+<p>Jobs, Admit Card, Results और exam updates सीधे अपने पसंदीदा community channel पर पाएं।</p>
 </div>
-<div class="community-actions">
-<a class="btn btn-whatsapp"
-   href="{WHATSAPP}"
-   target="_blank"
-   rel="noopener"
+<div class="ed-article-community-grid">
+<a href="{WHATSAPP}" target="_blank" rel="noopener"
+   class="ed-article-community-link ed-article-wa"
    aria-label="Exam Darpan WhatsApp Channel Follow करें"
-   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_top')">
-WhatsApp पर Follow करें →
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
+  <b>◉</b><span><strong>WhatsApp Channel</strong><small>Daily Jobs • Results • Admit Card</small></span><i>→</i>
+</a>
+<a href="{WHATSAPP_GROUP}" target="_blank" rel="noopener"
+   class="ed-article-community-link ed-article-wg"
+   aria-label="Exam Darpan WhatsApp Group Join करें"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_top')">
+  <b>◉</b><span><strong>WhatsApp Group</strong><small>Community • Alerts • Discussion</small></span><i>→</i>
+</a>
+<a href="{TELEGRAM}" target="_blank" rel="noopener"
+   class="ed-article-community-link ed-article-tg"
+   aria-label="Exam Darpan Telegram Channel Join करें"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram_top')">
+  <b>➤</b><span><strong>Telegram Channel</strong><small>Fast Alerts • Exam Updates</small></span><i>→</i>
+</a>
+<a href="{INSTAGRAM}" target="_blank" rel="noopener"
+   class="ed-article-community-link ed-article-ig"
+   aria-label="Exam Darpan Instagram Follow करें"
+   onclick="window.edTrackCommunity&&window.edTrackCommunity('instagram_top')">
+  <b>◎</b><span><strong>Instagram — Follow करें</strong><small>Exam Tips • Updates • Short Content</small></span><i>→</i>
 </a>
 </div>
 </section>
+<style>
+.ed-article-community-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:16px;
+}
+.ed-article-community-link{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  padding:12px 10px;
+  border-radius:12px;
+  color:#fff!important;
+  text-decoration:none!important;
+  box-shadow:0 5px 14px rgba(15,23,42,.12);
+}
+.ed-article-community-link>b{
+  flex:0 0 auto;
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:rgba(255,255,255,.18);
+  font-size:16px;
+}
+.ed-article-community-link>span{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  flex:1;
+}
+.ed-article-community-link strong{
+  font-size:12px;
+  line-height:1.25;
+}
+.ed-article-community-link small{
+  margin-top:3px;
+  font-size:9px;
+  line-height:1.25;
+  opacity:.9;
+}
+.ed-article-community-link>i{
+  flex:0 0 auto;
+  font-style:normal;
+  font-weight:900;
+}
+.ed-article-wa{background:linear-gradient(135deg,#16a34a,#059669);}
+.ed-article-wg{background:linear-gradient(135deg,#15803d,#166534);}
+.ed-article-tg{background:linear-gradient(135deg,#159bd7,#2563eb);}
+.ed-article-ig{background:linear-gradient(135deg,#7c3aed,#db2777,#f97316);}
+@media(max-width:800px){
+  .ed-article-community-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:520px){
+  .ed-article-community-grid{grid-template-columns:1fr;}
+}
+</style>
 {cover}
 {quick_facts(p)}
 <div class="article-content">{content}</div>
