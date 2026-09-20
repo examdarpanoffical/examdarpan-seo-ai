@@ -1451,7 +1451,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
     for p in filtered:
         s = slugify(p.get("slug"))
         items.append(
-            f'<article class="card post"><div class="post-top"><div class="post-copy">'
+            f'<article class="ed-category-post"><div class="post-top"><div class="post-copy">'
             f'<div class="post-badges"><span class="badge">{esc(category_name)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h2><a href="{article_path(s)}">{esc(post_title(p))}</a></h2>'
             f'<p>{esc(short_description(p))}</p><div class="post-meta"><span>{date_hi(p.get("publishedAt"))}</span><span>•</span><span>{reading_time(p.get("content"))} min read</span></div>'
             f'<a class="read-more" href="{article_path(s)}">पूरा article पढ़ें <b>→</b></a></div></div></article>'
@@ -1476,11 +1476,35 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(title)} | Exam Darpan</title><meta name="description" content="{esc(description[:155])}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.webp"><link rel="stylesheet" href="/styles.css">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.webp">
-<script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script></head><body>
+<script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
+<style id="exam-darpan-category-design">
+.ed-category-page{{max-width:1180px;margin:auto}}
+.ed-category-hero{{margin-bottom:24px;padding:30px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0f172a,#1d4ed8 62%,#2563eb);color:#fff;box-shadow:0 14px 35px rgba(15,23,42,.14)}}
+.ed-category-hero h1{{margin:4px 0 8px;color:#fff;font-size:clamp(28px,4vw,42px);line-height:1.1}}
+.ed-category-hero p{{margin:0;color:#dbeafe;line-height:1.7;max-width:760px}}
+.ed-category-kicker{{display:inline-block;color:#93c5fd;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:8px}}
+.ed-category-actions{{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}}
+.ed-category-trust{{margin-top:18px;padding:13px 15px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(255,255,255,.08)}}
+.ed-category-layout{{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start}}
+.ed-category-toolbar{{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}}
+.ed-category-count{{white-space:nowrap;padding:7px 11px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:900}}
+.ed-category-posts{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+.ed-category-post{{background:#fff;border:1px solid #e5e9f0;border-radius:16px;padding:17px;box-shadow:0 6px 20px rgba(15,23,42,.05);transition:transform .18s ease,box-shadow .18s ease}}
+.ed-category-post:hover{{transform:translateY(-2px);box-shadow:0 12px 28px rgba(15,23,42,.09)}}
+.ed-category-post h2{{margin:10px 0 7px;font-size:17px;line-height:1.45}}
+.ed-category-post h2 a{{color:#172033!important;text-decoration:none!important}}
+.ed-category-post h2 a:hover{{color:#2563eb!important}}
+.ed-category-side{{display:grid;gap:14px}}
+.ed-category-side-card{{padding:18px}}
+@media(max-width:900px){{.ed-category-layout{{grid-template-columns:1fr}}}}
+@media(max-width:650px){{.ed-category-posts{{grid-template-columns:1fr}}.ed-category-toolbar{{align-items:flex-start;flex-direction:column}}}}
+</style>
+
+</head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
-<main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="hero-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="hero-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
-<section id="articles" class="layout"><div><div class="section-title"><div><span class="eyebrow">{esc(category_name.upper())}</span><h2>Latest {esc(title)}</h2></div><span class="result-count">{len(filtered)} articles</span></div><div class="posts-grid">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside><div class="card pad trust-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card pad editor-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy.html">Editorial Policy <b>→</b></a></div></aside></section></main>
+<main class="main container"><div class="ed-category-page"><section class="ed-category-hero"><div><span class="ed-category-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="ed-category-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="ed-category-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
+<section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">{esc(category_name.upper())}</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} articles</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy.html">Editorial Policy <b>→</b></a></div></aside></section></div></main>
 <footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>'''
 
 
