@@ -22,7 +22,135 @@ async function load(){if(!slug){root.innerHTML='<div class="empty"><h2>Article U
 const p=match.data(),url=absolute(p.slug),oldPath=location.pathname,title=p.title||'Exam Darpan Article',desc=(p.excerpt||'').trim()||'Exam Darpan पर परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी पढ़ें।';if(oldPath.startsWith('/article/')){history.replaceState({},'', '/'+encodeURIComponent(String(p.slug||'').trim()));}document.title=title+' | Exam Darpan';document.querySelector('link[rel="canonical"]').href=url;meta('description',desc);prop('og:title',title+' | Exam Darpan');prop('og:description',desc);prop('og:url',url);if(p.featuredImage)prop('og:image',p.featuredImage);
 const published=p.publishedAt?.toDate?.()?.toISOString?.()||null,modified=p.updatedAt?.toDate?.()?.toISOString?.()||published;const schema={"@context":"https://schema.org","@type":"Article","headline":title,"description":desc,"url":url,"mainEntityOfPage":{"@type":"WebPage","@id":url},"author":{"@type":"Organization","name":"Exam Darpan Editorial Team","url":"https://examdarpan.in/editorial-policy.html"},"publisher":{"@type":"Organization","name":"Exam Darpan","url":"https://examdarpan.in/","logo":{"@type":"ImageObject","url":"https://examdarpan.in/assets/logo.webp"}},"datePublished":published,"dateModified":modified,"articleSection":p.category||'Latest Updates'};if(p.featuredImage)schema.image=[p.featuredImage];const sc=document.createElement('script');sc.type='application/ld+json';sc.textContent=JSON.stringify(schema);document.head.appendChild(sc);
 const articleText=String(p.content||'').replace(/<[^>]*>/g,' ').trim();const mins=Math.max(1,Math.ceil(articleText.split(/\s+/).filter(Boolean).length/180));
-root.innerHTML=`<nav class="meta" aria-label="Breadcrumb"><a href="/">Home</a> / ${esc(p.category||'Article')}</nav><div style="margin-top:12px"><span class="badge">${esc(p.category||'Latest Update')}</span></div><h1>${esc(title)}</h1><div class="meta">प्रकाशित: ${fmt(p.publishedAt)} · अपडेट: ${fmt(p.updatedAt||p.publishedAt)} · ${mins} min read</div><div class="article-cover article-cover-card" role="img" aria-label="${esc(title)}"><div class="article-cover-glow"></div><div class="article-cover-inner"><span class="article-cover-kicker">${esc(p.category||'Latest Update')}</span><h2>${esc(title)}</h2><div class="article-cover-brand"><strong>EXAM DARPAN</strong><span>Vacancy Se Result Tak, Har Jankari Ek Jagah</span></div></div></div><div class="article-content" style="margin-top:20px">${p.content||'<p>Content उपलब्ध नहीं है।</p>'}</div><div class="notice">महत्वपूर्ण: आवेदन, परीक्षा या परिणाम से जुड़ी कार्रवाई से पहले संबंधित विभाग की official notification जरूर verify करें।</div><div class="article-actions">${p.applyOnlineUrl?`<a class="btn btn-primary" href="${esc(p.applyOnlineUrl)}" target="_blank" rel="nofollow noopener">Apply Online ↗</a>`:''}${p.officialNotificationUrl?`<a class="btn btn-dark" href="${esc(p.officialNotificationUrl)}" target="_blank" rel="nofollow noopener">Official Notification ↗</a>`:''}${p.officialWebsiteUrl?`<a class="btn btn-gold" href="${esc(p.officialWebsiteUrl)}" target="_blank" rel="nofollow noopener">Official Website ↗</a>`:''}${p.notificationPdfUrl?`<a class="btn btn-dark" href="${esc(p.notificationPdfUrl)}" target="_blank" rel="nofollow noopener">Notification PDF ↗</a>`:''}</div><section class="community-card"><div><span class="section-label">EXAM DARPAN COMMUNITY</span><h2>नई भर्ती और परीक्षा updates से जुड़े रहें</h2><p>Important vacancy, admit card, result और exam updates के लिए community से जुड़े रहें।</p></div><div class="community-actions"><p>ऐसी नई updates के लिए Exam Darpan के Telegram और WhatsApp channels से जुड़ें.</p><div class="links"><a class="btn btn-primary" href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a><a class="btn btn-gold" href="https://whatsapp.com/channel/0029VbCwH1n2kNFl5EWNGu3c" target="_blank" rel="noopener">WhatsApp</a></div></div>`;
+root.innerHTML=`<nav class="meta" aria-label="Breadcrumb"><a href="/">Home</a> / ${esc(p.category||'Article')}</nav><div style="margin-top:12px"><span class="badge">${esc(p.category||'Latest Update')}</span></div><h1>${esc(title)}</h1><div class="meta">प्रकाशित: ${fmt(p.publishedAt)} · अपडेट: ${fmt(p.updatedAt||p.publishedAt)} · ${mins} min read</div><div class="article-cover article-cover-card" role="img" aria-label="${esc(title)}"><div class="article-cover-glow"></div><div class="article-cover-inner"><span class="article-cover-kicker">${esc(p.category||'Latest Update')}</span><h2>${esc(title)}</h2><div class="article-cover-brand"><strong>EXAM DARPAN</strong><span>Vacancy Se Result Tak, Har Jankari Ek Jagah</span></div></div></div>
+<div class="ed-article-community-top">
+  <div class="ed-article-community-title">
+    <span>JOIN EXAM DARPAN</span>
+    <strong>हर जरूरी exam update से जुड़े रहें</strong>
+  </div>
+  <div class="ed-article-community-grid">
+    <a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" class="ed-article-wa">
+      <b>◉</b><span><strong>WhatsApp Channel</strong><small>Daily Jobs • Results • Admit Card</small></span><i>→</i>
+    </a>
+    <a href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4" target="_blank" rel="noopener" class="ed-article-wa">
+      <b>◉</b><span><strong>WhatsApp Group</strong><small>Community • Alerts • Discussion</small></span><i>→</i>
+    </a>
+    <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener" class="ed-article-tg">
+      <b>➤</b><span><strong>Telegram Channel</strong><small>Fast Alerts • Exam Updates</small></span><i>→</i>
+    </a>
+    <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener" class="ed-article-ig">
+      <b>◎</b><span><strong>Instagram — Follow करें</strong><small>Exam Tips • Updates • Short Content</small></span><i>→</i>
+    </a>
+  </div>
+</div>
+<div class="article-content" style="margin-top:20px">${p.content||'<p>Content उपलब्ध नहीं है।</p>'}</div><div class="notice">महत्वपूर्ण: आवेदन, परीक्षा या परिणाम से जुड़ी कार्रवाई से पहले संबंधित विभाग की official notification जरूर verify करें।</div><div class="article-actions">${p.applyOnlineUrl?`<a class="btn btn-primary" href="${esc(p.applyOnlineUrl)}" target="_blank" rel="nofollow noopener">Apply Online ↗</a>`:''}${p.officialNotificationUrl?`<a class="btn btn-dark" href="${esc(p.officialNotificationUrl)}" target="_blank" rel="nofollow noopener">Official Notification ↗</a>`:''}${p.officialWebsiteUrl?`<a class="btn btn-gold" href="${esc(p.officialWebsiteUrl)}" target="_blank" rel="nofollow noopener">Official Website ↗</a>`:''}${p.notificationPdfUrl?`<a class="btn btn-dark" href="${esc(p.notificationPdfUrl)}" target="_blank" rel="nofollow noopener">Notification PDF ↗</a>`:''}</div><section class="community-card"><div><span class="section-label">EXAM DARPAN COMMUNITY</span><h2>नई भर्ती और परीक्षा updates से जुड़े रहें</h2><p>Important vacancy, admit card, result और exam updates के लिए community से जुड़े रहें।</p></div><div class="community-actions"><p>ऐसी नई updates के लिए Exam Darpan के Telegram और WhatsApp channels से जुड़ें.</p><div class="links"><a class="btn btn-primary" href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a><a class="btn btn-gold" href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener">WhatsApp</a></div></div>`;
 }catch(e){console.error(e);root.innerHTML='<div class="empty"><h2>Article load नहीं हो पाया</h2><p>Network या Firestore connection में समस्या हुई। कुछ सेकंड बाद refresh करके फिर कोशिश करें.</p><a class="btn btn-dark" href="/">Home पर जाएं</a></div>'}}
 document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().getFullYear());load();
-</script><div id="ed-whatsapp-popup" style="position:fixed;right:16px;bottom:16px;z-index:99999;max-width:370px;width:calc(100% - 32px);background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 30px #0003;border:1px solid #ddd;display:none;align-items:center;gap:12px;font-family:Arial,sans-serif"><div style="width:46px;height:46px;min-width:46px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px">◉</div><div style="flex:1"><b style="display:block;font-size:14px">Exam Darpan WhatsApp</b><span style="font-size:12px;color:#667">Latest Jobs, Admit Card & Result Updates</span></div><a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" style="background:#16a34a;color:#fff!important;padding:9px 12px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:bold">Join Now</a><button onclick="this.parentElement.style.display='none'" style="position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0003;width:24px;height:24px;cursor:pointer">×</button></div><script>setTimeout(()=>{let p=document.getElementById('ed-whatsapp-popup');if(p)p.style.display='flex'},4500);</script></body></html>
+</script><div id="ed-whatsapp-popup" style="position:fixed;right:16px;bottom:16px;z-index:99999;max-width:370px;width:calc(100% - 32px);background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 30px #0003;border:1px solid #ddd;display:none;align-items:center;gap:12px;font-family:Arial,sans-serif"><div style="width:46px;height:46px;min-width:46px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px">◉</div><div style="flex:1"><b style="display:block;font-size:14px">Exam Darpan WhatsApp</b><span style="font-size:12px;color:#667">Latest Jobs, Admit Card & Result Updates</span></div><a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" style="background:#16a34a;color:#fff!important;padding:9px 12px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:bold">Join Now</a><button onclick="this.parentElement.style.display='none'" style="position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0003;width:24px;height:24px;cursor:pointer">×</button></div><script>setTimeout(()=>{let p=document.getElementById('ed-whatsapp-popup');if(p)p.style.display='flex'},4500);</script>
+<style>
+.ed-article-community-top{
+  margin:20px 0 4px;
+  padding:16px;
+  border:1px solid #dfe7f0;
+  border-radius:18px;
+  background:linear-gradient(145deg,#fff,#f8fbff);
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+.ed-article-community-title{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  margin-bottom:12px;
+}
+.ed-article-community-title span{
+  color:#64748b;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+.ed-article-community-title strong{
+  color:#172033;
+  font-size:16px;
+}
+.ed-article-community-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+.ed-article-community-grid a{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:10px;
+  border-radius:13px;
+  color:#fff;
+  text-decoration:none;
+  box-sizing:border-box;
+}
+.ed-article-community-grid a>b{
+  width:31px;
+  height:31px;
+  flex:0 0 31px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:rgba(255,255,255,.2);
+  font-size:18px;
+}
+.ed-article-community-grid a span{
+  min-width:0;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.ed-article-community-grid a strong{
+  font-size:10px;
+  line-height:1.2;
+}
+.ed-article-community-grid a small{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:7.5px;
+  opacity:.9;
+}
+.ed-article-community-grid a i{
+  font-style:normal;
+  font-size:14px;
+}
+.ed-article-wa{background:linear-gradient(135deg,#16a34a,#059669)}
+.ed-article-tg{background:linear-gradient(135deg,#159bd7,#2563eb)}
+.ed-article-ig{background:linear-gradient(135deg,#7c3aed,#db2777,#f97316)}
+.ed-wa-float{
+  position:fixed;
+  right:16px;
+  bottom:18px;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:11px 15px;
+  border-radius:999px;
+  background:#16a34a;
+  color:#fff!important;
+  text-decoration:none!important;
+  font-size:11px;
+  font-weight:900;
+  box-shadow:0 8px 25px rgba(22,163,74,.35);
+}
+.ed-wa-float b{
+  font-size:17px;
+}
+@media(max-width:600px){
+  .ed-article-community-grid{grid-template-columns:1fr}
+  .ed-article-community-top{padding:13px}
+  .ed-wa-float{right:12px;bottom:14px;padding:10px 13px}
+}
+</style>
+<a class="ed-wa-float" href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" aria-label="Join Exam Darpan WhatsApp Channel">
+  <b>◉</b> WhatsApp Channel
+</a>
+
+</body></html>
