@@ -725,21 +725,31 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 .ed-community-live{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #dbeafe;border-radius:999px;background:#eff6ff;color:#2563eb;font-size:8px;font-weight:950;white-space:nowrap}
 .ed-community-live i{width:6px;height:6px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.12)}
 .ed-community-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
-.ed-community-card{position:relative;min-width:0;display:flex;align-items:center;gap:10px;padding:13px 12px;border-radius:16px;color:#fff!important;text-decoration:none!important;overflow:hidden;box-shadow:0 7px 18px rgba(15,23,42,.14);transition:.18s ease}
-.ed-community-card:hover{transform:translateY(-2px);box-shadow:0 11px 24px rgba(15,23,42,.2)}
-.ed-brand-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.18);color:#fff}
-.ed-brand-icon svg{width:24px;height:24px;display:block;fill:currentColor}
-.ed-community-card span:nth-child(2){min-width:0;display:flex;flex-direction:column;gap:3px;flex:1}
+.ed-community-card{position:relative;min-width:0;display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:10px;padding:13px 12px;border:1px solid rgba(255,255,255,.18);border-radius:17px;color:#fff!important;text-decoration:none!important;overflow:hidden;box-shadow:0 8px 22px rgba(15,23,42,.16);transition:transform .18s ease,box-shadow .18s ease}
+.ed-community-card:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.16),transparent 42%);pointer-events:none}
+.ed-community-card:after{content:"";position:absolute;width:90px;height:90px;right:-35px;top:-45px;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none}
+.ed-community-card:hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(15,23,42,.22)}
+.ed-brand-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.20);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 12px rgba(0,0,0,.12);position:relative;z-index:1}
+.ed-brand-icon svg{width:27px;height:27px;display:block}
+.ed-brand-icon svg *{vector-effect:non-scaling-stroke}
+.ed-brand-icon svg{fill:currentColor}
+.ed-community-card span:nth-child(2){min-width:0;display:flex;flex-direction:column;gap:3px;position:relative;z-index:1}
 .ed-community-card b{font-size:11px;line-height:1.2}
 .ed-community-card small{font-size:8px;line-height:1.25;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ed-community-card>strong{display:flex;align-items:center;gap:3px;font-size:9px;white-space:nowrap}
+.ed-community-card>strong{display:flex;align-items:center;gap:3px;font-size:9px;white-space:nowrap;position:relative;z-index:1;padding-left:5px}
 .ed-community-card em{font-style:normal;font-size:13px}
-.ed-wa{background:linear-gradient(135deg,#25D366,#128C7E)}
-.ed-wg{background:linear-gradient(135deg,#16a34a,#166534)}
-.ed-tg{background:linear-gradient(135deg,#29a9ea,#2563eb)}
-.ed-ig{background:linear-gradient(135deg,#833ab4,#e1306c 55%,#f77737)}
-@media(max-width:900px){.ed-community-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.ed-community-panel{padding:14px;border-radius:18px}.ed-community-head{align-items:flex-start;flex-direction:column}.ed-community-live{display:none}.ed-community-grid{grid-template-columns:1fr}.ed-community-card{padding:12px}}
+.ed-wa{background:linear-gradient(135deg,#25D366 0%,#16a085 100%)}
+.ed-wg{background:linear-gradient(135deg,#22c55e 0%,#15803d 100%)}
+.ed-tg{background:linear-gradient(135deg,#38bdf8 0%,#2563eb 100%)}
+.ed-ig{background:linear-gradient(135deg,#833ab4 0%,#e1306c 55%,#f77737 100%)}.ed-community-card strong em{transition:transform .18s ease}.ed-community-card:hover strong em{transform:translateX(3px)}
+.floating-whatsapp-group{{position:fixed;right:18px;bottom:18px;z-index:9999;display:flex;align-items:center;gap:10px;padding:9px 13px 9px 9px;border-radius:999px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff!important;text-decoration:none!important;box-shadow:0 10px 28px rgba(18,140,126,.34);border:2px solid rgba(255,255,255,.9);animation:edFloatPulse 2.8s ease-in-out infinite}}
+.floating-whatsapp-icon{{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#16a34a;box-shadow:0 3px 10px rgba(0,0,0,.14)}}
+.floating-whatsapp-icon svg{{width:23px;height:23px;fill:currentColor}}
+.floating-whatsapp-text{{display:flex;flex-direction:column;line-height:1.05}}.floating-whatsapp-text small{{font-size:8px;font-weight:700;opacity:.88}}.floating-whatsapp-text strong{{font-size:12px;margin-top:3px}}
+@keyframes edFloatPulse{{0%,100%{{box-shadow:0 10px 28px rgba(18,140,126,.34)}}50%{{box-shadow:0 10px 28px rgba(18,140,126,.34),0 0 0 7px rgba(37,211,102,.10)}}
+@media(max-width:560px){{.ed-community-card{{grid-template-columns:42px minmax(0,1fr) auto}}.ed-brand-icon{{width:42px;height:42px}}.floating-whatsapp-group{{right:12px;bottom:12px;padding:8px 11px 8px 8px}}.floating-whatsapp-icon{{width:36px;height:36px}}.floating-whatsapp-text strong{{font-size:11px}}
+@media(max-width:900px){{.ed-community-grid{{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){{.ed-community-panel{{padding:14px;border-radius:18px}}.ed-community-head{{align-items:flex-start;flex-direction:column}}.ed-community-live{{display:none}}.ed-community-grid{{grid-template-columns:1fr}}.ed-community-card{{padding:12px}}
 </style>
 {cover}
 {quick_facts(p)}
