@@ -44,7 +44,7 @@ jobs:
 
           test -f public/sitemap.xml
 
-          ARTICLE_COUNT="$(grep -rl --include="*.html" "EXAM-DARPAN-GENERATED-ARTICLE" public | wc -l | tr -d ' ')"
+          ARTICLE_COUNT="$(grep -l "EXAM-DARPAN-GENERATED-ARTICLE" public/*.html 2>/dev/null | wc -l | tr -d ' ')"
           SITEMAP_COUNT="$(grep -c "<loc>" public/sitemap.xml || true)"
 
           echo "Generated article pages: ${ARTICLE_COUNT}"
