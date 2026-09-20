@@ -2349,7 +2349,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         "LIVE UPDATES",
         "Rajasthan Government Jobs Hub",
         "All India Government Jobs Hub",
-        "आज का Daily Test",
+        'id="daily-test"',
         "Latest Articles",
     )
 
