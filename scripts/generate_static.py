@@ -1054,23 +1054,68 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         ],
     )
 
-    # 4. EXAM CALENDARS
+    # 4. EXAM CALENDAR
+    # IMPORTANT:
+    # public/app.js populates #matrixExamCalendar with
+    # live Rajasthan deadlines and exam dates.
     exam_calendars = (
         '<section class="ed-home-calendar-grid">'
-        '<article class="ed-home-calendar-card">'
-        '<span class="ed-home-hub-kicker">RAJASTHAN EXAMS</span>'
-        '<h2>Rajasthan Exam Calendar</h2>'
-        '<p>RPSC, RSSB, CET, Police, Teacher और Rajasthan exams की महत्वपूर्ण dates एक जगह देखें।</p>'
-        '<a class="btn btn-light" href="/exam-calendar.html">'
-        'Rajasthan Calendar देखें →</a>'
+
+        '<article class="card pad matrix-card exam-calendar-card">'
+        '<div class="card-head">'
+        '<h2><i class="dot purple"></i>Rajasthan Exam Calendar</h2>'
+        '<span class="pill purple-pill">LIVE</span>'
+        '</div>'
+
+        '<div id="matrixExamCalendar" class="exam-calendar-list">'
+        '<div class="empty">Live vacancies load हो रही हैं…</div>'
+        '</div>'
+
+        '<a class="calendar-more" href="/exam-calendar.html">'
+        'पूरा Exam Calendar देखें →'
+        '</a>'
         '</article>'
-        '<article class="ed-home-calendar-card">'
-        '<span class="ed-home-hub-kicker">ALL INDIA EXAMS</span>'
-        '<h2>All India Exam Calendar</h2>'
-        '<p>SSC, UPSC, Railway, Banking और Central Government exams की important dates देखें।</p>'
-        '<a class="btn btn-light" href="/exam-calendar.html">'
-        'All India Calendar देखें →</a>'
+
+        '<article class="card pad matrix-card exam-calendar-card">'
+        '<div class="card-head">'
+        '<h2><i class="dot blue"></i>All India Exam Calendar</h2>'
+        '<span class="pill blue-pill">LIVE</span>'
+        '</div>'
+
+        '<div class="ed-calendar-mini-grid">'
+
+        '<a href="/all-india-exam-calendar?category=UPSC">'
+        '<strong>UPSC</strong>'
+        '<span>Civil Services • NDA • CDS</span>'
+        '</a>'
+
+        '<a href="/all-india-exam-calendar?category=SSC">'
+        '<strong>SSC</strong>'
+        '<span>SSC JE & major exams</span>'
+        '</a>'
+
+        '<a href="/all-india-exam-calendar?category=Railway">'
+        '<strong>Railway</strong>'
+        '<span>RRB recruitment & exams</span>'
+        '</a>'
+
+        '<a href="/all-india-exam-calendar?category=Banking">'
+        '<strong>Banking</strong>'
+        '<span>Bank & PSU recruitment</span>'
+        '</a>'
+
+        '</div>'
+
+        '<div class="ed-calendar-trust">'
+        '✓ Active dates only · ✓ Official-source preferred · ✓ Auto-expiry'
+        '</div>'
+
+        '<a class="calendar-more" href="/all-india-exam-calendar">'
+        'पूरा All India Calendar देखें →'
+        '</a>'
+
         '</article>'
+
         '</section>'
     )
 
@@ -1112,34 +1157,222 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     )
 
     css = """<style id="exam-darpan-home-final-order">
-.ed-home-calendar-grid{
+.ed-home-live{
+  margin:0 0 22px;
+  background:#fff;
+  border:1px solid #e5e9f0;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:9px 12px;
+  overflow:hidden;
+  box-shadow:0 5px 16px rgba(15,23,42,.05)
+}
+.ed-home-live-label{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#172554;
+  color:#fff;
+  font-size:9px;
+  font-weight:900
+}
+.ed-home-live-label i{
+  width:6px;height:6px;border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.13)
+}
+.ed-home-live-track{min-width:0;overflow:hidden;white-space:nowrap}
+.ed-home-live-move{
+  display:inline-block;
+  min-width:max-content;
+  padding-left:100%;
+  animation:edHomeTicker 38s linear infinite
+}
+.ed-home-live:hover .ed-home-live-move{animation-play-state:paused}
+.ed-home-live-track a{
+  display:inline-block;
+  margin-right:34px;
+  color:#26334d!important;
+  font-size:11px;
+  font-weight:750
+}
+@keyframes edHomeTicker{to{transform:translateX(-100%)}}
+
+.ed-home-hubs{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:18px;
-  margin:0 0 28px;
+  margin:0 0 28px
 }
-.ed-home-calendar-card{
-  padding:18px;
+.ed-home-hub{
   background:#fff;
   border:1px solid #e3e8ef;
   border-radius:18px;
-  box-shadow:0 8px 25px rgba(15,23,42,.06);
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(15,23,42,.06)
 }
-.ed-home-calendar-card h2{
-  margin:4px 0 7px;
+.ed-home-hub-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:18px;
+  background:linear-gradient(135deg,#f8fbff,#fff);
+  border-bottom:1px solid #edf0f4
+}
+.ed-home-hub-kicker{
+  display:block;
+  margin-bottom:5px;
+  color:#2563eb;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.12em
+}
+.ed-home-hub-head h2{
+  margin:0;
   color:#172033;
-  font-size:18px;
+  font-size:20px;
+  line-height:1.2
 }
-.ed-home-calendar-card p{
-  margin:0 0 12px;
-  color:#68758a;
+.ed-home-hub-head>a{
+  flex:0 0 auto;
+  color:#2563eb!important;
+  font-size:9px;
+  font-weight:900
+}
+.ed-home-hub-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr
+}
+.ed-home-hub-section{
+  min-width:0;
+  padding:13px;
+  border-bottom:1px solid #edf0f4;
+  border-right:1px solid #edf0f4
+}
+.ed-home-hub-section:nth-child(2n){border-right:0}
+.ed-home-hub-section h3{
+  margin:0 0 8px;
+  font-size:12px;
+  line-height:1.3
+}
+.ed-home-hub-section h3 a{color:#172033!important}
+.ed-home-hub-section ul{
+  list-style:none;
+  margin:0;
+  padding:0
+}
+.ed-home-hub-section li{
+  padding:5px 0;
+  border-bottom:1px solid #f0f2f5
+}
+.ed-home-hub-section li:last-child{border-bottom:0}
+.ed-home-hub-section li a{
+  color:#354156!important;
   font-size:10px;
-  line-height:1.6;
+  line-height:1.4
 }
-@media(max-width:650px){
-  .ed-home-calendar-grid{
-    grid-template-columns:1fr;
-  }
+.ed-home-empty{
+  color:#98a2b3!important;
+  font-size:9px!important
+}
+
+.ed-home-daily{
+  margin:0 0 28px;
+  padding:20px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#101b35,#173b72);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  box-shadow:0 10px 28px rgba(15,23,42,.12)
+}
+.ed-home-daily h2{
+  margin:3px 0 5px;
+  color:#fff;
+  font-size:23px
+}
+.ed-home-daily p{
+  margin:0;
+  color:#cbd5e1;
+  font-size:10px
+}
+.ed-home-daily .eyebrow{
+  color:#93c5fd;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.12em
+}
+.ed-home-daily .btn{
+  flex:0 0 auto
+}
+
+.ed-home-latest{
+  margin:0 0 28px
+}
+.ed-home-latest-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px
+}
+.ed-home-latest-head h2{
+  margin:0;
+  color:#172033;
+  font-size:21px
+}
+.ed-home-latest-head p{
+  margin:4px 0 0;
+  color:#7b8798;
+  font-size:9px
+}
+.ed-home-latest-head a{
+  color:#2563eb!important;
+  font-size:9px;
+  font-weight:900
+}
+.ed-home-latest-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px
+}
+.ed-home-latest-card{
+  padding:14px;
+  background:#fff;
+  border:1px solid #e4e9f0;
+  border-radius:14px
+}
+.ed-home-latest-card a{
+  color:#172033!important;
+  font-size:11px;
+  font-weight:850;
+  line-height:1.45
+}
+.ed-home-latest-card small{
+  display:block;
+  margin-top:7px;
+  color:#8a94a5;
+  font-size:8px
+}
+
+@media(max-width:850px){
+  .ed-home-hubs{grid-template-columns:1fr}
+  .ed-home-latest-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .ed-home-hub-grid{grid-template-columns:1fr}
+  .ed-home-hub-section{border-right:0}
+  .ed-home-latest-grid{grid-template-columns:1fr}
+  .ed-home-daily{display:block}
+  .ed-home-daily .btn{display:inline-flex;margin-top:12px}
 }
 </style>"""
 
