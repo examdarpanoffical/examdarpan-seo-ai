@@ -47,7 +47,7 @@ jobs:
           grep -q "LIVE UPDATES" public/index.html
           grep -q "Rajasthan Government Jobs Hub" public/index.html
           grep -q "All India Government Jobs Hub" public/index.html
-          grep -q "आज का Daily Test" public/index.html
+          grep -q 'id="daily-test"' public/index.html
           grep -q "Latest Articles" public/index.html
 
           ARTICLE_COUNT="$(grep -l "EXAM-DARPAN-GENERATED-ARTICLE" public/*.html 2>/dev/null | wc -l | tr -d ' ')"
