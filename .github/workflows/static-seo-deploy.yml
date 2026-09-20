@@ -2,9 +2,8 @@ name: Exam Darpan Automatic SEO Deploy
 
 on:
   push:
-    branches: [main]
-  schedule:
-    - cron: '*/10 * * * *'
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -26,7 +25,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -38,11 +37,18 @@ jobs:
         run: |
           python scripts/generate_static.py
 
-      - name: Verify generated SEO files
+      - name: Verify generated homepage
         run: |
           set -euo pipefail
 
+          test -f public/index.html
           test -f public/sitemap.xml
+
+          grep -q "LIVE UPDATES" public/index.html
+          grep -q "Rajasthan Government Jobs Hub" public/index.html
+          grep -q "All India Government Jobs Hub" public/index.html
+          grep -q "आज का Daily Test" public/index.html
+          grep -q "Latest Articles" public/index.html
 
           ARTICLE_COUNT="$(grep -l "EXAM-DARPAN-GENERATED-ARTICLE" public/*.html 2>/dev/null | wc -l | tr -d ' ')"
           SITEMAP_COUNT="$(grep -c "<loc>" public/sitemap.xml || true)"
@@ -50,14 +56,12 @@ jobs:
           echo "Generated article pages: ${ARTICLE_COUNT}"
           echo "Sitemap URLs: ${SITEMAP_COUNT}"
 
-          # A successful Firestore build must contain at least one article.
           test "${ARTICLE_COUNT}" -gt 0
-
-          # Every generated article must have a sitemap entry.
           test "${SITEMAP_COUNT}" -ge "${ARTICLE_COUNT}"
 
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: |
+          npm install -g firebase-tools
 
       - name: Deploy Firebase Hosting
         env:
@@ -70,4 +74,5 @@ jobs:
 
       - name: Cleanup credentials
         if: always()
-        run: rm -f /tmp/firebase-service-account.json
+        run: |
+          rm -f /tmp/firebase-service-account.json
