@@ -930,7 +930,13 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         )
 
     def matches_hub_category(p: dict[str, Any], scope: str, category_name: str) -> bool:
-        """Route Government Jobs articles into useful exam-specific homepage shelves."""
+        """Strict homepage routing.
+
+        Firestore/CMS category is authoritative. Keyword inference is used
+        ONLY for articles whose explicit category is Government Jobs.
+        This prevents Scholarships/Yojana/Admit Card/Results/Syllabus/etc.
+        from leaking into SSC/UPSC/Railway/Banking shelves.
+        """
         if scope == "rajasthan":
             if not is_rajasthan(p):
                 return False
@@ -946,11 +952,28 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             return False
 
         cat = normalized_category(p)
-        blob = text_blob(p)
+
+        # Government Jobs shelf = ONLY actual Government Jobs category.
+        if category_name == "Government Jobs":
+            return cat == "Government Jobs"
+
+        # Explicit category always wins.
+        if cat == category_name:
+            return True
+
+        # Never infer SSC/UPSC/Railway/Banking/etc. from articles that
+        # explicitly belong to Scholarships, Yojana, Syllabus, Results,
+        # Admit Card, Entrance Exams, University & College, etc.
+        if cat != "Government Jobs":
+            return False
+
+        # Only unclassified Government Jobs can be routed by title.
+        title_blob = clean_text(p.get("title")).lower()
 
         signals = {
             "SSC Jobs": (
-                "ssc",
+                "ssc ",
+                "ssc-",
                 "staff selection commission",
             ),
             "UPSC Jobs": (
@@ -958,18 +981,21 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 "union public service commission",
             ),
             "Railway Jobs": (
-                "rrb",
+                "rrb ",
+                "rrb-",
                 "railway",
                 "indian railway",
                 "rpf",
             ),
             "Banking Jobs": (
                 "ibps",
-                "sbi",
+                "sbi ",
+                "sbi-",
                 "bank of india",
                 "banking",
                 "nabard",
-                "rbi",
+                "rbi ",
+                "rbi-",
             ),
             "Police & Defence Jobs": (
                 "capf",
@@ -980,26 +1006,25 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 "navy",
                 "air force",
                 "defence",
+                "defense",
                 "police",
             ),
             "Teaching Jobs": (
                 "teacher",
                 "teaching",
-                "school",
+                "school teacher",
                 "lecturer",
                 "professor",
                 "ugc",
                 "tet",
+                "reet",
             ),
         }
 
-        if category_name == "Government Jobs":
-            return cat == "Government Jobs"
-
-        if category_name in signals:
-            return any(term in blob for term in signals[category_name])
-
-        return cat == category_name
+        return any(
+            term in title_blob
+            for term in signals.get(category_name, ())
+        )
 
     def scoped_posts(scope: str, category_name: str, limit: int = 3):
         result = []
@@ -1046,7 +1071,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 '<div class="ed-home-hub-section">'
                 f'<h3><a href="{esc(category_path(category_slug))}">'
                 f'{esc(category_name)}</a></h3>'
-                f'<ul>{links(scope, category_name, 3)}</ul>'
+                f'<ul>{links(scope, category_name, 4)}</ul>'
                 '</div>'
             )
 
@@ -1136,8 +1161,111 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
         return None
 
+    def calendar_deadline_from_text(p: dict[str, Any]):
+        source = clean_text(
+            f'{p.get("title", "")} {p.get("excerpt", "")} {p.get("content", "")}'
+        )
+
+        year_match = re.search(r"\b(20\d{2})\b", source)
+        context_year = year_match.group(1) if year_match else str(
+            datetime.now(timezone.utc).year
+        )
+
+        months = {
+            "january": 1, "february": 2, "march": 3, "april": 4,
+            "may": 5, "june": 6, "july": 7, "august": 8,
+            "september": 9, "october": 10, "november": 11, "december": 12,
+            "जनवरी": 1, "फरवरी": 2, "मार्च": 3, "अप्रैल": 4,
+            "मई": 5, "जून": 6, "जुलाई": 7, "अगस्त": 8,
+            "सितंबर": 9, "अक्टूबर": 10, "नवंबर": 11, "दिसंबर": 12,
+        }
+
+        def make(day, month, year):
+            try:
+                return datetime(
+                    int(year),
+                    int(month),
+                    int(day),
+                    tzinfo=timezone.utc,
+                )
+            except (TypeError, ValueError):
+                return None
+
+        numeric_patterns = [
+            r"(?:last\s*date|deadline|closing\s*date|अंतिम\s*(?:तिथि|तारीख)|आवेदन\s*की\s*अंतिम\s*(?:तिथि|तारीख))"
+            r"[^0-9]{0,60}(\d{1,2})[./-](\d{1,2})[./-](20\d{2})",
+
+            r"(?:apply|application|applications|form|registration)"
+            r"[^0-9]{0,50}(?:by|until|upto|तक)\s*"
+            r"(\d{1,2})[./-](\d{1,2})[./-](20\d{2})",
+        ]
+
+        for pattern in numeric_patterns:
+            m = re.search(pattern, source, flags=re.I)
+            if m:
+                d = make(m.group(1), m.group(2), m.group(3))
+                if d:
+                    return d
+
+        month_pattern = (
+            r"(\d{1,2})\s+("
+            + "|".join(re.escape(x) for x in months)
+            + r")(?:\s+(20\d{2}))?"
+            r"[^0-9]{0,20}(?:तक|until|by)"
+        )
+
+        m = re.search(month_pattern, source, flags=re.I)
+
+        if m:
+            month = months.get(
+                m.group(2).lower(),
+                months.get(m.group(2))
+            )
+
+            d = make(
+                m.group(1),
+                month,
+                m.group(3) or context_year,
+            )
+
+            if d:
+                return d
+
+        return None
+
+    def calendar_exam_from_text(p: dict[str, Any]):
+        source = clean_text(
+            f'{p.get("title", "")} {p.get("excerpt", "")} {p.get("content", "")}'
+        )
+
+        patterns = [
+            r"(?:exam\s*date|exam\s*on|examination\s*date|"
+            r"परीक्षा\s*(?:तिथि|तारीख))"
+            r"[^0-9]{0,30}"
+            r"(\d{1,2})[./-](\d{1,2})[./-](20\d{2})",
+        ]
+
+        for pattern in patterns:
+            m = re.search(pattern, source, flags=re.I)
+
+            if not m:
+                continue
+
+            try:
+                return datetime(
+                    int(m.group(3)),
+                    int(m.group(2)),
+                    int(m.group(1)),
+                    tzinfo=timezone.utc,
+                )
+            except ValueError:
+                pass
+
+        return None
+
     def calendar_records(scope: str, limit: int = 6):
         rows = []
+        now = datetime.now(timezone.utc)
 
         for p in posts:
             if scope == "rajasthan" and not is_rajasthan(p):
@@ -1146,18 +1274,24 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             if scope == "all_india" and not is_all_india(p):
                 continue
 
-            last_date = calendar_date(
-                p,
-                "applicationLastDate",
-                "lastDate",
-                "lastDateTime",
-                "applyLastDate",
+            last_date = (
+                calendar_date(
+                    p,
+                    "applicationLastDate",
+                    "lastDate",
+                    "lastDateTime",
+                    "applyLastDate",
+                )
+                or calendar_deadline_from_text(p)
             )
 
-            exam_date = calendar_date(
-                p,
-                "examDate",
-                "examDateTime",
+            exam_date = (
+                calendar_date(
+                    p,
+                    "examDate",
+                    "examDateTime",
+                )
+                or calendar_exam_from_text(p)
             )
 
             start_date = calendar_date(
@@ -1167,14 +1301,22 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 "applyStartDate",
             )
 
-            if not last_date and not exam_date:
+            future_last = bool(last_date and last_date >= now)
+            future_exam = bool(exam_date and exam_date >= now)
+
+            # No fake/dummy calendar entries.
+            if not future_last and not future_exam:
                 continue
 
-            expiry = last_date or exam_date
+            sort_date = (
+                exam_date
+                if future_exam and not future_last
+                else (last_date or exam_date)
+            )
 
             rows.append(
                 (
-                    expiry,
+                    sort_date,
                     last_date,
                     exam_date,
                     start_date,
@@ -1298,16 +1440,27 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
     # 5. DAILY TEST
     daily = (
-        '<section class="ed-home-daily" id="daily-test">'
-        '<div>'
-        '<span class="eyebrow">DAILY PRACTICE</span>'
-        '<h2>आज का Daily Test</h2>'
-        '<p>Timer के साथ test दें और अंत में score व explanations देखें।</p>'
+        '<section class="ed-home-daily" id="daily-test" aria-label="Daily Test">'
+        '<div class="ed-home-daily-main">'
+        '<div class="ed-home-daily-kicker">'
+        '<span>DAILY PRACTICE</span><b>FREE</b>'
         '</div>'
-        '<a class="btn btn-primary" href="/quiz.html">'
-        'Daily Test खोलें →</a>'
+        '<h2>आज का Practice Test</h2>'
+        '<p>Timer के साथ test दें, score तुरंत देखें और हर सवाल की explanation से अपनी तैयारी मजबूत करें।</p>'
+        '<div class="ed-home-daily-points">'
+        '<span>⏱ Timed Test</span>'
+        '<span>✓ Instant Score</span>'
+        '<span>★ Explanations</span>'
+        '</div>'
+        '</div>'
+        '<div class="ed-home-daily-action">'
+        '<strong>आज की तैयारी का छोटा test</strong>'
+        '<small>Quiz page पर आज का available test देखें</small>'
+        '<a class="btn btn-primary" href="/quiz.html">अभी Test शुरू करें →</a>'
+        '</div>'
         '</section>'
     )
+
 
     # 6. LIMITED LATEST ARTICLES
     cards = "".join(
@@ -1625,34 +1778,92 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
 .ed-home-daily{
   margin:0 0 28px;
-  padding:20px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#101b35,#173b72);
+  padding:22px;
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(96,165,250,.18),transparent 30%),
+    linear-gradient(135deg,#0b1630,#173f78);
   color:#fff;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:18px;
-  box-shadow:0 10px 28px rgba(15,23,42,.12)
+  gap:22px;
+  box-shadow:0 14px 34px rgba(15,23,42,.16);
+  border:1px solid rgba(255,255,255,.08);
 }
-.ed-home-daily h2{
-  margin:3px 0 5px;
-  color:#fff;
-  font-size:23px
+.ed-home-daily-main{
+  min-width:0;
 }
-.ed-home-daily p{
-  margin:0;
-  color:#cbd5e1;
-  font-size:10px
+.ed-home-daily-kicker{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:7px;
 }
-.ed-home-daily .eyebrow{
+.ed-home-daily-kicker span{
   color:#93c5fd;
   font-size:8px;
-  font-weight:900;
-  letter-spacing:.12em
+  font-weight:950;
+  letter-spacing:.13em;
 }
-.ed-home-daily .btn{
-  flex:0 0 auto
+.ed-home-daily-kicker b{
+  padding:4px 7px;
+  border-radius:999px;
+  background:rgba(34,197,94,.14);
+  border:1px solid rgba(134,239,172,.18);
+  color:#bbf7d0;
+  font-size:7px;
+}
+.ed-home-daily h2{
+  margin:0 0 5px;
+  color:#fff;
+  font-size:24px;
+  line-height:1.15;
+}
+.ed-home-daily p{
+  max-width:650px;
+  margin:0;
+  color:#cbd5e1;
+  font-size:10px;
+  line-height:1.55;
+}
+.ed-home-daily-points{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:11px;
+}
+.ed-home-daily-points span{
+  padding:6px 8px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  color:#e2e8f0;
+  font-size:8px;
+  font-weight:800;
+}
+.ed-home-daily-action{
+  flex:0 0 215px;
+  padding:13px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:15px;
+  background:rgba(255,255,255,.07);
+}
+.ed-home-daily-action strong{
+  display:block;
+  color:#fff;
+  font-size:10px;
+}
+.ed-home-daily-action small{
+  display:block;
+  margin:4px 0 10px;
+  color:#cbd5e1;
+  font-size:8px;
+  line-height:1.4;
+}
+.ed-home-daily-action .btn{
+  width:100%;
+  justify-content:center;
 }
 
 .ed-home-latest{
@@ -1715,7 +1926,8 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   .ed-home-hub-section{border-right:0}
   .ed-home-latest-grid{grid-template-columns:1fr}
   .ed-home-daily{display:block}
-  .ed-home-daily .btn{display:inline-flex;margin-top:12px}
+  .ed-home-daily-action{margin-top:14px}
+  .ed-home-daily-action .btn{display:inline-flex;margin-top:0}
 }
 </style>"""
 
