@@ -929,17 +929,83 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             }
         )
 
+    def matches_hub_category(p: dict[str, Any], scope: str, category_name: str) -> bool:
+        """Route Government Jobs articles into useful exam-specific homepage shelves."""
+        if scope == "rajasthan":
+            if not is_rajasthan(p):
+                return False
+
+            cat = normalized_category(p)
+
+            if category_name == "Government Jobs":
+                return cat in {"Government Jobs", "Rajasthan Jobs"}
+
+            return cat == category_name
+
+        if scope != "all_india" or not is_all_india(p):
+            return False
+
+        cat = normalized_category(p)
+        blob = text_blob(p)
+
+        signals = {
+            "SSC Jobs": (
+                "ssc",
+                "staff selection commission",
+            ),
+            "UPSC Jobs": (
+                "upsc",
+                "union public service commission",
+            ),
+            "Railway Jobs": (
+                "rrb",
+                "railway",
+                "indian railway",
+                "rpf",
+            ),
+            "Banking Jobs": (
+                "ibps",
+                "sbi",
+                "bank of india",
+                "banking",
+                "nabard",
+                "rbi",
+            ),
+            "Police & Defence Jobs": (
+                "capf",
+                "cisf",
+                "crpf",
+                "bsf",
+                "army",
+                "navy",
+                "air force",
+                "defence",
+                "police",
+            ),
+            "Teaching Jobs": (
+                "teacher",
+                "teaching",
+                "school",
+                "lecturer",
+                "professor",
+                "ugc",
+                "tet",
+            ),
+        }
+
+        if category_name == "Government Jobs":
+            return cat == "Government Jobs"
+
+        if category_name in signals:
+            return any(term in blob for term in signals[category_name])
+
+        return cat == category_name
+
     def scoped_posts(scope: str, category_name: str, limit: int = 3):
         result = []
 
         for p in posts:
-            if normalized_category(p) != category_name:
-                continue
-
-            if scope == "rajasthan" and not is_rajasthan(p):
-                continue
-
-            if scope == "all_india" and not is_all_india(p):
+            if not matches_hub_category(p, scope, category_name):
                 continue
 
             result.append(p)
@@ -1055,65 +1121,176 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     )
 
     # 4. EXAM CALENDAR
-    # IMPORTANT:
-    # public/app.js populates #matrixExamCalendar with
-    # live Rajasthan deadlines and exam dates.
+    # Server-rendered so dates remain visible even if browser JS/Firestore
+    # loading fails on the homepage.
+
+    def calendar_date(p: dict[str, Any], *keys: str):
+        for key in keys:
+            value = p.get(key)
+
+            if value not in (None, ""):
+                d = as_datetime(value)
+
+                if d:
+                    return d
+
+        return None
+
+    def calendar_records(scope: str, limit: int = 6):
+        rows = []
+
+        for p in posts:
+            if scope == "rajasthan" and not is_rajasthan(p):
+                continue
+
+            if scope == "all_india" and not is_all_india(p):
+                continue
+
+            last_date = calendar_date(
+                p,
+                "applicationLastDate",
+                "lastDate",
+                "lastDateTime",
+                "applyLastDate",
+            )
+
+            exam_date = calendar_date(
+                p,
+                "examDate",
+                "examDateTime",
+            )
+
+            start_date = calendar_date(
+                p,
+                "applicationStartDate",
+                "startDate",
+                "applyStartDate",
+            )
+
+            if not last_date and not exam_date:
+                continue
+
+            expiry = last_date or exam_date
+
+            rows.append(
+                (
+                    expiry,
+                    last_date,
+                    exam_date,
+                    start_date,
+                    p,
+                )
+            )
+
+        rows.sort(
+            key=lambda x: x[0] or datetime.max.replace(tzinfo=timezone.utc)
+        )
+
+        return rows[:limit]
+
+    def calendar_card(row, scope_label: str) -> str:
+        _, last_date, exam_date, start_date, p = row
+
+        title = post_title(p)
+        slug = slugify(p.get("slug"))
+
+        date_parts = []
+
+        if start_date:
+            date_parts.append(
+                f'<span><small>Application Start</small>'
+                f'<b>{esc(date_hi(start_date))}</b></span>'
+            )
+
+        if last_date:
+            date_parts.append(
+                f'<span><small>Last Date</small>'
+                f'<b>{esc(date_hi(last_date))}</b></span>'
+            )
+
+        if exam_date:
+            date_parts.append(
+                f'<span><small>Exam Date</small>'
+                f'<b>{esc(date_hi(exam_date))}</b></span>'
+            )
+
+        if not date_parts:
+            date_parts.append(
+                '<span><small>Date</small>'
+                '<b>Official notice check करें</b></span>'
+            )
+
+        return (
+            '<a class="ed-home-calendar-item" '
+            f'href="{esc(article_path(slug))}">'
+            '<div class="ed-home-calendar-copy">'
+            f'<strong>{esc(title)}</strong>'
+            f'<small>{esc(scope_label)} • '
+            f'{esc(normalized_category(p))}</small>'
+            '</div>'
+            '<div class="ed-home-calendar-dates">'
+            + "".join(date_parts)
+            + '</div>'
+            '</a>'
+        )
+
+    def render_calendar_list(rows, scope_label: str) -> str:
+        if not rows:
+            return (
+                '<div class="ed-home-calendar-empty">'
+                'अभी verified date वाले active updates उपलब्ध नहीं हैं।'
+                '</div>'
+            )
+
+        return "".join(
+            calendar_card(row, scope_label)
+            for row in rows
+        )
+
+    rajasthan_calendar_rows = calendar_records("rajasthan")
+    all_india_calendar_rows = calendar_records("all_india")
+
     exam_calendars = (
         '<section class="ed-home-calendar-grid">'
 
-        '<article class="card pad matrix-card exam-calendar-card">'
-        '<div class="card-head">'
-        '<h2><i class="dot purple"></i>Rajasthan Exam Calendar</h2>'
-        '<span class="pill purple-pill">LIVE</span>'
+        '<article class="ed-home-calendar-panel rajasthan">'
+        '<div class="ed-home-calendar-head">'
+        '<div>'
+        '<span class="ed-home-calendar-kicker">RAJASTHAN EXAMS</span>'
+        '<h2>Rajasthan Exam Calendar</h2>'
+        '<p>Application और exam की verified dates एक जगह देखें।</p>'
+        '</div>'
+        '<span class="ed-home-calendar-badge">LIVE</span>'
         '</div>'
 
-        '<div id="matrixExamCalendar" class="exam-calendar-list">'
-        '<div class="empty">Live vacancies load हो रही हैं…</div>'
+        f'<div class="ed-home-calendar-list">'
+        f'{render_calendar_list(rajasthan_calendar_rows, "Rajasthan")}'
         '</div>'
 
-        '<a class="calendar-more" href="/exam-calendar.html">'
-        'पूरा Exam Calendar देखें →'
+        '<a class="ed-home-calendar-more" '
+        'href="/exam-calendar.html">'
+        'पूरा Rajasthan Calendar देखें →'
         '</a>'
         '</article>'
 
-        '<article class="card pad matrix-card exam-calendar-card">'
-        '<div class="card-head">'
-        '<h2><i class="dot blue"></i>All India Exam Calendar</h2>'
-        '<span class="pill blue-pill">LIVE</span>'
+        '<article class="ed-home-calendar-panel all-india">'
+        '<div class="ed-home-calendar-head">'
+        '<div>'
+        '<span class="ed-home-calendar-kicker">ALL INDIA EXAMS</span>'
+        '<h2>All India Exam Calendar</h2>'
+        '<p>SSC, UPSC, Railway, Banking और Central exams की dates।</p>'
+        '</div>'
+        '<span class="ed-home-calendar-badge">LIVE</span>'
         '</div>'
 
-        '<div class="ed-calendar-mini-grid">'
-
-        '<a href="/all-india-exam-calendar?category=UPSC">'
-        '<strong>UPSC</strong>'
-        '<span>Civil Services • NDA • CDS</span>'
-        '</a>'
-
-        '<a href="/all-india-exam-calendar?category=SSC">'
-        '<strong>SSC</strong>'
-        '<span>SSC JE & major exams</span>'
-        '</a>'
-
-        '<a href="/all-india-exam-calendar?category=Railway">'
-        '<strong>Railway</strong>'
-        '<span>RRB recruitment & exams</span>'
-        '</a>'
-
-        '<a href="/all-india-exam-calendar?category=Banking">'
-        '<strong>Banking</strong>'
-        '<span>Bank & PSU recruitment</span>'
-        '</a>'
-
+        f'<div class="ed-home-calendar-list">'
+        f'{render_calendar_list(all_india_calendar_rows, "All India")}'
         '</div>'
 
-        '<div class="ed-calendar-trust">'
-        '✓ Active dates only · ✓ Official-source preferred · ✓ Auto-expiry'
-        '</div>'
-
-        '<a class="calendar-more" href="/all-india-exam-calendar">'
+        '<a class="ed-home-calendar-more" '
+        'href="/all-india-exam-calendar">'
         'पूरा All India Calendar देखें →'
         '</a>'
-
         '</article>'
 
         '</section>'
@@ -1282,6 +1459,170 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   font-size:9px!important
 }
 
+.ed-home-calendar-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin:0 0 28px;
+}
+.ed-home-calendar-panel{
+  background:#fff;
+  border:1px solid #e3e8ef;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(15,23,42,.06);
+}
+.ed-home-calendar-panel.rajasthan{
+  border-top:4px solid #7c3aed;
+}
+.ed-home-calendar-panel.all-india{
+  border-top:4px solid #2563eb;
+}
+.ed-home-calendar-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:18px;
+  background:linear-gradient(135deg,#f8fbff,#fff);
+  border-bottom:1px solid #edf0f4;
+}
+.ed-home-calendar-kicker{
+  display:block;
+  margin-bottom:5px;
+  color:#64748b;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.13em;
+}
+.ed-home-calendar-head h2{
+  margin:0;
+  color:#172033;
+  font-size:20px;
+  line-height:1.2;
+}
+.ed-home-calendar-head p{
+  margin:5px 0 0;
+  color:#7b8798;
+  font-size:9px;
+  line-height:1.45;
+}
+.ed-home-calendar-badge{
+  flex:0 0 auto;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#ecfdf3;
+  color:#15803d;
+  font-size:8px;
+  font-weight:950;
+}
+.ed-home-calendar-list{
+  padding:8px 14px;
+}
+.ed-home-calendar-item{
+  display:block;
+  padding:12px 4px;
+  border-bottom:1px solid #edf0f4;
+  text-decoration:none!important;
+}
+.ed-home-calendar-item:last-child{
+  border-bottom:0;
+}
+.ed-home-calendar-copy strong{
+  display:block;
+  color:#172033;
+  font-size:10.5px;
+  line-height:1.45;
+}
+.ed-home-calendar-copy small{
+  display:block;
+  margin-top:3px;
+  color:#8a94a5;
+  font-size:8px;
+}
+.ed-home-calendar-dates{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  margin-top:8px;
+}
+.ed-home-calendar-dates span{
+  padding:7px 8px;
+  border:1px solid #edf0f4;
+  border-radius:9px;
+  background:#f8fafc;
+}
+.ed-home-calendar-dates small{
+  display:block;
+  color:#7b8798;
+  font-size:7px;
+}
+.ed-home-calendar-dates b{
+  display:block;
+  margin-top:2px;
+  color:#172033;
+  font-size:8px;
+  line-height:1.25;
+}
+.ed-home-calendar-more{
+  display:block;
+  padding:0 18px 16px;
+  color:#2563eb!important;
+  font-size:9px;
+  font-weight:900;
+}
+.ed-home-calendar-empty{
+  padding:14px 4px;
+  color:#98a2b3;
+  font-size:9px;
+}
+
+.ed-home-editorial{
+  margin:0 0 22px;
+  padding:18px;
+  border:1px solid #e3e8ef;
+  border-radius:18px;
+  background:linear-gradient(135deg,#ffffff,#f8fbff);
+}
+.ed-home-editorial-grid{
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:14px;
+  align-items:center;
+}
+.ed-home-editorial h2{
+  margin:0 0 5px;
+  color:#172033;
+  font-size:19px;
+}
+.ed-home-editorial p{
+  margin:0;
+  color:#667085;
+  font-size:10px;
+  line-height:1.55;
+}
+.ed-home-editorial a{
+  display:inline-flex;
+  margin-top:9px;
+  color:#2563eb!important;
+  font-size:9px;
+  font-weight:900;
+}
+.ed-home-editorial-points{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+.ed-home-editorial-points span{
+  padding:8px 9px;
+  border:1px solid #e8edf3;
+  border-radius:10px;
+  background:#fff;
+  color:#475467;
+  font-size:8px;
+  font-weight:800;
+}
+
 .ed-home-daily{
   margin:0 0 28px;
   padding:20px;
@@ -1364,6 +1705,8 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 
 @media(max-width:850px){
+  .ed-home-calendar-grid{grid-template-columns:1fr}
+  .ed-home-editorial-grid{grid-template-columns:1fr}
   .ed-home-hubs{grid-template-columns:1fr}
   .ed-home-latest-grid{grid-template-columns:1fr 1fr}
 }
@@ -1376,6 +1719,29 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 </style>"""
 
+    editorial = (
+        '<section class="ed-home-editorial" aria-label="Editorial standards">'
+        '<div class="ed-home-editorial-grid">'
+        '<div>'
+        '<span class="ed-home-hub-kicker">EDITORIAL & TRUST</span>'
+        '<h2>भरोसेमंद जानकारी और साफ dates</h2>'
+        '<p>'
+        'Recruitment, Admit Card, Result और Exam Calendar की जानकारी '
+        'official notification/source से cross-check करके publish की जाती है। '
+        'तारीख बदल सकती है, इसलिए final confirmation official notice से करें।'
+        '</p>'
+        '<a href="/editorial-policy.html">Editorial Policy देखें →</a>'
+        '</div>'
+        '<div class="ed-home-editorial-points">'
+        '<span>✓ Official-source based</span>'
+        '<span>✓ Rajasthan + All India अलग</span>'
+        '<span>✓ Application / Exam dates</span>'
+        '<span>✓ Clear category routing</span>'
+        '</div>'
+        '</div>'
+        '</section>'
+    )
+
     return (
         css
         + ticker
@@ -1386,6 +1752,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         + exam_calendars
         + daily
         + latest_articles
+        + editorial
     )
 
 def update_home(posts: list[dict[str, Any]]) -> None:
