@@ -64,6 +64,7 @@ CATEGORIES = [
     ("Entrance Exams", "entrance-exams", "Entrance Exams", "Entrance और admission examinations की महत्वपूर्ण जानकारी और updates।"),
     ("Scholarships", "scholarships", "Scholarships", "Students के लिए scholarship schemes, eligibility, dates और application updates।"),
     ("University & College", "university-college", "University & College", "University, college admission, courses और education updates।"),
+    ("Yojana", "yojana", "सरकारी योजनाएं", "सरकारी योजनाओं, eligibility, benefits और application updates की जानकारी।"),
     ("Latest Updates", "latest-updates", "Latest Updates", "Exam Darpan की नवीनतम परीक्षा, भर्ती और शिक्षा अपडेट्स।"),
 ]
 CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CATEGORIES}
@@ -816,21 +817,75 @@ WhatsApp Channel Follow करें →
 
 
 def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
-    """Compact homepage live ticker and category shelves from published posts."""
-    # Rajasthan Jobs and All India Jobs already have dedicated hubs lower on the homepage.
-    # Keep the top area focused; do not duplicate those large hub sections.
-    shelf_names = [
-        ("Admit Card", "admit-card", "Admit Card", "नई परीक्षा प्रवेश-पत्र updates"),
-        ("Results", "results", "Results", "नए सरकारी exam और भर्ती results"),
-        ("Answer Key", "answer-key", "Answer Key", "नई answer key और response updates"),
-        ("Syllabus", "syllabus", "Syllabus", "Exam syllabus और preparation updates"),
-    ]
+    """Homepage: fixed editorial order — live updates, two hubs, daily test, latest articles."""
 
-    css = """<style id="exam-darpan-home-shelves">
+    def category_posts(category_name: str, limit: int = 3) -> list[dict[str, Any]]:
+        return [
+            p for p in posts
+            if normalized_category(p) == category_name
+        ][:limit]
+
+    def links(category_name: str, limit: int = 3) -> str:
+        arr = category_posts(category_name, limit)
+        if not arr:
+            return '<li class="ed-home-empty">नई verified update जल्द यहाँ दिखाई देगी।</li>'
+
+        return "".join(
+            '<li>'
+            f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
+            f'{esc(post_title(p))}</a>'
+            '</li>'
+            for p in arr
+        )
+
+    def hub_section(title: str, hub_slug: str, categories: list[tuple[str, str]]) -> str:
+        blocks = []
+
+        for category_name, category_slug in categories:
+            blocks.append(
+                '<div class="ed-home-hub-section">'
+                f'<h3><a href="{esc(category_path(category_slug))}">{esc(category_name)}</a></h3>'
+                f'<ul>{links(category_name, 3)}</ul>'
+                '</div>'
+            )
+
+        return (
+            '<section class="ed-home-hub">'
+            '<div class="ed-home-hub-head">'
+            f'<div><span class="ed-home-hub-kicker">EXAM DARPAN HUB</span>'
+            f'<h2>{esc(title)}</h2></div>'
+            f'<a href="{esc(category_path(hub_slug))}">View all →</a>'
+            '</div>'
+            '<div class="ed-home-hub-grid">'
+            + "".join(blocks)
+            + '</div>'
+            '</section>'
+        )
+
+    # 1. Existing live updates — always first after TOP NAV.
+    latest = posts[:10]
+
+    ticker_links = "".join(
+        f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
+        f'{esc(post_title(p))}</a>'
+        for p in latest
+    )
+
+    ticker = (
+        '<section class="ed-home-live" aria-label="Live Updates">'
+        '<span class="ed-home-live-label"><i></i> LIVE UPDATES</span>'
+        '<div class="ed-home-live-track">'
+        f'<div class="ed-home-live-move">{ticker_links}</div>'
+        '</div>'
+        '</section>'
+    )
+
+    # Shared visual system.
+    css = """<style id="exam-darpan-home-final-order">
 .ed-home-live{
-  margin:0 0 18px;
+  margin:0 0 22px;
   background:#fff;
-  border:1px solid #e6eaf0;
+  border:1px solid #e5e9f0;
   border-radius:14px;
   display:flex;
   align-items:center;
@@ -849,30 +904,21 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   background:#172554;
   color:#fff;
   font-size:9px;
-  font-weight:900;
-  letter-spacing:.08em
+  font-weight:900
 }
 .ed-home-live-label i{
-  width:6px;
-  height:6px;
-  border-radius:50%;
+  width:6px;height:6px;border-radius:50%;
   background:#22c55e;
   box-shadow:0 0 0 4px rgba(34,197,94,.13)
 }
-.ed-home-live-track{
-  min-width:0;
-  overflow:hidden;
-  white-space:nowrap
-}
+.ed-home-live-track{min-width:0;overflow:hidden;white-space:nowrap}
 .ed-home-live-move{
   display:inline-block;
   min-width:max-content;
   padding-left:100%;
   animation:edHomeTicker 38s linear infinite
 }
-.ed-home-live:hover .ed-home-live-move{
-  animation-play-state:paused
-}
+.ed-home-live:hover .ed-home-live-move{animation-play-state:paused}
 .ed-home-live-track a{
   display:inline-block;
   margin-right:34px;
@@ -880,195 +926,251 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   font-size:11px;
   font-weight:750
 }
-.ed-home-live-track a:hover{
-  color:#2563eb!important
-}
-@keyframes edHomeTicker{
-  to{transform:translateX(-100%)}
-}
+@keyframes edHomeTicker{to{transform:translateX(-100%)}}
 
-.ed-home-shelves{
+.ed-home-hubs{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:16px;
-  margin:0 0 24px
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin:0 0 28px
 }
-.ed-home-shelf{
+.ed-home-hub{
   background:#fff;
-  border:1px solid #e5e9f0;
-  border-radius:17px;
+  border:1px solid #e3e8ef;
+  border-radius:18px;
   overflow:hidden;
-  box-shadow:0 7px 22px rgba(15,23,42,.055)
+  box-shadow:0 8px 25px rgba(15,23,42,.06)
 }
-.ed-home-shelf-head{
+.ed-home-hub-head{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-  padding:13px 15px;
-  border-bottom:1px solid #edf0f4;
-  background:linear-gradient(180deg,#fff,#fafcff)
+  gap:12px;
+  padding:18px;
+  background:linear-gradient(135deg,#f8fbff,#fff);
+  border-bottom:1px solid #edf0f4
 }
-.ed-home-shelf-title{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  min-width:0
-}
-.ed-home-shelf-dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#2563eb;
-  box-shadow:0 0 0 5px #eff6ff
-}
-.ed-home-shelf-title strong{
-  font-size:15px;
-  color:#172033
-}
-.ed-home-shelf-title small{
+.ed-home-hub-kicker{
   display:block;
-  color:#7b8798;
-  font-size:9px;
-  margin-top:1px
+  margin-bottom:5px;
+  color:#2563eb;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.12em
 }
-.ed-home-shelf-more{
+.ed-home-hub-head h2{
+  margin:0;
+  color:#172033;
+  font-size:20px;
+  line-height:1.2
+}
+.ed-home-hub-head>a{
   flex:0 0 auto;
   color:#2563eb!important;
-  font-size:10px;
+  font-size:9px;
   font-weight:900
 }
-.ed-home-shelf-list{
+.ed-home-hub-grid{
   display:grid;
   grid-template-columns:1fr 1fr
 }
-.ed-home-shelf-item{
+.ed-home-hub-section{
   min-width:0;
-  padding:12px 13px;
-  border-right:1px solid #edf0f4;
-  border-bottom:1px solid #edf0f4
+  padding:13px;
+  border-bottom:1px solid #edf0f4;
+  border-right:1px solid #edf0f4
 }
-.ed-home-shelf-item:nth-child(2n){
-  border-right:0
-}
-.ed-home-shelf-item:nth-last-child(-n+2){
-  border-bottom:0
-}
-.ed-home-shelf-item a{
-  display:block;
-  color:#172033!important;
-  text-decoration:none!important;
+.ed-home-hub-section:nth-child(2n){border-right:0}
+.ed-home-hub-section h3{
+  margin:0 0 8px;
   font-size:12px;
-  font-weight:800;
-  line-height:1.45
+  line-height:1.3
 }
-.ed-home-shelf-item a:hover{
-  color:#2563eb!important
+.ed-home-hub-section h3 a{color:#172033!important}
+.ed-home-hub-section ul{
+  list-style:none;
+  margin:0;
+  padding:0
 }
-.ed-home-shelf-meta{
+.ed-home-hub-section li{
+  padding:5px 0;
+  border-bottom:1px solid #f0f2f5
+}
+.ed-home-hub-section li:last-child{border-bottom:0}
+.ed-home-hub-section li a{
+  color:#354156!important;
+  font-size:10px;
+  line-height:1.4
+}
+.ed-home-empty{
+  color:#98a2b3!important;
+  font-size:9px!important
+}
+
+.ed-home-daily{
+  margin:0 0 28px;
+  padding:20px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#101b35,#173b72);
+  color:#fff;
   display:flex;
   align-items:center;
-  gap:6px;
-  margin-top:6px;
-  color:#8a94a5;
-  font-size:8.5px
+  justify-content:space-between;
+  gap:18px;
+  box-shadow:0 10px 28px rgba(15,23,42,.12)
 }
-.ed-home-shelf-meta b{
-  color:#16a34a;
+.ed-home-daily h2{
+  margin:3px 0 5px;
+  color:#fff;
+  font-size:23px
+}
+.ed-home-daily p{
+  margin:0;
+  color:#cbd5e1;
+  font-size:10px
+}
+.ed-home-daily .eyebrow{
+  color:#93c5fd;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.12em
+}
+.ed-home-daily .btn{
+  flex:0 0 auto
+}
+
+.ed-home-latest{
+  margin:0 0 28px
+}
+.ed-home-latest-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px
+}
+.ed-home-latest-head h2{
+  margin:0;
+  color:#172033;
+  font-size:21px
+}
+.ed-home-latest-head p{
+  margin:4px 0 0;
+  color:#7b8798;
+  font-size:9px
+}
+.ed-home-latest-head a{
+  color:#2563eb!important;
+  font-size:9px;
   font-weight:900
 }
-@media(max-width:800px){
-  .ed-home-shelves{
-    grid-template-columns:1fr
-  }
+.ed-home-latest-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px
+}
+.ed-home-latest-card{
+  padding:14px;
+  background:#fff;
+  border:1px solid #e4e9f0;
+  border-radius:14px
+}
+.ed-home-latest-card a{
+  color:#172033!important;
+  font-size:11px;
+  font-weight:850;
+  line-height:1.45
+}
+.ed-home-latest-card small{
+  display:block;
+  margin-top:7px;
+  color:#8a94a5;
+  font-size:8px
+}
+
+@media(max-width:850px){
+  .ed-home-hubs{grid-template-columns:1fr}
+  .ed-home-latest-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:560px){
-  .ed-home-live{
-    align-items:flex-start
-  }
-  .ed-home-shelf-list{
-    grid-template-columns:1fr
-  }
-  .ed-home-shelf-item{
-    border-right:0
-  }
-  .ed-home-shelf-item:nth-last-child(-n+2){
-    border-bottom:1px solid #edf0f4
-  }
-  .ed-home-shelf-item:last-child{
-    border-bottom:0
-  }
+  .ed-home-hub-grid{grid-template-columns:1fr}
+  .ed-home-hub-section{border-right:0}
+  .ed-home-latest-grid{grid-template-columns:1fr}
+  .ed-home-daily{display:block}
+  .ed-home-daily .btn{display:inline-flex;margin-top:12px}
 }
 </style>"""
 
-    latest = posts[:10]
+    rajasthan = hub_section(
+        "Rajasthan Government Jobs Hub",
+        "rajasthan-jobs",
+        [
+            ("Admit Card", "admit-card"),
+            ("Results", "results"),
+            ("Answer Key", "answer-key"),
+            ("Syllabus", "syllabus"),
+            ("Scholarships", "scholarships"),
+            ("University & College", "university-college"),
+            ("Yojana", "yojana"),
+        ],
+    )
 
-    ticker_links = "".join(
+    all_india = hub_section(
+        "All India Government Jobs Hub",
+        "government-jobs",
+        [
+            ("Government Jobs", "government-jobs"),
+            ("Admit Card", "admit-card"),
+            ("Results", "results"),
+            ("Answer Key", "answer-key"),
+            ("Syllabus", "syllabus"),
+            ("Scholarships", "scholarships"),
+            ("University & College", "university-college"),
+            ("Yojana", "yojana"),
+        ],
+    )
+
+    # Daily Test sits AFTER both hubs.
+    daily = (
+        '<section class="ed-home-daily" id="daily-test">'
+        '<div>'
+        '<span class="eyebrow">DAILY PRACTICE</span>'
+        '<h2>आज का Daily Test</h2>'
+        '<p>Timer के साथ test दें और अंत में score व explanations देखें।</p>'
+        '</div>'
+        '<a class="btn btn-primary" href="/quiz.html">Daily Test खोलें →</a>'
+        '</section>'
+    )
+
+    # Limited latest articles: 6 only.
+    cards = "".join(
+        '<article class="ed-home-latest-card">'
         f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
         f'{esc(post_title(p))}</a>'
-        for p in latest
+        f'<small>{esc(normalized_category(p))} • {date_hi(p.get("publishedAt"))}</small>'
+        '</article>'
+        for p in posts[:6]
     )
 
-    ticker = (
-        '<div class="ed-home-live" aria-label="Live Updates">'
-        '<span class="ed-home-live-label"><i></i> LIVE UPDATES</span>'
-        f'<div class="ed-home-live-track">'
-        f'<div class="ed-home-live-move">{ticker_links}</div>'
-        f'</div></div>'
+    latest_articles = (
+        '<section class="ed-home-latest" id="latest-articles">'
+        '<div class="ed-home-latest-head">'
+        '<div><h2>Latest Articles</h2><p>नवीनतम verified updates — limited और clean list.</p></div>'
+        '<a href="/category-latest-updates">View all →</a>'
+        '</div>'
+        f'<div class="ed-home-latest-grid">{cards}</div>'
+        '</section>'
     )
-
-    shelves = []
-
-    for category_name, category_slug, heading, subheading in shelf_names:
-        arr = [
-            p for p in posts
-            if normalized_category(p) == category_name
-        ][:4]
-
-        if not arr:
-            continue
-
-        cards = []
-
-        for post in arr:
-            status, _ = application_status(post)
-
-            cards.append(
-                '<div class="ed-home-shelf-item">'
-                f'<a href="{esc(article_path(slugify(post.get("slug"))))}">'
-                f'{esc(post_title(post))}</a>'
-                '<div class="ed-home-shelf-meta">'
-                f'<span>{esc(date_hi(post.get("publishedAt")))}</span>'
-                f'<b>{esc(status)}</b>'
-                '</div>'
-                '</div>'
-            )
-
-        shelves.append(
-            f'<section class="ed-home-shelf" aria-label="{esc(heading)}">'
-            '<div class="ed-home-shelf-head">'
-            '<div class="ed-home-shelf-title">'
-            '<span class="ed-home-shelf-dot"></span>'
-            '<div>'
-            f'<strong>{esc(heading)}</strong>'
-            f'<small>{esc(subheading)}</small>'
-            '</div>'
-            '</div>'
-            f'<a class="ed-home-shelf-more" href="{esc(category_path(category_slug))}">'
-            'View all →</a>'
-            '</div>'
-            '<div class="ed-home-shelf-list">'
-            + "".join(cards)
-            + '</div>'
-            '</section>'
-        )
 
     return (
         css
         + ticker
-        + '<div class="ed-home-shelves" id="home-category-shelves">'
-        + "".join(shelves)
+        + '<div class="ed-home-hubs">'
+        + rajasthan
+        + all_india
         + '</div>'
+        + daily
+        + latest_articles
     )
 
 
@@ -1421,13 +1523,8 @@ def update_home(posts: list[dict[str, Any]]) -> None:
             1
         )
 
-    # Add crawlable category hub immediately before the Latest Articles section once.
-    if '<!-- EXAM-DARPAN-CATEGORY-HUB -->' not in text:
-        hub = '<section class="card pad category-hub" id="categories"><div class="section-title"><div><span class="eyebrow">BROWSE BY TOPIC</span><h2>Popular Categories</h2></div></div><div class="category-links">'
-        hub += "".join(f'<a class="btn btn-light" href="{category_path(slug)}">{esc(title)}</a>' for name, slug, title, desc in CATEGORIES if name != "Latest Updates")
-        hub += '</div></section><!-- EXAM-DARPAN-CATEGORY-HUB -->'
-        text = text.replace('  <section class="layout" id="updates">', f'  {hub}\n  <section class="layout" id="updates">')
-
+    # Homepage category layout is rendered by homepage_dynamic_sections().
+    # Do not inject a duplicate Popular Categories block.
 
     # Homepage keeps the existing LIVE ticker/matrix/hub structure.
     # Do not inject duplicate Admit Card/Results/Syllabus shelves above <main>.
