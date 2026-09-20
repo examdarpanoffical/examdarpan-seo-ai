@@ -1091,7 +1091,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         text = text.replace(old, new)
 
     items: list[str] = []
-    for i, p in enumerate(posts[:12]):
+    for i, p in enumerate(posts[:6]):
         s = slugify(p.get("slug"))
         title = post_title(p)
         cat = normalized_category(p)
@@ -1429,19 +1429,8 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         text = text.replace('  <section class="layout" id="updates">', f'  {hub}\n  <section class="layout" id="updates">')
 
 
-    # Compact homepage live ticker + category shelves.
-    # All links come from the existing article_path/category_path helpers.
-    home_shelves = homepage_dynamic_sections(posts)
-
-    if '<!-- EXAM-DARPAN-HOME-SHELVES v2-category-safe -->' not in text:
-        text = text.replace(
-            '<main',
-            '<!-- EXAM-DARPAN-HOME-SHELVES -->'
-            + home_shelves
-            + '<main',
-            1
-        )
-
+    # Homepage keeps the existing LIVE ticker/matrix/hub structure.
+    # Do not inject duplicate Admit Card/Results/Syllabus shelves above <main>.
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
     text = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="https://examdarpan.in/">', text, count=1)
     schema = {
