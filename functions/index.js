@@ -224,6 +224,37 @@ All India Jobs
 <span>प्रकाशित: ${esc(published || "")}</span>
 </div>
 
+<section class="ed-article-community-top" aria-label="Exam Darpan Community">
+<style>
+.ed-article-community-top{margin:20px 0;padding:16px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.06)}
+.ed-article-community-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ed-article-community-grid a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:14px 8px;border-radius:12px;color:#fff;text-decoration:none;text-align:center;font-weight:700}
+.ed-article-community-grid a b{font-size:14px}
+.ed-article-community-grid a span{font-size:11px;opacity:.9}
+.ed-article-wa{background:linear-gradient(135deg,#16a34a,#059669)}
+.ed-article-tg{background:linear-gradient(135deg,#159bd7,#2563eb)}
+.ed-article-ig{background:linear-gradient(135deg,#7c3aed,#db2777,#f97316)}
+.ed-article-wg{background:linear-gradient(135deg,#15803d,#166534)}
+@media(max-width:600px){.ed-article-community-grid{grid-template-columns:repeat(2,1fr)}}
+#ed-whatsapp-popup{position:fixed;right:16px;bottom:16px;z-index:99999;max-width:370px;width:calc(100% - 32px);background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.2);border:1px solid #ddd;display:none;align-items:center;gap:12px;font-family:Arial,sans-serif}
+</style>
+
+<div class="ed-article-community-grid">
+<a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" class="ed-article-wa">
+<b>WhatsApp</b><span>Channel Follow</span>
+</a>
+<a href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4" target="_blank" rel="noopener" class="ed-article-wg">
+<b>WhatsApp</b><span>Group Join</span>
+</a>
+<a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener" class="ed-article-tg">
+<b>Telegram</b><span>Channel Join</span>
+</a>
+<a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener" class="ed-article-ig">
+<b>Instagram</b><span>Follow</span>
+</a>
+</div>
+</section>
+
 <div class="article-content">
 ${content}
 </div>
@@ -243,6 +274,16 @@ ${content}
 </div>
 </footer>
 
+<div id="ed-whatsapp-popup">
+<div style="width:46px;height:46px;min-width:46px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px">◉</div>
+<div style="flex:1">
+<b style="display:block;font-size:14px">Exam Darpan WhatsApp</b>
+<span style="font-size:12px;color:#667">Latest Jobs, Admit Card &amp; Result Updates</span>
+</div>
+<a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" style="background:#16a34a;color:#fff!important;padding:9px 12px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:bold">Join Now</a>
+<button onclick="this.parentElement.style.display='none'" style="position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0003;width:24px;height:24px;cursor:pointer">×</button>
+</div>
+<script>setTimeout(()=>{let p=document.getElementById('ed-whatsapp-popup');if(p)p.style.display='flex'},4500);</script>
 </body>
 </html>`;
 }
