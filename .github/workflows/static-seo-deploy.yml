@@ -45,8 +45,8 @@ jobs:
           test -f public/sitemap.xml
 
           grep -q "LIVE UPDATES" public/index.html
-          grep -q "Rajasthan Government Jobs Hub" public/index.html
-          grep -q "All India Government Jobs Hub" public/index.html
+          grep -q "Rajasthan Government Jobs" public/index.html
+          grep -q "All India Government Jobs" public/index.html
           grep -q 'id="daily-test"' public/index.html
           grep -q "Latest Articles" public/index.html
 

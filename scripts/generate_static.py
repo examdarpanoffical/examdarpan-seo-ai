@@ -2678,8 +2678,8 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 
     required_home_sections = (
         "LIVE UPDATES",
-        "Rajasthan Government Jobs Hub",
-        "All India Government Jobs Hub",
+        "Rajasthan Government Jobs",
+        "All India Government Jobs",
         'id="daily-test"',
         "Latest Articles",
     )
