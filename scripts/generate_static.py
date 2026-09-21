@@ -1446,7 +1446,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '<span>DAILY PRACTICE</span><b>FREE</b>'
         '</div>'
         '<h2>आज का Practice Test</h2>'
-        '<p>Timer के साथ test दें, score तुरंत देखें और हर सवाल की explanation से अपनी तैयारी मजबूत करें।</p>'
+        '<p>रोज़ 10–15 मिनट का timed practice करें, तुरंत score देखें और गलत सवालों की explanation से अपनी तैयारी सुधारें।</p>'
         '<div class="ed-home-daily-points">'
         '<span>⏱ Timed Test</span>'
         '<span>✓ Instant Score</span>'
@@ -1463,28 +1463,50 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
 
     # 6. LIMITED LATEST ARTICLES
+    # posts is already sorted newest-first by publishedAt.
+    # Show the latest six published articles across all categories.
+
+    latest_mix = []
+    seen_latest = set()
+
+    for p in posts:
+        slug = slugify(p.get("slug"))
+        if slug in seen_latest:
+            continue
+
+        latest_mix.append(p)
+        seen_latest.add(slug)
+
+        if len(latest_mix) >= 6:
+            break
+
     cards = "".join(
         '<article class="ed-home-latest-card">'
+        '<div class="ed-home-latest-card-top">'
+        f'<span class="ed-home-latest-chip">{esc(normalized_category(p))}</span>'
+        f'<time>{esc(date_hi(p.get("publishedAt")))}</time>'
+        '</div>'
         f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
         f'{esc(post_title(p))}</a>'
-        f'<small>{esc(normalized_category(p))} • '
-        f'{date_hi(p.get("publishedAt"))}</small>'
+        '<span class="ed-home-latest-arrow" aria-hidden="true">→</span>'
         '</article>'
-        for p in posts[:6]
+        for p in latest_mix
     )
 
     latest_articles = (
         '<section class="ed-home-latest" id="latest-articles">'
         '<div class="ed-home-latest-head">'
         '<div>'
+        '<span class="ed-home-latest-kicker">FRESH UPDATES</span>'
         '<h2>Latest Articles</h2>'
-        '<p>नवीनतम verified updates — limited और clean list.</p>'
+        '<p>नई published updates — category और date के साथ, ताकि जरूरी खबर तुरंत मिल जाए।</p>'
         '</div>'
         '<a href="/category-latest-updates">View all →</a>'
         '</div>'
         f'<div class="ed-home-latest-grid">{cards}</div>'
         '</section>'
     )
+
 
     css = """<style id="exam-darpan-home-final-order">
 .ed-home-live{
