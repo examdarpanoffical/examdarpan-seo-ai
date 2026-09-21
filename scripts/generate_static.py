@@ -2334,6 +2334,12 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         raise RuntimeError("public/index.html is missing")
     text = path.read_text(encoding="utf-8")
 
+    # Homepage WhatsApp CTA uses the official community group,
+    # not the old WhatsApp channel.
+    text = text.replace(WHATSAPP, WHATSAPP_GROUP)
+    text = text.replace("WhatsApp Channel", "WhatsApp Group")
+    text = text.replace("Follow करें", "Join Now")
+
     # Crawlable navigation: use dedicated category landing pages instead of query-only JS URLs.
     nav_replacements = {
         '?category=Rajasthan%20Jobs': category_path('rajasthan-jobs'),
@@ -2986,6 +2992,14 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         text = path.read_text(
             encoding="utf-8",
             errors="ignore",
+        )
+
+        # Government-job hubs must not show the legacy floating WhatsApp popup.
+        text = re.sub(
+            r'<div id="ed-whatsapp-popup">[\s\S]*?</script>',
+            '',
+            text,
+            count=1,
         )
 
         hub_posts = _hub_category_posts(posts, category_name)[:40]

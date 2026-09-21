@@ -2,7 +2,14 @@
 <title>Admin Dashboard | Exam Darpan</title><link rel="stylesheet" href="../styles.css"><script src="../firebase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script></head>
 <body class="admin-shell"><header class="admin-nav"><div class="container" style="display:flex;justify-content:space-between;align-items:center">
-<strong>EXAM DARPAN CMS</strong><div><span id="authStatus" style="color:#fff;margin-right:15px">Checking admin…</span><a href="../" style="color:#fff;margin-right:15px">View Site</a><button id="logout" class="btn btn-gold">Logout</button></div></div></header>
+<strong style="display:flex;align-items:center;gap:10px">
+<img src="../assets/logo.webp"
+     width="42"
+     height="42"
+     alt="Exam Darpan logo"
+     style="display:block;border-radius:50%;background:#fff;padding:2px">
+<span>EXAM DARPAN CMS</span>
+</strong><div><span id="authStatus" style="color:#fff;margin-right:15px">Checking admin…</span><a href="../" style="color:#fff;margin-right:15px">View Site</a><button id="logout" class="btn btn-gold">Logout</button></div></div></header>
 <main class="main container"><div class="admin-grid"><section class="form"><h2 id="formTitle">New Article</h2><input type="hidden" id="postId">
 <div class="field"><label>Title</label><input id="title"></div>
 <div class="field"><label>Slug</label><input id="slug" placeholder="rajasthan-ldc-recruitment-2026"></div>
@@ -157,4 +164,4 @@
 <div class="field"><label>Official Source Text</label><textarea id="aiSource" style="min-height:200px" placeholder="Official notification/PDF का relevant text यहाँ paste करें…"></textarea></div>
 <button id="aiGenerate" class="btn btn-gold">Generate Draft with Gemini</button><p id="aiMsg" class="meta"></p></section>
 <section><div class="form"><h2>Posts</h2><input id="filter" placeholder="Search posts" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:11px"><div id="posts" style="margin-top:12px"></div></div></section></div></main>
-<script type="module" src="dashboard.js?v=20260906-analytics2"></script><div id="ed-whatsapp-popup" style="position:fixed;right:16px;bottom:16px;z-index:99999;max-width:370px;width:calc(100% - 32px);background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 30px #0003;border:1px solid #ddd;display:none;align-items:center;gap:12px;font-family:Arial,sans-serif"><div style="width:46px;height:46px;min-width:46px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px">◉</div><div style="flex:1"><b style="display:block;font-size:14px">Exam Darpan WhatsApp</b><span style="font-size:12px;color:#667">Latest Jobs, Admit Card & Result Updates</span></div><a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener" style="background:#16a34a;color:#fff!important;padding:9px 12px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:bold">Join Now</a><button onclick="this.parentElement.style.display='none'" style="position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0003;width:24px;height:24px;cursor:pointer">×</button></div><script>setTimeout(()=>{let p=document.getElementById('ed-whatsapp-popup');if(p)p.style.display='flex'},4500);</script></body></html>
+<script type="module" src="dashboard.js?v=20260906-analytics2"></script></body></html>
