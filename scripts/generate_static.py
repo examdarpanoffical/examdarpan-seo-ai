@@ -1529,7 +1529,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             '</div>'
             f'<h3><a href="{esc(article_path(slugify(p.get("slug"))))}">'
             f'{esc(post_title(p))}</a></h3>'
-            f'<p>{esc(post_description(p)[:115])}</p>'
+            f'<p>{esc(short_description(p)[:115])}</p>'
             '<a class="ed-home-category-read" '
             f'href="{esc(article_path(slugify(p.get("slug"))))}">'
             'Read update <b>→</b></a>'
