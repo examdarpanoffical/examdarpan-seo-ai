@@ -1547,6 +1547,12 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             if normalized_category(p) == name
         ][:3]
 
+        # Hide empty homepage category sections.
+        # The section automatically appears after the first published
+        # article in that category is included in the next static build.
+        if not filtered:
+            return ""
+
         items = "".join(
             '<article class="ed-home-category-post">'
             '<div class="ed-home-category-post-meta">'
