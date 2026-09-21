@@ -1063,18 +1063,44 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         hub_slug: str,
         scope: str,
     ) -> str:
-        # One homepage feed per region. Do NOT split Admit Card / Result /
-        # Syllabus / Answer Key into duplicate shelves.
+        # Homepage hubs are STRICT vacancy feeds.
+        #
+        # Rajasthan Government Jobs:
+        #   ONLY Rajasthan Jobs / Government Jobs vacancies.
+        #
+        # All India Government Jobs:
+        #   ONLY Government Jobs vacancies.
+        #
+        # Admit Card, Results, Answer Key, Syllabus, Scholarships,
+        # Yojana, Entrance Exams and University/College content must
+        # remain in their own homepage category sections below.
+        #
+        # The Exam Calendar and Practice Test sections are intentionally
+        # untouched.
+
         if scope == "rajasthan":
-            eligible = [p for p in posts if is_rajasthan(p)]
+            hub_categories = {
+                "Government Jobs",
+                "Rajasthan Jobs",
+            }
         else:
-            eligible = [p for p in posts if is_all_india(p)]
+            hub_categories = {
+                "Government Jobs",
+            }
 
         feed = []
         seen = set()
 
-        for p in eligible:
+        for p in posts:
+            if not matches_hub_category(
+                p,
+                scope,
+                "Government Jobs",
+            ):
+                continue
+
             slug = slugify(p.get("slug"))
+
             if not slug or slug in seen:
                 continue
 
@@ -1100,7 +1126,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         if not cards:
             cards = (
                 '<div class="ed-home-empty">'
-                'अभी इस section में verified updates उपलब्ध नहीं हैं।'
+                'अभी इस section में कोई verified government job vacancy उपलब्ध नहीं है।'
                 '</div>'
             )
 
@@ -1111,7 +1137,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             '<span class="ed-home-hub-kicker">EXAM DARPAN HUB</span>'
             f'<h2>{esc(title)}</h2>'
             '<p class="ed-home-hub-subtitle">'
-            'Jobs, Admit Card, Result, Answer Key और Syllabus updates एक ही feed में।'
+            'सरकारी नौकरी की latest verified vacancies एक ही जगह देखें।'
             '</p>'
             '</div>'
             f'<a href="{esc(category_path(hub_slug))}">View all →</a>'
