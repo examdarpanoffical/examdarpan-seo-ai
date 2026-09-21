@@ -1589,8 +1589,6 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             + '</div>'
             '<aside class="ed-home-category-side">'
             '<div class="ed-home-category-side-card">'
-            '<strong>Official source first</strong>'
-            '<p>Dates, notices और application links को official source से cross-check करें।</p>'
             f'<a class="ed-home-category-viewall" href="{category_path(slug)}">'
             f'View all {esc(title)} →</a>'
             '</div>'
