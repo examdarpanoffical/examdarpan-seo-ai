@@ -1511,23 +1511,30 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         )
 
     def homepage_category_section(
-        category_name: str,
-        category_slug: str,
+        name: str,
+        slug: str,
         title: str,
         description: str,
     ) -> str:
-        items = [
+        filtered = [
             p for p in posts
-            if normalized_category(p) == category_name
-        ][:6]
+            if normalized_category(p) == name
+        ][:3]
 
-        # Empty categories should not create dead/empty homepage blocks.
-        if not items:
-            return ""
-
-        cards = "".join(
-            homepage_category_card(p, category_name)
-            for p in items
+        items = "".join(
+            '<article class="ed-home-category-post">'
+            '<div class="ed-home-category-post-meta">'
+            f'<span>{esc(normalized_category(p))}</span>'
+            f'<time>{esc(date_hi(p.get("publishedAt")))}</time>'
+            '</div>'
+            f'<h3><a href="{esc(article_path(slugify(p.get("slug"))))}">'
+            f'{esc(post_title(p))}</a></h3>'
+            f'<p>{esc(post_description(p)[:115])}</p>'
+            '<a class="ed-home-category-read" '
+            f'href="{esc(article_path(slugify(p.get("slug"))))}">'
+            'Read update <b>→</b></a>'
+            '</article>'
+            for p in filtered
         )
 
         return (
@@ -1538,23 +1545,23 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             f'<h2>{esc(title)}</h2>'
             f'<p>{esc(description)}</p>'
             '</div>'
-            f'<span class="ed-home-category-count">'
-            f'{len(items)} latest</span>'
+            f'<span class="ed-home-category-count">{len(filtered)} updates</span>'
             '</div>'
             '<div class="ed-home-category-layout">'
             '<div class="ed-home-category-posts">'
-            f'{cards}'
-            '</div>'
+            + (
+                items
+                if items
+                else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'
+            )
+            + '</div>'
             '<aside class="ed-home-category-side">'
             '<div class="ed-home-category-side-card">'
             '<strong>Official source first</strong>'
-            '<p>Important dates, application और result की final confirmation '
-            'official notification से करें।</p>'
+            '<p>Dates, notices और application links को official source से cross-check करें।</p>'
+            f'<a class="ed-home-category-viewall" href="{category_path(slug)}">'
+            f'View all {esc(title)} →</a>'
             '</div>'
-            f'<a class="ed-home-category-viewall" '
-            f'href="{esc(category_path(category_slug))}">'
-            'इस category की सभी updates देखें →'
-            '</a>'
             '</aside>'
             '</div>'
             '</section>'
