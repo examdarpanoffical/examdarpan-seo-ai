@@ -1062,16 +1062,45 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         title: str,
         hub_slug: str,
         scope: str,
-        categories: list[tuple[str, str]],
     ) -> str:
-        blocks = []
+        # One homepage feed per region. Do NOT split Admit Card / Result /
+        # Syllabus / Answer Key into duplicate shelves.
+        if scope == "rajasthan":
+            eligible = [p for p in posts if is_rajasthan(p)]
+        else:
+            eligible = [p for p in posts if is_all_india(p)]
 
-        for category_name, category_slug in categories:
-            blocks.append(
-                '<div class="ed-home-hub-section">'
-                f'<h3><a href="{esc(category_path(category_slug))}">'
-                f'{esc(category_name)}</a></h3>'
-                f'<ul>{links(scope, category_name, 4)}</ul>'
+        feed = []
+        seen = set()
+
+        for p in eligible:
+            slug = slugify(p.get("slug"))
+            if not slug or slug in seen:
+                continue
+
+            seen.add(slug)
+            feed.append(p)
+
+            if len(feed) >= 12:
+                break
+
+        cards = "".join(
+            '<article class="ed-home-hub-card">'
+            '<div class="ed-home-hub-card-meta">'
+            f'<span>{esc(normalized_category(p))}</span>'
+            f'<time>{esc(date_hi(p.get("publishedAt")))}</time>'
+            '</div>'
+            f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
+            f'{esc(post_title(p))}</a>'
+            '<span class="ed-home-hub-card-arrow" aria-hidden="true">→</span>'
+            '</article>'
+            for p in feed
+        )
+
+        if not cards:
+            cards = (
+                '<div class="ed-home-empty">'
+                'अभी इस section में verified updates उपलब्ध नहीं हैं।'
                 '</div>'
             )
 
@@ -1081,12 +1110,15 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             '<div>'
             '<span class="ed-home-hub-kicker">EXAM DARPAN HUB</span>'
             f'<h2>{esc(title)}</h2>'
+            '<p class="ed-home-hub-subtitle">'
+            'Jobs, Admit Card, Result, Answer Key और Syllabus updates एक ही feed में।'
+            '</p>'
             '</div>'
             f'<a href="{esc(category_path(hub_slug))}">View all →</a>'
             '</div>'
-            '<div class="ed-home-hub-grid">'
-            + "".join(blocks)
-            + '</div>'
+            '<div class="ed-home-hub-list">'
+            + cards +
+            '</div>'
             '</section>'
         )
 
@@ -1108,41 +1140,18 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '</section>'
     )
 
-    # 2. RAJASTHAN HUB
+    # 2. RAJASTHAN GOVERNMENT JOBS
     rajasthan = hub_section(
-        "Rajasthan Government Jobs Hub",
+        "Rajasthan Government Jobs",
         "rajasthan-jobs",
         "rajasthan",
-        [
-            ("Government Jobs", "government-jobs"),
-            ("Admit Card", "admit-card"),
-            ("Results", "results"),
-            ("Answer Key", "answer-key"),
-            ("Syllabus", "syllabus"),
-            ("Entrance Exams", "entrance-exams"),
-            ("Scholarships", "scholarships"),
-            ("University & College", "university-college"),
-            ("Yojana", "yojana"),
-        ],
     )
 
-    # 3. ALL INDIA / CENTRAL HUB
+    # 3. ALL INDIA GOVERNMENT JOBS
     all_india = hub_section(
-        "All India Government Jobs Hub",
+        "All India Government Jobs",
         "government-jobs",
         "all_india",
-        [
-            ("Government Jobs", "government-jobs"),
-            ("SSC Jobs", "ssc-jobs"),
-            ("UPSC Jobs", "upsc-jobs"),
-            ("Railway Jobs", "railway-jobs"),
-            ("Banking Jobs", "banking-jobs"),
-            ("Police & Defence Jobs", "police-defence-jobs"),
-            ("Teaching Jobs", "teaching-jobs"),
-            ("Admit Card", "admit-card"),
-            ("Results", "results"),
-            ("Syllabus", "syllabus"),
-        ],
     )
 
     # 4. EXAM CALENDAR
@@ -1462,7 +1471,101 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     )
 
 
-    # 6. LIMITED LATEST ARTICLES
+    # 6. CATEGORY CONTENT SECTIONS
+    # Reuse the category-page visual language on the homepage.
+    # Rajasthan/All India hubs, calendar and Daily Test stay separate.
+    homepage_category_specs = [
+        ("Admit Card", "admit-card", "Admit Card",
+         "नई परीक्षाओं के Admit Card और प्रवेश से जुड़ी verified updates।"),
+        ("Results", "results", "Results",
+         "सरकारी परीक्षाओं के latest result, merit list और score updates।"),
+        ("Answer Key", "answer-key", "Answer Key",
+         "परीक्षाओं की Answer Key और objection से जुड़ी महत्वपूर्ण updates।"),
+        ("Syllabus", "syllabus", "Exam Syllabus",
+         "सरकारी परीक्षाओं के syllabus और preparation से जुड़ी जानकारी।"),
+        ("Scholarships", "scholarships", "Scholarships",
+         "Students के लिए scholarship schemes, eligibility और application updates।"),
+        ("Yojana", "yojana", "सरकारी योजनाएं",
+         "सरकारी योजनाओं, eligibility, benefits और application updates की जानकारी।"),
+        ("Entrance Exams", "entrance-exams", "Entrance Exams",
+         "Entrance examinations, application और exam updates एक जगह।"),
+        ("University & College", "university-college", "University & College",
+         "University और college admission, notices और important updates।"),
+    ]
+
+    def homepage_category_card(p: dict[str, Any], category_name: str) -> str:
+        slug = slugify(p.get("slug"))
+        return (
+            '<article class="ed-home-category-post">'
+            f'<h3><a href="{esc(article_path(slug))}">'
+            f'{esc(post_title(p))}</a></h3>'
+            '<div class="ed-home-category-post-meta">'
+            f'<span>{esc(date_hi(p.get("publishedAt")))}</span>'
+            '<span>•</span>'
+            f'<span>{esc(category_name)}</span>'
+            '</div>'
+            f'<p>{esc(short_description(p))}</p>'
+            f'<a class="ed-home-category-read" href="{esc(article_path(slug))}">'
+            'पूरा article पढ़ें <b>→</b></a>'
+            '</article>'
+        )
+
+    def homepage_category_section(
+        category_name: str,
+        category_slug: str,
+        title: str,
+        description: str,
+    ) -> str:
+        items = [
+            p for p in posts
+            if normalized_category(p) == category_name
+        ][:6]
+
+        # Empty categories should not create dead/empty homepage blocks.
+        if not items:
+            return ""
+
+        cards = "".join(
+            homepage_category_card(p, category_name)
+            for p in items
+        )
+
+        return (
+            '<section class="ed-home-category-section">'
+            '<div class="ed-home-category-toolbar">'
+            '<div>'
+            '<span class="ed-home-category-kicker">EXAM DARPAN CATEGORY</span>'
+            f'<h2>{esc(title)}</h2>'
+            f'<p>{esc(description)}</p>'
+            '</div>'
+            f'<span class="ed-home-category-count">'
+            f'{len(items)} latest</span>'
+            '</div>'
+            '<div class="ed-home-category-layout">'
+            '<div class="ed-home-category-posts">'
+            f'{cards}'
+            '</div>'
+            '<aside class="ed-home-category-side">'
+            '<div class="ed-home-category-side-card">'
+            '<strong>Official source first</strong>'
+            '<p>Important dates, application और result की final confirmation '
+            'official notification से करें।</p>'
+            '</div>'
+            f'<a class="ed-home-category-viewall" '
+            f'href="{esc(category_path(category_slug))}">'
+            'इस category की सभी updates देखें →'
+            '</a>'
+            '</aside>'
+            '</div>'
+            '</section>'
+        )
+
+    homepage_category_sections = "".join(
+        homepage_category_section(*spec)
+        for spec in homepage_category_specs
+    )
+
+    # 7. LIMITED LATEST ARTICLES
     # posts is already sorted newest-first by publishedAt.
     # Show the latest six published articles across all categories.
 
@@ -1599,37 +1702,69 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 .ed-home-hub-grid{
   display:grid;
-  grid-template-columns:1fr 1fr
+  grid-template-columns:1fr 1fr;
+  gap:18px
 }
-.ed-home-hub-section{
-  min-width:0;
-  padding:13px;
-  border-bottom:1px solid #edf0f4;
-  border-right:1px solid #edf0f4
+.ed-home-hub-list{
+  padding:5px 16px 10px
 }
-.ed-home-hub-section:nth-child(2n){border-right:0}
-.ed-home-hub-section h3{
-  margin:0 0 8px;
-  font-size:12px;
-  line-height:1.3
+.ed-home-hub-card{
+  position:relative;
+  padding:12px 28px 12px 2px;
+  border-bottom:1px solid #edf0f4
 }
-.ed-home-hub-section h3 a{color:#172033!important}
-.ed-home-hub-section ul{
-  list-style:none;
-  margin:0;
-  padding:0
+.ed-home-hub-card:last-child{
+  border-bottom:0
 }
-.ed-home-hub-section li{
-  padding:5px 0;
-  border-bottom:1px solid #f0f2f5
+.ed-home-hub-card-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:5px
 }
-.ed-home-hub-section li:last-child{border-bottom:0}
-.ed-home-hub-section li a{
-  color:#354156!important;
-  font-size:10px;
-  line-height:1.4
+.ed-home-hub-card-meta span{
+  display:inline-flex;
+  max-width:70%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#eff6ff;
+  color:#2563eb;
+  font-size:7px;
+  font-weight:900
+}
+.ed-home-hub-card-meta time{
+  color:#98a2b3;
+  font-size:7px;
+  white-space:nowrap
+}
+.ed-home-hub-card a{
+  display:block;
+  color:#172033!important;
+  font-size:10.5px;
+  font-weight:800;
+  line-height:1.45
+}
+.ed-home-hub-card-arrow{
+  position:absolute;
+  right:2px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#2563eb;
+  font-size:13px;
+  font-weight:900
+}
+.ed-home-hub-subtitle{
+  margin:5px 0 0;
+  color:#7b8798;
+  font-size:8px;
+  line-height:1.45
 }
 .ed-home-empty{
+  padding:16px 2px;
   color:#98a2b3!important;
   font-size:9px!important
 }
@@ -1888,6 +2023,172 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   justify-content:center;
 }
 
+.ed-home-category-section{
+  margin:0 0 28px;
+}
+.ed-home-category-toolbar{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:13px;
+}
+.ed-home-category-kicker{
+  display:inline-block;
+  margin-bottom:5px;
+  color:#2563eb;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.12em;
+}
+.ed-home-category-toolbar h2{
+  margin:0;
+  color:#172033;
+  font-size:24px;
+  line-height:1.2;
+}
+.ed-home-category-toolbar p{
+  margin:5px 0 0;
+  max-width:720px;
+  color:#667085;
+  font-size:10px;
+  line-height:1.5;
+}
+.ed-home-category-count{
+  flex:0 0 auto;
+  padding:7px 11px;
+  border-radius:999px;
+  background:#eff6ff;
+  color:#1d4ed8;
+  font-size:9px;
+  font-weight:900;
+}
+.ed-home-category-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 230px;
+  gap:16px;
+  align-items:start;
+}
+.ed-home-category-posts{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;
+}
+.ed-home-category-post{
+  background:#fff;
+  border:1px solid #e5e9f0;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 6px 20px rgba(15,23,42,.05);
+}
+.ed-home-category-post h3{
+  margin:0 0 7px;
+  font-size:16px;
+  line-height:1.42;
+}
+.ed-home-category-post h3 a{
+  color:#172033!important;
+  text-decoration:none!important;
+}
+.ed-home-category-post h3 a:hover{
+  color:#2563eb!important;
+}
+.ed-home-category-post-meta{
+  display:flex;
+  gap:7px;
+  align-items:center;
+  color:#8a94a5;
+  font-size:9px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+.ed-home-category-post p{
+  margin:0;
+  color:#667085;
+  font-size:10.5px;
+  line-height:1.55;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.ed-home-category-read{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-top:11px;
+  color:#2563eb!important;
+  text-decoration:none!important;
+  font-size:10px;
+  font-weight:900;
+}
+.ed-home-category-read b{
+  font-size:13px;
+}
+.ed-home-category-side{
+  display:grid;
+  gap:10px;
+}
+.ed-home-category-side-card{
+  padding:16px;
+  border:1px solid #e5e9f0;
+  border-radius:16px;
+  background:linear-gradient(135deg,#fff,#f8fbff);
+  box-shadow:0 6px 20px rgba(15,23,42,.04);
+}
+.ed-home-category-side-card strong{
+  display:block;
+  color:#172033;
+  font-size:11px;
+}
+.ed-home-category-side-card p{
+  margin:6px 0 0;
+  color:#667085;
+  font-size:9px;
+  line-height:1.55;
+}
+.ed-home-category-viewall{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:10px 12px;
+  border:1px solid #dbe4f0;
+  border-radius:14px;
+  background:linear-gradient(180deg,#fff,#f8fbff);
+  color:#2563eb!important;
+  text-align:center;
+  font-size:10px;
+  font-weight:950;
+  text-decoration:none!important;
+  box-shadow:0 5px 16px rgba(15,23,42,.05);
+}
+.ed-home-category-viewall:hover{
+  border-color:#bfdbfe;
+  background:#eff6ff;
+}
+
+@media(max-width:900px){
+  .ed-home-category-layout{
+    grid-template-columns:1fr;
+  }
+  .ed-home-category-side{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media(max-width:650px){
+  .ed-home-category-toolbar{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .ed-home-category-posts{
+    grid-template-columns:1fr;
+  }
+  .ed-home-category-side{
+    grid-template-columns:1fr;
+  }
+}
+
 .ed-home-latest{
   margin:0 0 28px
 }
@@ -1985,6 +2286,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         + '</div>'
         + exam_calendars
         + daily
+        + homepage_category_sections
         + latest_articles
         + editorial
     )
