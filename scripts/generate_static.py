@@ -50,6 +50,8 @@ STATIC_PAGES = [
 
 CATEGORIES = [
     ("Rajasthan Jobs", "rajasthan-jobs", "राजस्थान सरकारी नौकरी", "राजस्थान की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
+    ("UP Jobs", "up-jobs", "उत्तर प्रदेश सरकारी नौकरी", "उत्तर प्रदेश की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
+    ("Bihar Jobs", "bihar-jobs", "बिहार सरकारी नौकरी", "बिहार की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
     ("Government Jobs", "government-jobs", "सरकारी नौकरी", "Central और All India Government Jobs की नवीनतम जानकारी।"),
     ("UP Jobs", "up-jobs", "उत्तर प्रदेश सरकारी नौकरी", "उत्तर प्रदेश की सरकारी भर्ती, परीक्षा, पात्रता और आवेदन से जुड़ी नवीनतम जानकारी।"),
     ("Bihar Jobs", "bihar-jobs", "बिहार सरकारी नौकरी", "बिहार की सरकारी भर्ती, परीक्षा, पात्रता और आवेदन से जुड़ी नवीनतम जानकारी।"),
@@ -199,14 +201,16 @@ def normalized_category(p: dict[str, Any]) -> str:
 
     aliases = {
         "Rajasthan": "Rajasthan Jobs",
+        "UP": "UP Jobs",
+        "Uttar Pradesh": "UP Jobs",
+        "Uttar Pradesh Jobs": "UP Jobs",
+        "Bihar": "Bihar Jobs",
+        "Bihar Jobs": "Bihar Jobs",
         "All India Jobs": "Government Jobs",
         "Admit Cards": "Admit Card",
         "Result": "Results",
         "Answer Keys": "Answer Key",
         "Exam Syllabus": "Syllabus",
-        "UP": "UP Jobs",
-        "Uttar Pradesh": "UP Jobs",
-        "Bihar": "Bihar Jobs",
     }
 
     category = aliases.get(
@@ -216,58 +220,41 @@ def normalized_category(p: dict[str, Any]) -> str:
 
     title = clean_text(p.get("title")).lower()
 
-    title_signals = [
-        ("Results", ("result", "परिणाम", "scorecard", "score card", "रिजल्ट")),
-        ("Answer Key", ("answer key", "answerkey", "उत्तर कुंजी", "उत्तर-कुंजी")),
-        ("Admit Card", (
-            "admit card", "admitcard", "hall ticket",
-            "प्रवेश पत्र", "प्रवेश-पत्र", "city intimation", "exam city"
-        )),
-        ("Syllabus", ("syllabus", "पाठ्यक्रम")),
-        ("Rajasthan Jobs", (
-            "rajasthan", "राजस्थान", "rpsc", "rssb",
-            "rajasthan staff selection"
-        )),
+    # State-specific signals
+    state_signals = [
         ("UP Jobs", (
-            "uttar pradesh", "up ", "up-", "यूपी", "उत्तर प्रदेश",
-            "uppsc", "upsssc", "up police", "यूपी पुलिस"
+            "uttar pradesh", "up police", "uppsc", "upsssc",
+            "upprpb", "up board", "उत्तर प्रदेश", "यूपी"
         )),
         ("Bihar Jobs", (
-            "bihar", "बिहार", "bpsc", "bssc", "csbc",
-            "bihar police", "बिहार पुलिस"
+            "bihar", "bpsc", "bssc", "csbc",
+            "bihar police", "बिहार"
         )),
-        ("Police & Defence Jobs", (
-            "police", "defence", "defense", "army", "bsf",
-            "crpf", "cisf", "itbp", "ssb", "paramilitary"
+        ("Rajasthan Jobs", (
+            "rajasthan", "rssb", "rsmssb", "rpsc",
+            "rajasthan police", "राजस्थान"
         )),
-        ("Teaching Jobs", (
-            "teacher", "teaching", "tet", "school lecturer",
-            "school teacher", "शिक्षक भर्ती", "अध्यापक"
+    ]
+
+    for target, terms in state_signals:
+        if title and any(term in title for term in terms):
+            return target
+
+    # High-confidence title signals
+    title_signals = [
+        ("Results", (
+            "result", "परिणाम", "scorecard", "score card"
         )),
-        ("Railway Jobs", (
-            "railway", "रेलवे", "rrb", "rrc", "ntpc",
-            "group d", "alp", "technician"
+        ("Answer Key", (
+            "answer key", "answerkey", "उत्तर कुंजी"
         )),
-        ("Banking Jobs", (
-            "bank", "banking", "ibps", "sbi po", "sbi clerk",
-            "rbi", "nabard", "बैंक भर्ती"
+        ("Admit Card", (
+            "admit card", "admitcard", "hall ticket",
+            "प्रवेश पत्र", "प्रवेश-पत्र",
+            "city intimation", "exam city"
         )),
-        ("SSC Jobs", (
-            "ssc ", "ssc-", "ssc cgl", "ssc chsl",
-            "ssc mts", "ssc gd", "staff selection commission"
-        )),
-        ("UPSC Jobs", (
-            "upsc", "civil services", "ias", "ips", "ifs",
-            "union public service commission"
-        )),
-        ("Yojana", (
-            "yojana", "योजना", "scheme", "सरकारी योजना"
-        )),
-        ("Scholarships", (
-            "scholarship", "छात्रवृत्ति", "स्कॉलरशिप"
-        )),
-        ("Entrance Exams", (
-            "entrance exam", "admission", "neet", "jee", "cuet"
+        ("Syllabus", (
+            "syllabus", "पाठ्यक्रम"
         )),
     ]
 
@@ -276,6 +263,7 @@ def normalized_category(p: dict[str, Any]) -> str:
             return target
 
     return category
+
 
 def date_value(p: dict[str, Any], *keys: str) -> Any:
     for key in keys:
