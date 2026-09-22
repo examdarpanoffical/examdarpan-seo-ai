@@ -51,6 +51,8 @@ STATIC_PAGES = [
 CATEGORIES = [
     ("Rajasthan Jobs", "rajasthan-jobs", "राजस्थान सरकारी नौकरी", "राजस्थान की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
     ("Government Jobs", "government-jobs", "सरकारी नौकरी", "Central और All India Government Jobs की नवीनतम जानकारी।"),
+    ("UP Jobs", "up-jobs", "उत्तर प्रदेश सरकारी नौकरी", "उत्तर प्रदेश की सरकारी भर्ती, परीक्षा, पात्रता और आवेदन से जुड़ी नवीनतम जानकारी।"),
+    ("Bihar Jobs", "bihar-jobs", "बिहार सरकारी नौकरी", "बिहार की सरकारी भर्ती, परीक्षा, पात्रता और आवेदन से जुड़ी नवीनतम जानकारी।"),
     ("Police & Defence Jobs", "police-defence-jobs", "Police & Defence Jobs", "Police, Defence और सुरक्षा विभाग की सरकारी भर्ती की नवीनतम जानकारी।"),
     ("Teaching Jobs", "teaching-jobs", "Teaching Jobs", "Teacher, REET, School और Education Department की भर्ती की जानकारी।"),
     ("Railway Jobs", "railway-jobs", "Railway Jobs", "Indian Railway की भर्ती, eligibility, vacancy और application updates।"),
@@ -194,6 +196,7 @@ def post_title(p: dict[str, Any]) -> str:
 def normalized_category(p: dict[str, Any]) -> str:
     """Return one deterministic public category for an article."""
     raw = str(p.get("category") or p.get("categoryName") or "").strip()
+
     aliases = {
         "Rajasthan": "Rajasthan Jobs",
         "All India Jobs": "Government Jobs",
@@ -201,22 +204,71 @@ def normalized_category(p: dict[str, Any]) -> str:
         "Result": "Results",
         "Answer Keys": "Answer Key",
         "Exam Syllabus": "Syllabus",
+        "UP": "UP Jobs",
+        "Uttar Pradesh": "UP Jobs",
+        "Bihar": "Bihar Jobs",
     }
-    category = aliases.get(raw, raw if raw in CATEGORY_BY_NAME else "Latest Updates")
+
+    category = aliases.get(
+        raw,
+        raw if raw in CATEGORY_BY_NAME else "Latest Updates"
+    )
 
     title = clean_text(p.get("title")).lower()
 
-    # High-confidence title signals override stale/manual Firestore categories.
-    # This prevents syllabus/result/admit-card articles from leaking into
-    # the wrong homepage shelf or category landing page.
     title_signals = [
-        ("Results", ("result", "परिणाम", "scorecard", "score card")),
-        ("Answer Key", ("answer key", "answerkey", "उत्तर कुंजी")),
+        ("Results", ("result", "परिणाम", "scorecard", "score card", "रिजल्ट")),
+        ("Answer Key", ("answer key", "answerkey", "उत्तर कुंजी", "उत्तर-कुंजी")),
         ("Admit Card", (
-            "admit card", "admitcard", "hall ticket", "प्रवेश पत्र",
-            "प्रवेश-पत्र", "city intimation", "exam city",
+            "admit card", "admitcard", "hall ticket",
+            "प्रवेश पत्र", "प्रवेश-पत्र", "city intimation", "exam city"
         )),
         ("Syllabus", ("syllabus", "पाठ्यक्रम")),
+        ("Rajasthan Jobs", (
+            "rajasthan", "राजस्थान", "rpsc", "rssb",
+            "rajasthan staff selection"
+        )),
+        ("UP Jobs", (
+            "uttar pradesh", "up ", "up-", "यूपी", "उत्तर प्रदेश",
+            "uppsc", "upsssc", "up police", "यूपी पुलिस"
+        )),
+        ("Bihar Jobs", (
+            "bihar", "बिहार", "bpsc", "bssc", "csbc",
+            "bihar police", "बिहार पुलिस"
+        )),
+        ("Police & Defence Jobs", (
+            "police", "defence", "defense", "army", "bsf",
+            "crpf", "cisf", "itbp", "ssb", "paramilitary"
+        )),
+        ("Teaching Jobs", (
+            "teacher", "teaching", "tet", "school lecturer",
+            "school teacher", "शिक्षक भर्ती", "अध्यापक"
+        )),
+        ("Railway Jobs", (
+            "railway", "रेलवे", "rrb", "rrc", "ntpc",
+            "group d", "alp", "technician"
+        )),
+        ("Banking Jobs", (
+            "bank", "banking", "ibps", "sbi po", "sbi clerk",
+            "rbi", "nabard", "बैंक भर्ती"
+        )),
+        ("SSC Jobs", (
+            "ssc ", "ssc-", "ssc cgl", "ssc chsl",
+            "ssc mts", "ssc gd", "staff selection commission"
+        )),
+        ("UPSC Jobs", (
+            "upsc", "civil services", "ias", "ips", "ifs",
+            "union public service commission"
+        )),
+        ("Yojana", (
+            "yojana", "योजना", "scheme", "सरकारी योजना"
+        )),
+        ("Scholarships", (
+            "scholarship", "छात्रवृत्ति", "स्कॉलरशिप"
+        )),
+        ("Entrance Exams", (
+            "entrance exam", "admission", "neet", "jee", "cuet"
+        )),
     ]
 
     for target, terms in title_signals:
@@ -224,7 +276,6 @@ def normalized_category(p: dict[str, Any]) -> str:
             return target
 
     return category
-
 
 def date_value(p: dict[str, Any], *keys: str) -> Any:
     for key in keys:
