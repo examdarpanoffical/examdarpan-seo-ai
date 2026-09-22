@@ -50,11 +50,7 @@ STATIC_PAGES = [
 
 CATEGORIES = [
     ("Rajasthan Jobs", "rajasthan-jobs", "राजस्थान सरकारी नौकरी", "राजस्थान की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
-    ("UP Jobs", "up-jobs", "उत्तर प्रदेश सरकारी नौकरी", "उत्तर प्रदेश की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
-    ("Bihar Jobs", "bihar-jobs", "बिहार सरकारी नौकरी", "बिहार की नई भर्ती, आवेदन, पात्रता और सरकारी नौकरी अपडेट्स।"),
     ("Government Jobs", "government-jobs", "सरकारी नौकरी", "Central और All India Government Jobs की नवीनतम जानकारी।"),
-    ("UP Jobs", "up-jobs", "उत्तर प्रदेश सरकारी नौकरी", "उत्तर प्रदेश की सरकारी भर्ती, परीक्षा, पात्रता और आवेदन से जुड़ी नवीनतम जानकारी।"),
-    ("Bihar Jobs", "bihar-jobs", "बिहार सरकारी नौकरी", "बिहार की सरकारी भर्ती, परीक्षा, पात्रता और आवेदन से जुड़ी नवीनतम जानकारी।"),
     ("Police & Defence Jobs", "police-defence-jobs", "Police & Defence Jobs", "Police, Defence और सुरक्षा विभाग की सरकारी भर्ती की नवीनतम जानकारी।"),
     ("Teaching Jobs", "teaching-jobs", "Teaching Jobs", "Teacher, REET, School और Education Department की भर्ती की जानकारी।"),
     ("Railway Jobs", "railway-jobs", "Railway Jobs", "Indian Railway की भर्ती, eligibility, vacancy और application updates।"),
@@ -201,11 +197,6 @@ def normalized_category(p: dict[str, Any]) -> str:
 
     aliases = {
         "Rajasthan": "Rajasthan Jobs",
-        "UP": "UP Jobs",
-        "Uttar Pradesh": "UP Jobs",
-        "Uttar Pradesh Jobs": "UP Jobs",
-        "Bihar": "Bihar Jobs",
-        "Bihar Jobs": "Bihar Jobs",
         "All India Jobs": "Government Jobs",
         "Admit Cards": "Admit Card",
         "Result": "Results",
@@ -218,52 +209,7 @@ def normalized_category(p: dict[str, Any]) -> str:
         raw if raw in CATEGORY_BY_NAME else "Latest Updates"
     )
 
-    title = clean_text(p.get("title")).lower()
-
-    # State-specific signals
-    state_signals = [
-        ("UP Jobs", (
-            "uttar pradesh", "up police", "uppsc", "upsssc",
-            "upprpb", "up board", "उत्तर प्रदेश", "यूपी"
-        )),
-        ("Bihar Jobs", (
-            "bihar", "bpsc", "bssc", "csbc",
-            "bihar police", "बिहार"
-        )),
-        ("Rajasthan Jobs", (
-            "rajasthan", "rssb", "rsmssb", "rpsc",
-            "rajasthan police", "राजस्थान"
-        )),
-    ]
-
-    for target, terms in state_signals:
-        if title and any(term in title for term in terms):
-            return target
-
-    # High-confidence title signals
-    title_signals = [
-        ("Results", (
-            "result", "परिणाम", "scorecard", "score card"
-        )),
-        ("Answer Key", (
-            "answer key", "answerkey", "उत्तर कुंजी"
-        )),
-        ("Admit Card", (
-            "admit card", "admitcard", "hall ticket",
-            "प्रवेश पत्र", "प्रवेश-पत्र",
-            "city intimation", "exam city"
-        )),
-        ("Syllabus", (
-            "syllabus", "पाठ्यक्रम"
-        )),
-    ]
-
-    for target, terms in title_signals:
-        if title and any(term in title for term in terms):
-            return target
-
     return category
-
 
 def date_value(p: dict[str, Any], *keys: str) -> Any:
     for key in keys:
