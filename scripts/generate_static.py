@@ -698,32 +698,28 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <div class="ed-community-grid">
 
 <a class="ed-community-card ed-wa" href="{WHATSAPP}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
-<span class="ed-brand-icon">
-<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5C9.1 3.5 3.5 8.9 3.5 15.6c0 2.3.7 4.6 2 6.5L4 28.5l6.6-1.5c1.7.9 3.5 1.4 5.4 1.4 6.9 0 12.5-5.6 12.5-12.6C28.5 8.9 22.9 3.5 16 3.5Zm0 22.8c-1.7 0-3.4-.4-4.9-1.3l-.4-.2-3.9.9.9-3.8-.3-.4c-1-1.6-1.5-3.5-1.5-5.4C5.9 10.7 10.4 6.4 16 6.4s10.1 4.3 10.1 9.7S21.6 26.3 16 26.3Z"/></svg>
+<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
 </span>
 <span><b>WhatsApp Channel</b><small>Daily Jobs • Results • Admit Card</small></span>
 <strong>Follow <em>→</em></strong>
 </a>
 
 <a class="ed-community-card ed-wg" href="{WHATSAPP_GROUP}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_top')">
-<span class="ed-brand-icon">
-<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5C9.1 3.5 3.5 8.9 3.5 15.6c0 2.3.7 4.6 2 6.5L4 28.5l6.6-1.5c1.7.9 3.5 1.4 5.4 1.4 6.9 0 12.5-5.6 12.5-12.6C28.5 8.9 22.9 3.5 16 3.5Zm0 22.8c-1.7 0-3.4-.4-4.9-1.3l-.4-.2-3.9.9.9-3.8-.3-.4c-1-1.6-1.5-3.5-1.5-5.4C5.9 10.7 10.4 6.4 16 6.4s10.1 4.3 10.1 9.7S21.6 26.3 16 26.3Z"/></svg>
+<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
 </span>
 <span><b>WhatsApp Group</b><small>Community • Alerts • Discussion</small></span>
 <strong>Join <em>→</em></strong>
 </a>
 
 <a class="ed-community-card ed-tg" href="{TELEGRAM}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram_top')">
-<span class="ed-brand-icon">
-<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M27.7 5.4 4.6 14.3c-1.6.6-1.6 1.5-.3 1.9l5.9 1.8 2.2 6.8c.3.9.2 1.3 1.1 1.3.6 0 .9-.3 1.3-.6l3-2.9 6.2 4.6c1.1.6 1.9.3 2.2-1l4-19.2c.4-1.5-.6-2.2-1.5-1.6ZM11.1 17.6l12.9-8.1c.6-.4 1.1-.2.7.2l-10.7 9.6-.4 4.1-2.5-5.8Z"/></svg>
+<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/telegram/ffffff" alt="" aria-hidden="true">
 </span>
 <span><b>Telegram Channel</b><small>Fast Alerts • Exam Updates</small></span>
 <strong>Join <em>→</em></strong>
 </a>
 
 <a class="ed-community-card ed-ig" href="{INSTAGRAM}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('instagram_top')">
-<span class="ed-brand-icon">
-<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="5" width="22" height="22" rx="6" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="23" cy="9" r="1.5"/></svg>
+<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" aria-hidden="true">
 </span>
 <span><b>Instagram</b><small>Exam Tips • Updates • Short Content</small></span>
 <strong>Follow <em>→</em></strong>
@@ -746,7 +742,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 .ed-community-card:after{{content:"";position:absolute;width:90px;height:90px;right:-35px;top:-45px;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none}}
 .ed-community-card:hover{{transform:translateY(-3px);box-shadow:0 13px 28px rgba(15,23,42,.22)}}
 .ed-brand-icon{{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.20);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 12px rgba(0,0,0,.12);position:relative;z-index:1}}
-.ed-brand-icon svg{{width:27px;height:27px;display:block}}
+.ed-brand-icon svg{{width:27px;height:27px;display:block}} .ed-brand-icon img{{width:27px;height:27px;display:block}}
 .ed-brand-icon svg *{{vector-effect:non-scaling-stroke}}
 .ed-brand-icon svg{{fill:currentColor}}
 .ed-community-card span:nth-child(2){{min-width:0;display:flex;flex-direction:column;gap:3px;position:relative;z-index:1}}
@@ -760,7 +756,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 .ed-ig{{background:linear-gradient(135deg,#833ab4 0%,#e1306c 55%,#f77737 100%)}}.ed-community-card strong em{{transition:transform .18s ease}}.ed-community-card:hover strong em{{transform:translateX(3px)}}
 .floating-whatsapp-group{{position:fixed;right:18px;bottom:18px;z-index:9999;display:flex;align-items:center;gap:10px;padding:9px 13px 9px 9px;border-radius:999px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff!important;text-decoration:none!important;box-shadow:0 10px 28px rgba(18,140,126,.34);border:2px solid rgba(255,255,255,.9);animation:edFloatPulse 2.8s ease-in-out infinite}}
 .floating-whatsapp-icon{{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#16a34a;box-shadow:0 3px 10px rgba(0,0,0,.14)}}
-.floating-whatsapp-icon svg{{width:23px;height:23px;fill:currentColor}}
+.floating-whatsapp-icon svg{{width:23px;height:23px;fill:currentColor}} .floating-whatsapp-icon img{{width:23px;height:23px;display:block}}
 .floating-whatsapp-text{{display:flex;flex-direction:column;line-height:1.05}}
 .floating-whatsapp-text small{{font-size:8px;font-weight:700;opacity:.88}}
 .floating-whatsapp-text strong{{font-size:12px;margin-top:3px}}
@@ -798,10 +794,7 @@ WhatsApp Channel Follow करें →
    rel="noopener"
    aria-label="WhatsApp Group Join Now"
    onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_floating')">
-  <span class="floating-whatsapp-icon" aria-hidden="true">
-    <svg viewBox="0 0 32 32" role="img">
-      <path d="M16 3.5C9.1 3.5 3.5 8.9 3.5 15.6c0 2.3.7 4.6 2 6.5L4 28.5l6.6-1.5c1.7.9 3.5 1.4 5.4 1.4 6.9 0 12.5-5.6 12.5-12.6C28.5 8.9 22.9 3.5 16 3.5Zm0 22.8c-1.7 0-3.4-.4-4.9-1.3l-.4-.2-3.9.9.9-3.8-.3-.4c-1-1.6-1.5-3.5-1.5-5.4C5.9 10.7 10.4 6.4 16 6.4s10.1 4.3 10.1 9.7S21.6 26.3 16 26.3Zm5.6-7.3c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.5-1.7-1.7-2-.2-.3 0-.5.1-.7.1-.1.3-.4.4-.6.1-.2.1-.4.2-.6.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.8.6.8.2 1.5.2 2 .1.6-.1 1.9-.8 2.2-1.6.3-.8.3-1.5.2-1.6-.1-.1-.3-.2-.6-.3Z"/>
-    </svg>
+  <span class="floating-whatsapp-icon" aria-hidden="true"><img src="https://cdn.simpleicons.org/whatsapp/16a34a" alt="" aria-hidden="true">
   </span>
   <span class="floating-whatsapp-text">
     <small>WhatsApp Group</small>
