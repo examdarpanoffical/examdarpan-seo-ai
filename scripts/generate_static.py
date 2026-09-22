@@ -787,7 +787,97 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 WhatsApp Channel Follow करें →
 </a>
 </div>
-</section></article></main>
+</section></article>
+
+</main>
+<style>
+.ed-article-social-popup-backdrop{{position:fixed;inset:0;background:rgba(15,23,42,.58);backdrop-filter:blur(4px);z-index:99998;opacity:0;visibility:hidden;transition:.25s}}
+.ed-article-social-popup-backdrop.is-visible{{opacity:1;visibility:visible}}
+.ed-article-social-popup{{position:fixed;left:50%;top:50%;width:min(410px,calc(100vw - 28px));transform:translate(-50%,-46%) scale(.94);background:#fff;border-radius:24px;padding:24px;z-index:99999;box-shadow:0 24px 70px rgba(15,23,42,.30);opacity:0;visibility:hidden;transition:.28s cubic-bezier(.2,.8,.2,1)}}
+.ed-article-social-popup.is-visible{{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}}
+.ed-article-social-popup-close{{position:absolute;right:12px;top:12px;width:32px;height:32px;border:0;border-radius:50%;background:#f1f5f9;color:#64748b;font-size:20px;cursor:pointer}}
+.ed-article-social-popup-head{{display:flex;align-items:center;gap:13px;padding-right:30px;margin-bottom:18px}}
+.ed-article-social-popup-badge{{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:15px;background:#fff7ed;color:#f97316;animation:edAlertPulse 2s ease-in-out infinite}}
+.ed-article-social-popup-badge svg{{width:27px;height:27px;fill:currentColor}}
+.ed-article-social-popup-head h3{{margin:0;color:#172033;font-size:19px;line-height:1.25}}
+.ed-article-social-popup-head p{{margin:5px 0 0;color:#64748b;font-size:11px}}
+.ed-article-social-popup-links{{display:grid;gap:10px}}
+.ed-article-social-popup-link{{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:16px;text-decoration:none!important;border:1px solid #e2e8f0}}
+.ed-article-social-popup-link.whatsapp{{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff!important;border:0;box-shadow:0 9px 22px rgba(18,140,126,.24)}}
+.ed-article-social-popup-link.instagram{{background:#fff;color:#172033!important}}
+.ed-article-social-popup-link.xsocial{{background:#111827;color:#fff!important;border-color:#111827}}
+.ed-article-social-popup-link .social-icon{{width:38px;height:38px;display:grid;place-items:center;flex:0 0 38px;border-radius:12px;background:rgba(255,255,255,.18)}}
+.ed-article-social-popup-link.instagram .social-icon{{background:#f1f5f9}}
+.ed-article-social-popup-link .social-icon img{{width:23px;height:23px;display:block}}
+.ed-article-social-popup-link strong{{display:block;font-size:13px}}
+.ed-article-social-popup-link small{{display:block;margin-top:3px;font-size:10px;opacity:.78}}
+.ed-article-social-popup-note{{margin-top:14px;text-align:center;color:#94a3b8;font-size:9px}}
+@keyframes edAlertPulse{{0%,100%{{transform:scale(1)}}50%{{transform:scale(1.06)}}}}
+@media(max-width:560px){{.ed-article-social-popup{{padding:20px;border-radius:21px}}}}
+</style>
+
+<div class="ed-article-social-popup-backdrop" id="edArticleSocialPopupBackdrop"></div>
+
+<section class="ed-article-social-popup" id="edArticleSocialPopup" aria-hidden="true">
+<button class="ed-article-social-popup-close" id="edArticleSocialPopupClose" type="button" aria-label="Close">×</button>
+
+<div class="ed-article-social-popup-head">
+<div class="ed-article-social-popup-badge" aria-hidden="true">
+<svg viewBox="0 0 32 32"><path d="M16 3.5C9.1 3.5 3.5 8.9 3.5 15.6c0 2.3.7 4.6 2 6.5L4 28.5l6.6-1.5c1.7.9 3.5 1.4 5.4 1.4 6.9 0 12.5-5.6 12.5-12.6C28.5 8.9 22.9 3.5 16 3.5Z"/></svg>
+</div>
+<div>
+<h3>🔔 Exam Alerts से जुड़े रहें</h3>
+<p>Vacancy, result और exam updates सीधे पाएं।</p>
+</div>
+</div>
+
+<div class="ed-article-social-popup-links">
+<a class="ed-article-social-popup-link whatsapp" href="{WHATSAPP_GROUP}" target="_blank" rel="noopener noreferrer">
+<span class="social-icon"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt=""></span>
+<span><strong>WhatsApp Group में Join करें</strong><small>Jobs • Results • Admit Card • Alerts</small></span>
+</a>
+
+<a class="ed-article-social-popup-link instagram" href="{INSTAGRAM}" target="_blank" rel="noopener noreferrer">
+<span class="social-icon"><img src="https://cdn.simpleicons.org/instagram/111827" alt=""></span>
+<span><strong>Instagram पर Follow करें</strong><small>Tips • Updates • Short Content</small></span>
+</a>
+
+<a class="ed-article-social-popup-link xsocial" href="https://x.com/exam_darpan" target="_blank" rel="noopener noreferrer">
+<span class="social-icon"><img src="https://cdn.simpleicons.org/x/ffffff" alt=""></span>
+<span><strong>Follow on X</strong><small>Quick Exam Updates</small></span>
+</a>
+</div>
+
+<div class="ed-article-social-popup-note">Official Exam Darpan social updates</div>
+</section>
+
+<script>
+(function(){{
+var popup=document.getElementById('edArticleSocialPopup');
+var backdrop=document.getElementById('edArticleSocialPopupBackdrop');
+var close=document.getElementById('edArticleSocialPopupClose');
+if(!popup||!backdrop||!close)return;
+function hidePopup(){{
+popup.classList.remove('is-visible');
+backdrop.classList.remove('is-visible');
+popup.setAttribute('aria-hidden','true');
+}}
+function showPopup(){{
+if(sessionStorage.getItem('edArticleSocialPopupClosed')==='1')return;
+popup.classList.add('is-visible');
+backdrop.classList.add('is-visible');
+popup.setAttribute('aria-hidden','false');
+}}
+close.addEventListener('click',function(){{
+sessionStorage.setItem('edArticleSocialPopupClosed','1');
+hidePopup();
+}});
+backdrop.addEventListener('click',hidePopup);
+document.addEventListener('keydown',function(e){{if(e.key==='Escape')hidePopup();}});
+setTimeout(showPopup,1600);
+}})();
+</script>
+
 <a class="floating-whatsapp-group"
    href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
    target="_blank"
