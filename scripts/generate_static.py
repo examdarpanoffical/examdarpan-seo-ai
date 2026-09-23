@@ -34,6 +34,7 @@ CATEGORY_MARKER = "<!-- EXAM-DARPAN-GENERATED-CATEGORY -->"
 WHATSAPP = "https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36"
 TELEGRAM = "https://t.me/examdarpanofficial"
 INSTAGRAM = "https://www.instagram.com/examdarpan_official/"
+X_SOCIAL = "https://x.com/exam_darpan"
 WHATSAPP_GROUP = "https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
 GA4_ID = "G-FWB3YMTSDX"
 
@@ -588,13 +589,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     schema1 = json.dumps(schema_article(p, url), ensure_ascii=False, separators=(",", ":"))
     schema2 = json.dumps(schema_breadcrumb(p, url), ensure_ascii=False, separators=(",", ":"))
 
-    cover = (
-        f'<div class="article-cover article-cover-card" role="img" aria-label="{esc(title)}">'
-        f'<div class="article-cover-glow"></div><div class="article-cover-inner">'
-        f'<span class="article-cover-kicker">{esc(cat)}</span><h2>{esc(title)}</h2>'
-        f'<div class="article-cover-brand"><strong>EXAM DARPAN</strong><span>Vacancy Se Result Tak, Har Jankari Ek Jagah</span></div>'
-        f'</div></div>'
-    )
+    cover = ""
 
     return f'''{ARTICLE_MARKER}
 <!doctype html>
@@ -666,88 +661,208 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo.webp" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="{category_path(cat_slug)}">{esc(cat)}</a></div>
 <nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><article class="article article-page">
-<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span aria-current="page">{esc(title)}</span></nav>
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
 <div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div>
 {verification_line(p)}
-<section class="ed-community-panel" aria-label="Exam Darpan Community">
-<div class="ed-community-head">
-  <div>
-    <span class="ed-community-eyebrow">JOIN EXAM DARPAN</span>
-    <h2>हर जरूरी exam update से जुड़े रहें</h2>
-    <p>Jobs, Admit Card, Results और exam alerts — चारों community channels एक जगह।</p>
+
+<section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
+  <div class="ed-article-follow-head">
+    <div>
+      <span class="ed-article-follow-label">STAY CONNECTED</span>
+      <strong>Exam Darpan Updates</strong>
+      <p>नई भर्ती, Admit Card, Result और exam alerts के लिए जुड़े रहें।</p>
+    </div>
   </div>
-  <span class="ed-community-live"><i></i> DAILY UPDATES</span>
-</div>
 
-<div class="ed-community-grid">
+  <div class="ed-article-follow-grid">
 
-<a class="ed-community-card ed-wa" href="{WHATSAPP}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
-<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
-</span>
-<span><b>WhatsApp Channel</b><small>Daily Jobs • Results • Admit Card</small></span>
-<strong>Follow <em>→</em></strong>
-</a>
+    <a class="ed-follow-btn ed-follow-whatsapp"
+       href="{WHATSAPP}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
+      <span class="ed-follow-icon">
+        <img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
+      </span>
+      <span><b>WhatsApp</b><small>Channel</small></span>
+      <em>↗</em>
+    </a>
 
-<a class="ed-community-card ed-wg" href="{WHATSAPP_GROUP}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_top')">
-<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
-</span>
-<span><b>WhatsApp Group</b><small>Community • Alerts • Discussion</small></span>
-<strong>Join <em>→</em></strong>
-</a>
+    <a class="ed-follow-btn ed-follow-group"
+       href="{WHATSAPP_GROUP}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_top')">
+      <span class="ed-follow-icon">
+        <img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
+      </span>
+      <span><b>WhatsApp</b><small>Group</small></span>
+      <em>↗</em>
+    </a>
 
-<a class="ed-community-card ed-tg" href="{TELEGRAM}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram_top')">
-<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/telegram/ffffff" alt="" aria-hidden="true">
-</span>
-<span><b>Telegram Channel</b><small>Fast Alerts • Exam Updates</small></span>
-<strong>Join <em>→</em></strong>
-</a>
+    <a class="ed-follow-btn ed-follow-telegram"
+       href="{TELEGRAM}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram_top')">
+      <span class="ed-follow-icon">
+        <img src="https://cdn.simpleicons.org/telegram/ffffff" alt="" aria-hidden="true">
+      </span>
+      <span><b>Telegram</b><small>Channel</small></span>
+      <em>↗</em>
+    </a>
 
-<a class="ed-community-card ed-ig" href="{INSTAGRAM}" target="_blank" rel="noopener" onclick="window.edTrackCommunity&&window.edTrackCommunity('instagram_top')">
-<span class="ed-brand-icon"><img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" aria-hidden="true">
-</span>
-<span><b>Instagram</b><small>Exam Tips • Updates • Short Content</small></span>
-<strong>Follow <em>→</em></strong>
-</a>
+    <a class="ed-follow-btn ed-follow-instagram"
+       href="{INSTAGRAM}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('instagram_top')">
+      <span class="ed-follow-icon">
+        <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" aria-hidden="true">
+      </span>
+      <span><b>Instagram</b><small>Follow</small></span>
+      <em>↗</em>
+    </a>
 
-</div>
+    <a class="ed-follow-btn ed-follow-x"
+       href="{X_SOCIAL}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('x_top')">
+      <span class="ed-follow-icon">
+        <img src="https://cdn.simpleicons.org/x/ffffff" alt="" aria-hidden="true">
+      </span>
+      <span><b>X</b><small>Follow</small></span>
+      <em>↗</em>
+    </a>
+
+  </div>
 </section>
 
 <style>
-.ed-community-panel{{margin:22px 0 18px;padding:20px;border:1px solid #e2e8f0;border-radius:22px;background:linear-gradient(145deg,#fff,#f7fbff);box-shadow:0 12px 34px rgba(15,23,42,.08)}}
-.ed-community-head{{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:15px}}
-.ed-community-eyebrow{{display:block;color:#2563eb;font-size:9px;font-weight:950;letter-spacing:.16em;margin-bottom:5px}}
-.ed-community-head h2{{margin:0;color:#172033;font-size:20px;line-height:1.25}}
-.ed-community-head p{{margin:6px 0 0;color:#64748b;font-size:11px;line-height:1.55}}
-.ed-community-live{{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #dbeafe;border-radius:999px;background:#eff6ff;color:#2563eb;font-size:8px;font-weight:950;white-space:nowrap}}
-.ed-community-live i{{width:6px;height:6px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.12)}}
-.ed-community-grid{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}}
-.ed-community-card{{position:relative;min-width:0;display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:10px;padding:13px 12px;border:1px solid rgba(255,255,255,.18);border-radius:17px;color:#fff!important;text-decoration:none!important;overflow:hidden;box-shadow:0 8px 22px rgba(15,23,42,.16);transition:transform .18s ease,box-shadow .18s ease}}
-.ed-community-card:before{{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.16),transparent 42%);pointer-events:none}}
-.ed-community-card:after{{content:"";position:absolute;width:90px;height:90px;right:-35px;top:-45px;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none}}
-.ed-community-card:hover{{transform:translateY(-3px);box-shadow:0 13px 28px rgba(15,23,42,.22)}}
-.ed-brand-icon{{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.20);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 12px rgba(0,0,0,.12);position:relative;z-index:1}}
-.ed-brand-icon svg{{width:27px;height:27px;display:block}} .ed-brand-icon img{{width:27px;height:27px;display:block}}
-.ed-brand-icon svg *{{vector-effect:non-scaling-stroke}}
-.ed-brand-icon svg{{fill:currentColor}}
-.ed-community-card span:nth-child(2){{min-width:0;display:flex;flex-direction:column;gap:3px;position:relative;z-index:1}}
-.ed-community-card b{{font-size:11px;line-height:1.2}}
-.ed-community-card small{{font-size:8px;line-height:1.25;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.ed-community-card>strong{{display:flex;align-items:center;gap:3px;font-size:9px;white-space:nowrap;position:relative;z-index:1;padding-left:5px}}
-.ed-community-card em{{font-style:normal;font-size:13px}}
-.ed-wa{{background:linear-gradient(135deg,#25D366 0%,#16a085 100%)}}
-.ed-wg{{background:linear-gradient(135deg,#22c55e 0%,#15803d 100%)}}
-.ed-tg{{background:linear-gradient(135deg,#38bdf8 0%,#2563eb 100%)}}
-.ed-ig{{background:linear-gradient(135deg,#833ab4 0%,#e1306c 55%,#f77737 100%)}}.ed-community-card strong em{{transition:transform .18s ease}}.ed-community-card:hover strong em{{transform:translateX(3px)}}
-.floating-whatsapp-group{{position:fixed;right:18px;bottom:18px;z-index:9999;display:flex;align-items:center;gap:10px;padding:9px 13px 9px 9px;border-radius:999px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff!important;text-decoration:none!important;box-shadow:0 10px 28px rgba(18,140,126,.34);border:2px solid rgba(255,255,255,.9);animation:edFloatPulse 2.8s ease-in-out infinite}}
-.floating-whatsapp-icon{{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#16a34a;box-shadow:0 3px 10px rgba(0,0,0,.14)}}
-.floating-whatsapp-icon svg{{width:23px;height:23px;fill:currentColor}} .floating-whatsapp-icon img{{width:23px;height:23px;display:block}}
-.floating-whatsapp-text{{display:flex;flex-direction:column;line-height:1.05}}
-.floating-whatsapp-text small{{font-size:8px;font-weight:700;opacity:.88}}
-.floating-whatsapp-text strong{{font-size:12px;margin-top:3px}}
-@keyframes edFloatPulse{{0%,100%{{box-shadow:0 10px 28px rgba(18,140,126,.34)}}50%{{box-shadow:0 10px 28px rgba(18,140,126,.34),0 0 0 7px rgba(37,211,102,.10)}}}}
-@media(max-width:900px){{.ed-community-grid{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
-@media(max-width:560px){{.ed-community-panel{{padding:14px;border-radius:18px}}.ed-community-head{{align-items:flex-start;flex-direction:column}}.ed-community-live{{display:none}}.ed-community-grid{{grid-template-columns:1fr}}.ed-community-card{{grid-template-columns:42px minmax(0,1fr) auto;padding:12px}}.ed-brand-icon{{width:42px;height:42px}}.floating-whatsapp-group{{right:12px;bottom:12px;padding:8px 11px 8px 8px}}.floating-whatsapp-icon{{width:36px;height:36px}}.floating-whatsapp-text strong{{font-size:11px}}}}
+.ed-article-follow{
+  max-width:850px;
+  margin:18px auto 28px;
+  padding:14px;
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 5px 18px rgba(15,23,42,.045);
+}
+.ed-article-follow-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:11px;
+}
+.ed-article-follow-label{
+  display:block;
+  color:#2563eb;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.14em;
+  margin-bottom:3px;
+}
+.ed-article-follow-head strong{
+  display:block;
+  color:#172033;
+  font-size:14px;
+  line-height:1.25;
+}
+.ed-article-follow-head p{
+  margin:3px 0 0;
+  color:#64748b;
+  font-size:9.5px;
+  line-height:1.4;
+}
+.ed-article-follow-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+}
+.ed-follow-btn{
+  min-width:0;
+  display:grid;
+  grid-template-columns:31px minmax(0,1fr) auto;
+  align-items:center;
+  gap:7px;
+  padding:8px 8px;
+  border-radius:11px;
+  color:#fff!important;
+  text-decoration:none!important;
+  box-shadow:0 3px 10px rgba(15,23,42,.09);
+  transition:transform .16s ease,box-shadow .16s ease;
+}
+.ed-follow-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 7px 15px rgba(15,23,42,.14);
+}
+.ed-follow-icon{
+  width:31px;
+  height:31px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:rgba(255,255,255,.18);
+}
+.ed-follow-icon img{
+  width:18px;
+  height:18px;
+  display:block;
+}
+.ed-follow-btn span:nth-child(2){
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  line-height:1.05;
+}
+.ed-follow-btn b{
+  font-size:9.5px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.ed-follow-btn small{
+  margin-top:3px;
+  font-size:7.5px;
+  opacity:.82;
+  white-space:nowrap;
+}
+.ed-follow-btn em{
+  font-style:normal;
+  font-size:12px;
+  opacity:.9;
+}
+.ed-follow-whatsapp{background:linear-gradient(135deg,#25d366,#128c7e)}
+.ed-follow-group{background:linear-gradient(135deg,#22c55e,#15803d)}
+.ed-follow-telegram{background:linear-gradient(135deg,#38bdf8,#2563eb)}
+.ed-follow-instagram{background:linear-gradient(135deg,#833ab4,#e1306c 55%,#f77737)}
+.ed-follow-x{background:linear-gradient(135deg,#111827,#000)}
+
+@media(max-width:1050px){
+  .ed-article-follow-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:600px){
+  .ed-article-follow{
+    margin:14px auto 22px;
+    padding:12px;
+    border-radius:14px;
+  }
+  .ed-article-follow-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+  }
+  .ed-follow-btn{
+    padding:8px 7px;
+  }
+}
+@media(max-width:390px){
+  .ed-article-follow-grid{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 {cover}
 {quick_facts(p)}
