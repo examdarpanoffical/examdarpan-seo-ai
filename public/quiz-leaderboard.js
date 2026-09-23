@@ -366,7 +366,11 @@
     `;
 
     const resultBox=document.getElementById('quizResult');
-    if(resultBox) resultBox.appendChild(card);
+    if(resultBox){
+      const mount=resultBox.querySelector('#quizLeaderboardMount');
+      if(mount) mount.replaceChildren(card);
+      else resultBox.appendChild(card);
+    }
   }
 
   async function run(){
