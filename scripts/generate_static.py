@@ -741,7 +741,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </section>
 
 <style>
-.ed-article-follow{
+.ed-article-follow{{
   max-width:850px;
   margin:18px auto 28px;
   padding:14px;
@@ -749,39 +749,39 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   border-radius:16px;
   background:#fff;
   box-shadow:0 5px 18px rgba(15,23,42,.045);
-}
-.ed-article-follow-head{
+}}
+.ed-article-follow-head{{
   display:flex;
   align-items:center;
   justify-content:space-between;
   margin-bottom:11px;
-}
-.ed-article-follow-label{
+}}
+.ed-article-follow-label{{
   display:block;
   color:#2563eb;
   font-size:8px;
   font-weight:950;
   letter-spacing:.14em;
   margin-bottom:3px;
-}
-.ed-article-follow-head strong{
+}}
+.ed-article-follow-head strong{{
   display:block;
   color:#172033;
   font-size:14px;
   line-height:1.25;
-}
-.ed-article-follow-head p{
+}}
+.ed-article-follow-head p{{
   margin:3px 0 0;
   color:#64748b;
   font-size:9.5px;
   line-height:1.4;
-}
-.ed-article-follow-grid{
+}}
+.ed-article-follow-grid{{
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
   gap:7px;
-}
-.ed-follow-btn{
+}}
+.ed-follow-btn{{
   min-width:0;
   display:grid;
   grid-template-columns:31px minmax(0,1fr) auto;
@@ -793,76 +793,76 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   text-decoration:none!important;
   box-shadow:0 3px 10px rgba(15,23,42,.09);
   transition:transform .16s ease,box-shadow .16s ease;
-}
-.ed-follow-btn:hover{
+}}
+.ed-follow-btn:hover{{
   transform:translateY(-2px);
   box-shadow:0 7px 15px rgba(15,23,42,.14);
-}
-.ed-follow-icon{
+}}
+.ed-follow-icon{{
   width:31px;
   height:31px;
   display:grid;
   place-items:center;
   border-radius:9px;
   background:rgba(255,255,255,.18);
-}
-.ed-follow-icon img{
+}}
+.ed-follow-icon img{{
   width:18px;
   height:18px;
   display:block;
-}
-.ed-follow-btn span:nth-child(2){
+}}
+.ed-follow-btn span:nth-child(2){{
   min-width:0;
   display:flex;
   flex-direction:column;
   line-height:1.05;
-}
-.ed-follow-btn b{
+}}
+.ed-follow-btn b{{
   font-size:9.5px;
   font-weight:900;
   white-space:nowrap;
-}
-.ed-follow-btn small{
+}}
+.ed-follow-btn small{{
   margin-top:3px;
   font-size:7.5px;
   opacity:.82;
   white-space:nowrap;
-}
-.ed-follow-btn em{
+}}
+.ed-follow-btn em{{
   font-style:normal;
   font-size:12px;
   opacity:.9;
-}
-.ed-follow-whatsapp{background:linear-gradient(135deg,#25d366,#128c7e)}
-.ed-follow-group{background:linear-gradient(135deg,#22c55e,#15803d)}
-.ed-follow-telegram{background:linear-gradient(135deg,#38bdf8,#2563eb)}
-.ed-follow-instagram{background:linear-gradient(135deg,#833ab4,#e1306c 55%,#f77737)}
-.ed-follow-x{background:linear-gradient(135deg,#111827,#000)}
+}}
+.ed-follow-whatsapp{{background:linear-gradient(135deg,#25d366,#128c7e)}}
+.ed-follow-group{{background:linear-gradient(135deg,#22c55e,#15803d)}}
+.ed-follow-telegram{{background:linear-gradient(135deg,#38bdf8,#2563eb)}}
+.ed-follow-instagram{{background:linear-gradient(135deg,#833ab4,#e1306c 55%,#f77737)}}
+.ed-follow-x{{background:linear-gradient(135deg,#111827,#000)}}
 
-@media(max-width:1050px){
-  .ed-article-follow-grid{
+@media(max-width:1050px){{
+  .ed-article-follow-grid{{
     grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-@media(max-width:600px){
-  .ed-article-follow{
+  }}
+}}
+@media(max-width:600px){{
+  .ed-article-follow{{
     margin:14px auto 22px;
     padding:12px;
     border-radius:14px;
-  }
-  .ed-article-follow-grid{
+  }}
+  .ed-article-follow-grid{{
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:7px;
-  }
-  .ed-follow-btn{
+  }}
+  .ed-follow-btn{{
     padding:8px 7px;
-  }
-}
-@media(max-width:390px){
-  .ed-article-follow-grid{
+  }}
+}}
+@media(max-width:390px){{
+  .ed-article-follow-grid{{
     grid-template-columns:1fr;
-  }
-}
+  }}
+}}
 </style>
 {cover}
 {quick_facts(p)}
