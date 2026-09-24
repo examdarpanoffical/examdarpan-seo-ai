@@ -1,9 +1,32 @@
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin Dashboard | Exam Darpan</title><link rel="stylesheet" href="../styles.css"><script src="../firebase-config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script><link rel="icon" type="image/png" href="/assets/logo.png?v=20260924"><link rel="apple-touch-icon" href="/assets/logo.png?v=20260924"><meta property="og:image" content="https://examdarpan.in/assets/og-logo.png"></head>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script><link rel="icon" type="image/png" href="/assets/logo.png?v=20260924-3"><link rel="apple-touch-icon" href="/assets/logo.png?v=20260924-3"><meta property="og:image" content="https://examdarpan.in/assets/og-logo.png"><script>
+/* Exam Darpan: remove legacy splash/service-worker/cache */
+(function(){
+  try {
+    var KEY = "ed-legacy-cache-cleanup-v1";
+    if (!sessionStorage.getItem(KEY)) {
+      sessionStorage.setItem(KEY, "1");
+
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(rs) {
+          return Promise.all(rs.map(function(r) { return r.unregister(); }));
+        }).catch(function(){});
+      }
+
+      if ("caches" in window) {
+        caches.keys().then(function(keys) {
+          return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+        }).catch(function(){});
+      }
+    }
+  } catch(e) {}
+})();
+</script>
+</head>
 <body class="admin-shell"><header class="admin-nav"><div class="container" style="display:flex;justify-content:space-between;align-items:center">
 <strong style="display:flex;align-items:center;gap:10px">
-<img src="/assets/logo.png?v=20260924-2"
+<img src="/assets/logo.png?v=20260924-3"
      width="42"
      height="42"
      alt="Exam Darpan logo"

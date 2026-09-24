@@ -38,9 +38,9 @@ X_SOCIAL = "https://x.com/exam_darpan"
 WHATSAPP_GROUP = "https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
 GA4_ID = "G-FWB3YMTSDX"
 # Site branding assets
-SITE_LOGO = "/assets/logo.png"
-SITE_FAVICON = "/assets/favicon.png"
-SITE_OG_IMAGE = "https://examdarpan.in/assets/og-logo.png"
+SITE_LOGO = "/assets/logo.png?v=20260924-3"
+SITE_FAVICON = "/assets/favicon.png?v=20260924-3"
+SITE_OG_IMAGE = "https://examdarpan.in/assets/og-logo.png?v=20260924-3"
 
 
 STATIC_PAGES = [
