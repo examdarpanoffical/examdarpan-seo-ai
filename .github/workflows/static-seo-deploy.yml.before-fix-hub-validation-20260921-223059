@@ -1,0 +1,78 @@
+name: Exam Darpan Automatic SEO Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: examdarpan-static-seo
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r monitor_requirements.txt
+
+      - name: Build static SEO pages
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python scripts/generate_static.py
+
+      - name: Verify generated homepage
+        run: |
+          set -euo pipefail
+
+          test -f public/index.html
+          test -f public/sitemap.xml
+
+          grep -q "LIVE UPDATES" public/index.html
+          grep -q "Rajasthan Government Jobs Hub" public/index.html
+          grep -q "All India Government Jobs Hub" public/index.html
+          grep -q 'id="daily-test"' public/index.html
+          grep -q "Latest Articles" public/index.html
+
+          ARTICLE_COUNT="$(grep -l "EXAM-DARPAN-GENERATED-ARTICLE" public/*.html 2>/dev/null | wc -l | tr -d ' ')"
+          SITEMAP_COUNT="$(grep -c "<loc>" public/sitemap.xml || true)"
+
+          echo "Generated article pages: ${ARTICLE_COUNT}"
+          echo "Sitemap URLs: ${SITEMAP_COUNT}"
+
+          test "${ARTICLE_COUNT}" -gt 0
+          test "${SITEMAP_COUNT}" -ge "${ARTICLE_COUNT}"
+
+      - name: Install Firebase CLI
+        run: |
+          npm install -g firebase-tools
+
+      - name: Deploy Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/firebase-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
+          firebase use examdarpan-dd963
+          firebase deploy --only hosting --non-interactive
+
+      - name: Cleanup credentials
+        if: always()
+        run: |
+          rm -f /tmp/firebase-service-account.json

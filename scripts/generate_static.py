@@ -37,6 +37,11 @@ INSTAGRAM = "https://www.instagram.com/examdarpan_official/"
 X_SOCIAL = "https://x.com/exam_darpan"
 WHATSAPP_GROUP = "https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
 GA4_ID = "G-FWB3YMTSDX"
+# Site branding assets
+SITE_LOGO = "/assets/logo.png"
+SITE_FAVICON = "/assets/favicon.png"
+SITE_OG_IMAGE = "https://examdarpan.in/assets/og-logo.png"
+
 
 STATIC_PAGES = [
     ("/", "Home"),
