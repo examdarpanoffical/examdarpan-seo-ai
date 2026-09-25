@@ -4371,17 +4371,55 @@ function normalizeQuizConfig(q){
 
 function calculateResult(){
   const total=quiz.questions.length;
+  const SKIP_INDEX=4;
+
   let right=0;
-  quiz.questions.forEach((q,i)=>{if(answers[i]===Number(q.answerIndex))right++});
-  const attempted=answers.filter(x=>x!==null).length;
-  const wrong=attempted-right,skipped=total-attempted;
+
+  quiz.questions.forEach((q,i)=>{
+    const chosen=answers[i];
+
+    // E = Skip / Not Attempted. It is NEVER correct and NEVER wrong.
+    if(chosen===SKIP_INDEX || chosen===null) return;
+
+    if(chosen===Number(q.answerIndex)) right++;
+  });
+
+  // E is an intentional skip. Blank questions (for auto-submit/time-up)
+  // are also treated as skipped and receive no negative marking.
+  const attempted=answers.filter(x=>x!==null && x!==SKIP_INDEX).length;
+  const explicitSkipped=answers.filter(x=>x===SKIP_INDEX).length;
+  const blankSkipped=answers.filter(x=>x===null).length;
+  const wrong=attempted-right;
+  const skipped=explicitSkipped+blankSkipped;
+
   const marks=quiz.marksPerQuestion;
-  const deduction=quiz.negativeMarkingEnabled?marks*quiz.negativeNumerator/quiz.negativeDenominator:0;
+  const deduction=quiz.negativeMarkingEnabled
+    ? marks*quiz.negativeNumerator/quiz.negativeDenominator
+    : 0;
+
   const score=(right*marks)-(wrong*deduction);
   const maxMarks=total*marks;
   const accuracy=attempted?Math.round(right/attempted*100):0;
-  const timeTakenSeconds=Math.max(0,Math.round((Date.now()-attemptStartedAt)/1000));
-  return {right,wrong,skipped,total,accuracy,score,maxMarks,marksPerQuestion:marks,negativeMarkingEnabled:quiz.negativeMarkingEnabled,negativeNumerator:quiz.negativeNumerator,negativeDenominator:quiz.negativeDenominator,negativeDeductionPerWrong:deduction,timeTakenSeconds};
+  const timeTakenSeconds=Math.max(
+    0,
+    Math.round((Date.now()-attemptStartedAt)/1000)
+  );
+
+  return {
+    right,
+    wrong,
+    skipped,
+    total,
+    accuracy,
+    score,
+    maxMarks,
+    marksPerQuestion:marks,
+    negativeMarkingEnabled:quiz.negativeMarkingEnabled,
+    negativeNumerator:quiz.negativeNumerator,
+    negativeDenominator:quiz.negativeDenominator,
+    negativeDeductionPerWrong:deduction,
+    timeTakenSeconds
+  };
 }
 
 function getStudentName(){try{return localStorage.getItem('examDarpanStudentName')||''}catch{return ''}}
@@ -4502,15 +4540,165 @@ function injectQuizRuntimeStyles(){
 
 function renderQuizQuestion(){
   if(!quiz||!started||submitted)return;
-  const app=$('quizApp');if(!app)return;
-  const total=quiz.questions.length,q=quiz.questions[current],selected=answers[current];
+
+  const app=$('quizApp');
+  if(!app)return;
+
+  const total=quiz.questions.length;
+  const q=quiz.questions[current];
+  const selected=answers[current];
+  const hasAnswer=selected!==null && selected!==undefined;
+
   app.hidden=false;
-  app.innerHTML=`<div class="card ed-quiz-head"><div><strong>${esc(quiz.title||'Daily Quiz')}</strong><div class="meta">Question ${current+1} of ${total} · ${answers.filter(x=>x!==null).length}/${total} answered</div></div><div id="quizTimer" class="ed-timer">⏱️ ${fmtTime(Math.max(0,(quiz.durationMinutes||10)*60-Math.round((Date.now()-attemptStartedAt)/1000)))}</div></div><div class="ed-progress"><i style="width:${Math.round(((current+1)/total)*100)}%"></i></div><div class="ed-dots">${quiz.questions.map((_,i)=>`<button type="button" class="ed-dot ${i===current?'active':''} ${answers[i]!==null?'done':''}" data-q="${i}">${i+1}</button>`).join('')}</div><div class="ed-q-card"><p class="ed-q-title">${current+1}. ${esc(q.question)}</p><div>${q.options.map((o,i)=>`<label class="ed-option ${selected===i?'selected':''}"><input type="radio" name="quizOption" value="${i}" ${selected===i?'checked':''}><span><b>${String.fromCharCode(65+i)}.</b> ${esc(o)}</span></label>`).join('')}</div><div class="ed-nav"><button type="button" class="btn" id="prevQ" ${current===0?'disabled':''}>← Previous</button>${current<total-1?'<button type="button" class="btn btn-primary" id="nextQ">Next →</button>':'<button type="button" class="btn btn-primary" id="submitQuizBtn">Submit Test</button>'}</div>${current===total-1?'<div class="ed-submit-note">सब answers check करके फिर Submit Test दबाएँ।</div>':''}</div>`;
-  app.querySelectorAll('input[name="quizOption"]').forEach(el=>el.addEventListener('change',()=>{answers[current]=Number(el.value);renderQuizQuestion()}));
-  app.querySelectorAll('[data-q]').forEach(el=>el.addEventListener('click',()=>{current=Number(el.dataset.q);renderQuizQuestion()}));
-  $('prevQ')?.addEventListener('click',()=>{current=Math.max(0,current-1);renderQuizQuestion()});
-  $('nextQ')?.addEventListener('click',()=>{current=Math.min(total-1,current+1);renderQuizQuestion()});
-  $('submitQuizBtn')?.addEventListener('click',()=>finishQuiz(false));
+
+  app.innerHTML=`
+    <div class="card ed-quiz-head">
+      <div>
+        <strong>${esc(quiz.title||'Daily Quiz')}</strong>
+        <div class="meta">
+          Question ${current+1} of ${total}
+          · ${answers.filter(x=>x!==null).length}/${total} answered
+        </div>
+      </div>
+      <div id="quizTimer" class="ed-timer">
+        ⏱️ ${fmtTime(Math.max(
+          0,
+          (quiz.durationMinutes||10)*60-
+          Math.round((Date.now()-attemptStartedAt)/1000)
+        ))}
+      </div>
+    </div>
+
+    <div class="ed-progress">
+      <i style="width:${Math.round(((current+1)/total)*100)}%"></i>
+    </div>
+
+    <div class="ed-dots">
+      ${quiz.questions.map((_,i)=>{
+        const isCurrent=i===current;
+        const answered=answers[i]!==null;
+        const canVisit=i<=current || answered;
+
+        return `
+          <button
+            type="button"
+            class="ed-dot ${isCurrent?'active':''} ${answered?'done':''}"
+            data-q="${i}"
+            ${canVisit?'':'disabled'}
+          >${i+1}</button>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="ed-q-card">
+      <p class="ed-q-title">
+        ${current+1}. ${esc(q.question)}
+      </p>
+
+      <div>
+        ${q.options.map((o,i)=>`
+          <label class="ed-option ${selected===i?'selected':''}">
+            <input
+              type="radio"
+              name="quizOption"
+              value="${i}"
+              ${selected===i?'checked':''}
+            >
+            <span>
+              <b>${String.fromCharCode(65+i)}.</b>
+              ${esc(o)}
+              ${i===4
+                ? '<small style="display:block;color:#64748b;margin-top:3px">इस option पर कोई negative marking नहीं होगी।</small>'
+                : ''}
+            </span>
+          </label>
+        `).join('')}
+      </div>
+
+      <div class="ed-nav">
+        <button
+          type="button"
+          class="btn"
+          id="prevQ"
+          ${current===0?'disabled':''}
+        >← Previous</button>
+
+        ${
+          current<total-1
+          ? `<button
+               type="button"
+               class="btn btn-primary"
+               id="nextQ"
+               ${hasAnswer?'':'disabled'}
+             >Next →</button>`
+          : `<button
+               type="button"
+               class="btn btn-primary"
+               id="submitQuizBtn"
+               ${hasAnswer?'':'disabled'}
+             >Submit Test</button>`
+        }
+      </div>
+
+      <div
+        class="ed-submit-note"
+        style="${hasAnswer
+          ? ''
+          : 'background:#fff7ed;color:#9a3412;border:1px solid #fed7aa'}"
+      >
+        ${
+          hasAnswer
+          ? 'E = Skip / Not Attempted · E पर 0 marks और कोई negative marking नहीं।'
+          : 'पहले A, B, C, D या E (Skip) में से एक option चुनना जरूरी है।'
+        }
+      </div>
+    </div>
+  `;
+
+  app.querySelectorAll('input[name="quizOption"]').forEach(el=>{
+    el.addEventListener('change',()=>{
+      answers[current]=Number(el.value);
+      renderQuizQuestion();
+    });
+  });
+
+  app.querySelectorAll('[data-q]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const target=Number(el.dataset.q);
+
+      // Never jump forward over an unanswered question.
+      if(target>current && answers[current]===null){
+        return;
+      }
+
+      current=target;
+      renderQuizQuestion();
+    });
+  });
+
+  $('prevQ')?.addEventListener('click',()=>{
+    current=Math.max(0,current-1);
+    renderQuizQuestion();
+  });
+
+  $('nextQ')?.addEventListener('click',()=>{
+    if(answers[current]===null){
+      alert('कृपया A, B, C, D या E (Skip) में से एक option चुनें।');
+      return;
+    }
+
+    current=Math.min(total-1,current+1);
+    renderQuizQuestion();
+  });
+
+  $('submitQuizBtn')?.addEventListener('click',()=>{
+    if(answers[current]===null){
+      alert('कृपया इस question में A, B, C, D या E (Skip) चुनें।');
+      return;
+    }
+
+    finishQuiz(false);
+  });
 }
 
 function startQuizTimer(){
@@ -4700,7 +4888,20 @@ async function loadQuiz(){
     if(!quiz){const q=query(collection(db,'quizzes'),where('status','==','published'),where('quizDate','==',today()),limit(1));const snap=await getDocs(q);if(snap.docs[0]){quizId=snap.docs[0].id;quiz=normalizeQuizConfig({id:quizId,...snap.docs[0].data()})}}
     $('quizLoading').hidden=true;
     if(!quiz){$('quizApp').hidden=false;$('quizApp').innerHTML='<div class="card empty"><h2>आज का quiz अभी publish नहीं हुआ है।</h2><p>Previous Quizzes नीचे उपलब्ध हैं।</p></div>';loadPrevious();return}
-    quiz.questions=Array.isArray(quiz.questions)?quiz.questions.filter(q=>q&&q.question&&Array.isArray(q.options)&&q.options.length>=2):[];
+    quiz.questions=Array.isArray(quiz.questions)
+  ? quiz.questions
+      .filter(q=>q&&q.question&&Array.isArray(q.options)&&q.options.length>=2)
+      .map(q=>{
+        const opts=[...q.options].slice(0,4);
+        while(opts.length<4) opts.push('');
+        opts.push('छोड़ें / Not Attempted');
+        return {
+          ...q,
+          options:opts,
+          answerIndex:Math.max(0,Math.min(3,Number(q.answerIndex)||0))
+        };
+      })
+  : [];
     if(!quiz.questions.length){$('quizApp').hidden=false;$('quizApp').innerHTML='<div class="card empty"><h2>इस quiz में अभी questions उपलब्ध नहीं हैं।</h2></div>';loadPrevious();return}
     answers=quiz.questions.map(()=>null);window.quiz=quiz;window.quizId=quizId;showStudentStart();loadPrevious();
   }catch(e){console.error(e);$('quizLoading').innerHTML=`<div class="empty"><strong>Quiz load नहीं हुआ.</strong><br>${esc(e.message||'Firestore error')}</div>`;loadPrevious()}

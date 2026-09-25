@@ -154,13 +154,39 @@ $('logout').onclick=()=>signOut(auth);
 /* ---------------- Daily Quiz CMS ---------------- */
 let quizQuestions=[];
 function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function newQuizQuestion(q={}){quizQuestions.push({question:q.question||'',options:Array.isArray(q.options)&&q.options.length===4?q.options:['','','',''],answerIndex:Number.isInteger(q.answerIndex)?q.answerIndex:0,explanation:q.explanation||''});renderQuizEditor();}
+function newQuizQuestion(q={}){
+  const base=Array.isArray(q.options)?q.options.slice(0,4):['','','',''];
+  while(base.length<4)base.push('');
+
+  quizQuestions.push({
+    question:q.question||'',
+    options:[...base,'छोड़ें / Not Attempted'],
+    answerIndex:Number.isInteger(q.answerIndex)&&q.answerIndex>=0&&q.answerIndex<=3?q.answerIndex:0,
+    explanation:q.explanation||''
+  });
+
+  renderQuizEditor();
+}
 function renderQuizEditor(){
   const box=$('quizQuestions');if(!box)return;
   box.innerHTML=quizQuestions.map((q,i)=>`<div class="quiz-admin-question card pad"><div class="quiz-admin-qhead"><strong>Question ${i+1}</strong><button type="button" class="btn btn-light" data-qremove="${i}">Remove</button></div>
   <div class="field"><label>Question</label><textarea data-qfield="${i}:question" rows="3" placeholder="Question text">${escapeHtml(q.question)}</textarea></div>
-  <div class="quiz-admin-options">${q.options.map((o,j)=>`<div class="field"><label>Option ${String.fromCharCode(65+j)}</label><input data-qfield="${i}:option:${j}" value="${escapeHtml(o)}"></div>`).join('')}</div>
-  <div class="admin-form-grid"><div class="field"><label>Correct Answer</label><select data-qfield="${i}:answer">${q.options.map((o,j)=>`<option value="${j}" ${q.answerIndex===j?'selected':''}>${String.fromCharCode(65+j)}${o?` — ${escapeHtml(o).slice(0,55)}`:''}</option>`).join('')}</select></div>
+  <div class="quiz-admin-options">
+    ${q.options.map((o,j)=>`
+      <div class="field">
+        <label>Option ${String.fromCharCode(65+j)}</label>
+        <input
+          data-qfield="${i}:option:${j}"
+          value="${escapeHtml(o)}"
+          ${j===4?'readonly':''}
+        >
+        ${j===4
+          ? '<small class="meta">E is mandatory Skip / Not Attempted. It gives 0 marks and no negative marking.</small>'
+          : ''}
+      </div>
+    `).join('')}
+  </div>
+  <div class="admin-form-grid"><div class="field"><label>Correct Answer (A–D only)</label><select data-qfield="${i}:answer">${q.options.slice(0,4).map((o,j)=>`<option value="${j}" ${q.answerIndex===j?'selected':''}>${String.fromCharCode(65+j)}${o?` — ${escapeHtml(o).slice(0,55)}`:''}</option>`).join('')}</select><small class="meta">E is always Skip / Not Attempted, never the correct answer.</small></div>
   <div class="field"><label>Explanation</label><textarea data-qfield="${i}:explanation" rows="2" placeholder="क्यों सही है?">${escapeHtml(q.explanation)}</textarea></div></div></div>`).join('')||'<div class="empty">पहला question add करें।</div>';
   box.querySelectorAll('[data-qremove]').forEach(b=>b.onclick=()=>{quizQuestions.splice(Number(b.dataset.qremove),1);renderQuizEditor()});
   box.querySelectorAll('[data-qfield]').forEach(el=>el.oninput=()=>syncQuizField(el));
@@ -178,10 +204,32 @@ function clearQuizForm(){
   quizQuestions=[];renderQuizEditor();$('quizMsg').textContent='';
 }
 function quizData(status){
-  const clean=quizQuestions.map(q=>({question:q.question.trim(),options:q.options.map(x=>x.trim()),answerIndex:Number(q.answerIndex),explanation:q.explanation.trim()}));
+  const clean=quizQuestions.map(q=>{
+    const options=(Array.isArray(q.options)?q.options.slice(0,4):[]);
+    while(options.length<4)options.push('');
+    options.push('छोड़ें / Not Attempted');
+
+    return {
+      question:q.question.trim(),
+      options,
+      answerIndex:Math.max(0,Math.min(3,Number(q.answerIndex)||0)),
+      explanation:q.explanation.trim()
+    };
+  });
+
   if(!clean.length)throw new Error('कम से कम 1 question add करें.');
-  if(clean.some(q=>!q.question||q.options.some(x=>!x)||q.options.length!==4))throw new Error('हर question में question text और चारों options भरें.');
-  if(clean.some(q=>q.answerIndex<0||q.answerIndex>3))throw new Error('हर question का correct answer select करें.');
+
+  if(clean.some(q=>!q.question||q.options.slice(0,4).some(x=>!x)))
+    throw new Error('हर question में question text और A-D options भरें.');
+
+  if(clean.some(q=>q.options.length!==5))
+    throw new Error('हर question में 5 options जरूरी हैं: A, B, C, D और E (Skip).');
+
+  if(clean.some(q=>q.options[4]!=='छोड़ें / Not Attempted'))
+    throw new Error('Option E को Skip / Not Attempted ही रखें.');
+
+  if(clean.some(q=>q.answerIndex<0||q.answerIndex>3))
+    throw new Error('Correct answer केवल A-D हो सकता है.');
   const date=$('quizDate').value;if(!date)throw new Error('Quiz date required.');
   const ratio=$('quizNegativeRatio')?.value||'1/3';
   let negativeNumerator=1,negativeDenominator=3;
@@ -253,7 +301,18 @@ function fillQuiz(q){
   $('quizShowRank').value=q.showRankAfterSubmit===false?'off':'on';
   $('quizTitle').value=q.title||'';
   $('quizDescription').value=q.description||'';
-  quizQuestions=(q.questions||[]).map(x=>({question:x.question||'',options:Array.isArray(x.options)&&x.options.length===4?x.options:['','','',''],answerIndex:Number(x.answerIndex)||0,explanation:x.explanation||''}));
+  quizQuestions=(q.questions||[]).map(x=>{
+    const options=Array.isArray(x.options)?x.options.slice(0,4):['','','',''];
+    while(options.length<4)options.push('');
+    options.push('छोड़ें / Not Attempted');
+
+    return {
+      question:x.question||'',
+      options,
+      answerIndex:Number.isInteger(Number(x.answerIndex))&&Number(x.answerIndex)>=0&&Number(x.answerIndex)<=3?Number(x.answerIndex):0,
+      explanation:x.explanation||''
+    };
+  });
   renderQuizEditor();$('quizMsg').textContent='Quiz loaded for editing.';document.querySelector('.admin-quiz-box')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 async function unpublishQuiz(id){
