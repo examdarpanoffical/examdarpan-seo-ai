@@ -4894,7 +4894,7 @@ async function loadQuiz(){
       .map(q=>{
         const opts=[...q.options].slice(0,4);
         while(opts.length<4) opts.push('');
-        opts.push('छोड़ें / Not Attempted');
+        opts.push('अनुत्तरित प्रश्न');
         return {
           ...q,
           options:opts,

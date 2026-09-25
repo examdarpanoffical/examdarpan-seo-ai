@@ -160,7 +160,7 @@ function newQuizQuestion(q={}){
 
   quizQuestions.push({
     question:q.question||'',
-    options:[...base,'छोड़ें / Not Attempted'],
+    options:[...base,'अनुत्तरित प्रश्न'],
     answerIndex:Number.isInteger(q.answerIndex)&&q.answerIndex>=0&&q.answerIndex<=3?q.answerIndex:0,
     explanation:q.explanation||''
   });
@@ -207,7 +207,7 @@ function quizData(status){
   const clean=quizQuestions.map(q=>{
     const options=(Array.isArray(q.options)?q.options.slice(0,4):[]);
     while(options.length<4)options.push('');
-    options.push('छोड़ें / Not Attempted');
+    options.push('अनुत्तरित प्रश्न');
 
     return {
       question:q.question.trim(),
@@ -225,7 +225,7 @@ function quizData(status){
   if(clean.some(q=>q.options.length!==5))
     throw new Error('हर question में 5 options जरूरी हैं: A, B, C, D और E (Skip).');
 
-  if(clean.some(q=>q.options[4]!=='छोड़ें / Not Attempted'))
+  if(clean.some(q=>q.options[4]!=='अनुत्तरित प्रश्न'))
     throw new Error('Option E को Skip / Not Attempted ही रखें.');
 
   if(clean.some(q=>q.answerIndex<0||q.answerIndex>3))
@@ -304,7 +304,7 @@ function fillQuiz(q){
   quizQuestions=(q.questions||[]).map(x=>{
     const options=Array.isArray(x.options)?x.options.slice(0,4):['','','',''];
     while(options.length<4)options.push('');
-    options.push('छोड़ें / Not Attempted');
+    options.push('अनुत्तरित प्रश्न');
 
     return {
       question:x.question||'',
