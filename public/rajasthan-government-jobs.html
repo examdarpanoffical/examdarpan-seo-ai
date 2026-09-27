@@ -13,7 +13,23 @@
 <link rel="canonical" href="https://examdarpan.in/rajasthan-government-jobs">
 <link rel="icon" type="image/png" href="/assets/logo.png?v=20260924-3"><link rel="apple-touch-icon" href="/assets/logo.png?v=20260924-3">
 <link rel="stylesheet" href="/styles.css">
-<script src="/firebase-config.js"></script>
+<script src="/firebase-config.js">
+async function getDocs(q){
+  const r = await fetch('/content-index.json',{cache:'default'});
+  if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
+  const data = await r.json();
+  const posts = Array.isArray(data.posts) ? data.posts : [];
+  const docs = posts
+    .filter(p => p && p.status === 'published')
+    .map((p,i) => ({
+      id: String(p.id || `static-${i}`),
+      data: () => p,
+      exists: () => true
+    }));
+  return {docs,empty:docs.length===0,size:docs.length};
+}
+
+</script>
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Exam Darpan">
@@ -699,18 +715,6 @@ Latest Updates <b>→</b>
 
 <script id="ed-rajasthan-live-hub-script" type="module">
 
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  where,
-  limit
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-
 const esc = (value = '') =>
   String(value).replace(/[&<>'"]/g, c => ({
     '&':'&amp;',
@@ -922,55 +926,21 @@ async function boot(){
 
   try{
 
-    if(!window.FIREBASE_CONFIG)
-      throw new Error('FIREBASE_CONFIG missing');
+    const response = await fetch('/content-index.json',{cache:'default'});
 
-    const app = initializeApp(window.FIREBASE_CONFIG);
-    const db = getFirestore(app);
+    if(!response.ok)
+      throw new Error(`content-index.json HTTP ${response.status}`);
 
-    const q = query(
-      collection(db, 'posts'),
-      where('status', '==', 'published')
-    );
+    const index = await response.json();
 
-    const snap = await getDocs(q);
-
-    const posts = snap.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
-      .filter(post => {
-        const text = [
-          post.title,
-          post.category,
-          post.slug,
-          post.excerpt,
-          post.description,
-          post.content,
-          post.tags
-        ]
-          .flat()
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
-
-        return /(?:\brajasthan\b|\brpsc\b|\brssb\b|\brsmssb\b|\breet\b|\brajasthan police\b|\brajasthan cet\b|\brvunl\b|\banuprati\b|\brajcrb\b|राजस्थान|अनुप्रति|सफाई\s*कर्मचारी|safai\s*karmchari|patwari|vdo|ldc|junior assistant|junior engineer|lab assistant|forest guard|agriculture supervisor)/i.test(text);
-      })
-      .sort((a, b) => {
-        const dateValue = post => {
-          const v = post.publishedAt;
-
-          if (v && typeof v.seconds === 'number') {
-            return v.seconds * 1000;
-          }
-
-          const t = new Date(v || 0).getTime();
-          return Number.isFinite(t) ? t : 0;
-        };
-
-        return dateValue(b) - dateValue(a);
-      });
+    const posts = Array.isArray(index.posts)
+      ? index.posts
+          .filter(post =>
+            post &&
+            String(post.status || '').toLowerCase() === 'published'
+          )
+          .sort((a,b) => timeOf(b.publishedAt) - timeOf(a.publishedAt))
+      : [];
 
     render(posts);
 
@@ -991,7 +961,6 @@ async function boot(){
     if(count) count.textContent = '—';
   }
 }
-
 boot();
 
 </script>

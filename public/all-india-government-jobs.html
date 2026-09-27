@@ -351,6 +351,22 @@ content="All India Government Jobs 2026 की latest सरकारी भर�
     }
   } catch(e) {}
 })();
+
+async function getDocs(q){
+  const r = await fetch('/content-index.json',{cache:'default'});
+  if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
+  const data = await r.json();
+  const posts = Array.isArray(data.posts) ? data.posts : [];
+  const docs = posts
+    .filter(p => p && p.status === 'published')
+    .map((p,i) => ({
+      id: String(p.id || `static-${i}`),
+      data: () => p,
+      exists: () => true
+    }));
+  return {docs,empty:docs.length===0,size:docs.length};
+}
+
 </script>
 </head>
 
@@ -609,59 +625,20 @@ function render(){
 
 async function loadJobs(){
   try{
-    const {initializeApp}=await import(
-      'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js'
-    );
 
-    const {
-      getFirestore,
-      collection,
-      getDocs,
-      query,
-      where,
-      orderBy,
-      limit
-    }=await import(
-      'https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js'
-    );
+    const response = await fetch('/content-index.json',{cache:'default'});
 
-    const app=initializeApp(
-      window.FIREBASE_CONFIG,
-      'all-india-jobs-hub'
-    );
+    if(!response.ok)
+      throw new Error(`content-index.json HTTP ${response.status}`);
 
-    const db=getFirestore(app);
+    const index = await response.json();
 
-    let snapshot;
-
-    try{
-      const q=query(
-        collection(db,'posts'),
-        where('status','==','published'),
-        orderBy('publishedAt','desc'),
-        limit(100)
-      );
-
-      snapshot=await getDocs(q);
-    }catch(error){
-      console.warn(
-        'Ordered jobs query failed; using fallback query.',
-        error
-      );
-
-      const q=query(
-        collection(db,'posts'),
-        where('status','==','published'),
-        limit(100)
-      );
-
-      snapshot=await getDocs(q);
-    }
-
-    allJobs=snapshot.docs.map(doc=>({
-      id:doc.id,
-      ...doc.data()
-    }));
+    allJobs = Array.isArray(index.posts)
+      ? index.posts.filter(post =>
+          post &&
+          String(post.status || '').toLowerCase() === 'published'
+        )
+      : [];
 
     render();
 
@@ -678,7 +655,6 @@ async function loadJobs(){
     `;
   }
 }
-
 filters.addEventListener('click',event=>{
   const button=event.target.closest('[data-filter]');
 
