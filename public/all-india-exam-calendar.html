@@ -297,14 +297,16 @@ footer a{
 }
 </style>
 
-<script src="/firebase-config.js">
+<script src="/firebase-config.js"></script>
+
+<script>
 async function getDocs(q){
   const r = await fetch('/content-index.json',{cache:'default'});
   if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
   const data = await r.json();
   const posts = Array.isArray(data.posts) ? data.posts : [];
   const docs = posts
-    .filter(p => p && p.status === 'published')
+    .filter(p => p && String(p.status || '').toLowerCase() === 'published')
     .map((p,i) => ({
       id: String(p.id || `static-${i}`),
       data: () => p,
@@ -312,8 +314,8 @@ async function getDocs(q){
     }));
   return {docs,empty:docs.length===0,size:docs.length};
 }
-
 </script>
+
 <link rel="icon" type="image/png" href="/assets/logo.png?v=20260924-3"><link rel="apple-touch-icon" href="/assets/logo.png?v=20260924-3"><meta property="og:image" content="https://examdarpan.in/assets/og-logo.png"><script>
 /* Exam Darpan: remove legacy splash/service-worker/cache */
 (function(){
