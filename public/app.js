@@ -40,28 +40,16 @@ const readingTime=html=>{
   return Math.max(1,Math.ceil(words/180));
 };
 
-async function loadFirebase(){
-  if(db) return db;
+let contentIndex=null;
 
-  const [{initializeApp},{getFirestore,collection,getDocs,query,where,orderBy,limit}]=await Promise.all([
-    import('https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js'),
-    import('https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js')
-  ]);
-
-  app=initializeApp(window.FIREBASE_CONFIG);
-  db=getFirestore(app);
-
-  window.__ED_FIREBASE={
-    collection,
-    getDocs,
-    query,
-    where,
-    orderBy,
-    limit
-  };
-
-  return db;
+async function loadContentIndex(){
+  if(contentIndex) return contentIndex;
+  const r=await fetch('/content-index.json',{cache:'default'});
+  if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
+  contentIndex=await r.json();
+  return contentIndex;
 }
+
 
 function getStaticPostsFromDOM(){
   const container=$('#postsContainer');
@@ -186,72 +174,17 @@ function getMatrixPosts(){
 
 async function loadPosts(){
   try{
-    await loadFirebase();
-
-    const {
-      collection,
-      getDocs,
-      query,
-      where,
-      orderBy,
-      limit
-    }=window.__ED_FIREBASE;
-
-    let snap;
-
-    try{
-      const q=query(
-        collection(db,'posts'),
-        where('status','==','published'),
-        orderBy('publishedAt','desc'),
-        limit(60)
-      );
-
-      snap=await getDocs(q);
-    }catch(queryError){
-      console.warn(
-        'Ordered posts query failed; using published-only fallback:',
-        queryError
-      );
-
-      const fallbackQuery=query(
-        collection(db,'posts'),
-        where('status','==','published'),
-        limit(60)
-      );
-
-      snap=await getDocs(fallbackQuery);
-    }
-
-    posts=snap.docs.map(d=>({
-      id:d.id,
-      ...d.data()
-    }));
-
-    // If Firestore has no usable published posts, use the
-    // already-rendered static article cards as the source.
-    if(!posts.length){
-      posts=getStaticPostsFromDOM();
-    }
-
-    postsLoaded=true;
-    postsLoadFailed=false;
-
-    render();
+    const data=await loadContentIndex();
+    posts=Array.isArray(data.posts)?data.posts:[];
+    if(!posts.length) posts=getStaticPostsFromDOM();
+    postsLoaded=true; postsLoadFailed=false; render();
   }catch(e){
-    console.error('Posts load failed:',e);
-
-    posts=getStaticPostsFromDOM();
-    postsLoaded=true;
-    postsLoadFailed=!posts.length;
-
-    if(posts.length){
-      render();
-    }else{
-      renderMatrix();
-    }
+    console.error('Static content index load failed:',e);
+    posts=getStaticPostsFromDOM(); postsLoaded=true; postsLoadFailed=!posts.length;
+    if(posts.length) render(); else renderMatrix();
   }
 }
+
 
 function render(){
   const search=($('#searchInput')?.value||'').toLowerCase().trim();
@@ -857,76 +790,21 @@ async function loadDailyQuiz(){
   const meta=$('#dailyQuizMeta');
   const cta=$('#dailyQuizCta');
   const summary=$('#dailyQuizSummary');
-
   if(!meta) return;
-
   try{
-    await loadFirebase();
-
-    const {
-      collection,
-      getDocs,
-      query,
-      where,
-      limit
-    }=window.__ED_FIREBASE;
-
+    const data=await loadContentIndex();
+    const quizzes=Array.isArray(data.quizzes)?data.quizzes:[];
     const now=new Date();
-
-    const y=now.getFullYear();
-    const m=String(now.getMonth()+1).padStart(2,'0');
-    const d=String(now.getDate()).padStart(2,'0');
-
-    const today=`${y}-${m}-${d}`;
-
-    const q=query(
-      collection(db,'quizzes'),
-      where('status','==','published'),
-      where('quizDate','==',today),
-      limit(1)
-    );
-
-    const snap=await getDocs(q);
-    const docSnap=snap.docs[0];
-
-    if(!docSnap){
-      meta.textContent=
-        'आज का quiz अभी publish नहीं हुआ है।';
-
-      cta.textContent='Previous Quizzes →';
-      cta.href='/quiz.html#previous';
-
-      return;
-    }
-
-    const quiz=docSnap.data();
-
-    const count=
-      Array.isArray(quiz.questions)
-        ? quiz.questions.length
-        : 0;
-
-    meta.textContent=
-      `${count} Questions • ${quiz.durationMinutes||10} Minutes`;
-
-    cta.textContent='Start Today’s Quiz →';
-
-    cta.href=
-      `/quiz.html?id=${encodeURIComponent(docSnap.id)}`;
-
-    if(summary){
-      summary.textContent=
-        quiz.description ||
-        'Timer के साथ quiz दें और submit करने के बाद score, सही-गलत answers और explanations देखें।';
-    }
-
-  }catch(e){
-    console.warn('Daily quiz unavailable',e);
-
-    meta.textContent=
-      'आज का quiz check करने के लिए खोलें।';
-  }
+    const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const quiz=quizzes.find(q=>q&&q.status==='published'&&q.quizDate===today);
+    if(!quiz){ meta.textContent='आज का quiz अभी publish नहीं हुआ है।'; cta.textContent='Previous Quizzes →'; cta.href='/quiz.html#previous'; return; }
+    const count=Array.isArray(quiz.questions)?quiz.questions.length:0;
+    meta.textContent=`${count} Questions • ${quiz.durationMinutes||10} Minutes`;
+    cta.textContent='Start Today’s Quiz →'; cta.href=`/quiz.html?id=${encodeURIComponent(quiz.id)}`;
+    if(summary) summary.textContent=quiz.description||'Timer के साथ quiz दें और submit करने के बाद score, सही-गलत answers और explanations देखें।';
+  }catch(e){ console.warn('Static daily quiz unavailable',e); meta.textContent='आज का quiz check करने के लिए खोलें।'; }
 }
+
 
 function updateYear(){
   const year=new Date().getFullYear();

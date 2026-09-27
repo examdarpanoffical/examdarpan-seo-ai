@@ -4433,11 +4433,8 @@ async function ensureAnonymousStudent(){
 function updateScroll(){
   const max=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
   const pct=Math.min(100,Math.max(0,Math.round((window.scrollY/max)*100)));
-  if(pct>maxScrollPercent)maxScrollPercent=pct;
-  if(attemptId&&studentUid){
-    clearTimeout(scrollTimer);
-    scrollTimer=setTimeout(async()=>{try{await updateDoc(doc(db,'quizAttempts',attemptId),{maxScrollPercent,lastScrollPercent:pct,lastActiveAt:serverTimestamp()})}catch{}} ,700);
-  }
+  if(pct>maxScrollPercent) maxScrollPercent=pct;
+  // Persist scroll telemetry only with the final attempt; no write per scroll.
 }
 
 async function createAttempt(){
@@ -4884,31 +4881,55 @@ async function showStudentStart(){
 async function loadQuiz(){
   const id=new URLSearchParams(location.search).get('id');
   try{
-    if(id){const s=await getDoc(doc(db,'quizzes',id));if(s.exists()&&s.data().status==='published'){quizId=s.id;quiz=normalizeQuizConfig({id:s.id,...s.data()})}}
-    if(!quiz){const q=query(collection(db,'quizzes'),where('status','==','published'),where('quizDate','==',today()),limit(1));const snap=await getDocs(q);if(snap.docs[0]){quizId=snap.docs[0].id;quiz=normalizeQuizConfig({id:quizId,...snap.docs[0].data()})}}
+    const response=await fetch('/content-index.json',{cache:'default'});
+    if(!response.ok) throw new Error(`content-index.json HTTP ${response.status}`);
+    const index=await response.json();
+    const published=Array.isArray(index.quizzes)?index.quizzes.filter(q=>q&&q.status==='published'):[];
+    let selected=id?published.find(q=>q.id===id):published.find(q=>q.quizDate===today());
+    // Rare fallback for an old direct quiz URL outside the 30-item manifest.
+    if(!selected && id){
+      const s=await getDoc(doc(db,'quizzes',id));
+      if(s.exists()&&s.data().status==='published') selected={id:s.id,...s.data()};
+    }
+    if(selected){ quizId=selected.id; quiz=normalizeQuizConfig(selected); }
     $('quizLoading').hidden=true;
-    if(!quiz){$('quizApp').hidden=false;$('quizApp').innerHTML='<div class="card empty"><h2>आज का quiz अभी publish नहीं हुआ है।</h2><p>Previous Quizzes नीचे उपलब्ध हैं।</p></div>';loadPrevious();return}
-    quiz.questions=Array.isArray(quiz.questions)
-  ? quiz.questions
-      .filter(q=>q&&q.question&&Array.isArray(q.options)&&q.options.length>=2)
-      .map(q=>{
-        const opts=[...q.options].slice(0,4);
-        while(opts.length<4) opts.push('');
-        opts.push('अनुत्तरित प्रश्न');
-        return {
-          ...q,
-          options:opts,
-          answerIndex:Math.max(0,Math.min(3,Number(q.answerIndex)||0))
-        };
-      })
-  : [];
-    if(!quiz.questions.length){$('quizApp').hidden=false;$('quizApp').innerHTML='<div class="card empty"><h2>इस quiz में अभी questions उपलब्ध नहीं हैं।</h2></div>';loadPrevious();return}
-    answers=quiz.questions.map(()=>null);window.quiz=quiz;window.quizId=quizId;showStudentStart();loadPrevious();
-  }catch(e){console.error(e);$('quizLoading').innerHTML=`<div class="empty"><strong>Quiz load नहीं हुआ.</strong><br>${esc(e.message||'Firestore error')}</div>`;loadPrevious()}
+    if(!quiz){
+      $('quizApp').hidden=false;
+      $('quizApp').innerHTML='<div class="card empty"><h2>आज का quiz अभी publish नहीं हुआ है।</h2><p>Previous Quizzes नीचे उपलब्ध हैं।</p></div>';
+      loadPrevious(published); return;
+    }
+    quiz.questions=Array.isArray(quiz.questions)?quiz.questions.filter(q=>q&&q.question&&Array.isArray(q.options)&&q.options.length>=2).map(q=>{
+      const opts=[...q.options].slice(0,4); while(opts.length<4) opts.push(''); opts.push('अनुत्तरित प्रश्न');
+      return {...q,options:opts,answerIndex:Math.max(0,Math.min(3,Number(q.answerIndex)||0))};
+    }):[];
+    if(!quiz.questions.length){
+      $('quizApp').hidden=false; $('quizApp').innerHTML='<div class="card empty"><h2>इस quiz में अभी questions उपलब्ध नहीं हैं।</h2></div>';
+      loadPrevious(published); return;
+    }
+    answers=quiz.questions.map(()=>null); window.quiz=quiz; window.quizId=quizId; showStudentStart(); loadPrevious(published);
+  }catch(e){
+    console.error(e);
+    $('quizLoading').innerHTML=`<div class="empty"><strong>Quiz load नहीं हुआ.</strong><br>${esc(e.message||'Static content error')}</div>`;
+    loadPrevious();
+  }
 }
 
-async function loadPrevious(){
-  try{const q=query(collection(db,'quizzes'),where('status','==','published'),orderBy('quizDate','desc'),limit(12));const snap=await getDocs(q);const rows=snap.docs.map(s=>({id:s.id,...s.data()})).filter(x=>x.id!==quizId);$('previousList').innerHTML=rows.length?rows.map(x=>{let attempt=null;try{attempt=JSON.parse(localStorage.getItem(`examDarpanQuiz:${x.id}`)||'null')}catch{};return `<a class="previous-quiz" href="/quiz.html?id=${encodeURIComponent(x.id)}"><div><strong>${esc(x.title||'Daily Quiz')}</strong><span>${fmtDate(x.quizDate)} · ${(x.questions||[]).length} Questions · ${x.durationMinutes||10} min${attempt?` · Last score: ${fmtScore(attempt.score??attempt.right)}/${fmtScore(attempt.maxMarks??attempt.total)}`:''}</span></div><b>→</b></a>`}).join(''):'<div class="empty">अभी previous quizzes उपलब्ध नहीं हैं।</div>'}catch(e){console.warn('Previous quizzes load failed',e);$('previousList').innerHTML='<div class="empty">Previous quizzes अभी load नहीं हो पाए।</div>'}
+async function loadPrevious(rows){
+  try{
+    if(!Array.isArray(rows)){
+      const r=await fetch('/content-index.json',{cache:'default'});
+      if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
+      const index=await r.json(); rows=Array.isArray(index.quizzes)?index.quizzes.filter(q=>q&&q.status==='published'):[];
+    }
+    rows=rows.filter(x=>x.id!==quizId).slice(0,12);
+    $('previousList').innerHTML=rows.length?rows.map(x=>{
+      let attempt=null; try{attempt=JSON.parse(localStorage.getItem(`examDarpanQuiz:${x.id}`)||'null')}catch{}
+      return `<a class="previous-quiz" href="/quiz.html?id=${encodeURIComponent(x.id)}"><div><strong>${esc(x.title||'Daily Quiz')}</strong><span>${fmtDate(x.quizDate)} · ${(x.questions||[]).length} Questions · ${x.durationMinutes||10} min${attempt?` · Last score: ${fmtScore(attempt.score??attempt.right)}/${fmtScore(attempt.maxMarks??attempt.total)}`:''}</span></div><b>→</b></a>`;
+    }).join(''):'<div class="empty">अभी previous quizzes उपलब्ध नहीं हैं।</div>';
+  }catch(e){
+    console.warn('Previous quizzes load failed',e);
+    $('previousList').innerHTML='<div class="empty">Previous quizzes अभी load नहीं हो पाए।</div>';
+  }
 }
 
 loadQuiz();

@@ -215,89 +215,27 @@
     });
   }
 
-  async function loadEntries(ctx, quizId){
-    const {db,collection,getDocs,query,where,limit}=ctx;
-
-    const mapRows=(snap)=>snap.docs
-      .map(d=>({id:d.id,...d.data()}))
-      .filter(x=>x.status==='submitted' && Number.isFinite(Number(x.score)))
-      .sort((a,b)=>
-        Number(b.score)-Number(a.score) ||
-        Number(b.correct||b.right||0)-Number(a.correct||a.right||0) ||
-        Number(a.wrong||0)-Number(b.wrong||0) ||
-        Number(a.timeTakenSeconds||a.timeSpentSeconds||0)-
-          Number(b.timeTakenSeconds||b.timeSpentSeconds||0) ||
-        Number(a.submittedAtMs||0)-Number(b.submittedAtMs||0)
-      );
-
-    /*
-     * Public leaderboard source.
-     * quizLeaderboard has public read permission in firestore.rules,
-     * so it can contain submissions from all students.
-     */
-    try{
-      const snap=await getDocs(query(
-        collection(db,'quizLeaderboard'),
-        where('quizId','==',quizId),
-        limit(1000)
-      ));
-
-      const rows=mapRows(snap);
-
-      if(rows.length){
-        const latest=new Map();
-
-        rows.forEach(row=>{
-          const key=row.studentUid||row.id;
-          const prev=latest.get(key);
-          const rowMs=Number(row.submittedAtMs||0);
-          const prevMs=Number(prev?.submittedAtMs||0);
-
-          if(!prev || rowMs>=prevMs){
-            latest.set(key,row);
-          }
-        });
-
-        return [...latest.values()].sort((a,b)=>
-          Number(b.score)-Number(a.score) ||
-          Number(b.correct||b.right||0)-Number(a.correct||a.right||0) ||
-          Number(a.wrong||0)-Number(b.wrong||0) ||
-          Number(a.timeTakenSeconds||a.timeSpentSeconds||0)-
-            Number(b.timeTakenSeconds||b.timeSpentSeconds||0) ||
-          Number(a.submittedAtMs||0)-Number(b.submittedAtMs||0)
-        );
-      }
-    }catch(e){
-      console.warn('[ExamDarpan leaderboard] public leaderboard read failed',e);
+  async function loadEntries(ctx, quizId, studentUid){
+    const {db,collection,getDocs,getDoc,doc,query,where,orderBy,limit}=ctx;
+    const mapRows=snap=>snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.status==='submitted'&&Number.isFinite(Number(x.score)));
+    // Only top 10 are needed for the public board. Firestore bills returned docs.
+    const topSnap=await getDocs(query(collection(db,'quizLeaderboard'),where('quizId','==',quizId),orderBy('score','desc'),limit(10)));
+    const topRows=mapRows(topSnap).sort((a,b)=>Number(b.score)-Number(a.score)||Number(b.correct??b.right??0)-Number(a.correct??a.right??0)||Number(a.wrong??0)-Number(b.wrong??0)||Number(a.timeTakenSeconds??a.timeSpentSeconds??0)-Number(b.timeTakenSeconds??b.timeSpentSeconds??0)||Number(a.submittedAtMs??0)-Number(b.submittedAtMs??0));
+    let me=topRows.find(x=>x.studentUid===studentUid)||null;
+    if(!me){
+      const own=await getDoc(doc(db,'quizLeaderboard',`${quizId}_${studentUid}`));
+      if(own.exists()){ const row={id:own.id,...own.data()}; if(row.status==='submitted'&&Number.isFinite(Number(row.score))) me=row; }
     }
-
-    /*
-     * Fallback: own quizAttempt. This keeps the result useful if the
-     * leaderboard write was rejected or an older submission has no
-     * quizLeaderboard document.
-     */
-    try{
-      const snap=await getDocs(query(
-        collection(db,'quizAttempts'),
-        where('quizId','==',quizId),
-        limit(1000)
-      ));
-
-      return mapRows(snap);
-    }catch(e){
-      console.warn('[ExamDarpan leaderboard] quizAttempts read failed',e);
-      return [];
-    }
+    return {topRows,me};
   }
 
-  function renderCard(result, user, rows){
-    if(!result || !result.quizId || !rows.length) return;
-
-    const me=rows.find(x=>x.studentUid===user.uid);
-    if(!me) return;
-
-    const rank=rows.findIndex(x=>x.studentUid===user.uid)+1;
-    const top=rows.slice(0,10);
+  function renderCard(result, user, data){
+    if(!result || !result.quizId || !data) return;
+    const me=data.me;
+    const top=data.topRows||[];
+    if(!me && !top.length) return;
+    const rankIndex=top.findIndex(x=>x.studentUid===user.uid);
+    const rank=rankIndex>=0?rankIndex+1:null;
 
     injectStyle();
 
@@ -321,7 +259,7 @@
       </div>
 
       <div class="ed-lb-self">
-        <div class="ed-lb-rank">#${rank}</div>
+        <div class="ed-lb-rank">${rank?`#${rank}`:"—"}</div>
         <div>
           <strong>${esc(me.studentName||'Student')}</strong>
           <small>
@@ -337,7 +275,7 @@
 
       <div class="ed-lb-section-title">
         <span>TOP PERFORMERS</span>
-        <span>${rows.length} students</span>
+        <span>Top ${top.length} students</span>
       </div>
 
       <div class="ed-lb-list">
@@ -360,7 +298,7 @@
       </div>
 
       <div class="ed-lb-next">
-        <b>Your Rank: #${rank}</b>
+        ${rank ? `<b>Your Top-10 Rank: #${rank}</b>` : `<b>Your result is shown above</b>`}
         · Ranking पहले Score, फिर Correct Answers, फिर कम Wrong और कम Time से तय होती है।
       </div>
     `;
@@ -415,6 +353,7 @@
     }
 
     let rendering=false;
+    let observer=null;
 
     const getQuizId=()=>{
       return window.quizId ||
@@ -446,16 +385,12 @@
          * Firestore write may become queryable a moment after updateDoc/addDoc.
          * Retry several times.
          */
-        for(let attempt=0;attempt<10;attempt++){
-          const rows=await loadEntries(ctx,quizId);
-
-          if(rows.length){
-            renderCard(resultData,user,rows);
-            submissionPending=false;
-            return;
-          }
-
-          await new Promise(r=>setTimeout(r,500*(attempt+1)));
+        const data=await loadEntries(ctx,quizId,user.uid);
+        if(data.me || data.topRows.length){
+          if(observer) observer.disconnect();
+          renderCard(resultData,user,data);
+          submissionPending=false;
+          return;
         }
 
         console.warn(
@@ -487,7 +422,7 @@
      * - browser refresh/re-entry
      * - slower Firestore writes
      */
-    const observer=new MutationObserver(()=>{
+    observer=new MutationObserver(()=>{
       if(!resultBox.hidden){
         clearTimeout(refreshTimer);
         refreshTimer=setTimeout(refresh,300);
