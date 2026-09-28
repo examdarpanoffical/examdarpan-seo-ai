@@ -385,8 +385,23 @@
          * Firestore write may become queryable a moment after updateDoc/addDoc.
          * Retry several times.
          */
-        const data=await loadEntries(ctx,quizId,user.uid);
-        if(data.me || data.topRows.length){
+        /*
+         * Firestore write is normally immediately queryable, but do not let
+         * a short browser/Firestore timing race hide the leaderboard.
+         */
+        let data=null;
+
+        for(let attempt=0;attempt<6;attempt++){
+          data=await loadEntries(ctx,quizId,user.uid);
+
+          if(data.me || data.topRows.length){
+            break;
+          }
+
+          await new Promise(r=>setTimeout(r,400));
+        }
+
+        if(data && (data.me || data.topRows.length)){
           if(observer) observer.disconnect();
           renderCard(resultData,user,data);
           submissionPending=false;
@@ -394,7 +409,7 @@
         }
 
         console.warn(
-          '[ExamDarpan leaderboard] No public leaderboard rows found:',
+          '[ExamDarpan leaderboard] No public leaderboard rows found after retries:',
           quizId
         );
 
