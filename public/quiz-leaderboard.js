@@ -217,14 +217,14 @@
 
   async function loadEntries(ctx, quizId, studentUid){
     const {db,collection,getDocs,getDoc,doc,query,where,orderBy,limit}=ctx;
-    const mapRows=snap=>snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.status==='submitted'&&Number.isFinite(Number(x.score)));
+    const mapRows=snap=>snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>Number.isFinite(Number(x.score)));
     // Only top 10 are needed for the public board. Firestore bills returned docs.
     const topSnap=await getDocs(query(collection(db,'quizLeaderboard'),where('quizId','==',quizId),orderBy('score','desc'),limit(10)));
     const topRows=mapRows(topSnap).sort((a,b)=>Number(b.score)-Number(a.score)||Number(b.correct??b.right??0)-Number(a.correct??a.right??0)||Number(a.wrong??0)-Number(b.wrong??0)||Number(a.timeTakenSeconds??a.timeSpentSeconds??0)-Number(b.timeTakenSeconds??b.timeSpentSeconds??0)||Number(a.submittedAtMs??0)-Number(b.submittedAtMs??0));
     let me=topRows.find(x=>x.studentUid===studentUid)||null;
     if(!me){
       const own=await getDoc(doc(db,'quizLeaderboard',`${quizId}_${studentUid}`));
-      if(own.exists()){ const row={id:own.id,...own.data()}; if(row.status==='submitted'&&Number.isFinite(Number(row.score))) me=row; }
+      if(own.exists()){ const row={id:own.id,...own.data()}; if(Number.isFinite(Number(row.score))) me=row; }
     }
     return {topRows,me};
   }
