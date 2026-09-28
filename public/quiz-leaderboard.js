@@ -322,10 +322,12 @@
      * exists and the leaderboard never renders.
      */
     let submissionPending=false;
+    let submissionDetail=null;
     let refreshTimer=null;
 
-    const requestRefresh=()=>{
+    const requestRefresh=(event)=>{
       submissionPending=true;
+      submissionDetail=event?.detail||null;
       clearTimeout(refreshTimer);
       refreshTimer=setTimeout(()=>refresh(),250);
     };
@@ -391,6 +393,34 @@
          */
         let data=null;
 
+        /*
+         * Immediate fallback:
+         * submit event already contains the student's verified result.
+         * Render it immediately so the leaderboard area never stays blank
+         * during Firebase/Auth/Firestore timing races.
+         */
+        if(
+          submissionDetail &&
+          submissionDetail.quizId===quizId &&
+          submissionDetail.studentUid
+        ){
+          const immediateMe={
+            ...submissionDetail,
+            id:`${quizId}_${submissionDetail.studentUid}`,
+            total:submissionDetail.maxMarks
+          };
+
+          renderCard(
+            {
+              quizId,
+              quizDate:submissionDetail.quizDate||today(),
+              maxMarks:submissionDetail.maxMarks||resultData.maxMarks
+            },
+            {uid:submissionDetail.studentUid},
+            {topRows:[immediateMe],me:immediateMe}
+          );
+        }
+
         for(let attempt=0;attempt<6;attempt++){
           data=await loadEntries(ctx,quizId,user.uid);
 
@@ -405,8 +435,16 @@
           if(observer) observer.disconnect();
           renderCard(resultData,user,data);
           submissionPending=false;
+          submissionDetail=null;
           return;
         }
+
+        /*
+         * Keep the immediate result visible if Firestore ranking query
+         * temporarily fails. Do not erase the already-rendered card.
+         */
+        submissionPending=false;
+        submissionDetail=null;
 
         console.warn(
           '[ExamDarpan leaderboard] No public leaderboard rows found after retries:',

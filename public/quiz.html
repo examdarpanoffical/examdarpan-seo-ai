@@ -4868,7 +4868,7 @@ async function finishQuiz(auto=false){
 
   await saveAttemptResult(result);
   window.quiz=quiz;window.quizId=quizId;
-  if(quiz.leaderboardEnabled!==false&&quiz.showRankAfterSubmit!==false){window.dispatchEvent(new CustomEvent('examDarpan:quizSubmitted',{detail:{quizId}}))}
+  if(quiz.leaderboardEnabled!==false&&quiz.showRankAfterSubmit!==false){window.dispatchEvent(new CustomEvent('examDarpan:quizSubmitted',{detail:{quizId,quizDate:quiz.quizDate||today(),studentUid,studentName,maxMarks:result.maxMarks,score:result.score,right:result.right,wrong:result.wrong,skipped:result.skipped,timeTakenSeconds:result.timeTakenSeconds,negativeMarkingEnabled:result.negativeMarkingEnabled,negativeDeductionPerWrong:result.negativeDeductionPerWrong}}))}
   $('retry')?.addEventListener('click',async()=>{try{clearInterval(timer);submitted=false;started=false;await createAttempt();started=true;current=0;answers=quiz.questions.map(()=>null);$('quizResult').hidden=true;renderQuizQuestion();startQuizTimer();window.scrollTo({top:0,behavior:'smooth'})}catch(e){alert('Test restart नहीं हो पाया: '+(e.message||e))}});
 }
 
