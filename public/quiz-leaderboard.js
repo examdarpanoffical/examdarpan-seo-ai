@@ -218,14 +218,47 @@
   async function loadEntries(ctx, quizId, studentUid){
     const {db,collection,getDocs,getDoc,doc,query,where,orderBy,limit}=ctx;
     const mapRows=snap=>snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>Number.isFinite(Number(x.score)));
-    // Only top 10 are needed for the public board. Firestore bills returned docs.
-    const topSnap=await getDocs(query(collection(db,'quizLeaderboard'),where('quizId','==',quizId),orderBy('score','desc'),limit(10)));
-    const topRows=mapRows(topSnap).sort((a,b)=>Number(b.score)-Number(a.score)||Number(b.correct??b.right??0)-Number(a.correct??a.right??0)||Number(a.wrong??0)-Number(b.wrong??0)||Number(a.timeTakenSeconds??a.timeSpentSeconds??0)-Number(b.timeTakenSeconds??b.timeSpentSeconds??0)||Number(a.submittedAtMs??0)-Number(b.submittedAtMs??0));
-    let me=topRows.find(x=>x.studentUid===studentUid)||null;
-    if(!me){
-      const own=await getDoc(doc(db,'quizLeaderboard',`${quizId}_${studentUid}`));
-      if(own.exists()){ const row={id:own.id,...own.data()}; if(Number.isFinite(Number(row.score))) me=row; }
-    }
+    /*
+     * Load all submissions for this quiz and sort locally.
+     * Do NOT use Firestore orderBy(score) here: that requires a composite
+     * index and can silently leave only the immediate/current result visible.
+     */
+    const snap=await getDocs(query(
+      collection(db,'quizLeaderboard'),
+      where('quizId','==',quizId),
+      limit(1000)
+    ));
+
+    const allRows=mapRows(snap);
+
+    // One leaderboard row per student. The document ID is attemptId, so
+    // multiple students/submissions must never overwrite each other.
+    const latest=new Map();
+
+    allRows.forEach(row=>{
+      const key=row.studentUid||row.id;
+      const previous=latest.get(key);
+
+      const rowMs=Number(row.submittedAtMs||0);
+      const previousMs=Number(previous?.submittedAtMs||0);
+
+      if(!previous || rowMs>=previousMs){
+        latest.set(key,row);
+      }
+    });
+
+    const ranked=[...latest.values()].sort((a,b)=>
+      Number(b.score||0)-Number(a.score||0) ||
+      Number(b.correct??b.right??0)-Number(a.correct??a.right??0) ||
+      Number(a.wrong||0)-Number(b.wrong||0) ||
+      Number(a.timeTakenSeconds??a.timeSpentSeconds??0)-
+        Number(b.timeTakenSeconds??b.timeSpentSeconds??0) ||
+      Number(a.submittedAtMs||0)-Number(b.submittedAtMs||0)
+    );
+
+    const topRows=ranked.slice(0,10);
+    let me=ranked.find(x=>x.studentUid===studentUid)||null;
+
     return {topRows,me};
   }
 
