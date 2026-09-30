@@ -4513,7 +4513,7 @@ async function saveAttemptResult(result){
       submittedAtMs:Date.now()
     };
 
-    const leaderboardId = `${quizId}_${studentUid}`;
+    const leaderboardId = attemptId;
     await setDoc(
       doc(db,'quizLeaderboard',leaderboardId),
       leaderboardPayload,
