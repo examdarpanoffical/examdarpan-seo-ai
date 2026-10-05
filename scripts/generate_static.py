@@ -37,6 +37,7 @@ INSTAGRAM = "https://www.instagram.com/examdarpan_official/"
 X_SOCIAL = "https://x.com/exam_darpan"
 WHATSAPP_GROUP = "https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
 GA4_ID = "G-FWB3YMTSDX"
+ADSENSE_SCRIPT = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1703856216593161"\n     crossorigin="anonymous"></script>'
 # Site branding assets
 SITE_LOGO = "/assets/logo.png?v=20260924-3"
 SITE_FAVICON = "/assets/favicon.png?v=20260924-3"
@@ -650,6 +651,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="{esc(url)}">
 <link rel="alternate" type="application/rss+xml" title="Exam Darpan RSS" href="{BASE}/feed.xml">
+{ADSENSE_SCRIPT}
 <meta property="og:type" content="article"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(search_title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{esc(img)}">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(search_title)}"><meta name="twitter:description" content="{esc(desc)}"><meta name="twitter:image" content="{esc(img)}">
 
