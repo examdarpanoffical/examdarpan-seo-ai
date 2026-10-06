@@ -20,6 +20,27 @@ const slugify=s=>translit(s).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').re
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cleanContent=s=>DOMPurify.sanitize(String(s||''),{USE_PROFILES:{html:true}});
 
+const normalizeArticleContent=(html,title)=>{
+  let out=cleanContent(html);
+  const normalizeText=value=>String(value||'')
+    .replace(/&nbsp;/gi,' ')
+    .replace(/<[^>]*>/g,' ')
+    .replace(/\s+/g,' ')
+    .trim()
+    .toLowerCase();
+
+  const target=normalizeText(title);
+
+  out=out.replace(/^\s*(?:<!--[\s\S]*?-->\s*)*<h1\b[^>]*>([\s\S]*?)<\/h1>\s*/i,(match,inner)=>{
+    return target && normalizeText(inner)===target ? '' : match;
+  });
+
+  out=out.replace(/<h1\b([^>]*)>/gi,'<h2$1>');
+  out=out.replace(/<\/h1\s*>/gi,'</h2>');
+
+  return out.trim();
+};
+
 async function ensureAdmin(user){
   try{
     const snap=await getDoc(doc(db,'admins',user.uid));
@@ -85,7 +106,7 @@ function articleData(status,existingPost=null){
   if(status==='published' && guards[category] && title && !guards[category].some(x=>lower.includes(x))){
     throw new Error(`Category "${category}" title से match नहीं कर रही। सही category चुनें ताकि गलत section में article न जाए.`);
   }
-  const content=cleanContent($('content').value);
+  const content=normalizeArticleContent($('content').value,title);
   const plain=content.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
   const excerpt=$('excerpt').value.trim()||plain.replace(/^AI-assisted draft — Human verification required before publication\.?/i,'').slice(0,155).trim();
   const enteredSlug=$('slug').value.trim();

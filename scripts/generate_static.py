@@ -345,8 +345,8 @@ def optimize_article_images(html):
 
     return re.sub(r'<img\b[^>]*>', repl, html, flags=re.I)
 
-def clean_article_content(value: Any) -> str:
-    """Remove internal editorial markers before Firestore HTML becomes public."""
+def clean_article_content(value: Any, article_title: str = "") -> str:
+    """Clean article HTML and enforce a single page-level H1 hierarchy."""
     text = str(value or "")
     text = re.sub(r'AI-assisted draft\s*[—-]?\s*Human verification required before publication\.?', "", text, flags=re.I)
     text = re.sub(r'Human verification required before publication\.?', "", text, flags=re.I)
@@ -361,6 +361,32 @@ def clean_article_content(value: Any) -> str:
     text = re.sub(r"\s+on[a-z]+\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]+)", "", text, flags=re.I)
     text = re.sub(r'(?i)javascript\s*:', "", text)
     text = re.sub(r'<p>\s*</p>', "", text, flags=re.I)
+
+    # The article template owns the page-level H1.
+    # Remove only a leading H1 when it duplicates the article title.
+    def _heading_text(value: str) -> str:
+        value = html.unescape(re.sub(r"<[^>]+>", " ", str(value or "")))
+        return re.sub(r"\s+", " ", value).strip().casefold()
+
+    target_title = _heading_text(article_title)
+
+    def _remove_duplicate_leading_h1(match: re.Match[str]) -> str:
+        heading = _heading_text(match.group(1))
+        return "" if target_title and heading == target_title else match.group(0)
+
+    text = re.sub(
+        r'^\s*(?:<!--[\s\S]*?-->\s*)*<h1\b[^>]*>([\s\S]*?)</h1>\s*',
+        _remove_duplicate_leading_h1,
+        text,
+        count=1,
+        flags=re.I,
+    )
+
+    # Any remaining editor-supplied H1 becomes an H2 so the page
+    # keeps exactly one H1 while preserving the author's heading text.
+    text = re.sub(r'<h1\b([^>]*)>', r'<h2\1>', text, flags=re.I)
+    text = re.sub(r'</h1\s*>', '</h2>', text, flags=re.I)
+
     return re.sub(r'\n{3,}', "\n\n", text).strip()
 
 def reading_time(content: Any) -> int:
@@ -654,7 +680,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     pub = iso(p.get("publishedAt"))
     mod = iso(p.get("updatedAt")) or pub
     related = related_posts(p, posts, limit=8)
-    content = clean_article_content(p.get("content")) or "<p>इस article का content अभी उपलब्ध नहीं है।</p>"
+    content = clean_article_content(p.get("content"), title) or "<p>इस article का content अभी उपलब्ध नहीं है।</p>"
     content = optimize_article_images(content)
 
     related_html = ""
