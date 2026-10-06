@@ -140,14 +140,14 @@ function articleData(status,existingPost=null){
     tags:$('tags').value.split(',').map(x=>x.trim()).filter(Boolean),
     status,updatedAt:serverTimestamp()
   };
-  // Preserve the original publication date when an existing article is edited.
-  // Only a draft being published for the first time receives a new publishedAt.
-  if(existingPost && existingPost.publishedAt){
-    base.publishedAt=existingPost.publishedAt;
-  }else if(existingPost && existingPost.createdAt){
-    // Legacy article: preserve its original creation/publication date.
+  // IMPORTANT: existing articles must NEVER receive a fresh publishedAt on edit.
+  // updateDoc() will leave the existing Firestore publishedAt untouched because
+  // we deliberately omit publishedAt from the update payload.
+  if(existingPost && !existingPost.publishedAt && existingPost.createdAt){
+    // Legacy article with no publishedAt: backfill it once from original createdAt.
     base.publishedAt=existingPost.createdAt;
-  }else if(status==='published'){
+  }else if(!existingPost && status==='published'){
+    // New article: set publication time only on first publication.
     base.publishedAt=serverTimestamp();
   }
   return base;
