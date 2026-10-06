@@ -7839,3 +7839,67 @@ body{
     font-size:21px;
   }
 }
+
+
+/* AUTHOR BYLINE + PROFILE */
+.ed-author-byline{
+  display:flex;
+  align-items:center;
+  margin:2px 0 24px;
+}
+.ed-author-name{
+  display:inline-flex;
+  align-items:center;
+  color:#1d4ed8;
+  text-decoration:none;
+  font-size:16px;
+  line-height:1.35;
+  font-weight:850;
+  letter-spacing:-.01em;
+  padding:8px 0;
+}
+.ed-author-name:hover{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.author-profile-head{
+  padding:4px 0 2px;
+}
+.author-profile-head h1{
+  margin:5px 0 3px;
+  font-size:clamp(32px,5vw,48px);
+  line-height:1.08;
+  letter-spacing:-.04em;
+  color:#101828;
+}
+.author-role{
+  margin:0;
+  color:#64748b;
+  font-size:14px;
+  font-weight:750;
+}
+.author-intro{
+  max-width:850px;
+  margin-top:22px;
+  color:#334155;
+  font-size:15px;
+  line-height:1.85;
+}
+.author-intro p{
+  margin:0 0 14px;
+}
+.author-intro p:last-child{
+  margin-bottom:0;
+}
+@media(max-width:600px){
+  .ed-author-byline{
+    margin-bottom:22px;
+  }
+  .ed-author-name{
+    font-size:15px;
+  }
+  .author-intro{
+    font-size:14.5px;
+    line-height:1.8;
+  }
+}

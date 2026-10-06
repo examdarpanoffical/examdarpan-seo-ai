@@ -139,7 +139,7 @@ function articleData(status,existingPost=null){
     officialWebsiteUrl:$('official').value.trim(),notificationPdfUrl:$('pdf').value.trim(),
     tags:$('tags').value.split(',').map(x=>x.trim()).filter(Boolean),
     authorName:'Lakshay',
-    authorRole:'Content Writer & Editorial Contributor',
+    authorRole:'Content Writer',
     authorUrl:'https://examdarpan.in/author/lakshay',
     status,updatedAt:serverTimestamp()
   };

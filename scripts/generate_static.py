@@ -83,7 +83,7 @@ CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CAT
 RESERVED_SLUGS = {"index", "article", "about", "privacy", "contact", "disclaimer", "terms", "editorial-policy", "author", "404"}
 
 AUTHOR_NAME = "Lakshay"
-AUTHOR_ROLE = "Content Writer & Editorial Contributor"
+AUTHOR_ROLE = "Content Writer"
 AUTHOR_PATH = "/author/lakshay"
 AUTHOR_URL = f"{BASE}{AUTHOR_PATH}"
 
@@ -782,7 +782,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
-<div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div><div class="ed-author-byline"><span class="ed-author-avatar">L</span><div><span class="ed-author-label">लेखक</span><a href="{AUTHOR_PATH}">{AUTHOR_NAME}</a><span class="ed-author-role">{AUTHOR_ROLE}</span></div></div>
+<div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div><div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">{AUTHOR_NAME}</a></div>
 {verification_line(p)}
 
 <section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
@@ -3389,19 +3389,19 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
 </nav>
 
 <section class="card" style="margin-top:18px;padding:24px">
-<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-<div style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#111827;color:#fff;font-size:28px;font-weight:800">L</div>
+<div class="author-profile-head">
 <div>
 <span class="eyebrow">AUTHOR PROFILE</span>
-<h1 style="margin:4px 0">{esc(AUTHOR_NAME)}</h1>
-<p class="meta" style="margin:0">{esc(AUTHOR_ROLE)}</p>
+<h1>{esc(AUTHOR_NAME)}</h1>
+<p class="author-role">{esc(AUTHOR_ROLE)}</p>
 </div>
 </div>
 
-<p style="margin-top:20px">
-Lakshay Exam Darpan पर सरकारी नौकरी, भर्ती, परीक्षा, Admit Card, Result और अन्य exam updates से जुड़ी उपयोगी जानकारी तैयार करते हैं।
-Articles में उपलब्ध जानकारी को प्रकाशित करने से पहले संबंधित official notification या official source को प्राथमिक reference माना जाता है।
-</p>
+<div class="author-intro">
+<p><strong>Lakshay</strong> Exam Darpan के लिए सरकारी नौकरी, भर्ती, प्रतियोगी परीक्षाओं, Admit Card, Result और अन्य महत्वपूर्ण exam updates पर सरल और उपयोगी content तैयार करते हैं।</p>
+<p>इनका लेखन focus विद्यार्थियों तक जरूरी जानकारी को साफ, समझने में आसान और practical तरीके से पहुँचाने पर रहता है, ताकि eligibility, application process, important dates और official updates जैसी जानकारी एक ही जगह स्पष्ट रूप से मिल सके।</p>
+<p>Content तैयार करते समय संबंधित official notification और official source को प्राथमिक reference माना जाता है। जानकारी में बदलाव होने पर articles को update रखने की कोशिश की जाती है।</p>
+</div>
 </section>
 
 <section style="margin-top:28px">
