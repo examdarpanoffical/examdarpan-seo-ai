@@ -53,7 +53,7 @@ const normalizeArticleText=value=>String(value||'').replace(/&nbsp;/gi,' ').repl
 const cleanArticleContent=(html,title)=>{
   let out=String(html||'');
   const target=normalizeArticleText(title);
-  out=out.replace(/^\s*(?:<!--[\s\S]*?-->\s*)*<h1\b[^>]*>([\s\S]*?)<\/h1>\s*/i,(match,inner)=>{
+  out=out.replace(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi,(match,inner)=>{
     return target&&normalizeArticleText(inner)===target?'':match;
   });
   out=out.replace(/<h1\b([^>]*)>/gi,'<h2$1>');
