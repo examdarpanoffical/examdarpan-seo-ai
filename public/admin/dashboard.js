@@ -144,6 +144,9 @@ function articleData(status,existingPost=null){
   // Only a draft being published for the first time receives a new publishedAt.
   if(existingPost && existingPost.publishedAt){
     base.publishedAt=existingPost.publishedAt;
+  }else if(existingPost && existingPost.createdAt){
+    // Legacy article: preserve its original creation/publication date.
+    base.publishedAt=existingPost.createdAt;
   }else if(status==='published'){
     base.publishedAt=serverTimestamp();
   }
