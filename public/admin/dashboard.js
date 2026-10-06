@@ -72,7 +72,7 @@ function fill(p){
   $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';$('tags').value=(p.tags||[]).join(', ');
   $('formTitle').textContent='Edit Article';window.scrollTo({top:0,behavior:'smooth'});
 }
-function articleData(status){
+function articleData(status,existingPost=null){
   const title=$('title').value.trim();
   const category=$('category').value||'Latest Updates';
   const lower=title.toLowerCase();
@@ -119,14 +119,22 @@ function articleData(status){
     tags:$('tags').value.split(',').map(x=>x.trim()).filter(Boolean),
     status,updatedAt:serverTimestamp()
   };
-  if(status==='published')base.publishedAt=serverTimestamp();
+  // Preserve the original publication date when an existing article is edited.
+  // Only a draft being published for the first time receives a new publishedAt.
+  if(existingPost && existingPost.publishedAt){
+    base.publishedAt=existingPost.publishedAt;
+  }else if(status==='published'){
+    base.publishedAt=serverTimestamp();
+  }
   return base;
 }
 async function save(status){
   if(!$('title').value.trim()){alert('Title required');return}
   if(!$('content').value.trim()){alert('Article content required');return}
   try{
-    const id=$('postId').value,d=articleData(status);
+    const id=$('postId').value;
+    const existingPost=id ? all.find(p=>p.id===id) : null;
+    const d=articleData(status,existingPost);
     if(id)await updateDoc(doc(db,'posts',id),d);
     else await addDoc(collection(db,'posts'),{...d,createdAt:serverTimestamp()});
     $('msg').textContent=status==='published'?'Published successfully. Telegram auto-share is queued.':'Draft saved successfully.';
