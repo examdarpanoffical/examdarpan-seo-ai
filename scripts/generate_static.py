@@ -826,72 +826,70 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <style>
 .ed-article-follow{{
   max-width:850px;
-  margin:18px auto 28px;
-  padding:14px;
+  margin:10px auto 18px;
+  padding:10px;
   border:1px solid #e2e8f0;
-  border-radius:16px;
+  border-radius:13px;
   background:#fff;
-  box-shadow:0 5px 18px rgba(15,23,42,.045);
+  box-shadow:0 3px 12px rgba(15,23,42,.04);
 }}
 .ed-article-follow-head{{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:11px;
+  margin-bottom:8px;
 }}
 .ed-article-follow-label{{
   display:block;
   color:#2563eb;
-  font-size:8px;
+  font-size:7px;
   font-weight:950;
-  letter-spacing:.14em;
-  margin-bottom:3px;
+  letter-spacing:.12em;
+  margin-bottom:2px;
 }}
 .ed-article-follow-head strong{{
   display:block;
   color:#172033;
-  font-size:14px;
-  line-height:1.25;
+  font-size:13px;
+  line-height:1.2;
 }}
 .ed-article-follow-head p{{
-  margin:3px 0 0;
+  margin:2px 0 0;
   color:#64748b;
-  font-size:9.5px;
-  line-height:1.4;
+  font-size:8.5px;
+  line-height:1.3;
 }}
 .ed-article-follow-grid{{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:7px;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
 }}
 .ed-follow-btn{{
   min-width:0;
+  min-height:46px;
   display:grid;
-  grid-template-columns:31px minmax(0,1fr) auto;
+  grid-template-columns:29px minmax(0,1fr) auto;
   align-items:center;
-  gap:7px;
-  padding:8px 8px;
-  border-radius:11px;
+  gap:6px;
+  padding:6px 7px;
+  border-radius:10px;
   color:#fff!important;
   text-decoration:none!important;
-  box-shadow:0 3px 10px rgba(15,23,42,.09);
+  box-shadow:0 2px 7px rgba(15,23,42,.08);
   transition:transform .16s ease,box-shadow .16s ease;
 }}
 .ed-follow-btn:hover{{
-  transform:translateY(-2px);
-  box-shadow:0 7px 15px rgba(15,23,42,.14);
+  transform:translateY(-1px);
+  box-shadow:0 4px 11px rgba(15,23,42,.12);
 }}
 .ed-follow-icon{{
-  width:31px;
-  height:31px;
+  width:29px;
+  height:29px;
   display:grid;
   place-items:center;
-  border-radius:9px;
+  border-radius:8px;
   background:rgba(255,255,255,.18);
 }}
 .ed-follow-icon img{{
-  width:18px;
-  height:18px;
+  width:17px;
+  height:17px;
   display:block;
 }}
 .ed-follow-btn span:nth-child(2){{
@@ -901,19 +899,21 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   line-height:1.05;
 }}
 .ed-follow-btn b{{
-  font-size:9.5px;
+  font-size:9px;
   font-weight:900;
   white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }}
 .ed-follow-btn small{{
-  margin-top:3px;
-  font-size:7.5px;
+  margin-top:2px;
+  font-size:7px;
   opacity:.82;
   white-space:nowrap;
 }}
 .ed-follow-btn em{{
   font-style:normal;
-  font-size:12px;
+  font-size:11px;
   opacity:.9;
 }}
 .ed-follow-whatsapp{{background:linear-gradient(135deg,#25d366,#128c7e)}}
@@ -922,28 +922,57 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 .ed-follow-instagram{{background:linear-gradient(135deg,#833ab4,#e1306c 55%,#f77737)}}
 .ed-follow-x{{background:linear-gradient(135deg,#111827,#000)}}
 
-@media(max-width:1050px){{
-  .ed-article-follow-grid{{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }}
-}}
 @media(max-width:600px){{
   .ed-article-follow{{
-    margin:14px auto 22px;
-    padding:12px;
-    border-radius:14px;
+    margin:9px auto 16px;
+    padding:9px;
+    border-radius:12px;
+  }}
+  .ed-article-follow-head{{
+    margin-bottom:7px;
+  }}
+  .ed-article-follow-head strong{{
+    font-size:12px;
+  }}
+  .ed-article-follow-head p{{
+    font-size:8px;
   }}
   .ed-article-follow-grid{{
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:7px;
+    gap:6px;
   }}
   .ed-follow-btn{{
-    padding:8px 7px;
+    min-height:44px;
+    padding:5px 6px;
+  }}
+  .ed-follow-icon{{
+    width:27px;
+    height:27px;
+  }}
+  .ed-follow-icon img{{
+    width:16px;
+    height:16px;
+  }}
+  .ed-follow-btn b{{
+    font-size:8.5px;
+  }}
+  .ed-follow-btn small{{
+    font-size:6.5px;
   }}
 }}
-@media(max-width:390px){{
-  .ed-article-follow-grid{{
-    grid-template-columns:1fr;
+
+@media(max-width:360px){{
+  .ed-follow-btn{{
+    grid-template-columns:26px minmax(0,1fr) auto;
+    gap:5px;
+    padding:5px;
+  }}
+  .ed-follow-icon{{
+    width:25px;
+    height:25px;
+  }}
+  .ed-follow-btn b{{
+    font-size:8px;
   }}
 }}
 </style>
@@ -3485,3 +3514,5 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 # EXAM_DARPAN_SOCIAL_POPUP_REMOVED_V2
+
+# EXAM_DARPAN_COMPACT_FOLLOW_CTA_V2
