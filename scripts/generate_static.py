@@ -82,6 +82,11 @@ CATEGORIES = [
 CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CATEGORIES}
 RESERVED_SLUGS = {"index", "article", "about", "privacy", "contact", "disclaimer", "terms", "editorial-policy", "author", "404"}
 
+AUTHOR_NAME = "Lakshay"
+AUTHOR_ROLE = "Content Writer & Editorial Contributor"
+AUTHOR_PATH = "/author/lakshay"
+AUTHOR_URL = f"{BASE}{AUTHOR_PATH}"
+
 MONTHS_HI = ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"]
 
 
@@ -638,7 +643,7 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
         "articleSection": cat,
         "inLanguage": "hi-IN",
         "isAccessibleForFree": True,
-        "author": {"@type": "Organization", "name": "Exam Darpan Editorial Team", "url": f"{BASE}/editorial-policy.html"},
+        "author": {"@type": "Person", "name": AUTHOR_NAME, "url": AUTHOR_URL, "jobTitle": AUTHOR_ROLE},
         "publisher": {
             "@type": "Organization",
             "name": "Exam Darpan",
@@ -777,7 +782,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
-<div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div>
+<div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div><div class="ed-author-byline"><span class="ed-author-avatar">L</span><div><span class="ed-author-label">लेखक</span><a href="{AUTHOR_PATH}">{AUTHOR_NAME}</a><span class="ed-author-role">{AUTHOR_ROLE}</span></div></div>
 {verification_line(p)}
 
 <section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
@@ -3287,8 +3292,147 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         )
 
 
+
+def write_author_profile(posts: list[dict[str, Any]]) -> None:
+    """Generate the public Lakshay author profile page."""
+    author_dir = PUBLIC / "author" / "lakshay"
+    author_dir.mkdir(parents=True, exist_ok=True)
+
+    latest = [
+        p for p in posts
+        if str(p.get("status", "")).lower() == "published"
+    ][:12]
+
+    cards = []
+    for p in latest:
+        slug = slugify(p.get("slug"))
+        if not slug:
+            continue
+        cards.append(
+            f'<article class="card post"><div class="post-copy">'
+            f'<div class="post-badges"><span class="badge">{esc(normalized_category(p))}</span></div>'
+            f'<h2><a href="{article_path(slug)}">{esc(post_title(p))}</a></h2>'
+            f'<p>{esc(short_description(p))}</p>'
+            f'<div class="post-meta"><span>{date_hi(p.get("publishedAt"))}</span></div>'
+            f'</div></article>'
+        )
+
+    latest_html = "".join(cards) or (
+        '<div class="card empty">अभी कोई published article उपलब्ध नहीं है।</div>'
+    )
+
+    profile_schema = {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "name": f"{AUTHOR_NAME} - Exam Darpan",
+        "url": AUTHOR_URL,
+        "mainEntity": {
+            "@type": "Person",
+            "name": AUTHOR_NAME,
+            "url": AUTHOR_URL,
+            "jobTitle": AUTHOR_ROLE,
+            "worksFor": {
+                "@type": "Organization",
+                "name": "Exam Darpan",
+                "url": f"{BASE}/",
+            },
+        },
+    }
+
+    schema_json = json.dumps(
+        profile_schema,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+    html = f"""<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{esc(AUTHOR_NAME)} | Exam Darpan</title>
+<meta name="description" content="{esc(AUTHOR_NAME)} Exam Darpan पर सरकारी नौकरी, भर्ती, परीक्षा, Admit Card और Result से जुड़ी जानकारी लिखते हैं।">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<link rel="canonical" href="{AUTHOR_URL}">
+<link rel="stylesheet" href="/styles.css">
+{ADSENSE_SCRIPT}
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){{dataLayer.push(arguments);}}
+gtag('js',new Date());
+gtag('config','{GA4_ID}',{{send_page_view:true}});
+</script>
+<script type="application/ld+json">{schema_json}</script>
+</head>
+<body>
+<div class="topbar"><div class="container topbar-inner">
+<span class="live"><i></i> LIVE</span>
+<span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span>
+</div></div>
+
+<header class="header">
+<div class="container head">
+<a class="brand" href="/" aria-label="Exam Darpan Home">
+<img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async">
+<div>
+<div class="brand-title">EXAM<span>DARPAN</span></div>
+<div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div>
+</div>
+</a>
+</div>
+</header>
+
+<main class="main container">
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+<a href="/">Home</a><span>›</span><span>Author</span><span>›</span><span>{esc(AUTHOR_NAME)}</span>
+</nav>
+
+<section class="card" style="margin-top:18px;padding:24px">
+<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+<div style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#111827;color:#fff;font-size:28px;font-weight:800">L</div>
+<div>
+<span class="eyebrow">AUTHOR PROFILE</span>
+<h1 style="margin:4px 0">{esc(AUTHOR_NAME)}</h1>
+<p class="meta" style="margin:0">{esc(AUTHOR_ROLE)}</p>
+</div>
+</div>
+
+<p style="margin-top:20px">
+Lakshay Exam Darpan पर सरकारी नौकरी, भर्ती, परीक्षा, Admit Card, Result और अन्य exam updates से जुड़ी उपयोगी जानकारी तैयार करते हैं।
+Articles में उपलब्ध जानकारी को प्रकाशित करने से पहले संबंधित official notification या official source को प्राथमिक reference माना जाता है।
+</p>
+</section>
+
+<section style="margin-top:28px">
+<div class="section-title">
+<div>
+<span class="eyebrow">LATEST ARTICLES</span>
+<h2>Latest Updates by {esc(AUTHOR_NAME)}</h2>
+</div>
+</div>
+<div class="posts-grid">{latest_html}</div>
+</section>
+</main>
+
+<footer class="footer">
+<div class="container">
+<p>© <span data-year></span> Exam Darpan · Independent Information Portal · <a href="/editorial-policy.html">Editorial Policy</a> · <a href="/disclaimer.html">Disclaimer</a></p>
+</div>
+</footer>
+
+<script>
+document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().getFullYear());
+</script>
+</body>
+</html>"""
+
+    (author_dir / "index.html").write_text(html, encoding="utf-8")
+
+
 def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], category_slugs: list[str]) -> None:
     urls: list[tuple[str, str | None, str | None]] = []
+    urls.append((AUTHOR_PATH, None, None))
     for path, _ in STATIC_PAGES:
         urls.append((path, None, None))
 
@@ -3521,6 +3665,7 @@ def main() -> int:
     (PUBLIC / "exam-calendar.html").write_text(exam_calendar_page(posts), encoding="utf-8")
     category_paths = write_categories(posts)
     category_slugs = [path.removeprefix("/category-") for path in category_paths]
+    write_author_profile(posts)
     write_sitemaps(posts, article_slugs, category_slugs)
 
     verify_generated_output(posts)
