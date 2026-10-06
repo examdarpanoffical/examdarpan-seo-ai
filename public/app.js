@@ -41,12 +41,23 @@ const readingTime=html=>{
 };
 
 let contentIndex=null;
+let contentIndexPromise=null;
 
 async function loadContentIndex(){
   if(contentIndex) return contentIndex;
-  const r=await fetch('/content-index.json',{cache:'default'});
-  if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
-  contentIndex=await r.json();
+
+  if(!contentIndexPromise){
+    contentIndexPromise=(async()=>{
+      const r=await fetch('/content-index.json',{cache:'default'});
+      if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
+      return r.json();
+    })().catch(e=>{
+      contentIndexPromise=null;
+      throw e;
+    });
+  }
+
+  contentIndex=await contentIndexPromise;
   return contentIndex;
 }
 
