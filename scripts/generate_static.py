@@ -37,6 +37,11 @@ INSTAGRAM = "https://www.instagram.com/examdarpan_official/"
 X_SOCIAL = "https://x.com/exam_darpan"
 WHATSAPP_GROUP = "https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
 GA4_ID = "G-FWB3YMTSDX"
+ICON_WHATSAPP_GREEN = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2316a34a'%3E%3Cpath d='M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.6 0 .3 5.3.3 11.8c0 2.1.5 4.1 1.6 5.9L.2 24l6.5-1.7a11.8 11.8 0 0 0 5.4 1.3h.1c6.5 0 11.8-5.3 11.8-11.8 0-3.1-1.2-6.1-3.5-8.3zM12.2 21.5h-.1c-1.7 0-3.4-.5-4.8-1.4l-.3-.2-3.8 1 1-3.7-.2-.3a9.7 9.7 0 1 1 8.2 4.6zm5.3-7.3c-.3-.2-1.7-.9-2-.9-.3-.1-.5-.2-.7.2-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-1.6-.8-2.7-1.4-3.8-3.2-.3-.5.3-.5.8-1.7.1-.2.1-.4 0-.6-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.1 1.4 3.3c.2.2 2.3 3.6 5.6 5 .8.3 1.4.5 1.9.6.8.2 1.5.2 2 .1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.1-1.4-.1-.2-.3-.3-.6-.4z'/%3E%3C/svg%3E"
+ICON_X_WHITE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M18.2 2h3.6l-7.9 9 9.3 11h-7.3l-5.7-6.7L4.3 22H.7l8.4-9.6L.2 2h7.5l5.2 6.1L18.2 2zm-1.3 18h2L6.7 4H4.6L16.9 20z'/%3E%3C/svg%3E"
+ICON_INSTAGRAM_WHITE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zM17.5 6.8a1 1 0 1 1-1 1 1 1 0 0 1 1-1z'/%3E%3C/svg%3E"
+ICON_TELEGRAM_WHITE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M21.9 2.8 2.8 10.2c-1.3.5-1.3 1.2-.2 1.5l4.9 1.5 1.9 5.8c.2.6.1.9.7.9.5 0 .7-.2 1-.5l2.4-2.3 5 3.7c.9.5 1.6.3 1.8-.8l3.2-15.1c.3-1.4-.5-2-1.6-1.4zM9.1 12.8l9.5-6c.5-.3.9-.1.5.2l-7.7 7-.3 3.1-2-4.3z'/%3E%3C/svg%3E"
+ICON_WHATSAPP_WHITE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.6 0 .3 5.3.3 11.8c0 2.1.5 4.1 1.6 5.9L.2 24l6.5-1.7a11.8 11.8 0 0 0 5.4 1.3h.1c6.5 0 11.8-5.3 11.8-11.8 0-3.1-1.2-6.1-3.5-8.3zM12.2 21.5h-.1c-1.7 0-3.4-.5-4.8-1.4l-.3-.2-3.8 1 1-3.7-.2-.3a9.7 9.7 0 1 1 8.2 4.6zm5.3-7.3c-.3-.2-1.7-.9-2-.9-.3-.1-.5-.2-.7.2-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-1.6-.8-2.7-1.4-3.8-3.2-.3-.5.3-.5.8-1.7.1-.2.1-.4 0-.6-.1-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.1 1.4 3.3c.2.2 2.3 3.6 5.6 5 .8.3 1.4.5 1.9.6.8.2 1.5.2 2 .1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.1-1.4-.1-.2-.3-.3-.6-.4z'/%3E%3C/svg%3E"
 ADSENSE_SCRIPT = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1703856216593161"\n     crossorigin="anonymous"></script>'
 # Site branding assets
 SITE_LOGO = "/assets/logo.png?v=20260924-3"
@@ -766,7 +771,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
        rel="noopener"
        onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
       <span class="ed-follow-icon">
-        <img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
+        <img src="{ICON_WHATSAPP_WHITE}" alt="" aria-hidden="true">
       </span>
       <span><b>WhatsApp</b><small>Channel</small></span>
       <em>↗</em>
@@ -780,7 +785,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
        rel="noopener"
        onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram_top')">
       <span class="ed-follow-icon">
-        <img src="https://cdn.simpleicons.org/telegram/ffffff" alt="" aria-hidden="true">
+        <img src="{ICON_TELEGRAM_WHITE}" alt="" aria-hidden="true">
       </span>
       <span><b>Telegram</b><small>Channel</small></span>
       <em>↗</em>
@@ -792,7 +797,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
        rel="noopener"
        onclick="window.edTrackCommunity&&window.edTrackCommunity('instagram_top')">
       <span class="ed-follow-icon">
-        <img src="https://cdn.simpleicons.org/instagram/ffffff" alt="" aria-hidden="true">
+        <img src="{ICON_INSTAGRAM_WHITE}" alt="" aria-hidden="true">
       </span>
       <span><b>Instagram</b><small>Follow</small></span>
       <em>↗</em>
@@ -804,7 +809,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
        rel="noopener"
        onclick="window.edTrackCommunity&&window.edTrackCommunity('x_top')">
       <span class="ed-follow-icon">
-        <img src="https://cdn.simpleicons.org/x/ffffff" alt="" aria-hidden="true">
+        <img src="{ICON_X_WHITE}" alt="" aria-hidden="true">
       </span>
       <span><b>X</b><small>Follow</small></span>
       <em>↗</em>
@@ -997,7 +1002,7 @@ WhatsApp Channel Follow करें →
    rel="noopener"
    aria-label="WhatsApp Group Join Now"
    onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_floating')">
-  <span class="floating-whatsapp-icon" aria-hidden="true"><img src="https://cdn.simpleicons.org/whatsapp/16a34a" alt="" aria-hidden="true">
+  <span class="floating-whatsapp-icon" aria-hidden="true"><img src="{ICON_WHATSAPP_GREEN}" alt="" aria-hidden="true">
   </span>
   <span class="floating-whatsapp-text">
     <small>WhatsApp Group</small>
