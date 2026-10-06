@@ -772,17 +772,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
       <em>↗</em>
     </a>
 
-    <a class="ed-follow-btn ed-follow-group"
-       href="{WHATSAPP_GROUP}"
-       target="_blank"
-       rel="noopener"
-       onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_top')">
-      <span class="ed-follow-icon">
-        <img src="https://cdn.simpleicons.org/whatsapp/ffffff" alt="" aria-hidden="true">
-      </span>
-      <span><b>WhatsApp</b><small>Group</small></span>
-      <em>↗</em>
-    </a>
+
 
     <a class="ed-follow-btn ed-follow-telegram"
        href="{TELEGRAM}"
@@ -917,7 +907,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   opacity:.9;
 }}
 .ed-follow-whatsapp{{background:linear-gradient(135deg,#25d366,#128c7e)}}
-.ed-follow-group{{background:linear-gradient(135deg,#22c55e,#15803d)}}
 .ed-follow-telegram{{background:linear-gradient(135deg,#38bdf8,#2563eb)}}
 .ed-follow-instagram{{background:linear-gradient(135deg,#833ab4,#e1306c 55%,#f77737)}}
 .ed-follow-x{{background:linear-gradient(135deg,#111827,#000)}}
@@ -3516,3 +3505,5 @@ if __name__ == "__main__":
 # EXAM_DARPAN_SOCIAL_POPUP_REMOVED_V2
 
 # EXAM_DARPAN_COMPACT_FOLLOW_CTA_V2
+
+# EXAM_DARPAN_FOUR_CTA_COMPACT_V1
