@@ -154,8 +154,16 @@ async function save(status){
   if(!$('content').value.trim()){alert('Article content required');return}
   try{
     const id=$('postId').value;
-    const existingPost=id ? all.find(p=>p.id===id) : null;
+    let existingPost=null;
+
+    if(id){
+      const existingSnap=await getDoc(doc(db,'posts',id));
+      if(!existingSnap.exists())throw new Error('Article Firestore में नहीं मिला.');
+      existingPost={id:existingSnap.id,...existingSnap.data()};
+    }
+
     const d=articleData(status,existingPost);
+
     if(id)await updateDoc(doc(db,'posts',id),d);
     else await addDoc(collection(db,'posts'),{...d,createdAt:serverTimestamp()});
     $('msg').textContent=status==='published'?'Published successfully. Telegram auto-share is queued.':'Draft saved successfully.';
