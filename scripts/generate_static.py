@@ -308,6 +308,38 @@ def clean_text(value: Any) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+
+# EXAM_DARPAN_IMAGE_PERFORMANCE_V2
+def optimize_article_images(html):
+    """Optimize article images without changing the page/template images."""
+    if not html:
+        return html
+
+    count = 0
+
+    def repl(match):
+        nonlocal count
+        tag = match.group(0)
+
+        # Respect an explicitly configured loading attribute.
+        if re.search(r'\bloading\s*=', tag, re.I):
+            count += 1
+            return tag
+
+        if count == 0:
+            count += 1
+            if not re.search(r'\bdecoding\s*=', tag, re.I):
+                tag = tag[:-1] + ' decoding="async">'
+            return tag
+
+        count += 1
+        if not re.search(r'\bdecoding\s*=', tag, re.I):
+            tag = tag[:-1] + ' decoding="async">'
+        tag = tag[:-1] + ' loading="lazy">'
+        return tag
+
+    return re.sub(r'<img\b[^>]*>', repl, html, flags=re.I)
+
 def clean_article_content(value: Any) -> str:
     """Remove internal editorial markers before Firestore HTML becomes public."""
     text = str(value or "")
@@ -618,6 +650,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     mod = iso(p.get("updatedAt")) or pub
     related = related_posts(p, posts, limit=8)
     content = clean_article_content(p.get("content")) or "<p>इस article का content अभी उपलब्ध नहीं है।</p>"
+    content = optimize_article_images(content)
 
     related_html = ""
     if related:
