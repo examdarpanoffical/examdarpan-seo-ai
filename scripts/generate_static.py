@@ -809,7 +809,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
-<div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span></div><div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div>
+<div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span></div>
 {verification_line(p)}
 
 <section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
