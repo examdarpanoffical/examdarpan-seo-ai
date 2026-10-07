@@ -1010,19 +1010,25 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     gap:6px;
   }}
   .ed-follow-btn{{
-    min-height:50px;
-    padding:6px 7px;
+    min-height:48px;
+    grid-template-columns:24px minmax(0,1fr) auto;
+    gap:5px;
+    padding:5px 6px;
   }}
   .ed-follow-icon{{
-    width:28px;
-    height:28px;
+    width:24px;
+    height:24px;
   }}
   .ed-follow-icon img{{
-    width:16px;
-    height:16px;
+    width:14px;
+    height:14px;
   }}
   .ed-follow-btn b{{
-    font-size:12px;
+    font-size:10px;
+  }}
+  .ed-follow-btn em{{
+    padding:6px 7px;
+    font-size:8px;
   }}
   .ed-follow-btn small{{
     display:none;
