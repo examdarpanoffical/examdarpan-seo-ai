@@ -57,7 +57,7 @@ STATIC_PAGES = [
     ("/privacy.html", "Privacy Policy"),
     ("/disclaimer.html", "Disclaimer"),
     ("/terms.html", "Terms & Conditions"),
-    ("/exam-calendar.html", "Exam Calendar"),
+    ("/exam-calendar", "Exam Calendar"),
 ]
 
 CATEGORIES = [
@@ -307,6 +307,12 @@ def article_path(slug: str) -> str:
 
 
 def category_path(category_slug: str) -> str:
+    # Primary public hubs. Keep the old category files available only
+    # as legacy redirect sources; all internal links must use one URL.
+    if category_slug == "rajasthan-jobs":
+        return "/rajasthan-government-jobs"
+    if category_slug == "government-jobs":
+        return "/all-india-government-jobs"
     return f"/category-{category_slug}"
 
 
@@ -1677,7 +1683,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '</div>'
 
         '<a class="ed-home-calendar-more" '
-        'href="/exam-calendar.html">'
+        'href="/exam-calendar">'
         'पूरा Rajasthan Calendar देखें →'
         '</a>'
         '</article>'
@@ -1723,7 +1729,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '<div class="ed-home-daily-action">'
         '<strong>आज की तैयारी का छोटा test</strong>'
         '<small>Quiz page पर आज का available test देखें</small>'
-        '<a class="btn btn-primary" href="/quiz.html">अभी Test शुरू करें →</a>'
+        '<a class="btn btn-primary" href="/quiz">अभी Test शुरू करें →</a>'
         '</div>'
         '</section>'
     )
@@ -2630,7 +2636,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 
     # Daily quiz entry point. Quiz data stays in Firestore so publishing does not require a deploy.
     if '<!-- EXAM-DARPAN-DAILY-QUIZ -->' not in text:
-        quiz = """<section class="card daily-quiz-teaser" id="daily-quiz"><div class="quiz-teaser-icon">?</div><div class="quiz-teaser-copy"><span class="eyebrow">DAILY PRACTICE</span><h2>आज का Daily Quiz</h2><p id="dailyQuizSummary">आज के नए प्रश्नों के साथ अपनी तैयारी check करें। Timer के साथ quiz दें और अंत में score व explanations देखें।</p><div class="quiz-teaser-meta"><span id="dailyQuizMeta">Loading today’s quiz…</span><a id="dailyQuizCta" class="btn btn-primary" href="/quiz.html">Quiz खोलें →</a></div></div></section><!-- EXAM-DARPAN-DAILY-QUIZ -->"""
+        quiz = """<section class="card daily-quiz-teaser" id="daily-quiz"><div class="quiz-teaser-icon">?</div><div class="quiz-teaser-copy"><span class="eyebrow">DAILY PRACTICE</span><h2>आज का Daily Quiz</h2><p id="dailyQuizSummary">आज के नए प्रश्नों के साथ अपनी तैयारी check करें। Timer के साथ quiz दें और अंत में score व explanations देखें।</p><div class="quiz-teaser-meta"><span id="dailyQuizMeta">Loading today’s quiz…</span><a id="dailyQuizCta" class="btn btn-primary" href="/quiz">Quiz खोलें →</a></div></div></section><!-- EXAM-DARPAN-DAILY-QUIZ -->"""
         text = text.replace('  <section class="layout" id="updates">', f'  {quiz}\n  <section class="layout" id="updates">', 1)
 
 
@@ -2892,11 +2898,11 @@ def update_home(posts: list[dict[str, Any]]) -> None:
   </div>
 
   <div class="ed-home-community-topics">
-    <a href="/category-rajasthan-jobs">Rajasthan Jobs</a>
-    <a href="/category-government-jobs">All India Jobs</a>
+    <a href="/rajasthan-government-jobs">Rajasthan Jobs</a>
+    <a href="/all-india-government-jobs">All India Jobs</a>
     <a href="/category-admit-card">Admit Card</a>
     <a href="/category-results">Results</a>
-    <a href="/exam-calendar.html">Exam Calendar</a>
+    <a href="/exam-calendar">Exam Calendar</a>
   </div>
 
   <div class="ed-home-community-foot">
@@ -3079,9 +3085,9 @@ def exam_calendar_page(posts: list[dict[str, Any]]) -> str:
             f'<td><span class="status-badge {cls}">{esc(status)}</span></td></tr>'
         )
     return f"""<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Exam Calendar 2026 | Exam Darpan</title><meta name="description" content="Rajasthan और Government Exams की application last date और exam date एक जगह देखें।"><meta name="robots" content="index,follow"><link rel="canonical" href="{BASE}/exam-calendar.html"><link rel="stylesheet" href="/styles.css"><link rel="icon" href="/assets/favicon.png"></head><body>
+<title>Exam Calendar 2026 | Exam Darpan</title><meta name="description" content="Rajasthan और Government Exams की application last date और exam date एक जगह देखें।"><meta name="robots" content="index,follow"><link rel="canonical" href="{BASE}/exam-calendar"><link rel="stylesheet" href="/styles.css"><link rel="icon" href="/assets/favicon.png"></head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
-<header class="header"><div class="container head"><a class="brand" href="/"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path("rajasthan-jobs")}">राजस्थान Jobs</a><a href="{category_path("government-jobs")}">All India Jobs</a><a href="{category_path("admit-card")}">Admit Card</a><a href="{category_path("results")}">Results</a><a href="/exam-calendar.html" class="active">Exam Calendar</a><a href="/quiz.html">Daily Quiz</a></div></nav></header>
+<header class="header"><div class="container head"><a class="brand" href="/"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path("rajasthan-jobs")}">राजस्थान Jobs</a><a href="{category_path("government-jobs")}">All India Jobs</a><a href="{category_path("admit-card")}">Admit Card</a><a href="{category_path("results")}">Results</a><a href="/exam-calendar" class="active">Exam Calendar</a><a href="/quiz">Daily Quiz</a></div></nav></header>
 <main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM CALENDAR</span><h1>Exam Calendar 2026</h1><p>Application deadlines और exam dates को एक जगह देखें। किसी भी अंतिम कार्रवाई से पहले official notification verify करें।</p></div></section>
 <section class="card pad calendar-card"><div class="section-title"><div><span class="eyebrow">DATES</span><h2>Important Exam Dates</h2></div><span class="result-count">{len(rows)} updates</span></div>
 <div class="table-scroll"><table class="calendar-table"><thead><tr><th>Exam / Recruitment</th><th>Last Date</th><th>Exam Date</th><th>Status</th></tr></thead><tbody>{"".join(rows) if rows else '<tr><td colspan="4">Published articles में अभी structured date data उपलब्ध नहीं है।</td></tr>'}</tbody></table></div></section></main>
@@ -3093,7 +3099,10 @@ def write_categories(posts: list[dict[str, Any]]) -> list[str]:
         out = PUBLIC / f"category-{slug_name}.html"
         out.write_text(category_page(name, slug_name, title, desc, posts), encoding="utf-8")
         if any(normalized_category(p) == name for p in posts):
-            paths.append(category_path(slug_name))
+            # Rajasthan Jobs and Government Jobs have dedicated primary hubs.
+            # Their old category pages remain only as redirect sources.
+            if slug_name not in {"rajasthan-jobs", "government-jobs"}:
+                paths.append(category_path(slug_name))
     return paths
 
 
@@ -3468,6 +3477,8 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
             )
 
     for cslug in category_slugs:
+        if cslug in {"rajasthan-jobs", "government-jobs"}:
+            continue
         cname = next((name for name, slug_name, _, _ in CATEGORIES if slug_name == cslug), None)
         cposts = [p for p in posts if normalized_category(p) == cname] if cname else []
         clast = max((iso(p.get("updatedAt")) or iso(p.get("publishedAt")) or "" for p in cposts), default=None) or None
@@ -3509,6 +3520,12 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         re.compile(r"AI-assisted draft\s*[—-]?\s*Human verification required before publication", re.I),
         re.compile(r"href=[\"']?/article/", re.I),
         re.compile(r"\d{1,2}\s+(?:जनवरी|फ़रवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर)[A-Za-z]", re.I),
+        re.compile(r'href=[\"\']/answer-key\.html(?:[?#\"\']|$)', re.I),
+        re.compile(r'href=[\"\']/syllabus\.html(?:[?#\"\']|$)', re.I),
+        re.compile(r'href=[\"\']/exam-calendar\.html(?:[?#\"\']|$)', re.I),
+        re.compile(r'href=[\"\']/quiz\.html(?:[?#\"\']|$)', re.I),
+        re.compile(r'href=[\"\']/category-rajasthan-jobs(?:[?#\"\']|$)', re.I),
+        re.compile(r'href=[\"\']/category-government-jobs(?:[?#\"\']|$)', re.I),
     ]
     for path in files:
         if not path.exists() or not path.is_file():
@@ -3527,6 +3544,30 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
+
+    legacy_sitemap_urls = [
+        "/answer-key.html",
+        "/syllabus.html",
+        "/exam-calendar.html",
+        "/quiz.html",
+        "/category-rajasthan-jobs",
+        "/category-government-jobs",
+    ]
+    for legacy in legacy_sitemap_urls:
+        if f"<loc>{xml_esc(BASE + legacy)}</loc>" in sitemap:
+            raise RuntimeError(
+                f"SEO verification failed: legacy URL still present in sitemap: {legacy}"
+            )
+
+    for primary in (
+        "/rajasthan-government-jobs",
+        "/all-india-government-jobs",
+        "/exam-calendar",
+    ):
+        if sitemap.count(f"<loc>{xml_esc(BASE + primary)}</loc>") != 1:
+            raise RuntimeError(
+                f"SEO verification failed: primary sitemap URL missing/duplicated: {primary}"
+            )
 
     for hub_file, hub_posts in (
         (

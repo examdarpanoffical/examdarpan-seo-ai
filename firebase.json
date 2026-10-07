@@ -75,6 +75,36 @@
     ],
     "redirects": [
       {
+        "source": "/answer-key.html",
+        "destination": "/category-answer-key",
+        "type": 301
+      },
+      {
+        "source": "/syllabus.html",
+        "destination": "/category-syllabus",
+        "type": 301
+      },
+      {
+        "source": "/exam-calendar.html",
+        "destination": "/exam-calendar",
+        "type": 301
+      },
+      {
+        "source": "/quiz.html",
+        "destination": "/quiz",
+        "type": 301
+      },
+      {
+        "source": "/category-rajasthan-jobs",
+        "destination": "/rajasthan-government-jobs",
+        "type": 301
+      },
+      {
+        "source": "/category-government-jobs",
+        "destination": "/all-india-government-jobs",
+        "type": 301
+      },
+      {
         "source": "/article/:slug",
         "destination": "/:slug",
         "type": 301
