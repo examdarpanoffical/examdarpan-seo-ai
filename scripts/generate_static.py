@@ -1090,7 +1090,60 @@ WhatsApp Channel Follow करें →
   </span>
 </a>
 
-<footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer>
+<footer class="footer">
+  <div class="container footer-main">
+    <div class="footer-brand">
+      <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
+      <p>Independent Education &amp; Government Job Information Portal.</p>
+      <div class="footer-trust-line">
+        <span>✓ Official-source based</span>
+        <span>✓ Clear dates</span>
+        <span>✓ Rajasthan + All India</span>
+      </div>
+      <div class="footer-socials">
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
+        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="/rajasthan-government-jobs">Rajasthan Jobs</a>
+      <a href="/all-india-government-jobs">All India Jobs</a>
+      <a href="/category-admit-card">Admit Card</a>
+      <a href="/category-results">Results</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="/category-answer-key">Answer Key</a>
+      <a href="/category-syllabus">Syllabus</a>
+      <a href="/exam-calendar">Exam Calendar</a>
+      <a href="/quiz">Daily Practice Test</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Important &amp; Legal</h4>
+      <a href="/about.html">About Us</a>
+      <a href="/editorial-policy.html">Editorial Policy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/disclaimer.html">Disclaimer</a>
+      <a href="/terms.html">Terms &amp; Conditions</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <div>
+      <strong>© <span data-year></span> Exam Darpan</strong>
+      <span> · Independent Education &amp; Government Job Information Portal</span>
+    </div>
+    <div class="footer-bottom-note">
+      Information is provided for educational purposes. Final confirmation should always be made from the official notification.
+    </div>
+  </div>
+</footer>
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
 </body></html>
 '''
@@ -2773,21 +2826,22 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     editorial = (
         '<section class="ed-home-editorial" aria-label="Editorial standards">'
         '<div class="ed-home-editorial-grid">'
-        '<div>'
+        '<div class="ed-home-editorial-copy">'
         '<span class="ed-home-hub-kicker">EDITORIAL & TRUST</span>'
-        '<h2>भरोसेमंद जानकारी और साफ dates</h2>'
+        '<h2>भरोसेमंद जानकारी, साफ dates और official-source verification</h2>'
         '<p>'
-        'Recruitment, Admit Card, Result और Exam Calendar की जानकारी '
-        'official notification/source से cross-check करके publish की जाती है। '
-        'तारीख बदल सकती है, इसलिए final confirmation official notice से करें।'
+        'Exam Darpan पर Recruitment, Admit Card, Result और Exam Calendar से जुड़ी '
+        'जानकारी उपलब्ध official notification और official sources को cross-check '
+        'करके तैयार की जाती है। किसी भी आवेदन या परीक्षा से पहले अंतिम जानकारी '
+        'official notice से जरूर verify करें।'
         '</p>'
         '<a href="/editorial-policy.html">Editorial Policy देखें →</a>'
         '</div>'
         '<div class="ed-home-editorial-points">'
-        '<span>✓ Official-source based</span>'
-        '<span>✓ Rajasthan + All India अलग</span>'
-        '<span>✓ Application / Exam dates</span>'
-        '<span>✓ Clear category routing</span>'
+        '<span><b>✓</b><strong>Official Source</strong><small>Verified information</small></span>'
+        '<span><b>✓</b><strong>Date Verification</strong><small>Application &amp; Exam dates</small></span>'
+        '<span><b>✓</b><strong>Rajasthan + All India</strong><small>Clear separation</small></span>'
+        '<span><b>✓</b><strong>Clear Categories</strong><small>Easy navigation</small></span>'
         '</div>'
         '</div>'
         '</section>'
@@ -3307,7 +3361,60 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><div class="ed-category-page"><section class="ed-category-hero"><div><span class="ed-category-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="ed-category-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="ed-category-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
 <section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">IMPORTANT LATEST</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} updates</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy.html">Editorial Policy <b>→</b></a></div></aside></section></div></main>
-<footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan · Independent Editorial Team</p></div><div><h4>Important</h4><p><a href="/about.html">About Us</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p><p><a href="/contact.html">Contact</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p><p><a href="/terms.html">Terms &amp; Conditions</a></p></div></div></footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>'''
+<footer class="footer">
+  <div class="container footer-main">
+    <div class="footer-brand">
+      <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
+      <p>Independent Education &amp; Government Job Information Portal.</p>
+      <div class="footer-trust-line">
+        <span>✓ Official-source based</span>
+        <span>✓ Clear dates</span>
+        <span>✓ Rajasthan + All India</span>
+      </div>
+      <div class="footer-socials">
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
+        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="/rajasthan-government-jobs">Rajasthan Jobs</a>
+      <a href="/all-india-government-jobs">All India Jobs</a>
+      <a href="/category-admit-card">Admit Card</a>
+      <a href="/category-results">Results</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="/category-answer-key">Answer Key</a>
+      <a href="/category-syllabus">Syllabus</a>
+      <a href="/exam-calendar">Exam Calendar</a>
+      <a href="/quiz">Daily Practice Test</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Important &amp; Legal</h4>
+      <a href="/about.html">About Us</a>
+      <a href="/editorial-policy.html">Editorial Policy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/disclaimer.html">Disclaimer</a>
+      <a href="/terms.html">Terms &amp; Conditions</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <div>
+      <strong>© <span data-year></span> Exam Darpan</strong>
+      <span> · Independent Education &amp; Government Job Information Portal</span>
+    </div>
+    <div class="footer-bottom-note">
+      Information is provided for educational purposes. Final confirmation should always be made from the official notification.
+    </div>
+  </div>
+</footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>'''
 
 
 
@@ -3332,7 +3439,60 @@ def exam_calendar_page(posts: list[dict[str, Any]]) -> str:
 <main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM CALENDAR</span><h1>Exam Calendar 2026</h1><p>Application deadlines और exam dates को एक जगह देखें। किसी भी अंतिम कार्रवाई से पहले official notification verify करें।</p></div></section>
 <section class="card pad calendar-card"><div class="section-title"><div><span class="eyebrow">DATES</span><h2>Important Exam Dates</h2></div><span class="result-count">{len(rows)} updates</span></div>
 <div class="table-scroll"><table class="calendar-table"><thead><tr><th>Exam / Recruitment</th><th>Last Date</th><th>Exam Date</th><th>Status</th></tr></thead><tbody>{"".join(rows) if rows else '<tr><td colspan="4">Published articles में अभी structured date data उपलब्ध नहीं है।</td></tr>'}</tbody></table></div></section></main>
-<footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p><p>© <span data-year></span> Exam Darpan</p></div></div></footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>"""
+<footer class="footer">
+  <div class="container footer-main">
+    <div class="footer-brand">
+      <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
+      <p>Independent Education &amp; Government Job Information Portal.</p>
+      <div class="footer-trust-line">
+        <span>✓ Official-source based</span>
+        <span>✓ Clear dates</span>
+        <span>✓ Rajasthan + All India</span>
+      </div>
+      <div class="footer-socials">
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
+        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="/rajasthan-government-jobs">Rajasthan Jobs</a>
+      <a href="/all-india-government-jobs">All India Jobs</a>
+      <a href="/category-admit-card">Admit Card</a>
+      <a href="/category-results">Results</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="/category-answer-key">Answer Key</a>
+      <a href="/category-syllabus">Syllabus</a>
+      <a href="/exam-calendar">Exam Calendar</a>
+      <a href="/quiz">Daily Practice Test</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Important &amp; Legal</h4>
+      <a href="/about.html">About Us</a>
+      <a href="/editorial-policy.html">Editorial Policy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/disclaimer.html">Disclaimer</a>
+      <a href="/terms.html">Terms &amp; Conditions</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <div>
+      <strong>© <span data-year></span> Exam Darpan</strong>
+      <span> · Independent Education &amp; Government Job Information Portal</span>
+    </div>
+    <div class="footer-bottom-note">
+      Information is provided for educational purposes. Final confirmation should always be made from the official notification.
+    </div>
+  </div>
+</footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>"""
 
 def write_categories(posts: list[dict[str, Any]]) -> list[str]:
     paths: list[str] = []
@@ -3666,9 +3826,58 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
 </main>
 
 <footer class="footer">
-<div class="container">
-<p>© <span data-year></span> Exam Darpan · Independent Information Portal · <a href="/editorial-policy.html">Editorial Policy</a> · <a href="/disclaimer.html">Disclaimer</a></p>
-</div>
+  <div class="container footer-main">
+    <div class="footer-brand">
+      <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
+      <p>Independent Education &amp; Government Job Information Portal.</p>
+      <div class="footer-trust-line">
+        <span>✓ Official-source based</span>
+        <span>✓ Clear dates</span>
+        <span>✓ Rajasthan + All India</span>
+      </div>
+      <div class="footer-socials">
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
+        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="/rajasthan-government-jobs">Rajasthan Jobs</a>
+      <a href="/all-india-government-jobs">All India Jobs</a>
+      <a href="/category-admit-card">Admit Card</a>
+      <a href="/category-results">Results</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="/category-answer-key">Answer Key</a>
+      <a href="/category-syllabus">Syllabus</a>
+      <a href="/exam-calendar">Exam Calendar</a>
+      <a href="/quiz">Daily Practice Test</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Important &amp; Legal</h4>
+      <a href="/about.html">About Us</a>
+      <a href="/editorial-policy.html">Editorial Policy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/disclaimer.html">Disclaimer</a>
+      <a href="/terms.html">Terms &amp; Conditions</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <div>
+      <strong>© <span data-year></span> Exam Darpan</strong>
+      <span> · Independent Education &amp; Government Job Information Portal</span>
+    </div>
+    <div class="footer-bottom-note">
+      Information is provided for educational purposes. Final confirmation should always be made from the official notification.
+    </div>
+  </div>
 </footer>
 
 <script>

@@ -7903,3 +7903,256 @@ body{
     line-height:1.8;
   }
 }
+
+
+/* EXAM DARPAN PROFESSIONAL EDITORIAL + FOOTER */
+.ed-home-editorial{
+  margin:0 0 24px;
+  padding:22px;
+  border:1px solid #dfe6ef;
+  border-radius:20px;
+  background:linear-gradient(145deg,#ffffff,#f8fbff);
+  box-shadow:0 8px 24px rgba(15,23,42,.045);
+}
+.ed-home-editorial-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);
+  gap:22px;
+  align-items:center;
+}
+.ed-home-editorial-copy{
+  min-width:0;
+}
+.ed-home-editorial h2{
+  margin:7px 0 9px;
+  color:#111827;
+  font-size:22px;
+  line-height:1.25;
+  letter-spacing:-.025em;
+}
+.ed-home-editorial p{
+  margin:0;
+  max-width:760px;
+  color:#667085;
+  font-size:11px;
+  line-height:1.72;
+}
+.ed-home-editorial a{
+  display:inline-flex;
+  margin-top:13px;
+  padding:8px 11px;
+  border-radius:9px;
+  background:#eff6ff;
+  color:#1d4ed8!important;
+  font-size:10px;
+  font-weight:900;
+  text-decoration:none;
+}
+.ed-home-editorial a:hover{
+  background:#dbeafe;
+}
+.ed-home-editorial-points{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.ed-home-editorial-points span{
+  display:grid;
+  grid-template-columns:24px 1fr;
+  grid-template-rows:auto auto;
+  column-gap:8px;
+  padding:11px;
+  border:1px solid #e4e9f0;
+  border-radius:12px;
+  background:#fff;
+}
+.ed-home-editorial-points span b{
+  grid-row:1 / span 2;
+  width:24px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#ecfdf5;
+  color:#059669;
+  font-size:11px;
+}
+.ed-home-editorial-points span strong{
+  color:#344054;
+  font-size:9px;
+  line-height:1.25;
+}
+.ed-home-editorial-points span small{
+  color:#98a2b3;
+  font-size:7px;
+  line-height:1.35;
+  margin-top:2px;
+}
+
+/* PROFESSIONAL FOOTER */
+.footer{
+  margin-top:0;
+  background:#071126;
+  color:#cbd5e1;
+  padding:0;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.footer-main{
+  display:grid;
+  grid-template-columns:minmax(260px,1.7fr) repeat(3,minmax(145px,1fr));
+  gap:34px;
+  padding:42px 0 32px;
+}
+.footer-brand{
+  min-width:0;
+}
+.footer-brand-title{
+  color:#fff;
+  font-size:21px;
+  font-weight:950;
+  letter-spacing:-.04em;
+}
+.footer-brand-title span{
+  color:#f59e0b;
+}
+.footer-brand p{
+  margin:10px 0 14px;
+  max-width:330px;
+  color:#aebbd0;
+  font-size:11px;
+  line-height:1.65;
+}
+.footer-trust-line{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.footer-trust-line span{
+  padding:5px 7px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:999px;
+  color:#9fb0c8;
+  font-size:7px;
+  font-weight:800;
+}
+.footer-socials{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+.footer-socials a{
+  display:inline-flex;
+  padding:7px 9px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;
+  color:#dbe5f2!important;
+  font-size:8px;
+  font-weight:850;
+  text-decoration:none!important;
+}
+.footer-socials a:hover{
+  background:rgba(255,255,255,.07);
+}
+.footer-col{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  min-width:0;
+}
+.footer-col h4{
+  margin:1px 0 11px;
+  color:#fff;
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.02em;
+}
+.footer-col a{
+  display:block;
+  margin:0 0 8px;
+  color:#9eacc1!important;
+  font-size:9px;
+  line-height:1.35;
+  text-decoration:none!important;
+}
+.footer-col a:hover{
+  color:#fff!important;
+  transform:translateX(2px);
+}
+.footer-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px;
+  padding:17px 0 19px;
+  border-top:1px solid rgba(255,255,255,.08);
+  color:#8292aa;
+  font-size:8px;
+  line-height:1.55;
+}
+.footer-bottom strong{
+  color:#dbe5f2;
+}
+.footer-bottom-note{
+  max-width:500px;
+  text-align:right;
+}
+
+/* Footer is intentionally compact on phones. */
+@media(max-width:850px){
+  .ed-home-editorial{
+    padding:17px;
+    border-radius:16px;
+  }
+  .ed-home-editorial-grid{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  .ed-home-editorial h2{
+    font-size:18px;
+  }
+  .ed-home-editorial p{
+    font-size:10px;
+  }
+  .ed-home-editorial-points{
+    gap:7px;
+  }
+  .ed-home-editorial-points span{
+    padding:9px;
+  }
+  .footer-main{
+    grid-template-columns:1.25fr 1fr;
+    gap:24px 18px;
+    padding:30px 10px 24px;
+  }
+  .footer-brand{
+    grid-column:1 / -1;
+    padding-bottom:5px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .footer-bottom{
+    display:block;
+    padding:15px 10px 18px;
+  }
+  .footer-bottom-note{
+    max-width:none;
+    margin-top:7px;
+    text-align:left;
+  }
+}
+@media(max-width:480px){
+  .ed-home-editorial-points{
+    grid-template-columns:1fr 1fr;
+  }
+  .footer-main{
+    grid-template-columns:1fr 1fr;
+    gap:22px 14px;
+  }
+  .footer-brand-title{
+    font-size:19px;
+  }
+  .footer-col a{
+    font-size:8.5px;
+  }
+}
+/* END EXAM DARPAN PROFESSIONAL EDITORIAL + FOOTER */
