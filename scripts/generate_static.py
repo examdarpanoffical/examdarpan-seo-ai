@@ -1826,55 +1826,67 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         filtered = [
             p for p in posts
             if normalized_category(p) == name
-        ][:3]
+        ][:5]
 
         # Hide empty homepage category sections.
-        # The section automatically appears after the first published
-        # article in that category is included in the next static build.
         if not filtered:
             return ""
 
-        items = "".join(
-            '<article class="ed-home-category-post">'
-            '<div class="ed-home-category-post-meta">'
-            f'<span>{esc(normalized_category(p))}</span>'
-            f'<time>{esc(date_hi(p.get("publishedAt")))}</time>'
-            '</div>'
-            f'<h3><a href="{esc(article_path(slugify(p.get("slug"))))}">'
-            f'{esc(post_title(p))}</a></h3>'
-            f'<p>{esc(short_description(p)[:115])}</p>'
-            '<a class="ed-home-category-read" '
-            f'href="{esc(article_path(slugify(p.get("slug"))))}">'
-            'Read update <b>→</b></a>'
-            '</article>'
-            for p in filtered
-        )
+        theme_map = {
+            "admit-card": "red",
+            "results": "teal",
+            "answer-key": "purple",
+            "syllabus": "green",
+            "scholarships": "orange",
+            "yojana": "navy",
+            "entrance-exams": "blue",
+            "university-college": "violet",
+        }
+        theme = theme_map.get(slug, "blue")
+
+        items = []
+
+        for index, p in enumerate(filtered):
+            article_slug = slugify(p.get("slug"))
+            published = as_datetime(p.get("publishedAt"))
+
+            is_new = bool(
+                published
+                and 0 <= (
+                    datetime.now(timezone.utc) - published
+                ).total_seconds() <= 7 * 86400
+            )
+
+            new_badge = (
+                '<span class="ed-home-section-new">New</span>'
+                if is_new
+                else ""
+            )
+
+            items.append(
+                '<a class="ed-home-section-item" '
+                f'href="{esc(article_path(article_slug))}">'
+                '<span class="ed-home-section-dot" aria-hidden="true"></span>'
+                '<span class="ed-home-section-title">'
+                f'{esc(post_title(p))}'
+                '</span>'
+                f'{new_badge}'
+                '</a>'
+            )
 
         return (
-            '<section class="ed-home-category-section">'
-            '<div class="ed-home-category-toolbar">'
-            '<div>'
-            '<span class="ed-home-category-kicker">EXAM DARPAN CATEGORY</span>'
-            f'<h2>{esc(title)}</h2>'
-            f'<p>{esc(description)}</p>'
+            f'<section class="ed-home-category-section ed-home-section-{theme}" '
+            f'aria-labelledby="home-section-{slug}">'
+            '<div class="ed-home-section-head">'
+            f'<h2 id="home-section-{slug}">{esc(title)}</h2>'
             '</div>'
-            f'<span class="ed-home-category-count">{len(filtered)} updates</span>'
-            '</div>'
-            '<div class="ed-home-category-layout">'
-            '<div class="ed-home-category-posts">'
-            + (
-                items
-                if items
-                else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'
-            )
+            '<div class="ed-home-section-list">'
+            + "".join(items)
             + '</div>'
-            '<aside class="ed-home-category-side">'
-            '<div class="ed-home-category-side-card">'
-            f'<a class="ed-home-category-viewall" href="{category_path(slug)}">'
-            f'View all {esc(title)} →</a>'
-            '</div>'
-            '</aside>'
-            '</div>'
+            '<a class="ed-home-section-more" '
+            f'href="{esc(category_path(slug))}">'
+            'View More'
+            '</a>'
             '</section>'
         )
 
@@ -2342,168 +2354,215 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 
 .ed-home-category-section{
-  margin:0 0 28px;
-}
-.ed-home-category-toolbar{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:14px;
-  margin-bottom:13px;
-}
-.ed-home-category-kicker{
-  display:inline-block;
-  margin-bottom:5px;
-  color:#2563eb;
-  font-size:8px;
-  font-weight:950;
-  letter-spacing:.12em;
-}
-.ed-home-category-toolbar h2{
-  margin:0;
-  color:#172033;
-  font-size:24px;
-  line-height:1.2;
-}
-.ed-home-category-toolbar p{
-  margin:5px 0 0;
-  max-width:720px;
-  color:#667085;
-  font-size:10px;
-  line-height:1.5;
-}
-.ed-home-category-count{
-  flex:0 0 auto;
-  padding:7px 11px;
-  border-radius:999px;
-  background:#eff6ff;
-  color:#1d4ed8;
-  font-size:9px;
-  font-weight:900;
-}
-.ed-home-category-layout{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 230px;
-  gap:16px;
-  align-items:start;
-}
-.ed-home-category-posts{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:13px;
-}
-.ed-home-category-post{
+  margin:0 0 24px;
+  overflow:hidden;
   background:#fff;
-  border:1px solid #e5e9f0;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 6px 20px rgba(15,23,42,.05);
+  border:1px solid #e1e1dc;
+  border-radius:15px;
+  box-shadow:0 3px 10px rgba(15,23,42,.045);
 }
-.ed-home-category-post h3{
-  margin:0 0 7px;
-  font-size:16px;
-  line-height:1.42;
+
+.ed-home-section-head{
+  padding:17px 22px;
+  background:#557d16;
 }
-.ed-home-category-post h3 a{
+
+.ed-home-section-head h2{
+  margin:0;
+  color:#fff;
+  font-size:23px;
+  line-height:1.2;
+  font-weight:900;
+  letter-spacing:-.02em;
+}
+
+.ed-home-section-list{
+  background:#fff;
+}
+
+.ed-home-section-item{
+  min-height:69px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:13px 22px;
+  border-bottom:1px solid #e4e4df;
   color:#172033!important;
   text-decoration:none!important;
 }
-.ed-home-category-post h3 a:hover{
-  color:#2563eb!important;
-}
-.ed-home-category-post-meta{
-  display:flex;
-  gap:7px;
-  align-items:center;
-  color:#8a94a5;
-  font-size:9px;
-  font-weight:800;
-  margin-bottom:8px;
-}
-.ed-home-category-post p{
-  margin:0;
-  color:#667085;
-  font-size:10.5px;
-  line-height:1.55;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-.ed-home-category-read{
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  margin-top:11px;
-  color:#2563eb!important;
-  text-decoration:none!important;
-  font-size:10px;
-  font-weight:900;
-}
-.ed-home-category-read b{
-  font-size:13px;
-}
-.ed-home-category-side{
-  display:grid;
-  gap:10px;
-}
-.ed-home-category-side-card{
-  padding:16px;
-  border:1px solid #e5e9f0;
-  border-radius:16px;
-  background:linear-gradient(135deg,#fff,#f8fbff);
-  box-shadow:0 6px 20px rgba(15,23,42,.04);
-}
-.ed-home-category-side-card strong{
-  display:block;
-  color:#172033;
-  font-size:11px;
-}
-.ed-home-category-side-card p{
-  margin:6px 0 0;
-  color:#667085;
-  font-size:9px;
-  line-height:1.55;
-}
-.ed-home-category-viewall{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:48px;
-  padding:10px 12px;
-  border:1px solid #dbe4f0;
-  border-radius:14px;
-  background:linear-gradient(180deg,#fff,#f8fbff);
-  color:#2563eb!important;
-  text-align:center;
-  font-size:10px;
-  font-weight:950;
-  text-decoration:none!important;
-  box-shadow:0 5px 16px rgba(15,23,42,.05);
-}
-.ed-home-category-viewall:hover{
-  border-color:#bfdbfe;
-  background:#eff6ff;
+
+.ed-home-section-item:last-child{
+  border-bottom:0;
 }
 
-@media(max-width:900px){
-  .ed-home-category-layout{
-    grid-template-columns:1fr;
-  }
-  .ed-home-category-side{
-    grid-template-columns:1fr 1fr;
-  }
+.ed-home-section-item:hover{
+  background:#fafcf7;
 }
-@media(max-width:650px){
-  .ed-home-category-toolbar{
-    align-items:flex-start;
-    flex-direction:column;
+
+.ed-home-section-dot{
+  width:11px;
+  height:11px;
+  flex:0 0 11px;
+  border-radius:50%;
+  background:#6b8f1f;
+}
+
+.ed-home-section-title{
+  min-width:0;
+  flex:1;
+  color:#172033;
+  font-size:16px;
+  line-height:1.45;
+  font-weight:650;
+}
+
+.ed-home-section-new{
+  flex:0 0 auto;
+  padding:7px 11px;
+  border-radius:7px;
+  background:#c33b32;
+  color:#fff;
+  font-size:12px;
+  line-height:1;
+  font-weight:900;
+}
+
+.ed-home-section-more{
+  display:block;
+  padding:17px 18px;
+  background:#faf8f2;
+  color:#557d16!important;
+  text-align:center;
+  text-decoration:none!important;
+  font-size:16px;
+  font-weight:900;
+  border-top:1px solid #e4e4df;
+}
+
+.ed-home-section-more:hover{
+  background:#f4f1e8;
+}
+
+/* Section themes */
+.ed-home-section-red .ed-home-section-head{
+  background:#b9382f;
+}
+.ed-home-section-red .ed-home-section-dot{
+  background:#b9382f;
+}
+.ed-home-section-red .ed-home-section-more{
+  color:#b9382f!important;
+}
+
+.ed-home-section-teal .ed-home-section-head{
+  background:#138a83;
+}
+.ed-home-section-teal .ed-home-section-dot{
+  background:#138a83;
+}
+.ed-home-section-teal .ed-home-section-more{
+  color:#138a83!important;
+}
+
+.ed-home-section-purple .ed-home-section-head{
+  background:#7b3f78;
+}
+.ed-home-section-purple .ed-home-section-dot{
+  background:#7b3f78;
+}
+.ed-home-section-purple .ed-home-section-more{
+  color:#7b3f78!important;
+}
+
+.ed-home-section-green .ed-home-section-head{
+  background:#557d16;
+}
+.ed-home-section-green .ed-home-section-dot{
+  background:#6b8f1f;
+}
+.ed-home-section-green .ed-home-section-more{
+  color:#557d16!important;
+}
+
+.ed-home-section-orange .ed-home-section-head{
+  background:#bd6d18;
+}
+.ed-home-section-orange .ed-home-section-dot{
+  background:#bd6d18;
+}
+.ed-home-section-orange .ed-home-section-more{
+  color:#bd6d18!important;
+}
+
+.ed-home-section-navy .ed-home-section-head{
+  background:#1f3157;
+}
+.ed-home-section-navy .ed-home-section-dot{
+  background:#1f3157;
+}
+.ed-home-section-navy .ed-home-section-more{
+  color:#1f3157!important;
+}
+
+.ed-home-section-blue .ed-home-section-head{
+  background:#2867a8;
+}
+.ed-home-section-blue .ed-home-section-dot{
+  background:#2867a8;
+}
+.ed-home-section-blue .ed-home-section-more{
+  color:#2867a8!important;
+}
+
+.ed-home-section-violet .ed-home-section-head{
+  background:#684477;
+}
+.ed-home-section-violet .ed-home-section-dot{
+  background:#684477;
+}
+.ed-home-section-violet .ed-home-section-more{
+  color:#684477!important;
+}
+
+@media(max-width:600px){
+  .ed-home-category-section{
+    margin-bottom:18px;
+    border-radius:13px;
   }
-  .ed-home-category-posts{
-    grid-template-columns:1fr;
+
+  .ed-home-section-head{
+    padding:14px 15px;
   }
-  .ed-home-category-side{
-    grid-template-columns:1fr;
+
+  .ed-home-section-head h2{
+    font-size:19px;
+  }
+
+  .ed-home-section-item{
+    min-height:61px;
+    gap:10px;
+    padding:11px 14px;
+  }
+
+  .ed-home-section-dot{
+    width:9px;
+    height:9px;
+    flex-basis:9px;
+  }
+
+  .ed-home-section-title{
+    font-size:13px;
+    line-height:1.42;
+  }
+
+  .ed-home-section-new{
+    padding:6px 8px;
+    font-size:9px;
+  }
+
+  .ed-home-section-more{
+    padding:14px;
+    font-size:14px;
   }
 }
 
