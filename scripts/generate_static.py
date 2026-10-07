@@ -82,7 +82,7 @@ CATEGORIES = [
 CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CATEGORIES}
 RESERVED_SLUGS = {"index", "article", "about", "privacy", "contact", "disclaimer", "terms", "editorial-policy", "author", "404"}
 
-AUTHOR_NAME = "Lakshay"
+AUTHOR_NAME = "Lakshay Kumar"
 AUTHOR_ROLE = "Content Writer"
 AUTHOR_PATH = "/author/lakshay"
 AUTHOR_URL = f"{BASE}{AUTHOR_PATH}"
@@ -809,7 +809,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
-<div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{reading_time(content)} min read</span></div><div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">{AUTHOR_NAME}</a></div>
+<div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span></div><div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div>
 {verification_line(p)}
 
 <section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
@@ -3428,7 +3428,7 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
 </div>
 
 <div class="author-intro">
-<p><strong>Lakshay</strong> Exam Darpan के लिए सरकारी नौकरी, भर्ती, प्रतियोगी परीक्षाओं, Admit Card, Result और अन्य महत्वपूर्ण exam updates पर सरल और उपयोगी content तैयार करते हैं।</p>
+<p><strong>Lakshay Kumar</strong> Exam Darpan के लिए सरकारी नौकरी, भर्ती, प्रतियोगी परीक्षाओं, Admit Card, Result और अन्य महत्वपूर्ण exam updates पर सरल और उपयोगी content तैयार करते हैं।</p>
 <p>इनका लेखन focus विद्यार्थियों तक जरूरी जानकारी को साफ, समझने में आसान और practical तरीके से पहुँचाने पर रहता है, ताकि eligibility, application process, important dates और official updates जैसी जानकारी एक ही जगह स्पष्ट रूप से मिल सके।</p>
 <p>Content तैयार करते समय संबंधित official notification और official source को प्राथमिक reference माना जाता है। जानकारी में बदलाव होने पर articles को update रखने की कोशिश की जाती है।</p>
 </div>
