@@ -371,6 +371,27 @@ def clean_article_content(value: Any, article_title: str = "") -> str:
     text = re.sub(r'<\s*(script|style|iframe|object|embed|form|base|link)[^>]*/?>', "", text, flags=re.I)
     text = re.sub(r"\s+on[a-z]+\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]+)", "", text, flags=re.I)
     text = re.sub(r'(?i)javascript\s*:', "", text)
+
+    # Normalize legacy internal URLs saved inside older Firestore article HTML.
+    # Keep query strings intact while enforcing the current canonical public paths.
+    legacy_link_rules = [
+        ('/category-rajasthan-jobs', '/rajasthan-government-jobs'),
+        ('/category-government-jobs', '/all-india-government-jobs'),
+        ('/answer-key.html', '/category-answer-key'),
+        ('/syllabus.html', '/category-syllabus'),
+        ('/exam-calendar.html', '/exam-calendar'),
+        ('/quiz.html', '/quiz'),
+    ]
+
+    for old_path, new_path in legacy_link_rules:
+        text = text.replace('href="' + old_path, 'href="' + new_path)
+        text = text.replace("href='" + old_path, "href='" + new_path)
+
+    text = re.sub(
+        r'(?i)(href=["\'])/article/([A-Za-z0-9._~-]+)(?=[?#"\'])',
+        r'\1/\2',
+        text,
+    )
     text = re.sub(r'<p>\s*</p>', "", text, flags=re.I)
 
     # The article template owns the page-level H1.
