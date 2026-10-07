@@ -1344,30 +1344,18 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         hub_slug: str,
         scope: str,
     ) -> str:
-        # Homepage hubs are STRICT vacancy feeds.
-        #
-        # Rajasthan Government Jobs:
-        #   ONLY Rajasthan Jobs / Government Jobs vacancies.
-        #
-        # All India Government Jobs:
-        #   ONLY Government Jobs vacancies.
-        #
-        # Admit Card, Results, Answer Key, Syllabus, Scholarships,
-        # Yojana, Entrance Exams and University/College content must
-        # remain in their own homepage category sections below.
-        #
-        # The Exam Calendar and Practice Test sections are intentionally
-        # untouched.
-
+        # Homepage hubs are strict government-job vacancy feeds.
         if scope == "rajasthan":
             hub_categories = {
                 "Government Jobs",
                 "Rajasthan Jobs",
             }
+            theme = "green"
         else:
             hub_categories = {
                 "Government Jobs",
             }
+            theme = "blue"
 
         feed = []
         seen = set()
@@ -1388,44 +1376,58 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
             seen.add(slug)
             feed.append(p)
 
-            if len(feed) >= 12:
+            if len(feed) >= 5:
                 break
 
-        cards = "".join(
-            '<article class="ed-home-hub-card">'
-            '<div class="ed-home-hub-card-meta">'
-            f'<span>{esc(normalized_category(p))}</span>'
-            f'<time>{esc(date_hi(p.get("publishedAt")))}</time>'
-            '</div>'
-            f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
-            f'{esc(post_title(p))}</a>'
-            '<span class="ed-home-hub-card-arrow" aria-hidden="true">→</span>'
-            '</article>'
-            for p in feed
-        )
+        rows = []
 
-        if not cards:
-            cards = (
+        for p in feed:
+            article_slug = slugify(p.get("slug"))
+            published = as_datetime(p.get("publishedAt"))
+
+            is_new = bool(
+                published
+                and 0 <= (
+                    datetime.now(timezone.utc) - published
+                ).total_seconds() <= 7 * 86400
+            )
+
+            new_badge = (
+                '<span class="ed-home-hub-new">New</span>'
+                if is_new else ""
+            )
+
+            rows.append(
+                '<a class="ed-home-hub-item" '
+                f'href="{esc(article_path(article_slug))}">'
+                '<span class="ed-home-hub-dot" aria-hidden="true"></span>'
+                '<span class="ed-home-hub-title">'
+                f'{esc(post_title(p))}'
+                '</span>'
+                f'{new_badge}'
+                '</a>'
+            )
+
+        if not rows:
+            rows.append(
                 '<div class="ed-home-empty">'
                 'अभी इस section में कोई verified government job vacancy उपलब्ध नहीं है।'
                 '</div>'
             )
 
         return (
-            '<section class="ed-home-hub">'
+            f'<section class="ed-home-hub ed-home-hub-{theme}" '
+            f'aria-labelledby="home-hub-{hub_slug}">'
             '<div class="ed-home-hub-head">'
-            '<div>'
-            '<span class="ed-home-hub-kicker">EXAM DARPAN HUB</span>'
-            f'<h2>{esc(title)}</h2>'
-            '<p class="ed-home-hub-subtitle">'
-            'सरकारी नौकरी की latest verified vacancies एक ही जगह देखें।'
-            '</p>'
-            '</div>'
-            f'<a href="{esc(category_path(hub_slug))}">View all →</a>'
+            f'<h2 id="home-hub-{hub_slug}">{esc(title)}</h2>'
             '</div>'
             '<div class="ed-home-hub-list">'
-            + cards +
-            '</div>'
+            + "".join(rows)
+            + '</div>'
+            f'<a class="ed-home-hub-more" '
+            f'href="{esc(category_path(hub_slug))}">'
+            'View More'
+            '</a>'
             '</section>'
         )
 
@@ -1995,104 +1997,93 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   margin:0 0 28px
 }
 .ed-home-hub{
-  background:#fff;
-  border:1px solid #e3e8ef;
-  border-radius:18px;
+  margin:0 0 24px;
   overflow:hidden;
-  box-shadow:0 8px 25px rgba(15,23,42,.06)
+  background:#fff;
+  border:1px solid #e1e1dc;
+  border-radius:15px;
+  box-shadow:0 3px 10px rgba(15,23,42,.045);
 }
 .ed-home-hub-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:18px;
-  background:linear-gradient(135deg,#f8fbff,#fff);
-  border-bottom:1px solid #edf0f4
+  padding:17px 22px;
+  background:#557d16;
 }
-.ed-home-hub-kicker{
-  display:block;
-  margin-bottom:5px;
-  color:#2563eb;
-  font-size:8px;
-  font-weight:950;
-  letter-spacing:.12em
+.ed-home-hub-green .ed-home-hub-head{
+  background:#557d16;
+}
+.ed-home-hub-blue .ed-home-hub-head{
+  background:#2867a8;
 }
 .ed-home-hub-head h2{
   margin:0;
-  color:#172033;
-  font-size:20px;
-  line-height:1.2
-}
-.ed-home-hub-head>a{
-  flex:0 0 auto;
-  color:#2563eb!important;
-  font-size:9px;
-  font-weight:900
-}
-.ed-home-hub-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px
+  color:#fff;
+  font-size:23px;
+  line-height:1.2;
+  font-weight:900;
+  letter-spacing:-.02em;
 }
 .ed-home-hub-list{
-  padding:5px 16px 10px
+  background:#fff;
 }
-.ed-home-hub-card{
-  position:relative;
-  padding:12px 28px 12px 2px;
-  border-bottom:1px solid #edf0f4
-}
-.ed-home-hub-card:last-child{
-  border-bottom:0
-}
-.ed-home-hub-card-meta{
+.ed-home-hub-item{
+  min-height:69px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  margin-bottom:5px
-}
-.ed-home-hub-card-meta span{
-  display:inline-flex;
-  max-width:70%;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  padding:3px 7px;
-  border-radius:999px;
-  background:#eff6ff;
-  color:#2563eb;
-  font-size:7px;
-  font-weight:900
-}
-.ed-home-hub-card-meta time{
-  color:#98a2b3;
-  font-size:7px;
-  white-space:nowrap
-}
-.ed-home-hub-card a{
-  display:block;
+  gap:14px;
+  padding:13px 22px;
+  border-bottom:1px solid #e4e4df;
   color:#172033!important;
-  font-size:10.5px;
-  font-weight:800;
-  line-height:1.45
+  text-decoration:none!important;
 }
-.ed-home-hub-card-arrow{
-  position:absolute;
-  right:2px;
-  top:50%;
-  transform:translateY(-50%);
-  color:#2563eb;
-  font-size:13px;
-  font-weight:900
+.ed-home-hub-item:last-child{
+  border-bottom:0;
 }
-.ed-home-hub-subtitle{
-  margin:5px 0 0;
-  color:#7b8798;
-  font-size:8px;
-  line-height:1.45
+.ed-home-hub-item:hover{
+  background:#fafaf7;
 }
+.ed-home-hub-dot{
+  width:11px;
+  height:11px;
+  flex:0 0 11px;
+  border-radius:50%;
+  background:#6b8f1f;
+}
+.ed-home-hub-blue .ed-home-hub-dot{
+  background:#2867a8;
+}
+.ed-home-hub-title{
+  min-width:0;
+  flex:1;
+  color:#172033;
+  font-size:16px;
+  line-height:1.45;
+  font-weight:650;
+}
+.ed-home-hub-new{
+  flex:0 0 auto;
+  padding:7px 11px;
+  border-radius:7px;
+  background:#c33b32;
+  color:#fff;
+  font-size:12px;
+  line-height:1;
+  font-weight:900;
+}
+.ed-home-hub-more{
+  display:block;
+  padding:17px 18px;
+  background:#faf8f2;
+  color:#557d16!important;
+  text-align:center;
+  text-decoration:none!important;
+  font-size:16px;
+  font-weight:900;
+  border-top:1px solid #e4e4df;
+}
+.ed-home-hub-blue .ed-home-hub-more{
+  color:#2867a8!important;
+}
+
 .ed-home-empty{
   padding:16px 2px;
   color:#98a2b3!important;
@@ -2623,6 +2614,39 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 @media(max-width:560px){
   .ed-home-hub-grid{grid-template-columns:1fr}
+  .ed-home-hub{
+    margin-bottom:18px;
+    border-radius:13px;
+  }
+  .ed-home-hub-head{
+    padding:14px 15px;
+  }
+  .ed-home-hub-head h2{
+    font-size:19px;
+  }
+  .ed-home-hub-item{
+    min-height:61px;
+    gap:10px;
+    padding:11px 14px;
+  }
+  .ed-home-hub-dot{
+    width:9px;
+    height:9px;
+    flex-basis:9px;
+  }
+  .ed-home-hub-title{
+    font-size:13px;
+    line-height:1.42;
+  }
+  .ed-home-hub-new{
+    padding:6px 8px;
+    font-size:9px;
+  }
+  .ed-home-hub-more{
+    padding:14px 15px;
+    font-size:14px;
+  }
+
   .ed-home-hub-section{border-right:0}
   .ed-home-latest-grid{grid-template-columns:1fr}
   .ed-home-daily{display:block}
