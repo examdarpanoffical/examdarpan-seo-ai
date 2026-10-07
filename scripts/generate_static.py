@@ -2093,66 +2093,67 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 .ed-home-calendar-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:18px;
-  margin:0 0 28px;
+  gap:14px;
+  margin:0 0 22px;
 }
 .ed-home-calendar-panel{
   background:#fff;
   border:1px solid #e3e8ef;
-  border-radius:18px;
+  border-radius:13px;
   overflow:hidden;
-  box-shadow:0 8px 25px rgba(15,23,42,.06);
+  box-shadow:0 3px 12px rgba(15,23,42,.045);
 }
 .ed-home-calendar-panel.rajasthan{
-  border-top:4px solid #7c3aed;
+  border-top:3px solid #7c3aed;
 }
 .ed-home-calendar-panel.all-india{
-  border-top:4px solid #2563eb;
+  border-top:3px solid #2563eb;
 }
 .ed-home-calendar-head{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
-  gap:12px;
-  padding:18px;
-  background:linear-gradient(135deg,#f8fbff,#fff);
+  gap:10px;
+  padding:13px 15px;
+  background:#fff;
   border-bottom:1px solid #edf0f4;
 }
 .ed-home-calendar-kicker{
   display:block;
-  margin-bottom:5px;
+  margin-bottom:3px;
   color:#64748b;
-  font-size:8px;
+  font-size:7px;
   font-weight:950;
-  letter-spacing:.13em;
+  letter-spacing:.12em;
 }
 .ed-home-calendar-head h2{
   margin:0;
   color:#172033;
-  font-size:20px;
-  line-height:1.2;
+  font-size:17px;
+  line-height:1.25;
+  font-weight:900;
 }
 .ed-home-calendar-head p{
-  margin:5px 0 0;
+  margin:4px 0 0;
   color:#7b8798;
-  font-size:9px;
-  line-height:1.45;
+  font-size:8px;
+  line-height:1.4;
 }
 .ed-home-calendar-badge{
   flex:0 0 auto;
-  padding:5px 8px;
+  padding:5px 7px;
   border-radius:999px;
   background:#ecfdf3;
   color:#15803d;
-  font-size:8px;
+  font-size:7px;
   font-weight:950;
 }
 .ed-home-calendar-list{
-  padding:8px 14px;
+  padding:2px 13px;
 }
 .ed-home-calendar-item{
   display:block;
-  padding:12px 4px;
+  padding:10px 2px;
   border-bottom:1px solid #edf0f4;
   text-decoration:none!important;
 }
@@ -2162,50 +2163,54 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 .ed-home-calendar-copy strong{
   display:block;
   color:#172033;
-  font-size:10.5px;
-  line-height:1.45;
+  font-size:10px;
+  line-height:1.4;
+  font-weight:800;
 }
 .ed-home-calendar-copy small{
   display:block;
-  margin-top:3px;
+  margin-top:2px;
   color:#8a94a5;
-  font-size:8px;
+  font-size:7.5px;
 }
 .ed-home-calendar-dates{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:6px;
-  margin-top:8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:6px;
 }
 .ed-home-calendar-dates span{
-  padding:7px 8px;
-  border:1px solid #edf0f4;
-  border-radius:9px;
+  display:inline-block;
+  padding:5px 7px;
+  border:1px solid #e8edf3;
+  border-radius:7px;
   background:#f8fafc;
 }
 .ed-home-calendar-dates small{
-  display:block;
+  display:inline;
   color:#7b8798;
-  font-size:7px;
+  font-size:6.5px;
 }
 .ed-home-calendar-dates b{
-  display:block;
-  margin-top:2px;
+  display:inline;
+  margin-left:3px;
   color:#172033;
-  font-size:8px;
-  line-height:1.25;
+  font-size:7.5px;
+  line-height:1.2;
 }
 .ed-home-calendar-more{
   display:block;
-  padding:0 18px 16px;
+  padding:11px 15px 12px;
   color:#2563eb!important;
-  font-size:9px;
+  font-size:8px;
   font-weight:900;
+  border-top:1px solid #edf0f4;
+  background:#fafbfc;
 }
 .ed-home-calendar-empty{
-  padding:14px 4px;
+  padding:12px 3px;
   color:#98a2b3;
-  font-size:9px;
+  font-size:8px;
 }
 
 .ed-home-editorial{
@@ -2558,52 +2563,93 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 
 .ed-home-latest{
-  margin:0 0 28px
+  margin:0 0 22px;
 }
 .ed-home-latest-head{
   display:flex;
-  align-items:end;
+  align-items:flex-end;
   justify-content:space-between;
-  gap:12px;
-  margin-bottom:12px
+  gap:10px;
+  margin-bottom:8px;
 }
 .ed-home-latest-head h2{
   margin:0;
   color:#172033;
-  font-size:21px
+  font-size:19px;
+  line-height:1.2;
+  font-weight:900;
 }
 .ed-home-latest-head p{
-  margin:4px 0 0;
+  margin:3px 0 0;
   color:#7b8798;
-  font-size:9px
+  font-size:8px;
+  line-height:1.4;
 }
 .ed-home-latest-head a{
+  flex:0 0 auto;
   color:#2563eb!important;
-  font-size:9px;
-  font-weight:900
+  font-size:8px;
+  font-weight:900;
 }
 .ed-home-latest-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px
+  display:block;
+  background:#fff;
+  border:1px solid #e3e8ef;
+  border-radius:13px;
+  overflow:hidden;
+  box-shadow:0 3px 12px rgba(15,23,42,.04);
 }
 .ed-home-latest-card{
-  padding:14px;
+  position:relative;
+  display:block;
+  padding:11px 38px 11px 14px;
   background:#fff;
-  border:1px solid #e4e9f0;
-  border-radius:14px
+  border:0;
+  border-bottom:1px solid #edf0f4;
+  border-radius:0;
+}
+.ed-home-latest-card:last-child{
+  border-bottom:0;
+}
+.ed-home-latest-card-top{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:4px;
+  min-width:0;
+}
+.ed-home-latest-chip{
+  display:inline-flex;
+  align-items:center;
+  max-width:65%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#667085;
+  font-size:7px;
+  font-weight:800;
+}
+.ed-home-latest-card-top time{
+  flex:0 0 auto;
+  color:#98a2b3;
+  font-size:7px;
 }
 .ed-home-latest-card a{
-  color:#172033!important;
-  font-size:11px;
-  font-weight:850;
-  line-height:1.45
-}
-.ed-home-latest-card small{
   display:block;
-  margin-top:7px;
-  color:#8a94a5;
-  font-size:8px
+  color:#172033!important;
+  font-size:10.5px;
+  font-weight:850;
+  line-height:1.45;
+  text-decoration:none!important;
+}
+.ed-home-latest-arrow{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#2563eb;
+  font-size:13px;
+  font-weight:900;
 }
 
 @media(max-width:850px){
@@ -2613,6 +2659,75 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   .ed-home-latest-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:560px){
+  .ed-home-calendar-grid{
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .ed-home-calendar-head{
+    padding:12px 13px;
+  }
+  .ed-home-calendar-head h2{
+    font-size:16px;
+  }
+  .ed-home-calendar-head p{
+    font-size:7.5px;
+  }
+  .ed-home-calendar-list{
+    padding:1px 12px;
+  }
+  .ed-home-calendar-item{
+    padding:9px 1px;
+  }
+  .ed-home-calendar-copy strong{
+    font-size:9.5px;
+  }
+  .ed-home-calendar-dates{
+    gap:4px;
+    margin-top:5px;
+  }
+  .ed-home-calendar-dates span{
+    padding:4px 6px;
+  }
+  .ed-home-calendar-more{
+    padding:10px 13px;
+  }
+
+  .ed-home-latest{
+    margin-bottom:18px;
+  }
+  .ed-home-latest-head{
+    align-items:flex-end;
+    margin-bottom:7px;
+  }
+  .ed-home-latest-head h2{
+    font-size:18px;
+  }
+  .ed-home-latest-head p{
+    font-size:7.5px;
+  }
+  .ed-home-latest-head a{
+    font-size:8px;
+  }
+  .ed-home-latest-card{
+    padding:10px 35px 10px 12px;
+  }
+  .ed-home-latest-card a{
+    font-size:10px;
+    line-height:1.42;
+  }
+  .ed-home-latest-chip{
+    font-size:6.5px;
+  }
+  .ed-home-latest-card-top time{
+    font-size:6.5px;
+  }
+  .ed-home-latest-arrow{
+    right:12px;
+    font-size:12px;
+  }
+
+
   .ed-home-hub-grid{grid-template-columns:1fr}
   .ed-home-hub{
     margin-bottom:18px;
