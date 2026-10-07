@@ -884,7 +884,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   margin:10px auto 18px;
   padding:10px;
   border:1px solid #e2e8f0;
-  border-radius:12px;
+  border-radius:13px;
   background:#fff;
   box-shadow:0 3px 12px rgba(15,23,42,.04);
 }}
@@ -1024,7 +1024,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     height:14px;
   }}
   .ed-follow-btn b{{
-    font-size:9.5px;
+    font-size:10px;
   }}
   .ed-follow-btn em{{
     padding:6px 7px;
@@ -1724,7 +1724,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '</div>'
 
         f'<div class="ed-home-calendar-list">'
-        f'{render_calendar_list(rajasthan_calendar_rows[:3], "Rajasthan")}'
+        f'{render_calendar_list(rajasthan_calendar_rows, "Rajasthan")}'
         '</div>'
 
         '<a class="ed-home-calendar-more" '
@@ -1744,7 +1744,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '</div>'
 
         f'<div class="ed-home-calendar-list">'
-        f'{render_calendar_list(all_india_calendar_rows[:3], "All India")}'
+        f'{render_calendar_list(all_india_calendar_rows, "All India")}'
         '</div>'
 
         '<a class="ed-home-calendar-more" '
@@ -2092,16 +2092,16 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
 .ed-home-calendar-grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-  margin:0 0 18px;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin:0 0 22px;
 }
 .ed-home-calendar-panel{
   background:#fff;
   border:1px solid #e3e8ef;
-  border-radius:11px;
+  border-radius:13px;
   overflow:hidden;
-  box-shadow:0 2px 9px rgba(15,23,42,.035);
+  box-shadow:0 3px 12px rgba(15,23,42,.045);
 }
 .ed-home-calendar-panel.rajasthan{
   border-top:3px solid #7c3aed;
@@ -2113,47 +2113,47 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:8px;
-  padding:9px 11px;
+  gap:10px;
+  padding:13px 15px;
   background:#fff;
   border-bottom:1px solid #edf0f4;
 }
 .ed-home-calendar-kicker{
   display:block;
-  margin-bottom:2px;
+  margin-bottom:3px;
   color:#64748b;
-  font-size:6px;
+  font-size:7px;
   font-weight:950;
-  letter-spacing:.1em;
+  letter-spacing:.12em;
 }
 .ed-home-calendar-head h2{
   margin:0;
   color:#172033;
-  font-size:13px;
-  line-height:1.2;
+  font-size:17px;
+  line-height:1.25;
   font-weight:900;
 }
 .ed-home-calendar-head p{
-  margin:3px 0 0;
+  margin:4px 0 0;
   color:#7b8798;
-  font-size:6.5px;
-  line-height:1.3;
+  font-size:8px;
+  line-height:1.4;
 }
 .ed-home-calendar-badge{
   flex:0 0 auto;
-  padding:3px 5px;
+  padding:5px 7px;
   border-radius:999px;
   background:#ecfdf3;
   color:#15803d;
-  font-size:6px;
+  font-size:7px;
   font-weight:950;
 }
 .ed-home-calendar-list{
-  padding:0 10px;
+  padding:2px 13px;
 }
 .ed-home-calendar-item{
   display:block;
-  padding:6px 0;
+  padding:10px 2px;
   border-bottom:1px solid #edf0f4;
   text-decoration:none!important;
 }
@@ -2163,54 +2163,54 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 .ed-home-calendar-copy strong{
   display:block;
   color:#172033;
-  font-size:8.5px;
-  line-height:1.3;
+  font-size:10px;
+  line-height:1.4;
   font-weight:800;
 }
 .ed-home-calendar-copy small{
   display:block;
-  margin-top:1px;
+  margin-top:2px;
   color:#8a94a5;
-  font-size:6px;
+  font-size:7.5px;
 }
 .ed-home-calendar-dates{
   display:flex;
   flex-wrap:wrap;
-  gap:3px;
-  margin-top:3px;
+  gap:5px;
+  margin-top:6px;
 }
 .ed-home-calendar-dates span{
   display:inline-block;
-  padding:3px 5px;
+  padding:5px 7px;
   border:1px solid #e8edf3;
-  border-radius:5px;
+  border-radius:7px;
   background:#f8fafc;
 }
 .ed-home-calendar-dates small{
   display:inline;
   color:#7b8798;
-  font-size:5.5px;
+  font-size:6.5px;
 }
 .ed-home-calendar-dates b{
   display:inline;
-  margin-left:2px;
+  margin-left:3px;
   color:#172033;
-  font-size:6.5px;
+  font-size:7.5px;
   line-height:1.2;
 }
 .ed-home-calendar-more{
   display:block;
-  padding:8px 11px;
+  padding:11px 15px 12px;
   color:#2563eb!important;
-  font-size:7px;
+  font-size:8px;
   font-weight:900;
   border-top:1px solid #edf0f4;
   background:#fafbfc;
 }
 .ed-home-calendar-empty{
-  padding:9px 2px;
+  padding:12px 3px;
   color:#98a2b3;
-  font-size:7px;
+  font-size:8px;
 }
 
 .ed-home-editorial{
@@ -2234,7 +2234,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 .ed-home-editorial p{
   margin:0;
   color:#667085;
-  font-size:9.5px;
+  font-size:10px;
   line-height:1.55;
 }
 .ed-home-editorial a{
@@ -2307,7 +2307,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   max-width:650px;
   margin:0;
   color:#cbd5e1;
-  font-size:9.5px;
+  font-size:10px;
   line-height:1.55;
 }
 .ed-home-daily-points{
@@ -2335,7 +2335,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 .ed-home-daily-action strong{
   display:block;
   color:#fff;
-  font-size:9.5px;
+  font-size:10px;
 }
 .ed-home-daily-action small{
   display:block;
@@ -2523,7 +2523,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 @media(max-width:600px){
   .ed-home-category-section{
     margin-bottom:18px;
-    border-radius:12px;
+    border-radius:13px;
   }
 
   .ed-home-section-head{
@@ -2563,201 +2563,210 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 
 .ed-home-latest{
-  margin:0 0 18px;
+  margin:0 0 22px;
 }
 .ed-home-latest-head{
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
-  gap:8px;
-  margin-bottom:7px;
+  gap:10px;
+  margin-bottom:8px;
 }
 .ed-home-latest-head h2{
   margin:0;
   color:#172033;
-  font-size:17px;
-  line-height:1.15;
+  font-size:19px;
+  line-height:1.2;
   font-weight:900;
 }
 .ed-home-latest-head p{
-  margin:2px 0 0;
+  margin:3px 0 0;
   color:#7b8798;
-  font-size:6.5px;
-  line-height:1.3;
+  font-size:8px;
+  line-height:1.4;
 }
 .ed-home-latest-head a{
   flex:0 0 auto;
   color:#2563eb!important;
-  font-size:7px;
+  font-size:8px;
   font-weight:900;
 }
 .ed-home-latest-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-  background:transparent;
-  border:0;
-  border-radius:0;
-  overflow:visible;
-  box-shadow:none;
+  display:block;
+  background:#fff;
+  border:1px solid #e3e8ef;
+  border-radius:13px;
+  overflow:hidden;
+  box-shadow:0 3px 12px rgba(15,23,42,.04);
 }
 .ed-home-latest-card{
   position:relative;
-  min-width:0;
-  padding:10px 27px 10px 12px;
+  display:block;
+  padding:11px 38px 11px 14px;
   background:#fff;
-  border:1px solid #e3e8ef;
-  border-radius:10px;
-  box-shadow:0 2px 9px rgba(15,23,42,.035);
-  overflow:hidden;
-}
-.ed-home-latest-card::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:3px;
-  background:#2563eb;
-}
-.ed-home-latest-card:nth-child(3n+2)::before{
-  background:#7c3aed;
-}
-.ed-home-latest-card:nth-child(3n+3)::before{
-  background:#16a34a;
+  border:0;
+  border-bottom:1px solid #edf0f4;
+  border-radius:0;
 }
 .ed-home-latest-card:last-child{
-  border-bottom:1px solid #e3e8ef;
+  border-bottom:0;
 }
 .ed-home-latest-card-top{
   display:flex;
   align-items:center;
-  gap:6px;
-  margin-bottom:3px;
+  gap:7px;
+  margin-bottom:4px;
   min-width:0;
 }
 .ed-home-latest-chip{
   display:inline-flex;
   align-items:center;
-  max-width:60%;
+  max-width:65%;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  padding:2px 5px;
-  border-radius:999px;
-  background:#f1f5f9;
-  color:#64748b;
-  font-size:6px;
-  font-weight:850;
+  color:#667085;
+  font-size:7px;
+  font-weight:800;
 }
 .ed-home-latest-card-top time{
   flex:0 0 auto;
   color:#98a2b3;
-  font-size:6px;
+  font-size:7px;
 }
 .ed-home-latest-card a{
   display:block;
   color:#172033!important;
-  font-size:9.5px;
+  font-size:10.5px;
   font-weight:850;
-  line-height:1.38;
+  line-height:1.45;
   text-decoration:none!important;
 }
 .ed-home-latest-arrow{
   position:absolute;
-  right:10px;
+  right:14px;
   top:50%;
   transform:translateY(-50%);
   color:#2563eb;
-  font-size:11px;
+  font-size:13px;
   font-weight:900;
 }
 
 @media(max-width:850px){
-  .ed-home-calendar-grid{
-    grid-template-columns:1fr;
-  }
-  .ed-home-editorial-grid{
-    grid-template-columns:1fr;
-  }
-  .ed-home-hubs{
-    grid-template-columns:1fr;
-  }
+  .ed-home-calendar-grid{grid-template-columns:1fr}
+  .ed-home-editorial-grid{grid-template-columns:1fr}
+  .ed-home-hubs{grid-template-columns:1fr}
+  .ed-home-latest-grid{grid-template-columns:1fr 1fr}
 }
-
 @media(max-width:560px){
   .ed-home-calendar-grid{
     grid-template-columns:1fr;
-    gap:7px;
-    margin-bottom:14px;
+    gap:10px;
+    margin-bottom:18px;
   }
   .ed-home-calendar-head{
-    padding:8px 10px;
+    padding:12px 13px;
   }
   .ed-home-calendar-head h2{
-    font-size:12.5px;
+    font-size:16px;
   }
   .ed-home-calendar-head p{
-    font-size:6px;
+    font-size:7.5px;
   }
   .ed-home-calendar-list{
-    padding:0 9px;
+    padding:1px 12px;
   }
   .ed-home-calendar-item{
-    padding:6px 0;
+    padding:9px 1px;
   }
   .ed-home-calendar-copy strong{
-    font-size:8.2px;
+    font-size:9.5px;
   }
   .ed-home-calendar-dates{
-    gap:3px;
-    margin-top:3px;
+    gap:4px;
+    margin-top:5px;
   }
   .ed-home-calendar-dates span{
-    padding:3px 4px;
+    padding:4px 6px;
   }
   .ed-home-calendar-more{
-    padding:7px 10px;
-    font-size:6.8px;
+    padding:10px 13px;
   }
 
   .ed-home-latest{
-    margin-bottom:14px;
+    margin-bottom:18px;
   }
   .ed-home-latest-head{
-    margin-bottom:6px;
+    align-items:flex-end;
+    margin-bottom:7px;
   }
   .ed-home-latest-head h2{
-    font-size:16px;
+    font-size:18px;
   }
   .ed-home-latest-head p{
-    font-size:6px;
+    font-size:7.5px;
   }
   .ed-home-latest-head a{
-    font-size:6.8px;
-  }
-  .ed-home-latest-grid{
-    grid-template-columns:1fr;
-    gap:6px;
+    font-size:8px;
   }
   .ed-home-latest-card{
-    padding:9px 25px 9px 11px;
-    border-radius:9px;
+    padding:10px 35px 10px 12px;
   }
   .ed-home-latest-card a{
-    font-size:9px;
-    line-height:1.36;
+    font-size:10px;
+    line-height:1.42;
   }
   .ed-home-latest-chip{
-    font-size:5.5px;
+    font-size:6.5px;
   }
   .ed-home-latest-card-top time{
-    font-size:5.5px;
+    font-size:6.5px;
   }
   .ed-home-latest-arrow{
-    right:8px;
-    font-size:10px;
+    right:12px;
+    font-size:12px;
   }
+
+
+  .ed-home-hub-grid{grid-template-columns:1fr}
+  .ed-home-hub{
+    margin-bottom:18px;
+    border-radius:13px;
+  }
+  .ed-home-hub-head{
+    padding:14px 15px;
+  }
+  .ed-home-hub-head h2{
+    font-size:19px;
+  }
+  .ed-home-hub-item{
+    min-height:61px;
+    gap:10px;
+    padding:11px 14px;
+  }
+  .ed-home-hub-dot{
+    width:9px;
+    height:9px;
+    flex-basis:9px;
+  }
+  .ed-home-hub-title{
+    font-size:13px;
+    line-height:1.42;
+  }
+  .ed-home-hub-new{
+    padding:6px 8px;
+    font-size:9px;
+  }
+  .ed-home-hub-more{
+    padding:14px 15px;
+    font-size:14px;
+  }
+
+  .ed-home-hub-section{border-right:0}
+  .ed-home-latest-grid{grid-template-columns:1fr}
+  .ed-home-daily{display:block}
+  .ed-home-daily-action{margin-top:14px}
+  .ed-home-daily-action .btn{display:inline-flex;margin-top:0}
 }
 </style>"""
 
@@ -3265,21 +3274,21 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 .ed-category-hero{{margin-bottom:22px;padding:28px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0f172a,#1d4ed8 62%,#2563eb);color:#fff;box-shadow:0 14px 35px rgba(15,23,42,.14)}}
 .ed-category-hero h1{{margin:4px 0 8px;color:#fff;font-size:clamp(28px,4vw,42px);line-height:1.1}}
 .ed-category-hero p{{margin:0;color:#dbeafe;line-height:1.7;max-width:760px}}
-.ed-category-kicker{{display:inline-block;color:#93c5fd;font-size:9.5px;font-weight:900;letter-spacing:.12em;margin-bottom:8px}}
+.ed-category-kicker{{display:inline-block;color:#93c5fd;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:8px}}
 .ed-category-actions{{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}}
-.ed-category-trust{{margin-top:18px;padding:11px 13px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(255,255,255,.08)}}
+.ed-category-trust{{margin-top:18px;padding:13px 15px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(255,255,255,.08)}}
 .ed-category-layout{{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start}}
 .ed-category-toolbar{{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}}
 .ed-category-toolbar h2{{margin:3px 0 0;font-size:25px}}
-.ed-category-count{{white-space:nowrap;padding:7px 11px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:9.5px;font-weight:900}}
+.ed-category-count{{white-space:nowrap;padding:7px 11px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:900}}
 .ed-category-posts{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}}
 .ed-category-post{{background:#fff;border:1px solid #e5e9f0;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(15,23,42,.05)}}
-.ed-category-post h3{{margin:0 0 7px;font-size:15px;line-height:1.42}}
+.ed-category-post h3{{margin:0 0 7px;font-size:17px;line-height:1.42}}
 .ed-category-post h3 a{{color:#172033!important;text-decoration:none!important}}
 .ed-category-post h3 a:hover{{color:#2563eb!important}}
 .ed-category-post-meta{{display:flex;gap:7px;align-items:center;color:#8a94a5;font-size:9px;font-weight:800;margin-bottom:8px}}
 .ed-category-post p{{margin:0;color:#667085;font-size:11px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
-.ed-category-read{{display:inline-flex;align-items:center;gap:4px;margin-top:11px;color:#2563eb!important;text-decoration:none!important;font-size:9.5px;font-weight:900}}
+.ed-category-read{{display:inline-flex;align-items:center;gap:4px;margin-top:11px;color:#2563eb!important;text-decoration:none!important;font-size:10px;font-weight:900}}
 .ed-category-read b{{font-size:13px}}
 .ed-category-more{{grid-column:1/-1;margin-top:2px}}
 .ed-category-more summary{{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:1px solid #dbe4f0;border-radius:14px;background:linear-gradient(180deg,#fff,#f8fbff);color:#2563eb;font-size:13px;font-weight:950;box-shadow:0 5px 16px rgba(15,23,42,.05)}}
