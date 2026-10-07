@@ -4330,7 +4330,7 @@ body{
 <body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo.png?v=20260924-3" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div>
-<nav class="nav"><div class="container"><a href="/">Home</a><a href="/rajasthan-government-jobs">राजस्थान Jobs</a><a href="/category-government-jobs">All India Jobs</a><a href="/category-admit-card">Admit Card</a><a href="/category-results">Results</a><a href="/exam-calendar.html">Exam Calendar</a><a class="active" href="/quiz">Daily Quiz</a></div></nav></header>
+<nav class="nav"><div class="container"><a href="/">Home</a><a href="/rajasthan-government-jobs">राजस्थान Jobs</a><a href="/all-india-government-jobs">All India Jobs</a><a href="/category-admit-card">Admit Card</a><a href="/category-results">Results</a><a href="/exam-calendar">Exam Calendar</a><a class="active" href="/quiz">Daily Quiz</a></div></nav></header>
 <main class="main container quiz-shell">
 <section id="quizLoading" class="card quiz-hero"><span class="hero-kicker">DAILY PRACTICE</span><h1>आज का Daily Quiz</h1><p>Timer के साथ questions attempt करें और submit करने के बाद पूरा answer review देखें।</p><div class="quiz-loading">आज का quiz load हो रहा है…</div></section>
 <section id="quizApp" class="quiz-app" hidden></section>
@@ -4924,7 +4924,7 @@ async function loadPrevious(rows){
     rows=rows.filter(x=>x.id!==quizId).slice(0,12);
     $('previousList').innerHTML=rows.length?rows.map(x=>{
       let attempt=null; try{attempt=JSON.parse(localStorage.getItem(`examDarpanQuiz:${x.id}`)||'null')}catch{}
-      return `<a class="previous-quiz" href="/quiz.html?id=${encodeURIComponent(x.id)}"><div><strong>${esc(x.title||'Daily Quiz')}</strong><span>${fmtDate(x.quizDate)} · ${(x.questions||[]).length} Questions · ${x.durationMinutes||10} min${attempt?` · Last score: ${fmtScore(attempt.score??attempt.right)}/${fmtScore(attempt.maxMarks??attempt.total)}`:''}</span></div><b>→</b></a>`;
+      return `<a class="previous-quiz" href="/quiz?id=${encodeURIComponent(x.id)}"><div><strong>${esc(x.title||'Daily Quiz')}</strong><span>${fmtDate(x.quizDate)} · ${(x.questions||[]).length} Questions · ${x.durationMinutes||10} min${attempt?` · Last score: ${fmtScore(attempt.score??attempt.right)}/${fmtScore(attempt.maxMarks??attempt.total)}`:''}</span></div><b>→</b></a>`;
     }).join(''):'<div class="empty">अभी previous quizzes उपलब्ध नहीं हैं।</div>';
   }catch(e){
     console.warn('Previous quizzes load failed',e);
