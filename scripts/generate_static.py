@@ -823,20 +823,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 
   <div class="ed-article-follow-grid">
 
-    <a class="ed-follow-btn ed-follow-whatsapp"
-       href="{WHATSAPP}"
-       target="_blank"
-       rel="noopener"
-       onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
-      <span class="ed-follow-icon">
-        <img src="{ICON_WHATSAPP_WHITE}" alt="" aria-hidden="true">
-      </span>
-      <span><b>WhatsApp</b><small>Channel</small></span>
-      <em>↗</em>
-    </a>
-
-
-
     <a class="ed-follow-btn ed-follow-telegram"
        href="{TELEGRAM}"
        target="_blank"
@@ -846,8 +832,24 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
         <img src="{ICON_TELEGRAM_WHITE}" alt="" aria-hidden="true">
       </span>
       <span><b>Telegram</b><small>Channel</small></span>
-      <em>↗</em>
+      <em>Join Us</em>
     </a>
+
+    <a class="ed-follow-btn ed-follow-whatsapp"
+       href="{WHATSAPP}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
+      <span class="ed-follow-icon">
+        <img src="{ICON_WHATSAPP_WHITE}" alt="" aria-hidden="true">
+      </span>
+      <span><b>WhatsApp</b><small>Channel</small></span>
+      <em>Join Us</em>
+    </a>
+
+
+
+
 
     <a class="ed-follow-btn ed-follow-instagram"
        href="{INSTAGRAM}"
@@ -858,7 +860,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
         <img src="{ICON_INSTAGRAM_WHITE}" alt="" aria-hidden="true">
       </span>
       <span><b>Instagram</b><small>Follow</small></span>
-      <em>↗</em>
+      <em>Follow</em>
     </a>
 
     <a class="ed-follow-btn ed-follow-x"
@@ -870,7 +872,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
         <img src="{ICON_X_WHITE}" alt="" aria-hidden="true">
       </span>
       <span><b>X</b><small>Follow</small></span>
-      <em>↗</em>
+      <em>Follow</em>
     </a>
 
   </div>
@@ -887,7 +889,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   box-shadow:0 3px 12px rgba(15,23,42,.04);
 }}
 .ed-article-follow-head{{
-  margin-bottom:8px;
+  display:none;
 }}
 .ed-article-follow-label{{
   display:block;
@@ -916,16 +918,18 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 }}
 .ed-follow-btn{{
   min-width:0;
-  min-height:46px;
+  min-height:52px;
   display:grid;
-  grid-template-columns:29px minmax(0,1fr) auto;
+  grid-template-columns:30px minmax(0,1fr) auto;
   align-items:center;
-  gap:6px;
-  padding:6px 7px;
-  border-radius:10px;
-  color:#fff!important;
+  gap:8px;
+  padding:7px 8px;
+  border:1px solid #e2e8f0;
+  border-radius:11px;
+  background:#fff!important;
+  color:#172033!important;
   text-decoration:none!important;
-  box-shadow:0 2px 7px rgba(15,23,42,.08);
+  box-shadow:0 2px 8px rgba(15,23,42,.05);
   transition:transform .16s ease,box-shadow .16s ease;
 }}
 .ed-follow-btn:hover{{
@@ -933,12 +937,11 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   box-shadow:0 4px 11px rgba(15,23,42,.12);
 }}
 .ed-follow-icon{{
-  width:29px;
-  height:29px;
+  width:30px;
+  height:30px;
   display:grid;
   place-items:center;
-  border-radius:8px;
-  background:rgba(255,255,255,.18);
+  border-radius:50%;
 }}
 .ed-follow-icon img{{
   width:17px;
@@ -952,27 +955,40 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   line-height:1.05;
 }}
 .ed-follow-btn b{{
-  font-size:9px;
-  font-weight:900;
+  font-size:13px;
+  font-weight:850;
+  color:#172033;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }}
 .ed-follow-btn small{{
-  margin-top:2px;
-  font-size:7px;
-  opacity:.82;
-  white-space:nowrap;
+  display:none;
 }}
 .ed-follow-btn em{{
   font-style:normal;
-  font-size:11px;
-  opacity:.9;
+  padding:7px 10px;
+  border-radius:7px;
+  color:#fff;
+  font-size:9px;
+  font-weight:850;
+  line-height:1;
+  opacity:1;
 }}
-.ed-follow-whatsapp{{background:linear-gradient(135deg,#25d366,#128c7e)}}
-.ed-follow-telegram{{background:linear-gradient(135deg,#38bdf8,#2563eb)}}
-.ed-follow-instagram{{background:linear-gradient(135deg,#833ab4,#e1306c 55%,#f77737)}}
-.ed-follow-x{{background:linear-gradient(135deg,#111827,#000)}}
+.ed-follow-whatsapp{{background:#fff}}
+.ed-follow-telegram{{background:#fff}}
+.ed-follow-instagram{{background:#fff}}
+.ed-follow-x{{background:#fff}}
+
+.ed-follow-whatsapp .ed-follow-icon{{background:#25d366}}
+.ed-follow-telegram .ed-follow-icon{{background:#229ed9}}
+.ed-follow-instagram .ed-follow-icon{{background:linear-gradient(135deg,#833ab4,#e1306c,#f77737)}}
+.ed-follow-x .ed-follow-icon{{background:#111}}
+
+.ed-follow-whatsapp em{{background:#25d366}}
+.ed-follow-telegram em{{background:#229ed9}}
+.ed-follow-instagram em{{background:#d62f72}}
+.ed-follow-x em{{background:#111}}
 
 @media(max-width:600px){{
   .ed-article-follow{{
@@ -994,22 +1010,22 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     gap:6px;
   }}
   .ed-follow-btn{{
-    min-height:44px;
-    padding:5px 6px;
+    min-height:50px;
+    padding:6px 7px;
   }}
   .ed-follow-icon{{
-    width:27px;
-    height:27px;
+    width:28px;
+    height:28px;
   }}
   .ed-follow-icon img{{
     width:16px;
     height:16px;
   }}
   .ed-follow-btn b{{
-    font-size:8.5px;
+    font-size:12px;
   }}
   .ed-follow-btn small{{
-    font-size:6.5px;
+    display:none;
   }}
 }}
 
