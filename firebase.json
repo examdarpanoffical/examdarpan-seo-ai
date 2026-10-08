@@ -105,16 +105,21 @@
         "type": 301
       }
     ],
-    "rewrites": [
-      {
-        "source": "/quiz",
-        "destination": "/quiz.html"
-      },
-      {
-        "source": "/:slug",
-        "destination": "/article.html"
-      }
-    ]
+"rewrites": [
+  {
+    "source": "/sitemap.xml",
+    "function": "sitemap"
+  },
+  {
+    "source": "/quiz",
+    "destination": "/quiz.html"
+  },
+  {
+    "source": "/:slug",
+    "destination": "/article.html"
+  }
+]
+    
   },
   "firestore": {
     "rules": "firestore.rules",
