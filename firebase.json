@@ -10,11 +10,20 @@
     "trailingSlash": false,
     "headers": [
       {
-        "source": "content-index.json",
+        "source": "sitemap.xml",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public,max-age=300,must-revalidate"
+            "value": "public, max-age=3600, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "robots.txt",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, must-revalidate"
           }
         ]
       },
@@ -28,25 +37,7 @@
         ]
       },
       {
-        "source": "/*.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public,max-age=300,must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/**/*.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public,max-age=300,must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "quiz.html",
+        "source": "quiz",
         "headers": [
           {
             "key": "Cache-Control",
@@ -71,27 +62,31 @@
             "value": "public,max-age=86400,must-revalidate"
           }
         ]
+      },
+      {
+        "source": "/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600, must-revalidate"
+          }
+        ]
       }
     ],
     "redirects": [
       {
-        "source": "/answer-key.html",
+        "source": "/answer-key",
         "destination": "/category-answer-key",
         "type": 301
       },
       {
-        "source": "/syllabus.html",
+        "source": "/syllabus",
         "destination": "/category-syllabus",
         "type": 301
       },
       {
-        "source": "/exam-calendar.html",
+        "source": "/exam-calendar",
         "destination": "/exam-calendar",
-        "type": 301
-      },
-      {
-        "source": "/quiz.html",
-        "destination": "/quiz",
         "type": 301
       },
       {
@@ -116,7 +111,7 @@
         "destination": "/quiz.html"
       },
       {
-        "source": "/article/:slug",
+        "source": "/:slug",
         "destination": "/article.html"
       }
     ]
