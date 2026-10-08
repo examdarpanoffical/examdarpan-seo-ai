@@ -30,6 +30,15 @@
   } catch(e) {}
 })();
 </script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "8ee3721e-bd3a-4b6a-bc6b-936de7cb75f9",
+    });
+  });
+</script>
 </head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
 <header class="header"><div class="container head"><a class="brand" href="/"><img src="/assets/logo.png?v=20260924-3" width="52" height="52" alt="Exam Darpan logo"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="/rajasthan-government-jobs">राजस्थान Jobs</a><a href="/?category=Government%20Jobs">All India Jobs</a><a href="/?category=Admit%20Card">Admit Card</a><a href="/?category=Results">Results</a></div></nav></header>

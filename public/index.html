@@ -1027,6 +1027,15 @@ padding:6px 7px;border-radius:12px;
   } catch(e) {}
 })();
 </script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "8ee3721e-bd3a-4b6a-bc6b-936de7cb75f9",
+    });
+  });
+</script>
 </head>
 <body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी और परीक्षाओं की भरोसेमंद जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
