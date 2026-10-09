@@ -1051,6 +1051,135 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     font-size:8px;
   }}
 }}
+
+
+/* EXAM_DARPAN_PREMIUM_ARTICLE_UI_V1 */
+.article-facts {{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}}
+.article-facts .quick-fact {{
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dbe5f2;
+  border-radius: 14px;
+  background: #f8fbff;
+}}
+.article-facts .quick-fact span {{
+  display: block;
+  margin-bottom: 5px;
+  color: #52627a;
+  font-size: 12px;
+}}
+.article-facts .quick-fact strong {{
+  color: #10244a;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}}
+.article-content {{
+  font-size: 16px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}}
+.article-content h2 {{
+  margin: 30px 0 14px;
+  padding: 12px 14px;
+  border-left: 4px solid #2563eb;
+  border-radius: 0 10px 10px 0;
+  background: #f1f6ff;
+  color: #10244a;
+  font-size: 22px;
+  line-height: 1.45;
+}}
+.article-content h3 {{
+  margin: 22px 0 10px;
+  color: #17376b;
+  font-size: 18px;
+  line-height: 1.5;
+}}
+.article-content table {{
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 18px 0 24px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.65;
+  -webkit-overflow-scrolling: touch;
+}}
+.article-content table th {{
+  padding: 12px 13px;
+  background: #10244a;
+  color: #fff;
+  text-align: left;
+  font-weight: 800;
+}}
+.article-content table td {{
+  padding: 11px 13px;
+  border-top: 1px solid #e5eaf2;
+  border-right: 1px solid #edf1f6;
+  vertical-align: top;
+  min-width: 95px;
+}}
+.article-content table tr:nth-child(even) td {{
+  background: #f7faff;
+}}
+.article-actions {{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0;
+  padding: 16px;
+  border: 1px solid #dbe5f2;
+  border-radius: 16px;
+  background: #f8fbff;
+}}
+.article-actions .btn {{ min-height: 44px; }}
+.notice {{
+  margin: 22px 0;
+  padding: 15px 16px;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: 12px;
+  background: #fffbeb;
+  color: #713f12;
+  font-size: 14px;
+  line-height: 1.8;
+}}
+.related-section {{
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}}
+.related-section .posts-grid {{ gap: 12px; }}
+.related-section .post {{
+  border-radius: 15px;
+  background: #fff;
+}}
+@media (max-width: 520px) {{
+  .article-facts {{ gap: 8px; }}
+  .article-facts .quick-fact {{
+    padding: 11px;
+    border-radius: 12px;
+  }}
+  .article-facts .quick-fact span {{ font-size: 11px; }}
+  .article-facts .quick-fact strong {{ font-size: 13px; }}
+  .article-content {{ font-size: 15px; line-height: 1.85; }}
+  .article-content h2 {{ font-size: 19px; }}
+  .article-content table {{ font-size: 13px; }}
+  .article-content table th,
+  .article-content table td {{ padding: 9px 10px; }}
+  .article-actions {{ padding: 12px; gap: 8px; }}
+  .article-actions .btn {{ flex: 1 1 140px; }}
+}}
+
 </style>
 {cover}
 {quick_facts(p)}
