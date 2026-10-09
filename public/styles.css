@@ -8156,3 +8156,120 @@ body{
   }
 }
 /* END EXAM DARPAN PROFESSIONAL EDITORIAL + FOOTER */
+
+/* EXAM_DARPAN_ARTICLE_HEADING_SPACING_V1 */
+.article-page .post-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.article-page > h1 {
+  max-width: 900px;
+  margin: 0 0 18px !important;
+  font-size: clamp(29px, 3.5vw, 42px) !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.035em !important;
+  font-weight: 850;
+  color: #101828 !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.article-page .ed-author-byline {
+  margin: 0 0 2px;
+}
+
+.article-page .ed-author-name {
+  padding: 5px 0;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 800;
+}
+
+.article-page .article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 4px 0 18px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #667085;
+}
+
+.article-page .ed-article-follow {
+  margin: 18px 0 26px;
+}
+
+.article-page > .article-content {
+  margin-top: 0;
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.article-page > .article-content p {
+  margin: 0 0 20px;
+}
+
+.article-page > .article-content h2 {
+  margin: 34px 0 15px;
+  padding: 12px 15px;
+  border-left: 4px solid #2563eb !important;
+  border-radius: 0 10px 10px 0;
+  background: #f1f6ff;
+  font-size: 23px;
+  line-height: 1.4;
+}
+
+.article-page > .article-content h3 {
+  margin: 25px 0 11px;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .article-page > h1 {
+    font-size: 27px !important;
+    line-height: 1.27 !important;
+    letter-spacing: -0.025em !important;
+    margin-bottom: 15px !important;
+  }
+
+  .article-page .ed-author-name {
+    font-size: 15px;
+  }
+
+  .article-page .article-meta {
+    gap: 4px 8px;
+    margin-bottom: 16px;
+    font-size: 11px;
+  }
+
+  .article-page .ed-article-follow {
+    margin: 16px 0 24px;
+  }
+
+  .article-page > .article-content {
+    font-size: 15.5px;
+    line-height: 1.9;
+  }
+
+  .article-page > .article-content p {
+    margin-bottom: 19px;
+  }
+
+  .article-page > .article-content h2 {
+    margin-top: 29px;
+    margin-bottom: 13px;
+    padding: 10px 12px;
+    font-size: 20px;
+  }
+
+  .article-page > .article-content h3 {
+    margin-top: 23px;
+    font-size: 18px;
+  }
+}
