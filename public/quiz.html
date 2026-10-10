@@ -4879,68 +4879,41 @@ async function showStudentStart(){
 }
 
 async function loadQuiz(){
+  const id=new URLSearchParams(location.search).get('id');
   try{
-    const id = new URLSearchParams(location.search).get('id');
-    const todayDate = today();
-    let selected = null;
-
-    try{
-      const response = await fetch('/content-index.json', {cache:'no-store'});
-      if(response.ok){
-        const index = await response.json();
-        const published = Array.isArray(index.quizzes)
-          ? index.quizzes.filter(q => q && q.status === 'published')
-          : [];
-        selected = id
-          ? published.find(q => String(q.id) === id)
-          : published.find(q => q.quizDate === todayDate);
-      }
-    }catch(e){
-      console.warn('Quiz index unavailable; trying Firestore.', e);
-    }
-
+    const response=await fetch('/content-index.json',{cache:'default'});
+    if(!response.ok) throw new Error(`content-index.json HTTP ${response.status}`);
+    const index=await response.json();
+    const published=Array.isArray(index.quizzes)?index.quizzes.filter(q=>q&&q.status==='published'):[];
+    let selected=id?published.find(q=>q.id===id):published.find(q=>q.quizDate===today());
+    // Rare fallback for an old direct quiz URL outside the 30-item manifest.
     if(!selected && id){
-      const snap = await getDoc(doc(db, 'quizzes', id));
-      if(snap.exists() && snap.data().status === 'published'){
-        selected = {id:snap.id, ...snap.data()};
-      }
+      const s=await getDoc(doc(db,'quizzes',id));
+      if(s.exists()&&s.data().status==='published') selected={id:s.id,...s.data()};
     }
-
-    if(!selected && !id){
-      const q = query(
-        collection(db, 'quizzes'),
-        where('status', '==', 'published'),
-        where('quizDate', '==', todayDate),
-        limit(1)
-      );
-      const snaps = await getDocs(q);
-      if(!snaps.empty){
-        const snap = snaps.docs[0];
-        selected = {id:snap.id, ...snap.data()};
-      }
+    if(selected){ quizId=selected.id; quiz=normalizeQuizConfig(selected); }
+    $('quizLoading').hidden=true;
+    if(!quiz){
+      $('quizApp').hidden=false;
+      $('quizApp').innerHTML='<div class="card empty"><h2>आज का quiz अभी publish नहीं हुआ है।</h2><p>Previous Quizzes नीचे उपलब्ध हैं।</p></div>';
+      loadPrevious(published); return;
     }
-
-    if(!selected){
-      showEmpty();
-      return;
+    quiz.questions=Array.isArray(quiz.questions)?quiz.questions.filter(q=>q&&q.question&&Array.isArray(q.options)&&q.options.length>=2).map(q=>{
+      const opts=[...q.options].slice(0,4); while(opts.length<4) opts.push(''); opts.push('अनुत्तरित प्रश्न');
+      return {...q,options:opts,answerIndex:Math.max(0,Math.min(3,Number(q.answerIndex)||0))};
+    }):[];
+    if(!quiz.questions.length){
+      $('quizApp').hidden=false; $('quizApp').innerHTML='<div class="card empty"><h2>इस quiz में अभी questions उपलब्ध नहीं हैं।</h2></div>';
+      loadPrevious(published); return;
     }
-
-    quizId = selected.id;
-    quiz = normalizeQuizConfig(selected);
-    if(!Array.isArray(quiz.questions) || quiz.questions.length === 0){
-      console.error('Selected quiz has no questions.');
-      showEmpty();
-      return;
-    }
-
-    window.quiz = quiz;
-    window.quizId = quizId;
-    await showStudentStart();
-  }catch(error){
-    console.error('Quiz loading failed:', error);
-    showEmpty();
+    answers=quiz.questions.map(()=>null); window.quiz=quiz; window.quizId=quizId; showStudentStart(); loadPrevious(published);
+  }catch(e){
+    console.error(e);
+    $('quizLoading').innerHTML=`<div class="empty"><strong>Quiz load नहीं हुआ.</strong><br>${esc(e.message||'Static content error')}</div>`;
+    loadPrevious();
   }
 }
+
 async function loadPrevious(rows){
   try{
     if(!Array.isArray(rows)){
