@@ -3650,7 +3650,9 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     urls: list[tuple[str, str | None, str | None]] = []
     urls.append((AUTHOR_PATH, None, None))
     for path, _ in STATIC_PAGES:
-        urls.append((path, None, None))
+        # Firebase Hosting cleanUrls: publish extensionless canonical URLs.
+        sitemap_path = path[:-5] if path.endswith(".html") else path
+        urls.append((sitemap_path, None, None))
 
     # Important government-job hub pages.
     # Hub membership comes from the explicit normalized category.
@@ -3762,6 +3764,10 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: canonical count != 1 in {path.name}")
         if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
+        if not re.search(r"<h1\b[^>]*>\s*.+?\s*</h1>", txt, flags=re.S | re.I):
+            raise RuntimeError(f"SEO verification failed: missing H1 in generated article {path.name}")
+        if re.search(r"\$\{esc\(title\)\}", txt, flags=re.I):
+            raise RuntimeError(f"SEO verification failed: unresolved title template in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
 
     try:
@@ -3776,6 +3782,12 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         raise RuntimeError("SEO verification failed: removed Exam Calendar URL remains in sitemap")
 
     legacy_sitemap_urls = [
+        "/about.html",
+        "/contact.html",
+        "/editorial-policy.html",
+        "/privacy.html",
+        "/disclaimer.html",
+        "/terms.html",
         "/answer-key.html",
         "/syllabus.html",
         "/quiz.html",
@@ -3796,6 +3808,28 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(
                 f"SEO verification failed: primary sitemap URL missing/duplicated: {primary}"
             )
+
+    # Catch missing primary headings on the homepage and generated category/hub landing pages.
+    h1_required_files = [PUBLIC / "index.html"]
+    h1_required_files.extend(PUBLIC.glob("category-*.html"))
+    h1_required_files.extend(
+        [PUBLIC / "all-india-government-jobs.html", PUBLIC / "rajasthan-government-jobs.html"]
+    )
+    for page in h1_required_files:
+        if not page.exists():
+            continue
+        page_html = page.read_text(encoding="utf-8", errors="ignore")
+        if not re.search(r"<h1\b[^>]*>\s*.+?\s*</h1>", page_html, flags=re.S | re.I):
+            raise RuntimeError(f"SEO verification failed: missing H1 in landing page {page.name}")
+
+    # Important internal navigation must use crawlable, non-query-based hub paths.
+    home_html = (PUBLIC / "index.html").read_text(encoding="utf-8", errors="ignore")
+    for required_link in (
+        "/rajasthan-government-jobs",
+        "/all-india-government-jobs",
+    ):
+        if f'href="{required_link}"' not in home_html:
+            raise RuntimeError(f"SEO verification failed: homepage internal link missing: {required_link}")
 
     for hub_file, hub_posts in (
         (
