@@ -3066,6 +3066,10 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 
     replacement = (
         '<main class="main container">'
+        '<header class="home-seo-heading">'
+        '<h1>सरकारी नौकरी और परीक्षाओं की भरोसेमंद जानकारी</h1>'
+        '<p>राजस्थान और केंद्र सरकार की भर्ती, एडमिट कार्ड, रिजल्ट और परीक्षा अपडेट।</p>'
+        '</header>'
         + home_sections
         + home_community
         + '</main>'
