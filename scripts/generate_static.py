@@ -2759,8 +2759,8 @@ def update_home(posts: list[dict[str, Any]]) -> None:
 
     # Replace marketing-heavy hero mini panel with a concise trust signal.
     text = re.sub(
-        r'<div class="hero-mini">.*?</div>\s*</section>',
-        '<div class="hero-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>',
+        r'<div class="hero-mini">.*?</div>',
+        '<div class="hero-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div>',
         text, count=1, flags=re.S
     )
 
