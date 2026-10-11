@@ -10,8 +10,8 @@ Design goals:
 - Keep the existing hand-built homepage design and replace only marked dynamic sections.
 - Never publish Telegram automation or call Telegram APIs.
 """
-from __future__ import xml.etree.ElementTree as ET
-import annotations
+from __future__ import annotations
+import xml.etree.ElementTree as ET
 
 import html
 import json
@@ -2666,7 +2666,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '<span class="ed-home-hub-kicker">EDITORIAL & TRUST</span>'
         '<h2>भरोसेमंद जानकारी, साफ dates और official-source verification</h2>'
         '<p>'
-        'Exam Darpan पर Recruitment, Admit Card, Result और Exam Calendar से जुड़ी '
+        'Exam Darpan पर Recruitment, Admit Card और Result से जुड़ी '
         'जानकारी उपलब्ध official notification और official sources को cross-check '
         'करके तैयार की जाती है। किसी भी आवेदन या परीक्षा से पहले अंतिम जानकारी '
         'official notice से जरूर verify करें।'
@@ -2690,7 +2690,6 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         + rajasthan
         + all_india
         + '</div>'
-        + exam_calendars
         + daily
         + homepage_category_sections
         + latest_articles
