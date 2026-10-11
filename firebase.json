@@ -86,7 +86,7 @@
       },
       {
         "source": "/exam-calendar",
-        "destination": "/exam-calendar",
+        "destination": "/",
         "type": 301
       },
       {
