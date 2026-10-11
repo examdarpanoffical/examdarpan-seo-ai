@@ -3650,7 +3650,11 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     urls: list[tuple[str, str | None, str | None]] = []
     urls.append((AUTHOR_PATH, None, None))
     for path, _ in STATIC_PAGES:
-        urls.append((path, None, None))
+        # Firebase Hosting has cleanUrls enabled, so the canonical public URL
+        # for a generated *.html page is its extensionless path. Keep the
+        # source/output filename unchanged; only normalize the sitemap URL.
+        sitemap_path = path[:-5] if path.endswith(".html") else path
+        urls.append((sitemap_path, None, None))
 
     # Important government-job hub pages.
     # Hub membership comes from the explicit normalized category.
@@ -3776,6 +3780,12 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         raise RuntimeError("SEO verification failed: removed Exam Calendar URL remains in sitemap")
 
     legacy_sitemap_urls = [
+        "/about.html",
+        "/contact.html",
+        "/editorial-policy.html",
+        "/privacy.html",
+        "/disclaimer.html",
+        "/terms.html",
         "/answer-key.html",
         "/syllabus.html",
         "/quiz.html",
