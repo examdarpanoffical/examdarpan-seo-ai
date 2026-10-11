@@ -21,7 +21,7 @@ LEGACY_SITEMAP_SUFFIXES = {
     "/about.html", "/contact.html", "/privacy.html", "/disclaimer.html",
     "/terms.html", "/policy.html", "/exam-calendar.html",
 }
-TEMPLATE_LEAK = re.compile(r"\\$\\{\\s*esc\\(title\\)\\s*\\}")
+TEMPLATE_LEAK = re.compile(r"\$\{\s*esc\(title\)\s*\}")
 
 
 def main() -> int:
@@ -58,7 +58,7 @@ def main() -> int:
             issues.append(("WARN", f"Could not read {path.relative_to(PUBLIC)}: {exc}"))
             continue
         rel = path.relative_to(PUBLIC).as_posix()
-        titles = re.findall(r"<title\\b[^>]*>(.*?)</title>", html, re.I | re.S)
+        titles = re.findall(r"<title\b[^>]*>(.*?)</title>", html, re.I | re.S)
         if len(titles) != 1 or not re.sub(r"<[^>]+>", "", titles[0]).strip():
             issues.append(("WARN", f"Expected exactly one non-empty title; found {len(titles)} in {rel}"))
         elif TEMPLATE_LEAK.search(titles[0]):
