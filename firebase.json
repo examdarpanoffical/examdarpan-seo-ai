@@ -107,10 +107,6 @@
     ],
 "rewrites": [
   {
-    "source": "/sitemap.xml",
-    "function": "sitemap"
-  },
-  {
     "source": "/quiz",
     "destination": "/quiz.html"
   },
