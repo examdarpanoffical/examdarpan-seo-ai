@@ -2,13 +2,13 @@
 /* Give fallback article routes a path-specific title/canonical even if Firestore is unavailable. */
 (function(){
   try {
-    var path = location.pathname.replace(/\\/+$/, "") || "/";
+    var path = location.pathname.replace(/\/+$/, "") || "/";
     var parts = path.split("/").filter(Boolean);
     if (parts[0] === "article" && parts[1]) path = "/" + parts[1];
     if (path !== "/") {
-      var slug = decodeURIComponent(path.slice(1)).replace(/[-_]+/g, " ").replace(/\\s+/g, " ").trim();
+      var slug = decodeURIComponent(path.slice(1)).replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
       if (slug) {
-        document.title = slug.replace(/\\b\\w/g, function(c){ return c.toUpperCase(); }) + " | Exam Darpan";
+        document.title = slug.replace(/\b\w/g, function(c){ return c.toUpperCase(); }) + " | Exam Darpan";
         var canonical = document.querySelector('link[rel="canonical"]');
         if (canonical) canonical.href = "https://examdarpan.in" + path;
       }
