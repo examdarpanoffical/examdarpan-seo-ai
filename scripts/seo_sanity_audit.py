@@ -21,7 +21,7 @@ LEGACY_SITEMAP_SUFFIXES = {
     "/about.html", "/contact.html", "/privacy.html", "/disclaimer.html",
     "/terms.html", "/policy.html", "/exam-calendar.html",
 }
-TEMPLATE_LEAK = re.compile(r"\$\{\s*esc\(title\)\s*\}|\$\{[^}]+\}")
+TEMPLATE_LEAK = re.compile(r"\\$\\{\\s*esc\\(title\\)\\s*\\}")
 
 
 def main() -> int:
@@ -58,11 +58,13 @@ def main() -> int:
             issues.append(("WARN", f"Could not read {path.relative_to(PUBLIC)}: {exc}"))
             continue
         rel = path.relative_to(PUBLIC).as_posix()
-        if TEMPLATE_LEAK.search(html):
-            issues.append(("ERROR", f"Unexpanded template expression in {rel}"))
-        titles = re.findall(r"<title\b[^>]*>(.*?)</title>", html, re.I | re.S)
+        titles = re.findall(r"<title\\b[^>]*>(.*?)</title>", html, re.I | re.S)
         if len(titles) != 1 or not re.sub(r"<[^>]+>", "", titles[0]).strip():
             issues.append(("WARN", f"Expected exactly one non-empty title; found {len(titles)} in {rel}"))
+        elif TEMPLATE_LEAK.search(titles[0]):
+            # Check the title only. JavaScript template literals elsewhere in
+            # HTML are valid and must not be reported as unexpanded placeholders.
+            issues.append(("ERROR", f"Unexpanded title template in {rel}"))
         canonicals = re.findall(r'<link\b[^>]*rel=["\']canonical["\'][^>]*href=["\']([^"\']+)', html, re.I)
         if len(canonicals) != 1:
             issues.append(("WARN", f"Expected exactly one canonical; found {len(canonicals)} in {rel}"))
