@@ -49,8 +49,7 @@ jobs:
           print(f"Validated sitemap XML: {len(urls)} unique URLs on preferred HTTPS host")
           PY
 
-      - name: Run report-only SEO audit when present
-        if: hashFiles('scripts/seo_sanity_audit.py') != ''
+      - name: Run report-only SEO audit
         run: python scripts/seo_sanity_audit.py
 
       - name: Ensure this workflow never deploys
