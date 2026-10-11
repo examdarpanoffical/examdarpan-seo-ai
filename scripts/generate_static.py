@@ -10,7 +10,8 @@ Design goals:
 - Keep the existing hand-built homepage design and replace only marked dynamic sections.
 - Never publish Telegram automation or call Telegram APIs.
 """
-from __future__ import annotations
+from __future__ import xml.etree.ElementTree as ET
+import annotations
 
 import html
 import json
@@ -59,7 +60,6 @@ STATIC_PAGES = [
     ("/privacy.html", "Privacy Policy"),
     ("/disclaimer.html", "Disclaimer"),
     ("/terms.html", "Terms & Conditions"),
-    ("/exam-calendar", "Exam Calendar"),
 ]
 
 CATEGORIES = [
@@ -381,7 +381,6 @@ def clean_article_content(value: Any, article_title: str = "") -> str:
         ('/category-government-jobs', '/all-india-government-jobs'),
         ('/answer-key.html', '/category-answer-key'),
         ('/syllabus.html', '/category-syllabus'),
-        ('/exam-calendar.html', '/exam-calendar'),
         ('/quiz.html', '/quiz'),
     ]
 
@@ -1250,7 +1249,6 @@ WhatsApp Channel Follow करें →
       <h4>Resources</h4>
       <a href="/category-answer-key">Answer Key</a>
       <a href="/category-syllabus">Syllabus</a>
-      <a href="/exam-calendar">Exam Calendar</a>
       <a href="/quiz">Daily Practice Test</a>
     </div>
 
@@ -1645,299 +1643,6 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         "All India Government Jobs",
         "government-jobs",
         "all_india",
-    )
-
-    # 4. EXAM CALENDAR
-    # Server-rendered so dates remain visible even if browser JS/Firestore
-    # loading fails on the homepage.
-
-    def calendar_date(p: dict[str, Any], *keys: str):
-        for key in keys:
-            value = p.get(key)
-
-            if value not in (None, ""):
-                d = as_datetime(value)
-
-                if d:
-                    return d
-
-        return None
-
-    def calendar_deadline_from_text(p: dict[str, Any]):
-        source = clean_text(
-            f'{p.get("title", "")} {p.get("excerpt", "")} {p.get("content", "")}'
-        )
-
-        year_match = re.search(r"\b(20\d{2})\b", source)
-        context_year = year_match.group(1) if year_match else str(
-            datetime.now(timezone.utc).year
-        )
-
-        months = {
-            "january": 1, "february": 2, "march": 3, "april": 4,
-            "may": 5, "june": 6, "july": 7, "august": 8,
-            "september": 9, "october": 10, "november": 11, "december": 12,
-            "जनवरी": 1, "फरवरी": 2, "मार्च": 3, "अप्रैल": 4,
-            "मई": 5, "जून": 6, "जुलाई": 7, "अगस्त": 8,
-            "सितंबर": 9, "अक्टूबर": 10, "नवंबर": 11, "दिसंबर": 12,
-        }
-
-        def make(day, month, year):
-            try:
-                return datetime(
-                    int(year),
-                    int(month),
-                    int(day),
-                    tzinfo=timezone.utc,
-                )
-            except (TypeError, ValueError):
-                return None
-
-        numeric_patterns = [
-            r"(?:last\s*date|deadline|closing\s*date|अंतिम\s*(?:तिथि|तारीख)|आवेदन\s*की\s*अंतिम\s*(?:तिथि|तारीख))"
-            r"[^0-9]{0,60}(\d{1,2})[./-](\d{1,2})[./-](20\d{2})",
-
-            r"(?:apply|application|applications|form|registration)"
-            r"[^0-9]{0,50}(?:by|until|upto|तक)\s*"
-            r"(\d{1,2})[./-](\d{1,2})[./-](20\d{2})",
-        ]
-
-        for pattern in numeric_patterns:
-            m = re.search(pattern, source, flags=re.I)
-            if m:
-                d = make(m.group(1), m.group(2), m.group(3))
-                if d:
-                    return d
-
-        month_pattern = (
-            r"(\d{1,2})\s+("
-            + "|".join(re.escape(x) for x in months)
-            + r")(?:\s+(20\d{2}))?"
-            r"[^0-9]{0,20}(?:तक|until|by)"
-        )
-
-        m = re.search(month_pattern, source, flags=re.I)
-
-        if m:
-            month = months.get(
-                m.group(2).lower(),
-                months.get(m.group(2))
-            )
-
-            d = make(
-                m.group(1),
-                month,
-                m.group(3) or context_year,
-            )
-
-            if d:
-                return d
-
-        return None
-
-    def calendar_exam_from_text(p: dict[str, Any]):
-        source = clean_text(
-            f'{p.get("title", "")} {p.get("excerpt", "")} {p.get("content", "")}'
-        )
-
-        patterns = [
-            r"(?:exam\s*date|exam\s*on|examination\s*date|"
-            r"परीक्षा\s*(?:तिथि|तारीख))"
-            r"[^0-9]{0,30}"
-            r"(\d{1,2})[./-](\d{1,2})[./-](20\d{2})",
-        ]
-
-        for pattern in patterns:
-            m = re.search(pattern, source, flags=re.I)
-
-            if not m:
-                continue
-
-            try:
-                return datetime(
-                    int(m.group(3)),
-                    int(m.group(2)),
-                    int(m.group(1)),
-                    tzinfo=timezone.utc,
-                )
-            except ValueError:
-                pass
-
-        return None
-
-    def calendar_records(scope: str, limit: int = 6):
-        rows = []
-        now = datetime.now(timezone.utc)
-
-        for p in posts:
-            if scope == "rajasthan" and not is_rajasthan(p):
-                continue
-
-            if scope == "all_india" and not is_all_india(p):
-                continue
-
-            last_date = (
-                calendar_date(
-                    p,
-                    "applicationLastDate",
-                    "lastDate",
-                    "lastDateTime",
-                    "applyLastDate",
-                )
-                or calendar_deadline_from_text(p)
-            )
-
-            exam_date = (
-                calendar_date(
-                    p,
-                    "examDate",
-                    "examDateTime",
-                )
-                or calendar_exam_from_text(p)
-            )
-
-            start_date = calendar_date(
-                p,
-                "applicationStartDate",
-                "startDate",
-                "applyStartDate",
-            )
-
-            future_last = bool(last_date and last_date >= now)
-            future_exam = bool(exam_date and exam_date >= now)
-
-            # No fake/dummy calendar entries.
-            if not future_last and not future_exam:
-                continue
-
-            sort_date = (
-                exam_date
-                if future_exam and not future_last
-                else (last_date or exam_date)
-            )
-
-            rows.append(
-                (
-                    sort_date,
-                    last_date,
-                    exam_date,
-                    start_date,
-                    p,
-                )
-            )
-
-        rows.sort(
-            key=lambda x: x[0] or datetime.max.replace(tzinfo=timezone.utc)
-        )
-
-        return rows[:limit]
-
-    def calendar_card(row, scope_label: str) -> str:
-        _, last_date, exam_date, start_date, p = row
-
-        title = post_title(p)
-        slug = slugify(p.get("slug"))
-
-        date_parts = []
-
-        if start_date:
-            date_parts.append(
-                f'<span><small>Application Start</small>'
-                f'<b>{esc(date_hi(start_date))}</b></span>'
-            )
-
-        if last_date:
-            date_parts.append(
-                f'<span><small>Last Date</small>'
-                f'<b>{esc(date_hi(last_date))}</b></span>'
-            )
-
-        if exam_date:
-            date_parts.append(
-                f'<span><small>Exam Date</small>'
-                f'<b>{esc(date_hi(exam_date))}</b></span>'
-            )
-
-        if not date_parts:
-            date_parts.append(
-                '<span><small>Date</small>'
-                '<b>Official notice check करें</b></span>'
-            )
-
-        return (
-            '<a class="ed-home-calendar-item" '
-            f'href="{esc(article_path(slug))}">'
-            '<div class="ed-home-calendar-copy">'
-            f'<strong>{esc(title)}</strong>'
-            f'<small>{esc(scope_label)} • '
-            f'{esc(normalized_category(p))}</small>'
-            '</div>'
-            '<div class="ed-home-calendar-dates">'
-            + "".join(date_parts)
-            + '</div>'
-            '</a>'
-        )
-
-    def render_calendar_list(rows, scope_label: str) -> str:
-        if not rows:
-            return (
-                '<div class="ed-home-calendar-empty">'
-                'अभी verified date वाले active updates उपलब्ध नहीं हैं।'
-                '</div>'
-            )
-
-        return "".join(
-            calendar_card(row, scope_label)
-            for row in rows
-        )
-
-    rajasthan_calendar_rows = calendar_records("rajasthan")
-    all_india_calendar_rows = calendar_records("all_india")
-
-    exam_calendars = (
-        '<section class="ed-home-calendar-grid">'
-
-        '<article class="ed-home-calendar-panel rajasthan">'
-        '<div class="ed-home-calendar-head">'
-        '<div>'
-        '<span class="ed-home-calendar-kicker">RAJASTHAN EXAMS</span>'
-        '<h2>Rajasthan Exam Calendar</h2>'
-        '<p>Application और exam की verified dates एक जगह देखें।</p>'
-        '</div>'
-        '<span class="ed-home-calendar-badge">LIVE</span>'
-        '</div>'
-
-        f'<div class="ed-home-calendar-list">'
-        f'{render_calendar_list(rajasthan_calendar_rows, "Rajasthan")}'
-        '</div>'
-
-        '<a class="ed-home-calendar-more" '
-        'href="/exam-calendar">'
-        'पूरा Rajasthan Calendar देखें →'
-        '</a>'
-        '</article>'
-
-        '<article class="ed-home-calendar-panel all-india">'
-        '<div class="ed-home-calendar-head">'
-        '<div>'
-        '<span class="ed-home-calendar-kicker">ALL INDIA EXAMS</span>'
-        '<h2>All India Exam Calendar</h2>'
-        '<p>SSC, UPSC, Railway, Banking और Central exams की dates।</p>'
-        '</div>'
-        '<span class="ed-home-calendar-badge">LIVE</span>'
-        '</div>'
-
-        f'<div class="ed-home-calendar-list">'
-        f'{render_calendar_list(all_india_calendar_rows, "All India")}'
-        '</div>'
-
-        '<a class="ed-home-calendar-more" '
-        'href="/all-india-exam-calendar">'
-        'पूरा All India Calendar देखें →'
-        '</a>'
-        '</article>'
-
-        '</section>'
     )
 
     # 5. DAILY TEST
@@ -3328,7 +3033,6 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     <a href="/all-india-government-jobs">All India Jobs</a>
     <a href="/category-admit-card">Admit Card</a>
     <a href="/category-results">Results</a>
-    <a href="/exam-calendar">Exam Calendar</a>
   </div>
 
   <div class="ed-home-community-foot">
@@ -3521,7 +3225,6 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
       <h4>Resources</h4>
       <a href="/category-answer-key">Answer Key</a>
       <a href="/category-syllabus">Syllabus</a>
-      <a href="/exam-calendar">Exam Calendar</a>
       <a href="/quiz">Daily Practice Test</a>
     </div>
 
@@ -3549,81 +3252,6 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 
 
 
-
-def exam_calendar_page(posts: list[dict[str, Any]]) -> str:
-    rows = []
-    for p in posts:
-        last = date_value(p, "applicationLastDate","lastDate","lastDateTime","applyLastDate")
-        exam = date_value(p, "examDate","examDateTime")
-        if not last and not exam:
-            continue
-        status, cls = application_status(p)
-        rows.append(
-            f'<tr><td><a href="{article_path(slugify(p.get("slug")))}">{esc(post_title(p))}</a></td>'
-            f'<td>{esc(date_hi(last) if last else "—")}</td><td>{esc(date_hi(exam) if exam else "—")}</td>'
-            f'<td><span class="status-badge {cls}">{esc(status)}</span></td></tr>'
-        )
-    return f"""<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Exam Calendar 2026 | Exam Darpan</title><meta name="description" content="Rajasthan और Government Exams की application last date और exam date एक जगह देखें।"><meta name="robots" content="index,follow"><link rel="canonical" href="{BASE}/exam-calendar"><link rel="stylesheet" href="/styles.css"><link rel="icon" href="/assets/favicon.png"></head><body>
-<div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
-<header class="header"><div class="container head"><a class="brand" href="/"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path("rajasthan-jobs")}">राजस्थान Jobs</a><a href="{category_path("government-jobs")}">All India Jobs</a><a href="{category_path("admit-card")}">Admit Card</a><a href="{category_path("results")}">Results</a><a href="/exam-calendar" class="active">Exam Calendar</a><a href="/quiz">Daily Quiz</a></div></nav></header>
-<main class="main container"><section class="hero card"><div><span class="hero-kicker">EXAM CALENDAR</span><h1>Exam Calendar 2026</h1><p>Application deadlines और exam dates को एक जगह देखें। किसी भी अंतिम कार्रवाई से पहले official notification verify करें।</p></div></section>
-<section class="card pad calendar-card"><div class="section-title"><div><span class="eyebrow">DATES</span><h2>Important Exam Dates</h2></div><span class="result-count">{len(rows)} updates</span></div>
-<div class="table-scroll"><table class="calendar-table"><thead><tr><th>Exam / Recruitment</th><th>Last Date</th><th>Exam Date</th><th>Status</th></tr></thead><tbody>{"".join(rows) if rows else '<tr><td colspan="4">Published articles में अभी structured date data उपलब्ध नहीं है।</td></tr>'}</tbody></table></div></section></main>
-<footer class="footer">
-  <div class="container footer-main">
-    <div class="footer-brand">
-      <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
-      <p>Independent Education &amp; Government Job Information Portal.</p>
-      <div class="footer-trust-line">
-        <span>✓ Official-source based</span>
-        <span>✓ Clear dates</span>
-        <span>✓ Rajasthan + All India</span>
-      </div>
-      <div class="footer-socials">
-        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
-        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
-      </div>
-    </div>
-
-    <div class="footer-col">
-      <h4>Explore</h4>
-      <a href="/rajasthan-government-jobs">Rajasthan Jobs</a>
-      <a href="/all-india-government-jobs">All India Jobs</a>
-      <a href="/category-admit-card">Admit Card</a>
-      <a href="/category-results">Results</a>
-    </div>
-
-    <div class="footer-col">
-      <h4>Resources</h4>
-      <a href="/category-answer-key">Answer Key</a>
-      <a href="/category-syllabus">Syllabus</a>
-      <a href="/exam-calendar">Exam Calendar</a>
-      <a href="/quiz">Daily Practice Test</a>
-    </div>
-
-    <div class="footer-col">
-      <h4>Important &amp; Legal</h4>
-      <a href="/about.html">About Us</a>
-      <a href="/editorial-policy.html">Editorial Policy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/disclaimer.html">Disclaimer</a>
-      <a href="/terms.html">Terms &amp; Conditions</a>
-    </div>
-  </div>
-
-  <div class="container footer-bottom">
-    <div>
-      <strong>© <span data-year></span> Exam Darpan</strong>
-      <span> · Independent Education &amp; Government Job Information Portal</span>
-    </div>
-    <div class="footer-bottom-note">
-      Information is provided for educational purposes. Final confirmation should always be made from the official notification.
-    </div>
-  </div>
-</footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>"""
 
 def write_categories(posts: list[dict[str, Any]]) -> list[str]:
     paths: list[str] = []
@@ -3985,7 +3613,6 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
       <h4>Resources</h4>
       <a href="/category-answer-key">Answer Key</a>
       <a href="/category-syllabus">Syllabus</a>
-      <a href="/exam-calendar">Exam Calendar</a>
       <a href="/quiz">Daily Practice Test</a>
     </div>
 
@@ -4069,6 +3696,18 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     for p, s in zip(posts, article_slugs):
         urls.append((f"/{quote(s, safe='-._~')}", iso(p.get("updatedAt")) or iso(p.get("publishedAt")), safe_url(p.get("featuredImage")) or None))
 
+    # Keep sitemap URLs unique and in canonical form.
+    deduped_urls: list[tuple[str, str | None, str | None]] = []
+    seen_urls: set[str] = set()
+    for path, lastmod, image in urls:
+        canonical_path = path.rstrip("/") or "/"
+        canonical_url = BASE.rstrip("/") + (canonical_path if canonical_path != "/" else "/")
+        if canonical_url in seen_urls:
+            continue
+        seen_urls.add(canonical_url)
+        deduped_urls.append((canonical_path, lastmod, image))
+    urls = deduped_urls
+
     xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">']
     for path, lastmod, image in urls:
         xml.append("  <url>")
@@ -4126,10 +3765,20 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
 
+    try:
+        sitemap_root = ET.fromstring(sitemap)
+    except ET.ParseError as exc:
+        raise RuntimeError(f"SEO verification failed: sitemap XML is invalid: {exc}") from exc
+    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    locs = [node.text.strip() for node in sitemap_root.findall("sm:url/sm:loc", ns) if node.text]
+    if len(locs) != len(set(locs)):
+        raise RuntimeError("SEO verification failed: duplicate URLs in sitemap")
+    if any("/exam-calendar" in url for url in locs):
+        raise RuntimeError("SEO verification failed: removed Exam Calendar URL remains in sitemap")
+
     legacy_sitemap_urls = [
         "/answer-key.html",
         "/syllabus.html",
-        "/exam-calendar.html",
         "/quiz.html",
         "/category-rajasthan-jobs",
         "/category-government-jobs",
@@ -4143,7 +3792,6 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
     for primary in (
         "/rajasthan-government-jobs",
         "/all-india-government-jobs",
-        "/exam-calendar",
     ):
         if sitemap.count(f"<loc>{xml_esc(BASE + primary)}</loc>") != 1:
             raise RuntimeError(
@@ -4283,8 +3931,6 @@ def main() -> int:
 
         article_slugs.append(s)
         seen.add(s)
-
-    (PUBLIC / "exam-calendar.html").write_text(exam_calendar_page(posts), encoding="utf-8")
     category_paths = write_categories(posts)
     category_slugs = [path.removeprefix("/category-") for path in category_paths]
     write_author_profile(posts)
