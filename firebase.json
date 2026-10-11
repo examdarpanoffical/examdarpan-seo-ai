@@ -86,7 +86,7 @@
       },
       {
         "source": "/exam-calendar",
-        "destination": "/exam-calendar",
+        "destination": "/",
         "type": 301
       },
       {
@@ -106,10 +106,6 @@
       }
     ],
 "rewrites": [
-  {
-    "source": "/sitemap.xml",
-    "function": "sitemap"
-  },
   {
     "source": "/quiz",
     "destination": "/quiz.html"
