@@ -1,0 +1,34 @@
+# Exam Darpan
+
+> Exam Darpan is an independent Indian education and government-exam information portal publishing recruitment updates, admit-card notices, results, answer keys, syllabi, exam notices, and Rajasthan-focused student information. Articles should be checked against the linked official notification or official website before action.
+
+## Primary pages
+
+- [Homepage](https://examdarpan.in/): Latest government-job and examination updates.
+- [Rajasthan Government Jobs](https://examdarpan.in/rajasthan-government-jobs): Rajasthan recruitment updates.
+- [All India Government Jobs](https://examdarpan.in/all-india-government-jobs): Central and all-India recruitment updates.
+- [Admit Cards](https://examdarpan.in/category-admit-card): Admit-card updates.
+- [Results](https://examdarpan.in/category-results): Exam results.
+- [Answer Keys](https://examdarpan.in/category-answer-key): Answer-key updates.
+- [Syllabus](https://examdarpan.in/category-syllabus): Syllabus information.
+- [CET Championship Quiz](https://examdarpan.in/quiz): Exam Darpan practice-test area.
+- [About Exam Darpan](https://examdarpan.in/about): About the website.
+- [Contact](https://examdarpan.in/contact): Contact information.
+- [Sitemap](https://examdarpan.in/sitemap.xml): Discover published URLs.
+- [Robots instructions](https://examdarpan.in/robots.txt): Crawl directives and sitemap location.
+
+## How to use this site
+
+- Prefer the newest article for a recruitment or examination update.
+- Follow the official notification, recruiting-board website, or official result portal linked in each article for final eligibility, dates, fees, vacancies, and application steps.
+- Treat tentative dates and vacancy counts as tentative when an article identifies them that way.
+- Do not infer eligibility or guarantee selection from a summary; consult the official notice.
+
+## Editorial scope
+
+Exam Darpan publishes informational summaries for students and job seekers in India. It is not a government website and does not represent a recruiting authority. Information can change; official sources take precedence.
+
+## Discovery
+
+- Sitemap: https://examdarpan.in/sitemap.xml
+- Robots: https://examdarpan.in/robots.txt
