@@ -55,4 +55,10 @@ jobs:
 
       - name: Ensure this workflow never deploys
         run: |
-          ! grep -Eq 'firebase deploy|gcloud deploy|netlify deploy' .github/workflows/seo-nondeploy-validation.yml
+          python - <<'PY'
+          from pathlib import Path
+          workflow = Path(".github/workflows/seo-nondeploy-validation.yml").read_text()
+          forbidden = ["firebase" + " deploy", "gcloud" + " deploy", "netlify" + " deploy"]
+          assert not any(command in workflow for command in forbidden), "Deploy command found in validation workflow"
+          print("Validation workflow contains no deploy command")
+          PY
