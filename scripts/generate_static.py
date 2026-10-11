@@ -3762,9 +3762,9 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: canonical count != 1 in {path.name}")
         if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
-        if not re.search(r"<h1\\b[^>]*>\\s*.+?\\s*</h1>", txt, flags=re.S | re.I):
+        if not re.search(r"<h1\b[^>]*>\s*.+?\s*</h1>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing H1 in generated article {path.name}")
-        if re.search(r"\\$\\{esc\\(title\\)\\}", txt, flags=re.I):
+        if re.search(r"\$\{esc\(title\)\}", txt, flags=re.I):
             raise RuntimeError(f"SEO verification failed: unresolved title template in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
 
@@ -3811,7 +3811,7 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         if not page.exists():
             continue
         page_html = page.read_text(encoding="utf-8", errors="ignore")
-        if not re.search(r"<h1\\b[^>]*>\\s*.+?\\s*</h1>", page_html, flags=re.S | re.I):
+        if not re.search(r"<h1\b[^>]*>\s*.+?\s*</h1>", page_html, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing H1 in landing page {page.name}")
 
     # Important internal navigation must use crawlable, non-query-based hub paths.
