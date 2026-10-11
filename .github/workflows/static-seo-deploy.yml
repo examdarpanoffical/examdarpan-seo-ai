@@ -63,6 +63,10 @@ jobs:
           test "${ARTICLE_COUNT}" -gt 0
           test "${SITEMAP_COUNT}" -ge "${ARTICLE_COUNT}"
 
+      - name: Report SEO sanity checks
+        run: |
+          python scripts/seo_sanity_audit.py
+
       - name: Install Firebase CLI
         run: |
           npm install -g firebase-tools
