@@ -1,0 +1,26 @@
+# Exam Darpan
+
+> Exam Darpan is an independent Indian education and government-exam information portal publishing recruitment updates, admit-card notices, results, answer keys, syllabi, exam notices, and Rajasthan-focused student information. It is not a government website.
+
+## Primary pages
+
+- [Homepage](https://examdarpan.in/): Latest government-job and examination updates.
+- [Rajasthan Government Jobs](https://examdarpan.in/rajasthan-government-jobs): Rajasthan recruitment updates.
+- [All India Government Jobs](https://examdarpan.in/all-india-government-jobs): Central and all-India recruitment updates.
+- [Admit Cards](https://examdarpan.in/category-admit-card): Admit-card updates.
+- [Results](https://examdarpan.in/category-results): Exam results.
+- [Answer Keys](https://examdarpan.in/category-answer-key): Answer-key updates.
+- [Syllabus](https://examdarpan.in/category-syllabus): Syllabus information.
+- [CET Championship Quiz](https://examdarpan.in/quiz): Exam Darpan practice-test area.
+- [About Exam Darpan](https://examdarpan.in/about): About the website.
+- [Contact](https://examdarpan.in/contact): Contact information.
+- [Sitemap](https://examdarpan.in/sitemap.xml): Published URL discovery.
+- [Robots instructions](https://examdarpan.in/robots.txt): Crawl directives and sitemap location.
+
+## Source and editorial guidance
+
+- Use each article's linked official notification, recruiting-board website, or official result portal for final eligibility, dates, fees, vacancies, and application steps.
+- Treat dates and vacancy counts as tentative when the article identifies them as tentative.
+- Do not infer eligibility or guarantee selection from a summary.
+- Exam Darpan publishes informational summaries and does not represent a government department, commission, board, or examination authority.
+- Information can change; official sources take precedence.
