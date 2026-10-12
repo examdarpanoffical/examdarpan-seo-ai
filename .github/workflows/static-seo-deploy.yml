@@ -51,7 +51,7 @@ jobs:
           test -f public/index.html
           test -f public/sitemap.xml
           test -f public/categories.html
-          grep -q '<title>Exam Darpan – Rajasthan Govt Jobs, Admit Card & Results</title>' public/index.html
+          grep -q '<title>Exam Darpan – Govt Jobs, Results & Exam Updates in India</title>' public/index.html
           grep -Fq '"alternateName":["Exam Darpan Official","examdarpan.in"]' public/index.html
 
           CATEGORY_PAGE_COUNT="$(find public -maxdepth 1 -type f -name 'category-*.html' | wc -l | tr -d ' ')"
