@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
   schedule:
     # Rebuild published Firestore content without adding public Firestore reads.
@@ -47,6 +50,12 @@ jobs:
 
           test -f public/index.html
           test -f public/sitemap.xml
+          test -f public/categories.html
+
+          CATEGORY_PAGE_COUNT="$(find public -maxdepth 1 -type f -name 'category-*.html' | wc -l | tr -d ' ')"
+          echo "Generated category landing pages: ${CATEGORY_PAGE_COUNT}"
+          test "${CATEGORY_PAGE_COUNT}" -ge 17
+          grep -q 'href="/categories"' public/index.html
 
           grep -q "LIVE UPDATES" public/index.html
           grep -q "Rajasthan Government Jobs" public/index.html
@@ -68,10 +77,12 @@ jobs:
           python scripts/seo_sanity_audit.py
 
       - name: Install Firebase CLI
+        if: github.event_name != 'pull_request'
         run: |
           npm install -g firebase-tools
 
       - name: Deploy Firebase Hosting
+        if: github.event_name != 'pull_request'
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
         run: |
