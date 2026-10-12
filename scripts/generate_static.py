@@ -374,6 +374,16 @@ def clean_article_content(value: Any, article_title: str = "") -> str:
     text = re.sub(r'<\s*(script|style|iframe|object|embed|form|base|link)[^>]*/?>', "", text, flags=re.I)
     text = re.sub(r"\s+on[a-z]+\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]+)", "", text, flags=re.I)
     text = re.sub(r'(?i)javascript\s*:', "", text)
+    # Use one visual system for all stored article HTML, including older posts.
+    # Remove per-article inline styling and retain only shared Important Links wrappers.
+    text = re.sub(r'\s+style\s*=\s*(["\']).*?\1', "", text, flags=re.I | re.S)
+    def _standardize_class(match: re.Match[str]) -> str:
+        raw = match.group(2) or ""
+        keep = [name for name in re.split(r'\s+', raw.strip()) if name in {"important-links", "link-row"}]
+        return (' class="' + " ".join(keep) + '"') if keep else ""
+    text = re.sub(r'\s+class\s*=\s*(["\'])(.*?)\1', _standardize_class, text, flags=re.I | re.S)
+    text = re.sub(r'<font\b[^>]*>', '', text, flags=re.I)
+    text = re.sub(r'</font\s*>', '', text, flags=re.I)
 
     # Normalize legacy internal URLs saved inside older Firestore article HTML.
     # Keep query strings intact while enforcing the current canonical public paths.
