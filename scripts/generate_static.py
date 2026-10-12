@@ -814,71 +814,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span></div>
 {verification_line(p)}
 
-<section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
-  <div class="ed-article-follow-head">
-    <div>
-      <span class="ed-article-follow-label">STAY CONNECTED</span>
-      <strong>Exam Darpan Updates</strong>
-      <p>नई भर्ती, Admit Card, Result और exam alerts के लिए जुड़े रहें।</p>
-    </div>
-  </div>
-
-  <div class="ed-article-follow-grid">
-
-    <a class="ed-follow-btn ed-follow-telegram"
-       href="{TELEGRAM}"
-       target="_blank"
-       rel="noopener"
-       onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram_top')">
-      <span class="ed-follow-icon">
-        <img src="{ICON_TELEGRAM_WHITE}" alt="" aria-hidden="true">
-      </span>
-      <span><b>Telegram</b><small>Channel</small></span>
-      <em>Join Us</em>
-    </a>
-
-    <a class="ed-follow-btn ed-follow-whatsapp"
-       href="{WHATSAPP}"
-       target="_blank"
-       rel="noopener"
-       onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_top')">
-      <span class="ed-follow-icon">
-        <img src="{ICON_WHATSAPP_WHITE}" alt="" aria-hidden="true">
-      </span>
-      <span><b>WhatsApp</b><small>Channel</small></span>
-      <em>Join Us</em>
-    </a>
-
-
-
-
-
-    <a class="ed-follow-btn ed-follow-instagram"
-       href="{INSTAGRAM}"
-       target="_blank"
-       rel="noopener"
-       onclick="window.edTrackCommunity&&window.edTrackCommunity('instagram_top')">
-      <span class="ed-follow-icon">
-        <img src="{ICON_INSTAGRAM_WHITE}" alt="" aria-hidden="true">
-      </span>
-      <span><b>Instagram</b><small>Follow</small></span>
-      <em>Follow</em>
-    </a>
-
-    <a class="ed-follow-btn ed-follow-x"
-       href="{X_SOCIAL}"
-       target="_blank"
-       rel="noopener"
-       onclick="window.edTrackCommunity&&window.edTrackCommunity('x_top')">
-      <span class="ed-follow-icon">
-        <img src="{ICON_X_WHITE}" alt="" aria-hidden="true">
-      </span>
-      <span><b>X</b><small>Follow</small></span>
-      <em>Follow</em>
-    </a>
-
-  </div>
-</section>
 
 <style>
 .ed-article-follow{{
@@ -1188,23 +1123,72 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 {action_html}
 <section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
 {related_html}
-<section class="community-card article-community-cta article-community-cta-bottom">
-<div>
-<span class="section-label">STAY UPDATED</span>
-<h2>नई भर्ती और परीक्षा अपडेट WhatsApp पर पाएं</h2>
-<p>{esc(community_copy(cat)[1])} नई vacancy, Admit Card और Result updates miss न हों — Exam Darpan WhatsApp Channel follow करें।</p>
-</div>
-<div class="community-actions">
-<a class="btn btn-whatsapp"
-   href="{WHATSAPP}"
-   target="_blank"
-   rel="noopener"
-   aria-label="Exam Darpan WhatsApp Channel Follow करें"
-   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_bottom')">
-WhatsApp Channel Follow करें →
-</a>
-</div>
-</section></article>
+<section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
+  <div class="ed-article-follow-head">
+    <div>
+      <span class="ed-article-follow-label">STAY CONNECTED</span>
+      <strong>Exam Darpan Updates</strong>
+      <p>नई भर्ती, Admit Card, Result और exam alerts के लिए जुड़े रहें।</p>
+    </div>
+  </div>
+
+  <div class="ed-article-follow-grid">
+
+    <a class="ed-follow-btn ed-follow-telegram"
+       href="{TELEGRAM}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('telegram_bottom')">
+      <span class="ed-follow-icon">
+        <img src="{ICON_TELEGRAM_WHITE}" alt="" aria-hidden="true">
+      </span>
+      <span><b>Telegram</b><small>Channel</small></span>
+      <em>Join Us</em>
+    </a>
+
+    <a class="ed-follow-btn ed-follow-whatsapp"
+       href="{WHATSAPP}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_channel_bottom')">
+      <span class="ed-follow-icon">
+        <img src="{ICON_WHATSAPP_WHITE}" alt="" aria-hidden="true">
+      </span>
+      <span><b>WhatsApp</b><small>Channel</small></span>
+      <em>Join Us</em>
+    </a>
+
+
+
+
+
+    <a class="ed-follow-btn ed-follow-instagram"
+       href="{INSTAGRAM}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('instagram_bottom')">
+      <span class="ed-follow-icon">
+        <img src="{ICON_INSTAGRAM_WHITE}" alt="" aria-hidden="true">
+      </span>
+      <span><b>Instagram</b><small>Follow</small></span>
+      <em>Follow</em>
+    </a>
+
+    <a class="ed-follow-btn ed-follow-x"
+       href="{X_SOCIAL}"
+       target="_blank"
+       rel="noopener"
+       onclick="window.edTrackCommunity&&window.edTrackCommunity('x_bottom')">
+      <span class="ed-follow-icon">
+        <img src="{ICON_X_WHITE}" alt="" aria-hidden="true">
+      </span>
+      <span><b>X</b><small>Follow</small></span>
+      <em>Follow</em>
+    </a>
+
+  </div>
+</section>
+</article>
 
 </main>
 <a class="floating-whatsapp-group"
