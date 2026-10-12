@@ -54,6 +54,7 @@ SITE_OG_IMAGE = "https://examdarpan.in/assets/og-logo.png?v=20260924-3"
 
 STATIC_PAGES = [
     ("/", "Home"),
+    ("/categories.html", "All Categories"),
     ("/about.html", "About Us"),
     ("/contact.html", "Contact"),
     ("/editorial-policy.html", "Editorial Policy"),
@@ -82,7 +83,7 @@ CATEGORIES = [
     ("Latest Updates", "latest-updates", "Latest Updates", "Exam Darpan की नवीनतम परीक्षा, भर्ती और शिक्षा अपडेट्स।"),
 ]
 CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CATEGORIES}
-RESERVED_SLUGS = {"index", "article", "about", "privacy", "contact", "disclaimer", "terms", "editorial-policy", "author", "404"}
+RESERVED_SLUGS = {"index", "article", "about", "privacy", "contact", "disclaimer", "terms", "editorial-policy", "author", "categories", "404"}
 
 AUTHOR_NAME = "Lakshay Kumar"
 AUTHOR_ROLE = "Content Writer"
@@ -3650,6 +3651,106 @@ document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().get
     (author_dir / "index.html").write_text(html, encoding="utf-8")
 
 
+
+def write_category_directory(posts: list[dict[str, Any]]) -> None:
+    """Generate a single crawlable directory linking every supported category."""
+    cards = []
+    item_list = []
+    for position, (name, slug_name, title, description) in enumerate(CATEGORIES, start=1):
+        count = sum(1 for post in posts if normalized_category(post) == name)
+        url = f"{BASE}{category_path(slug_name)}"
+        cards.append(
+            '<article class="ed-category-directory-card">'
+            f'<h2><a href="{esc(category_path(slug_name))}">{esc(title)}</a></h2>'
+            f'<p>{esc(description)}</p>'
+            f'<div class="ed-category-directory-meta"><span>{count} published article{"s" if count != 1 else ""}</span>'
+            f'<a href="{esc(category_path(slug_name))}">View updates →</a></div>'
+            '</article>'
+        )
+        item_list.append({
+            "@type": "ListItem",
+            "position": position,
+            "name": title,
+            "url": url,
+        })
+
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "All Categories | Exam Darpan",
+        "url": f"{BASE}/categories",
+        "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": item_list,
+        },
+    }
+    page = f"""<!-- EXAM-DARPAN-GENERATED-CATEGORIES-DIRECTORY -->
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>All Categories: Rajasthan Jobs, Admit Card, Results &amp; More | Exam Darpan</title>
+<meta name="description" content="Exam Darpan की सभी categories एक जगह देखें: Rajasthan Jobs, All India Jobs, Railway, SSC, Banking, Admit Card, Results, Answer Key, Syllabus, Scholarships और अधिक।">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<link rel="canonical" href="{BASE}/categories">
+<link rel="icon" href="/assets/favicon.png">
+<link rel="stylesheet" href="/styles.css">
+<script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>
+<style>
+.ed-category-directory{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0 34px}}
+.ed-category-directory-card{{padding:18px;border:1px solid #e2e8f0;border-radius:15px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.04)}}
+.ed-category-directory-card h2{{font-size:18px;line-height:1.4;margin:0 0 8px}}
+.ed-category-directory-card h2 a{{color:#17376b;text-decoration:none}}
+.ed-category-directory-card p{{color:#667085;font-size:13px;line-height:1.65;margin:0 0 14px}}
+.ed-category-directory-meta{{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid #edf0f4;padding-top:12px;color:#667085;font-size:11px}}
+.ed-category-directory-meta a{{color:#2563eb;font-weight:800;text-decoration:none}}
+@media(max-width:850px){{.ed-category-directory{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
+@media(max-width:560px){{.ed-category-directory{{grid-template-columns:1fr}}}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
+<header class="header"><div class="container head">
+<a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a>
+</div>
+<nav class="nav"><div class="container"><a href="/">Home</a><a href="/rajasthan-government-jobs">राजस्थान Jobs</a><a href="/all-india-government-jobs">All India Jobs</a><a href="/categories" aria-current="page">All Categories</a><a href="/category-admit-card">Admit Card</a><a href="/category-results">Results</a></div></nav>
+</header>
+<main class="main container">
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>All Categories</span></nav>
+<section class="ed-category-hero" style="margin-top:20px;padding:26px;border-radius:18px;background:linear-gradient(135deg,#10244a,#2563eb);color:#fff">
+<span style="font-size:11px;font-weight:900;letter-spacing:.12em;color:#bfdbfe">EXPLORE EXAM DARPAN</span>
+<h1 style="margin:8px 0;color:#fff;font-size:clamp(28px,4vw,40px)">सभी Categories एक जगह</h1>
+<p style="max-width:780px;line-height:1.75;color:#dbeafe">अपनी जरूरत के अनुसार भर्ती, परीक्षा, Admit Card, Result और शिक्षा से जुड़ी category चुनें। हर category में उपलब्ध published updates के links दिए गए हैं।</p>
+</section>
+<div class="ed-category-directory">{"".join(cards)}</div>
+</main>
+<footer class="footer"><div class="container footer-bottom"><div><strong>© <span data-year></span> Exam Darpan</strong><span> · Independent Education &amp; Government Job Information Portal</span></div><div><a href="/editorial-policy">Editorial Policy</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div></div></footer>
+<script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
+</body>
+</html>"""
+    (PUBLIC / "categories.html").write_text(page, encoding="utf-8")
+
+
+def inject_category_directory_links() -> None:
+    """Expose the all-categories directory from the homepage and generated pages."""
+    targets = [PUBLIC / "index.html", *PUBLIC.glob("*.html"), *PUBLIC.glob("category-*.html"), PUBLIC / "author" / "lakshay" / "index.html"]
+    marker = '<a href="/category-syllabus">Syllabus</a>'
+    replacement = marker + '\n      <a href="/categories">All Categories</a>'
+    seen_paths = set()
+    for path in targets:
+        if path in seen_paths or not path.exists():
+            continue
+        seen_paths.add(path)
+        try:
+            content = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if 'href="/categories"' in content or marker not in content:
+            continue
+        path.write_text(content.replace(marker, replacement, 1), encoding="utf-8")
+
+
 def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], category_slugs: list[str]) -> None:
     urls: list[tuple[str, str | None, str | None]] = []
     urls.append((AUTHOR_PATH, None, None))
@@ -3813,8 +3914,23 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
                 f"SEO verification failed: primary sitemap URL missing/duplicated: {primary}"
             )
 
+    # The all-categories directory must exist, link every supported category,
+    # and appear exactly once in the sitemap.
+    directory_path = PUBLIC / "categories.html"
+    if not directory_path.exists():
+        raise RuntimeError("SEO verification failed: categories.html is missing")
+    directory_html = directory_path.read_text(encoding="utf-8", errors="ignore")
+    for category_name, category_slug, _, _ in CATEGORIES:
+        category_href = category_path(category_slug)
+        if f'href="{category_href}"' not in directory_html:
+            raise RuntimeError(f"SEO verification failed: category directory link missing for {category_name}")
+        if not (PUBLIC / f"category-{category_slug}.html").exists():
+            raise RuntimeError(f"SEO verification failed: generated category page missing for {category_name}")
+    if sitemap.count(f"<loc>{xml_esc(BASE + '/categories')}</loc>") != 1:
+        raise RuntimeError("SEO verification failed: /categories missing/duplicated in sitemap")
+
     # Catch missing primary headings on the homepage and generated category/hub landing pages.
-    h1_required_files = [PUBLIC / "index.html"]
+    h1_required_files = [PUBLIC / "index.html", PUBLIC / "categories.html"]
     h1_required_files.extend(PUBLIC.glob("category-*.html"))
     h1_required_files.extend(
         [PUBLIC / "all-india-government-jobs.html", PUBLIC / "rajasthan-government-jobs.html"]
@@ -3971,6 +4087,8 @@ def main() -> int:
     category_paths = write_categories(posts)
     category_slugs = [path.removeprefix("/category-") for path in category_paths]
     write_author_profile(posts)
+    write_category_directory(posts)
+    inject_category_directory_links()
     write_sitemaps(posts, article_slugs, category_slugs)
 
     verify_generated_output(posts)

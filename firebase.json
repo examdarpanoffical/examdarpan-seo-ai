@@ -109,10 +109,6 @@
   {
     "source": "/quiz",
     "destination": "/quiz.html"
-  },
-  {
-    "source": "/:slug",
-    "destination": "/article.html"
   }
 ]
     
