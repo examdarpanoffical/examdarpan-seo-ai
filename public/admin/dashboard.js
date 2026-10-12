@@ -18,7 +18,9 @@ const $=id=>document.getElementById(id);
 const translit=s=>String(s||'').toLowerCase().replace(/[àáâãäå]/g,'a').replace(/[æ]/g,'ae').replace(/[ç]/g,'c').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i').replace(/[ñ]/g,'n').replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ýÿ]/g,'y');
 const slugify=s=>translit(s).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,110);
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const cleanContent=s=>DOMPurify.sanitize(String(s||''),{USE_PROFILES:{html:true}});
+const ARTICLE_ALLOWED_TAGS=['h1','h2','h3','h4','h5','h6','p','br','hr','ul','ol','li','strong','b','em','i','u','s','blockquote','table','caption','colgroup','col','thead','tbody','tfoot','tr','th','td','a','img','sup','sub'];
+const ARTICLE_ALLOWED_ATTR=['href','src','alt','title','target','rel','colspan','rowspan','scope','width','height'];
+const cleanContent=s=>DOMPurify.sanitize(String(s||''),{ALLOWED_TAGS:ARTICLE_ALLOWED_TAGS,ALLOWED_ATTR:ARTICLE_ALLOWED_ATTR,ALLOW_DATA_ATTR:false,ALLOW_ARIA_ATTR:false});
 
 const normalizeArticleContent=(html,title)=>{
   let out=cleanContent(html);
@@ -35,9 +37,24 @@ const normalizeArticleContent=(html,title)=>{
     return target && normalizeText(inner)===target ? '' : match;
   });
 
-  out=out.replace(/<h1\b([^>]*)>/gi,'<h2$1>');
-  out=out.replace(/<\/h1\s*>/gi,'</h2>');
-
+  // Standardize semantics; article styles come from the shared site stylesheet, not pasted HTML.
+  out=out.replace(/<h1\\b[^>]*>/gi,'<h2>');
+  out=out.replace(/<\\/h1\\s*>/gi,'</h2>');
+  out=out.replace(/<h[456]\\b[^>]*>/gi,'<h3>');
+  out=out.replace(/<\\/h[456]\\s*>/gi,'</h3>');
+  out=out.replace(/<p\\b[^>]*>/gi,'<p>');
+  out=out.replace(/<h2\\b[^>]*>/gi,'<h2>');
+  out=out.replace(/<h3\\b[^>]*>/gi,'<h3>');
+  out=out.replace(/<a\\b([^>]*)>/gi,(match,attrs)=>{
+    const href=(attrs.match(/\\bhref\\s*=\\s*(['"])(.*?)\\1/i)||[])[2]||'';
+    if(!href.trim())return '<a>';
+    return '<a href="'+escapeHtml(href.trim())+'" target="_blank" rel="noopener noreferrer">';
+  });
+  out=out.replace(/<img\\b([^>]*)>/gi,(match,attrs)=>{
+    const src=(attrs.match(/\\bsrc\\s*=\\s*(['"])(.*?)\\1/i)||[])[2]||'';
+    const alt=(attrs.match(/\\balt\\s*=\\s*(['"])(.*?)\\1/i)||[])[2]||'';
+    return src?'<img src="'+escapeHtml(src)+'" alt="'+escapeHtml(alt)+'" loading="lazy" decoding="async">':'';
+  });
   return out.trim();
 };
 
@@ -217,6 +234,18 @@ function renderCategoryLinks(){
 $('category').addEventListener('change',renderCategoryLinks);
 renderCategoryLinks();
 
+$('previewArticle').onclick=()=>{
+  const title=$('title').value.trim()||'Article Title Preview';
+  const category=$('category').value||'Latest Updates';
+  const content=normalizeArticleContent($('content').value,title);
+  const excerpt=$('excerpt').value.trim();
+  const frame=$('articlePreviewFrame');
+  const doc='<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Preview</title><link rel="stylesheet" href="https://examdarpan.in/styles.css"><style>body{margin:0;padding:22px 12px;background:#f4f7fb}.preview-wrap{max-width:1050px;margin:0 auto}.preview-label{max-width:1000px;margin:0 auto 12px;color:#64748b;font:700 12px Arial,sans-serif}.article.article-page{display:block}.preview-excerpt{max-width:790px;margin:0 auto 18px;color:#64748b;font-size:14px;line-height:1.7}</style></head><body><div class="preview-wrap"><div class="preview-label">LIVE STYLE PREVIEW · Exam Darpan article template</div><article class="article article-page"><nav class="breadcrumbs"><a href="#">Home</a><span>›</span><span>'+escapeHtml(category)+'</span><span>›</span><span>Article Preview</span></nav><div class="post-badges"><span class="badge">'+escapeHtml(category)+'</span><span class="status-badge">PREVIEW</span></div><h1>'+escapeHtml(title)+'</h1><div class="ed-author-byline"><span class="ed-author-name">By Lakshay Kumar</span></div><div class="article-meta"><span>Publish date preview</span><span>•</span><span>Official source verify करें</span></div>'+(excerpt?'<p class="preview-excerpt">'+escapeHtml(excerpt)+'</p>':'')+'<div class="article-facts"><div class="quick-fact"><span>Article layout</span><strong>Standard template</strong></div><div class="quick-fact"><span>Mobile friendly</span><strong>Responsive design</strong></div></div><div class="article-content">'+content+'</div><div class="notice"><strong>महत्वपूर्ण:</strong> कार्रवाई से पहले official notification verify करें।</div></article></div></body></html>';
+  frame.srcdoc=doc;
+  $('articlePreviewDialog').showModal();
+};
+$('closeArticlePreview').onclick=()=>$('articlePreviewDialog').close();
+$('articlePreviewDialog').addEventListener('click',e=>{if(e.target===$('articlePreviewDialog'))$('articlePreviewDialog').close()});
 $('saveDraft').onclick=()=>save('draft');
 $('publish').onclick=()=>save('published');
 $('clear').onclick=clearForm;
