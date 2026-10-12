@@ -3103,8 +3103,27 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     schema = {
         "@context": "https://schema.org",
         "@graph": [
-            {"@type": "WebSite", "name": "Exam Darpan", "url": f"{BASE}/", "inLanguage": "hi-IN"},
-            {"@type": "Organization", "name": "Exam Darpan", "url": f"{BASE}/", "logo": f"{BASE}/assets/logo.png"},
+            {
+                "@type": "WebSite",
+                "name": "Exam Darpan",
+                "alternateName": ["Exam Darpan Official", "examdarpan.in"],
+                "url": f"{BASE}/",
+                "description": "Exam Darpan Official Website for Rajasthan and Central Government Jobs, Exams, Admit Cards, Results and verified education updates.",
+                "inLanguage": "hi-IN",
+            },
+            {
+                "@type": "Organization",
+                "name": "Exam Darpan",
+                "alternateName": ["Exam Darpan Official"],
+                "url": f"{BASE}/",
+                "logo": f"{BASE}/assets/logo.png",
+                "sameAs": [
+                    "https://t.me/examdarpanofficial",
+                    "https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36",
+                    "https://x.com/exam_darpan",
+                    "https://www.instagram.com/examdarpan_official/",
+                ],
+            },
         ],
     }
     schema_tag = '<script type="application/ld+json">' + json.dumps(schema, ensure_ascii=False, separators=(",", ":")) + '</script>'
