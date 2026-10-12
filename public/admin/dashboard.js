@@ -38,21 +38,21 @@ const normalizeArticleContent=(html,title)=>{
   });
 
   // Standardize semantics; article styles come from the shared site stylesheet, not pasted HTML.
-  out=out.replace(/<h1\\b[^>]*>/gi,'<h2>');
-  out=out.replace(/<\\/h1\\s*>/gi,'</h2>');
-  out=out.replace(/<h[456]\\b[^>]*>/gi,'<h3>');
-  out=out.replace(/<\\/h[456]\\s*>/gi,'</h3>');
-  out=out.replace(/<p\\b[^>]*>/gi,'<p>');
-  out=out.replace(/<h2\\b[^>]*>/gi,'<h2>');
-  out=out.replace(/<h3\\b[^>]*>/gi,'<h3>');
-  out=out.replace(/<a\\b([^>]*)>/gi,(match,attrs)=>{
-    const href=(attrs.match(/\\bhref\\s*=\\s*(['"])(.*?)\\1/i)||[])[2]||'';
+  out=out.replace(/<h1\b[^>]*>/gi,'<h2>');
+  out=out.replace(/<\/h1\s*>/gi,'</h2>');
+  out=out.replace(/<h[456]\b[^>]*>/gi,'<h3>');
+  out=out.replace(/<\/h[456]\s*>/gi,'</h3>');
+  out=out.replace(/<p\b[^>]*>/gi,'<p>');
+  out=out.replace(/<h2\b[^>]*>/gi,'<h2>');
+  out=out.replace(/<h3\b[^>]*>/gi,'<h3>');
+  out=out.replace(/<a\b([^>]*)>/gi,(match,attrs)=>{
+    const href=(attrs.match(/\bhref\s*=\s*(['"])(.*?)\1/i)||[])[2]||'';
     if(!href.trim())return '<a>';
     return '<a href="'+escapeHtml(href.trim())+'" target="_blank" rel="noopener noreferrer">';
   });
-  out=out.replace(/<img\\b([^>]*)>/gi,(match,attrs)=>{
-    const src=(attrs.match(/\\bsrc\\s*=\\s*(['"])(.*?)\\1/i)||[])[2]||'';
-    const alt=(attrs.match(/\\balt\\s*=\\s*(['"])(.*?)\\1/i)||[])[2]||'';
+  out=out.replace(/<img\b([^>]*)>/gi,(match,attrs)=>{
+    const src=(attrs.match(/\bsrc\s*=\s*(['"])(.*?)\1/i)||[])[2]||'';
+    const alt=(attrs.match(/\balt\s*=\s*(['"])(.*?)\1/i)||[])[2]||'';
     return src?'<img src="'+escapeHtml(src)+'" alt="'+escapeHtml(alt)+'" loading="lazy" decoding="async">':'';
   });
   return out.trim();
