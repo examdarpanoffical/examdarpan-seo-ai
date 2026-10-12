@@ -3736,7 +3736,7 @@ def inject_category_directory_links() -> None:
     """Expose the all-categories directory from the homepage and generated pages."""
     targets = [PUBLIC / "index.html", *PUBLIC.glob("*.html"), *PUBLIC.glob("category-*.html"), PUBLIC / "author" / "lakshay" / "index.html"]
     marker = '<a href="/category-syllabus">Syllabus</a>'
-    replacement = marker + '\\n      <a href="/categories">All Categories</a>'
+    replacement = marker + '\n      <a href="/categories">All Categories</a>'
     seen_paths = set()
     for path in targets:
         if path in seen_paths or not path.exists():
