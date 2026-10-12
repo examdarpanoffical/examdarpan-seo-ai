@@ -189,7 +189,7 @@ async function save(status){
 
     if(id)await updateDoc(doc(db,'posts',id),d);
     else await addDoc(collection(db,'posts'),{...d,createdAt:serverTimestamp()});
-    $('msg').textContent=status==='published'?'Published successfully. Static HTML build will refresh category/article pages on the next scheduled run (usually within 5 minutes). Telegram auto-share is queued.':'Draft saved successfully.';
+    $('msg').textContent=status==='published'?'Published successfully. Static HTML pages refresh on the next scheduled rebuild (usually within 1 hour). Telegram auto-share is queued.':'Draft saved successfully.';
     clearForm();await loadPosts();
   }catch(e){console.error(e);$('msg').textContent='Save error: '+(e.message||e)}
 }
