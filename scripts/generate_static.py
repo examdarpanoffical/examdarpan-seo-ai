@@ -3108,7 +3108,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
                 "name": "Exam Darpan",
                 "alternateName": ["Exam Darpan Official", "examdarpan.in"],
                 "url": f"{BASE}/",
-                "description": "Exam Darpan Official Website for Rajasthan and Central Government Jobs, Exams, Admit Cards, Results and verified education updates.",
+                "description": "Exam Darpan official website for India-wide Central and State Government Jobs, Recruitment, Exams, Admit Cards, Results, Answer Keys, Scholarships and education updates, including Rajasthan.",
                 "inLanguage": "hi-IN",
             },
             {
