@@ -172,7 +172,7 @@ async function save(status){
 
     if(id)await updateDoc(doc(db,'posts',id),d);
     else await addDoc(collection(db,'posts'),{...d,createdAt:serverTimestamp()});
-    $('msg').textContent=status==='published'?'Published successfully. Telegram auto-share is queued.':'Draft saved successfully.';
+    $('msg').textContent=status==='published'?'Published successfully. Static HTML build will refresh category/article pages on the next scheduled run (usually within 5 minutes). Telegram auto-share is queued.':'Draft saved successfully.';
     clearForm();await loadPosts();
   }catch(e){console.error(e);$('msg').textContent='Save error: '+(e.message||e)}
 }
@@ -187,6 +187,36 @@ function clearForm(){
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
 }
+const CATEGORY_URLS={
+  'Rajasthan Jobs':'/rajasthan-government-jobs',
+  'Government Jobs':'/all-india-government-jobs',
+  'Police & Defence Jobs':'/category-police-defence-jobs',
+  'Teaching Jobs':'/category-teaching-jobs',
+  'Railway Jobs':'/category-railway-jobs',
+  'Banking Jobs':'/category-banking-jobs',
+  'SSC Jobs':'/category-ssc-jobs',
+  'UPSC Jobs':'/category-upsc-jobs',
+  'Admit Card':'/category-admit-card',
+  'Results':'/category-results',
+  'Answer Key':'/category-answer-key',
+  'Syllabus':'/category-syllabus',
+  'Entrance Exams':'/category-entrance-exams',
+  'Scholarships':'/category-scholarships',
+  'University & College':'/category-university-college',
+  'Yojana':'/category-yojana',
+  'Latest Updates':'/category-latest-updates'
+};
+function renderCategoryLinks(){
+  const selected=$('category').value;
+  const links=[['All Categories','/categories'],...Object.entries(CATEGORY_URLS)];
+  $('categoryLinksPreview').innerHTML=links.map(([name,url])=>{
+    const active=name===selected;
+    return '<a href="'+url+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:7px 10px;border-radius:8px;border:1px solid '+(active?'#2563eb':'#dbe3ee')+';background:'+(active?'#eff6ff':'#fff')+';color:'+(active?'#1d4ed8':'#334155')+';font-size:12px;font-weight:700;text-decoration:none">'+escapeHtml(name)+(active?' ✓':'')+'</a>';
+  }).join('');
+}
+$('category').addEventListener('change',renderCategoryLinks);
+renderCategoryLinks();
+
 $('saveDraft').onclick=()=>save('draft');
 $('publish').onclick=()=>save('published');
 $('clear').onclick=clearForm;
