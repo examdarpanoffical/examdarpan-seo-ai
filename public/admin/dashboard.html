@@ -85,11 +85,11 @@
 </div>
 
 <div class="field"><label>Excerpt</label><textarea id="excerpt" style="min-height:90px"></textarea></div>
-<div class="field"><label>Content HTML</label><textarea id="content" style="min-height:300px" placeholder="AI draft यहाँ आएगा; आप review/edit कर सकते हैं."></textarea></div>
+<div class="field"><label>Content HTML</label><textarea id="content" style="min-height:300px" placeholder="AI draft यहाँ आएगा; आप review/edit कर सकते हैं."></textarea><p class="meta">Standard layout: content में headings, paragraphs, lists, tables और official links रखें। Custom colors/inline CSS हटाकर publish पर सभी articles में एक consistent style लागू होगी। Publish से पहले Preview Article देखें.</p></div>
 <div class="field"><label>Featured Image</label><input id="image" placeholder="Generate free branded thumbnail or paste image URL"></div>
 <div class="field"><button type="button" id="aiImageGenerate" class="btn btn-gold">Generate Free Branded Thumbnail</button><p id="aiImageMsg" class="meta">यह local thumbnail है; Gemini Image/Blaze की जरूरत नहीं.</p><div id="aiImagePreview" style="margin-top:10px"></div></div>
 <div class="field"><label>Official Notification URL</label><input id="notification"></div><div class="field"><label>Apply Online URL</label><input id="apply"></div><div class="field"><label>Official Website URL</label><input id="official"></div><div class="field"><label>Notification PDF URL</label><input id="pdf"></div><div class="field"><label>Tags (comma separated)</label><input id="tags"></div>
-<div style="display:flex;gap:10px;flex-wrap:wrap"><button id="saveDraft" class="btn btn-dark">Save Draft</button><button id="publish" class="btn btn-primary">Publish</button><button id="clear" class="btn btn-gold">Clear</button></div><p id="msg" class="meta"></p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button id="previewArticle" type="button" class="btn btn-gold">Preview Article</button><button id="saveDraft" class="btn btn-dark">Save Draft</button><button id="publish" class="btn btn-primary">Publish</button><button id="clear" class="btn btn-gold">Clear</button></div><p id="msg" class="meta"></p>
 <hr style="border:0;border-top:1px solid #e2e8f0;margin:20px 0">
 <div class="admin-quiz-box">
   <div class="section-label">STUDENT PRACTICE</div><h2>Daily Quiz Publisher</h2>
@@ -191,4 +191,12 @@
 <div class="field"><label>Official Source Text</label><textarea id="aiSource" style="min-height:200px" placeholder="Official notification/PDF का relevant text यहाँ paste करें…"></textarea></div>
 <button id="aiGenerate" class="btn btn-gold">Generate Draft with Gemini</button><p id="aiMsg" class="meta"></p></section>
 <section><div class="form"><h2>Posts</h2><input id="filter" placeholder="Search posts" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:11px"><div id="posts" style="margin-top:12px"></div></div></section></div></main>
-<script type="module" src="dashboard.js?v=20261012-category-links2"></script></body></html>
+<script type="module" src="dashboard.js?v=20261012-category-links2"></script>
+<dialog id="articlePreviewDialog" style="width:min(1100px,96vw);max-width:1100px;height:92vh;max-height:92vh;padding:0;border:1px solid #dbe3ee;border-radius:18px;box-shadow:0 20px 70px #0f172a55">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:#0b1730;color:#fff">
+    <strong>Article Preview — Exam Darpan Standard Layout</strong>
+    <button type="button" id="closeArticlePreview" class="btn btn-gold">Close Preview</button>
+  </div>
+  <iframe id="articlePreviewFrame" title="Article preview" sandbox="allow-same-origin" style="display:block;width:100%;height:calc(100% - 54px);border:0;background:#f4f7fb"></iframe>
+</dialog>
+</body></html>
