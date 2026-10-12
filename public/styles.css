@@ -8727,3 +8727,32 @@ body{
   }
 }
 /* END ARTICLE READING EXPERIENCE V3 */
+
+/* STANDARD ARTICLE CONTENT BLOCKS */
+.article-page > .article-content .important-links {
+  margin:24px 0;
+  padding:17px;
+  border:1px solid #dbe5f2;
+  border-radius:16px;
+  background:linear-gradient(145deg,#f8fbff,#fff);
+  box-shadow:0 5px 18px rgba(15,23,42,.04);
+}
+.article-page > .article-content .important-links > :first-child { margin-top:0; }
+.article-page > .article-content .important-links > :last-child { margin-bottom:0; }
+.article-page > .article-content .important-links .link-row {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px 14px;
+  padding:11px 0;
+  border-bottom:1px solid #e7edf5;
+}
+.article-page > .article-content .important-links .link-row:last-child { border-bottom:0; }
+.article-page > .article-content .important-links a { font-weight:800; }
+@media(max-width:600px) {
+  .article-page > .article-content .important-links { padding:13px; border-radius:13px; }
+  .article-page > .article-content .important-links .link-row { align-items:flex-start; }
+}
+/* END STANDARD ARTICLE CONTENT BLOCKS */
+
