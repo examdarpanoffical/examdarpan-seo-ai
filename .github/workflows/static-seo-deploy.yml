@@ -50,6 +50,10 @@ jobs:
           test -f public/index.html
           test -f public/sitemap.xml
           test -f public/categories.html
+          grep -Fq 'id="exam-darpan-student-first-home-v3"' public/index.html
+          grep -Fq 'class="ed-v3-hero"' public/index.html
+          grep -Fq 'सरकारी नौकरी की तैयारी में' public/index.html
+          grep -Fq 'आज के Latest Updates' public/index.html
 
       - name: Report SEO sanity checks
         run: |
