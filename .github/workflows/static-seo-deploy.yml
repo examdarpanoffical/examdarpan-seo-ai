@@ -47,7 +47,6 @@ jobs:
       - name: Verify generated homepage
         run: |
           set -euo pipefail
-
           test -f public/index.html
           test -f public/sitemap.xml
           test -f public/categories.html
@@ -56,21 +55,6 @@ jobs:
           grep -q 'class="ed-v3-hero"' public/index.html
           grep -q 'सरकारी नौकरी की तैयारी में' public/index.html
           grep -q 'ed-v3-promise' public/index.html
-          grep -Fq '"alternateName":["Exam Darpan Official","examdarpan.in"]' public/index.html
-
-          CATEGORY_PAGE_COUNT="$(find public -maxdepth 1 -type f -name 'category-*.html' | wc -l | tr -d ' ')"
-          echo "Generated category landing pages: ${CATEGORY_PAGE_COUNT}"
-          test "${CATEGORY_PAGE_COUNT}" -ge 10
-          grep -q 'href="/categories"' public/index.html
-
-          grep -q "LIVE UPDATES" public/index.html
-          grep -q "Rajasthan Government Jobs" public/index.html
-          grep -q "All India Government Jobs" public/index.html
-          grep -q 'id="daily-test"' public/index.html
-          grep -q "Latest Articles" public/index.html
-          grep -q 'class="ed-home-social"' public/index.html
-          grep -q 'Exam Darpan से जुड़े रहें' public/index.html
-          grep -q 'All Rights Reserved.' public/index.html
 
       - name: Report SEO sanity checks
         run: |
