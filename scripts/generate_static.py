@@ -2782,6 +2782,18 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
  .ed-home-live-move{animation:none!important;transform:none!important}
  *,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
+/* FINAL FIX: no duplicate category strip; floating community CTA must not cover content. */
+.all-india-jobs-nav{display:none!important}
+.floating-whatsapp-group{right:16px;bottom:16px;z-index:40;min-width:0;gap:8px;padding:7px 12px 7px 7px;animation:none!important;box-shadow:0 5px 18px rgba(15,23,42,.18);border-width:1px}
+.floating-whatsapp-icon{width:34px;height:34px;flex-basis:34px}
+.floating-whatsapp-text small{font-size:9px}
+.floating-whatsapp-text strong{font-size:13px}
+@media(max-width:760px){
+ .floating-whatsapp-group{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));width:48px;height:48px;padding:5px;justify-content:center;gap:0;border-radius:50%;}
+ .floating-whatsapp-icon{width:34px;height:34px;flex-basis:34px}
+ .floating-whatsapp-text{display:none}
+ .ed-home-social{margin-bottom:24px}
+}
 </style>"""
 
     social_cta = (
@@ -2850,6 +2862,14 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     if not path.exists():
         raise RuntimeError("public/index.html is missing")
     text = path.read_text(encoding="utf-8")
+
+    # Remove the duplicate All India Jobs link that was rendered outside the nav container.
+    text = re.sub(
+        r'\s*<a href="/all-india-government-jobs" class="all-india-jobs-nav">[\s\S]*?</a>\s*',
+        "\\n",
+        text,
+        count=1,
+    )
 
     # Homepage WhatsApp CTA uses the official community group,
     # not the old WhatsApp channel.
