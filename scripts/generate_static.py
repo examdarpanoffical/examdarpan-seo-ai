@@ -1574,6 +1574,11 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 '<span class="ed-home-hub-new">New</span>'
                 if is_new else ""
             )
+            status_label, status_class = application_status(p)
+            status_badge = (
+                f'<span class="ed-home-hub-status {status_class}">{esc(status_label)}</span>'
+                if status_label != "UPDATE" else ""
+            )
 
             rows.append(
                 '<a class="ed-home-hub-item" '
@@ -1582,7 +1587,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 '<span class="ed-home-hub-title">'
                 f'{esc(post_title(p))}'
                 '</span>'
-                f'{new_badge}'
+                f'{status_badge}{new_badge}'
                 '</a>'
             )
 
@@ -2726,6 +2731,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .ed-home-hub-item{min-height:70px;padding:15px 20px;gap:13px;border-bottom:1px solid #edf0f5;font-size:14px;line-height:1.55}
 .ed-home-hub-item:hover{background:#f5f8fd!important}
 .ed-home-hub-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#2c5ca8!important}
+.ed-home-hub-status{flex:0 0 auto;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.02em;line-height:1.2;white-space:nowrap}
+.ed-home-hub-status.status-open{background:#dcfce7;color:#166534}
+.ed-home-hub-status.status-closing{background:#fef3c7;color:#92400e}
+.ed-home-hub-status.status-closed{background:#fee2e2;color:#991b1b}
+.ed-home-hub-status.status-soon{background:#dbeafe;color:#1d4ed8}
+.ed-home-hub-status.status-admit,.ed-home-hub-status.status-result{background:#ede9fe;color:#5b21b6}
 .ed-home-hub-more{display:flex;justify-content:center;padding:14px;background:#f8fafc!important;color:#173b78!important;font-weight:850}
 .ed-home-category-section,.ed-home-calendar-panel,.ed-home-latest-card{border:1px solid #dfe6ef;border-radius:17px;box-shadow:0 6px 22px rgba(15,35,70,.035)}
 .ed-home-section-head,.ed-home-section-red .ed-home-section-head,.ed-home-section-teal .ed-home-section-head,.ed-home-section-purple .ed-home-section-head,.ed-home-section-blue .ed-home-section-head{background:#173b78!important}
