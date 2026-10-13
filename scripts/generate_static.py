@@ -1226,9 +1226,10 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
         <span>✓ Rajasthan + All India</span>
       </div>
       <div class="footer-socials">
-        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
-        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
+        <a href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener noreferrer">X</a>
       </div>
     </div>
 
@@ -2652,6 +2653,39 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   .ed-home-daily-action{margin-top:14px}
   .ed-home-daily-action .btn{display:inline-flex;margin-top:0}
 }
+
+/* Unified brand palette: calm navy/blue, consistent across homepage shelves */
+.ed-home-hub-green .ed-home-hub-head{background:#173b82!important}
+.ed-home-hub-blue .ed-home-hub-head{background:#2453a6!important}
+.ed-home-hub-green .ed-home-hub-dot{background:#2453a6!important}
+.ed-home-hub-blue .ed-home-hub-dot{background:#2453a6!important}
+.ed-home-hub-more,.ed-home-hub-blue .ed-home-hub-more{background:#f8fafc!important;color:#173b82!important}
+.ed-home-section-head,.ed-home-section-red .ed-home-section-head,.ed-home-section-teal .ed-home-section-head,.ed-home-section-purple .ed-home-section-head,.ed-home-section-blue .ed-home-section-head{background:#173b82!important}
+.ed-home-section-dot,.ed-home-section-red .ed-home-section-dot,.ed-home-section-teal .ed-home-section-dot,.ed-home-section-purple .ed-home-section-dot,.ed-home-section-blue .ed-home-section-dot{background:#2453a6!important}
+.ed-home-section-more,.ed-home-section-red .ed-home-section-more,.ed-home-section-teal .ed-home-section-more,.ed-home-section-purple .ed-home-section-more,.ed-home-section-blue .ed-home-section-more{background:#f8fafc!important;color:#173b82!important}
+.ed-home-section-new,.ed-home-hub-new{background:#b45309!important}
+.ed-home-category-section,.ed-home-hub,.ed-home-calendar-panel{border-color:#e2e8f0}
+.ed-home-category-section,.ed-home-hub,.ed-home-calendar-panel,.ed-home-latest-card{box-shadow:0 4px 16px rgba(15,23,42,.045)}
+.ed-home-section-item,.ed-home-hub-item{transition:background-color .16s ease}
+.ed-home-section-item:hover,.ed-home-hub-item:hover{background:#f3f7fd!important}
+.ed-home-latest-card{border-radius:13px}
+.ed-home-latest-card>a{line-height:1.5}
+@media(max-width:760px){
+  .ed-home-hubs,.ed-home-calendar-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .ed-home-hub,.ed-home-category-section{margin-bottom:16px}
+  .ed-home-hub-head,.ed-home-section-head{padding:15px 16px}
+  .ed-home-hub-head h2,.ed-home-section-head h2{font-size:19px}
+  .ed-home-hub-item,.ed-home-section-item{min-height:0;padding:13px 15px;gap:10px}
+  .ed-home-hub-title,.ed-home-section-title{font-size:13px;line-height:1.5}
+  .ed-home-hub-new,.ed-home-section-new{font-size:9px;padding:6px 7px}
+  .ed-home-hub-more,.ed-home-section-more{padding:13px;font-size:13px}
+  .ed-home-daily{border-radius:16px;padding:18px}
+  .ed-home-daily h2{font-size:22px}
+  .ed-home-latest-head{align-items:flex-start;gap:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .ed-home-live-move{animation:none;transform:none;padding-left:0}
+}
 </style>"""
 
     social_cta = (
@@ -3248,9 +3282,10 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
         <span>✓ Rajasthan + All India</span>
       </div>
       <div class="footer-socials">
-        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
-        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
+        <a href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener noreferrer">X</a>
       </div>
     </div>
 
@@ -3636,9 +3671,10 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
         <span>✓ Rajasthan + All India</span>
       </div>
       <div class="footer-socials">
-        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener">Telegram</a>
-        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener">X</a>
+        <a href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener noreferrer">X</a>
       </div>
     </div>
 
