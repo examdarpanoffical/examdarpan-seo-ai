@@ -2882,6 +2882,90 @@ def update_home(posts: list[dict[str, Any]]) -> None:
         count=1,
     )
 
+    # Rebuild the above-the-fold homepage into a clear student-first portal.
+    premium_home_css = """<style id="exam-darpan-student-first-home-v3">
+:root{--ed-v3-ink:#101d35;--ed-v3-blue:#174ea6;--ed-v3-navy:#0a1c3c;--ed-v3-muted:#64748b;--ed-v3-line:#dbe4f0}
+body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
+.topbar{background:#07172f!important}
+.header{background:#fff!important}
+.header .head{min-height:88px}
+.brand-title{letter-spacing:-.045em}
+.nav{background:#fff!important;border-top:1px solid #edf1f6;border-bottom:1px solid #dbe4f0;box-shadow:0 5px 18px rgba(15,35,70,.045)}
+.nav .container{gap:5px}
+.nav a{border-radius:9px!important;font-weight:750!important}
+.main.container{max-width:1240px!important}
+.ed-v3-hero{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(270px,.72fr);gap:28px;position:relative;overflow:hidden;margin:24px 0 20px;padding:clamp(26px,4vw,48px);border-radius:26px;background:linear-gradient(120deg,#081a38 0%,#123d7b 68%,#2167b2 100%);color:#fff;box-shadow:0 22px 50px rgba(13,43,88,.18)}
+.ed-v3-hero:after{content:"";position:absolute;width:360px;height:360px;border:1px solid rgba(255,255,255,.12);border-radius:50%;right:18%;top:-270px;box-shadow:0 0 0 35px rgba(255,255,255,.035),0 0 0 75px rgba(255,255,255,.025);pointer-events:none}
+.ed-v3-copy,.ed-v3-panel{position:relative;z-index:1}
+.ed-v3-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(255,255,255,.23);border-radius:999px;background:rgba(255,255,255,.08);color:#dbeafe;font-size:10px;font-weight:900;letter-spacing:.12em}
+.ed-v3-kicker i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 4px rgba(74,222,128,.14)}
+.ed-v3-hero h1{max-width:720px;margin:18px 0 14px;color:#fff!important;font-size:clamp(32px,4.1vw,54px)!important;line-height:1.13!important;letter-spacing:-.045em!important;text-wrap:balance}
+.ed-v3-hero h1 span{color:#93c5fd!important}
+.ed-v3-hero p{max-width:640px;color:#e1eaf8!important;font-size:15px!important;line-height:1.85!important}
+.ed-v3-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.ed-v3-actions a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 16px;border:1px solid rgba(255,255,255,.23);border-radius:12px;color:#fff!important;text-decoration:none!important;font-size:12px;font-weight:850}
+.ed-v3-actions .primary{background:#fff;color:#12376b!important;border-color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.ed-v3-actions .soft{background:rgba(255,255,255,.08)}
+.ed-v3-panel{align-self:center;padding:20px;border:1px solid rgba(255,255,255,.2);border-radius:19px;background:rgba(4,19,44,.48);backdrop-filter:blur(8px)}
+.ed-v3-panel h2{margin:0 0 5px;color:#fff;font-size:17px;letter-spacing:-.02em}
+.ed-v3-panel>p{margin:0 0 15px;color:#c9d8ee;font-size:11px;line-height:1.6}
+.ed-v3-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ed-v3-shortcuts a{display:flex;align-items:center;gap:9px;min-height:58px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.07);color:#fff!important;text-decoration:none!important;font-size:11px;font-weight:800}
+.ed-v3-shortcuts a:hover{background:rgba(255,255,255,.15);transform:translateY(-1px)}
+.ed-v3-shortcuts b{display:grid;place-items:center;flex:0 0 31px;width:31px;height:31px;border-radius:9px;background:rgba(147,197,253,.17);color:#bfdbfe;font-size:14px}
+.ed-v3-promise{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 24px}
+.ed-v3-promise article{display:flex;align-items:center;gap:11px;padding:15px;border:1px solid #e0e7f0;border-radius:15px;background:#fff;box-shadow:0 5px 18px rgba(15,35,70,.035)}
+.ed-v3-promise b{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:#edf4ff;color:#174ea6;font-size:17px}
+.ed-v3-promise strong{display:block;font-size:12px;color:#182944}
+.ed-v3-promise span{display:block;margin-top:3px;color:#718096;font-size:10px;line-height:1.45}
+.ed-home-live{margin-bottom:22px!important}
+.ed-home-hubs{gap:18px!important}
+.ed-home-hub{background:#fff}
+.ed-home-hub-head{border-radius:15px 15px 0 0}
+.ed-home-hub-item{display:flex;align-items:center}
+.ed-home-hub-title{flex:1;min-width:0}
+.ed-home-hub-status{margin-left:6px}
+@media(max-width:850px){.ed-v3-hero{grid-template-columns:1fr;gap:22px}.ed-v3-panel{max-width:none}.ed-v3-hero h1{font-size:clamp(30px,6vw,43px)!important}}
+@media(max-width:650px){.header .head{min-height:74px}.ed-v3-hero{margin:14px 0 15px;padding:23px 18px;border-radius:20px;gap:19px}.ed-v3-hero h1{font-size:31px!important}.ed-v3-hero p{font-size:13px!important}.ed-v3-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}.ed-v3-actions a{padding:11px 8px;font-size:11px}.ed-v3-actions .primary{grid-column:1/-1}.ed-v3-panel{padding:15px}.ed-v3-promise{grid-template-columns:1fr;gap:8px;margin-bottom:17px}.ed-v3-promise article{padding:11px 13px}.ed-v3-promise b{width:32px;height:32px;flex-basis:32px}.nav .container{gap:3px}.nav a{font-size:11px!important;padding:10px 9px!important}}
+@media(prefers-reduced-motion:reduce){.ed-v3-shortcuts a{transition:none!important}}
+</style>"""
+    if 'id="exam-darpan-student-first-home-v3"' not in text:
+        text = text.replace("</head>", premium_home_css + "\\n</head>", 1)
+
+    hero_markup = """<section class="ed-v3-hero" aria-labelledby="ed-v3-title">
+  <div class="ed-v3-copy">
+    <span class="ed-v3-kicker"><i aria-hidden="true"></i> EXAM DARPAN • STUDENT FIRST</span>
+    <h1 id="ed-v3-title">सरकारी नौकरी की तैयारी में <span>हर जरूरी अपडेट</span>, एक भरोसेमंद जगह</h1>
+    <p>राजस्थान और केंद्र सरकार की भर्ती, admit card, result, answer key और syllabus — आसान भाषा में। आवेदन करने से पहले official notification और तारीखें जरूर जाँचें।</p>
+    <div class="ed-v3-actions">
+      <a class="primary" href="#updates">आज के Latest Updates <b aria-hidden="true">→</b></a>
+      <a class="soft" href="/rajasthan-government-jobs">राजस्थान Jobs</a>
+      <a class="soft" href="/quiz">Free Practice Test <b aria-hidden="true">↗</b></a>
+    </div>
+  </div>
+  <aside class="ed-v3-panel" aria-label="Quick links for students">
+    <h2>आपको क्या देखना है?</h2>
+    <p>सीधे अपनी जरूरत वाले section पर जाएँ।</p>
+    <div class="ed-v3-shortcuts">
+      <a href="/all-india-government-jobs"><b>↗</b><span>All India Jobs</span></a>
+      <a href="/category-admit-card"><b>▣</b><span>Admit Card</span></a>
+      <a href="/category-results"><b>✓</b><span>Exam Results</span></a>
+      <a href="/category-answer-key"><b>≡</b><span>Answer Key</span></a>
+    </div>
+  </aside>
+</section>
+<section class="ed-v3-promise" aria-label="Exam Darpan information standards">
+  <article><b>✓</b><div><strong>Official notice first</strong><span>Apply करने से पहले original notification जाँचें</span></div></article>
+  <article><b>◷</b><div><strong>Dates पर ध्यान</strong><span>Last date और exam date अलग-अलग देखें</span></div></article>
+  <article><b>◎</b><div><strong>तैयारी भी साथ</strong><span>Free practice test से अपनी तैयारी जाँचें</span></div></article>
+</section>"""
+    text = re.sub(
+        r'<section class="hero card">[\\s\\S]*?</section>',
+        lambda _m: hero_markup,
+        text,
+        count=1,
+    )
+
     # Homepage WhatsApp CTA uses the official community group,
     # not the old WhatsApp channel.
     text = text.replace(WHATSAPP, WHATSAPP_GROUP)
