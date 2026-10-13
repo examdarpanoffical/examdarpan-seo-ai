@@ -1644,7 +1644,10 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 .ed-home-priority{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 24px}
 .ed-home-priority-card{min-width:0;overflow:hidden;border:1px solid #e0e7f0;border-radius:17px;background:#fff;box-shadow:0 8px 24px rgba(15,35,70,.045);transition:transform .18s ease,box-shadow .18s ease}
 .ed-home-priority-card:hover{transform:translateY(-2px);box-shadow:0 13px 30px rgba(15,35,70,.09)}
-.ed-home-priority-head{display:flex;align-items:center;gap:11px;padding:15px 16px;background:#153b78;color:#fff}
+.ed-home-priority-head{display:flex;align-items:center;gap:11px;padding:15px 16px;background:#b91c1c;color:#fff}
+.ed-home-priority-card:nth-child(2) .ed-home-priority-head{background:#047857}
+.ed-home-priority-card:nth-child(3) .ed-home-priority-head{background:#1d4ed8}
+.ed-home-priority-more{background:#f8fafc}
 .ed-home-priority-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.12);font-size:18px}
 .ed-home-priority-head h2{margin:0;color:#fff;font-size:17px;line-height:1.25;font-weight:900;letter-spacing:-.02em}
 .ed-home-priority-head p{margin:4px 0 0;color:#dbeafe;font-size:10px;line-height:1.4}
@@ -1707,11 +1710,11 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         ("📋", "Answer Key & Syllabus", "answer-key-syllabus",
          {"Answer Key", "Syllabus"},
          "Answer key, objection notice और exam syllabus updates",
-         "/category-answer-key"),
+         category_path("answer-key")),
         ("🎓", "Scholarships & Yojana", "scholarships-yojana",
          {"Scholarships", "Yojana"},
          "विद्यार्थियों के लिए scholarship और सरकारी योजना updates",
-         "/category-scholarships"),
+         category_path("scholarships")),
     ]
     secondary_css = """<style id="exam-darpan-home-secondary-panels">
 .ed-home-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 24px}
@@ -1802,19 +1805,10 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     # 6. CATEGORY CONTENT SECTIONS
     # Reuse the category-page visual language on the homepage.
     # Rajasthan/All India hubs, calendar and Daily Test stay separate.
+    # These category shelves are shown once. Results / Admit Card are in the
+    # three primary reference panels; Answer Key + Syllabus and Scholarships +
+    # Yojana are combined into the two secondary reference panels above.
     homepage_category_specs = [
-        ("Admit Card", "admit-card", "Admit Card",
-         "नई परीक्षाओं के Admit Card और प्रवेश से जुड़ी verified updates।"),
-        ("Results", "results", "Results",
-         "सरकारी परीक्षाओं के latest result, merit list और score updates।"),
-        ("Answer Key", "answer-key", "Answer Key",
-         "परीक्षाओं की Answer Key और objection से जुड़ी महत्वपूर्ण updates।"),
-        ("Syllabus", "syllabus", "Exam Syllabus",
-         "सरकारी परीक्षाओं के syllabus और preparation से जुड़ी जानकारी।"),
-        ("Scholarships", "scholarships", "Scholarships",
-         "Students के लिए scholarship schemes, eligibility और application updates।"),
-        ("Yojana", "yojana", "सरकारी योजनाएं",
-         "सरकारी योजनाओं, eligibility, benefits और application updates की जानकारी।"),
         ("Entrance Exams", "entrance-exams", "Entrance Exams",
          "Entrance examinations, application और exam updates एक जगह।"),
         ("University & College", "university-college", "University & College",
@@ -1963,6 +1957,15 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
 
     css = """<style id="exam-darpan-home-final-order">
+/* Full reference palette: red-to-blue masthead, dark translucent nav, amber alert. */
+.topbar{background:linear-gradient(100deg,#b91c1c 0%,#1e3a8a 54%,#312e81 100%)!important;color:#fff!important}
+.topbar a,.topbar span,.topbar strong{color:#fff!important}
+.header{background:linear-gradient(100deg,#b91c1c 0%,#1e3a8a 54%,#312e81 100%)!important;color:#fff!important;border:0!important}
+.header .brand-title,.header .brand-name,.header .tagline,.header p{color:#fff!important}
+.header .search,.header input[type="search"],.header input[type="text"]{background:#fff!important;color:#172033!important;border-color:#dbe4f0!important}
+.nav{background:#111827!important;border-top:1px solid rgba(255,255,255,.15)!important;border-bottom:0!important;box-shadow:0 5px 18px rgba(15,23,42,.12)!important}
+.nav a{color:#fff!important}
+.nav a:hover,.nav a.active{background:rgba(255,255,255,.14)!important;color:#fde68a!important}
 .ed-home-live{
   margin:0 0 22px;
   background:#fff;
@@ -3463,7 +3466,6 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     # The earlier hero substitution is superseded below when <main> is rebuilt.
     replacement = (
         '<main class="main container">'
-        + hero_markup
         + home_sections
         + home_community
         + '</main>'
@@ -3478,14 +3480,17 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     )
 
     required_home_sections = (
-        'id="exam-darpan-student-first-home-v3"',
-        'class="ed-v3-hero"',
-        "सरकारी नौकरी की तैयारी में",
-        "आज के Latest Updates",
-        "LIVE UPDATES",
+        'id="exam-darpan-home-final-order"',
+        'class="ed-home-live"',
+        'class="ed-home-priority"',
+        'class="ed-home-secondary"',
+        "Answer Key &amp; Syllabus",
+        "Scholarships &amp; Yojana",
         "Rajasthan Government Jobs",
         "All India Government Jobs",
         'id="daily-test"',
+        "Entrance Exams",
+        "University &amp; College",
         "Latest Articles",
     )
 
