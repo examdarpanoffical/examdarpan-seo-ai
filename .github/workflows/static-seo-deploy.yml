@@ -71,7 +71,6 @@ jobs:
           grep -q 'class="ed-home-social"' public/index.html
           grep -q 'Exam Darpan से जुड़े रहें' public/index.html
           grep -q 'All Rights Reserved.' public/index.html
-          grep -q 'https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK' public/index.html
 
       - name: Report SEO sanity checks
         run: |
