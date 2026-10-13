@@ -2866,7 +2866,7 @@ def update_home(posts: list[dict[str, Any]]) -> None:
     # Remove the duplicate All India Jobs link that was rendered outside the nav container.
     text = re.sub(
         r'\s*<a href="/all-india-government-jobs" class="all-india-jobs-nav">[\s\S]*?</a>\s*',
-        "\\n",
+        "\n",
         text,
         count=1,
     )
