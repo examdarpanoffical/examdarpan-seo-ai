@@ -9344,3 +9344,300 @@ main.main article.article{
   .article-cover-inner{min-height:210px;padding:18px 15px}
   .article-cover-card h2{font-size:22px}
 }
+
+
+/* =========================================================
+   EXAM DARPAN — UNIVERSAL ARTICLE TABLE + IMPORTANT LINKS
+   Apply consistently to every generated and existing article
+   ========================================================= */
+.article-page table,
+.single-post table,
+.article-container table,
+.article-content table,
+.article-body table,
+#articleRoot table,
+main.main article table,
+.exam-info-table{
+  width:100%!important;
+  max-width:100%!important;
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  margin:22px 0!important;
+  background:#fff!important;
+  border:1px solid #cbd5e1!important;
+  border-radius:10px!important;
+  overflow:hidden!important;
+  color:#334155!important;
+  font-size:14px!important;
+  line-height:1.55!important;
+}
+.article-page table th,
+.single-post table th,
+.article-container table th,
+.article-content table th,
+.article-body table th,
+#articleRoot table th,
+main.main article table th,
+.exam-info-table th{
+  background:#203f91!important;
+  color:#fff!important;
+  font-weight:800!important;
+  border:1px solid #d4dce9!important;
+  padding:13px 14px!important;
+  text-align:left!important;
+  vertical-align:middle!important;
+}
+.article-page table td,
+.single-post table td,
+.article-container table td,
+.article-content table td,
+.article-body table td,
+#articleRoot table td,
+main.main article table td,
+.exam-info-table td{
+  background:#fff!important;
+  color:#334155!important;
+  border:1px solid #d4dce9!important;
+  padding:13px 14px!important;
+  text-align:left!important;
+  vertical-align:middle!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+.article-page table tbody tr:nth-child(even) td,
+.single-post table tbody tr:nth-child(even) td,
+.article-container table tbody tr:nth-child(even) td,
+.article-content table tbody tr:nth-child(even) td,
+.article-body table tbody tr:nth-child(even) td,
+#articleRoot table tbody tr:nth-child(even) td,
+main.main article table tbody tr:nth-child(even) td{
+  background:#f7f9fc!important;
+}
+.article-page table tr:first-child th:first-child,
+.single-post table tr:first-child th:first-child,
+.article-container table tr:first-child th:first-child,
+.article-content table tr:first-child th:first-child,
+.article-body table tr:first-child th:first-child,
+#articleRoot table tr:first-child th:first-child{border-top-left-radius:9px}
+.article-page table tr:first-child th:last-child,
+.single-post table tr:first-child th:last-child,
+.article-container table tr:first-child th:last-child,
+.article-content table tr:first-child th:last-child,
+.article-body table tr:first-child th:last-child,
+#articleRoot table tr:first-child th:last-child{border-top-right-radius:9px}
+
+/* Keep wide tables usable on phones without shrinking the article page */
+.article-page .table-wrap,
+.article-page .table-responsive,
+.single-post .table-wrap,
+.single-post .table-responsive,
+.article-container .table-wrap,
+.article-container .table-responsive,
+.article-content .table-wrap,
+.article-content .table-responsive{
+  max-width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+@media(max-width:640px){
+  .article-page table,
+  .single-post table,
+  .article-container table,
+  .article-content table,
+  .article-body table,
+  #articleRoot table,
+  main.main article table,
+  .exam-info-table{
+    font-size:13px!important;
+    margin:18px 0!important;
+    border-radius:8px!important;
+  }
+  .article-page table th,
+  .single-post table th,
+  .article-container table th,
+  .article-content table th,
+  .article-body table th,
+  #articleRoot table th,
+  main.main article table th,
+  .exam-info-table th,
+  .article-page table td,
+  .single-post table td,
+  .article-container table td,
+  .article-content table td,
+  .article-body table td,
+  #articleRoot table td,
+  main.main article table td,
+  .exam-info-table td{
+    padding:11px 10px!important;
+    min-width:0;
+  }
+}
+
+/* Same amber bordered Important Links panel as the reference screenshot.
+   Supports the classes used in both old and newly generated articles. */
+.article-page .important-links,
+.single-post .important-links,
+.article-container .important-links,
+.article-content .important-links,
+#articleRoot .important-links,
+.article-page .important-links-box,
+.single-post .important-links-box,
+.article-container .important-links-box,
+.article-content .important-links-box,
+#articleRoot .important-links-box,
+.article-page .important-links-container,
+.article-content .important-links-container{
+  display:block;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  margin:24px 0!important;
+  padding:16px!important;
+  background:#fffdf4!important;
+  border:2px solid #f4e6a0!important;
+  border-radius:18px!important;
+  box-shadow:none!important;
+  overflow:hidden;
+}
+.article-page .important-links h2,
+.article-page .important-links h3,
+.single-post .important-links h2,
+.single-post .important-links h3,
+.article-container .important-links h2,
+.article-container .important-links h3,
+.article-content .important-links h2,
+.article-content .important-links h3,
+#articleRoot .important-links h2,
+#articleRoot .important-links h3,
+.article-page .important-links-box h2,
+.article-page .important-links-box h3,
+.single-post .important-links-box h2,
+.single-post .important-links-box h3,
+.article-container .important-links-box h2,
+.article-container .important-links-box h3,
+.article-content .important-links-box h2,
+.article-content .important-links-box h3,
+#articleRoot .important-links-box h2,
+#articleRoot .important-links-box h3{
+  margin:0 0 12px!important;
+  padding:0 0 10px!important;
+  border:0!important;
+  border-bottom:1px solid #f3df88!important;
+  color:#8a4b08!important;
+  font-size:clamp(17px,2.2vw,21px)!important;
+  line-height:1.45!important;
+}
+.article-page .link-row,
+.single-post .link-row,
+.article-container .link-row,
+.article-content .link-row,
+#articleRoot .link-row,
+.article-page .important-links-box .link-row,
+.single-post .important-links-box .link-row,
+.article-container .important-links-box .link-row,
+.article-content .important-links-box .link-row,
+#articleRoot .important-links-box .link-row,
+.article-page .important-links .link-row,
+.article-content .important-links .link-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  width:100%;
+  box-sizing:border-box;
+  margin:10px 0!important;
+  padding:13px 14px!important;
+  background:#fff!important;
+  border:1px solid #f4e9b8!important;
+  border-radius:13px!important;
+  box-shadow:0 1px 2px rgba(15,23,42,.025)!important;
+  color:#1e293b!important;
+  font-size:14px!important;
+  line-height:1.55!important;
+  overflow-wrap:anywhere;
+}
+.article-page .link-row a,
+.single-post .link-row a,
+.article-container .link-row a,
+.article-content .link-row a,
+#articleRoot .link-row a,
+.article-page .important-links-box .link-row a,
+.single-post .important-links-box .link-row a,
+.article-container .important-links-box .link-row a,
+.article-content .important-links-box .link-row a,
+#articleRoot .important-links-box .link-row a,
+.article-page .important-links .link-row a,
+.article-content .important-links .link-row a{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:40px;
+  max-width:45%;
+  box-sizing:border-box;
+  padding:9px 15px!important;
+  border:0!important;
+  border-radius:8px!important;
+  background:#2563eb!important;
+  color:#fff!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  line-height:1.35!important;
+  text-align:center;
+  text-decoration:none!important;
+  white-space:normal;
+}
+.article-page .link-row a:hover,
+.single-post .link-row a:hover,
+.article-container .link-row a:hover,
+.article-content .link-row a:hover,
+#articleRoot .link-row a:hover{background:#1d4ed8!important}
+.article-page .link-row a[href*="chat.whatsapp.com"],
+.single-post .link-row a[href*="chat.whatsapp.com"],
+.article-container .link-row a[href*="chat.whatsapp.com"],
+.article-content .link-row a[href*="chat.whatsapp.com"],
+#articleRoot .link-row a[href*="chat.whatsapp.com"],
+.article-page .link-row a[href*="whatsapp.com"],
+.single-post .link-row a[href*="whatsapp.com"],
+.article-container .link-row a[href*="whatsapp.com"],
+.article-content .link-row a[href*="whatsapp.com"],
+#articleRoot .link-row a[href*="whatsapp.com"]{background:#059669!important}
+@media(max-width:640px){
+  .article-page .important-links,
+  .single-post .important-links,
+  .article-container .important-links,
+  .article-content .important-links,
+  #articleRoot .important-links,
+  .article-page .important-links-box,
+  .single-post .important-links-box,
+  .article-container .important-links-box,
+  .article-content .important-links-box,
+  #articleRoot .important-links-box{
+    padding:13px!important;
+    border-radius:15px!important;
+  }
+  .article-page .link-row,
+  .single-post .link-row,
+  .article-container .link-row,
+  .article-content .link-row,
+  #articleRoot .link-row,
+  .article-page .important-links-box .link-row,
+  .single-post .important-links-box .link-row,
+  .article-container .important-links-box .link-row,
+  .article-content .important-links-box .link-row,
+  #articleRoot .important-links-box .link-row{
+    align-items:flex-start!important;
+    flex-direction:row!important;
+    gap:9px!important;
+    padding:12px!important;
+  }
+  .article-page .link-row a,
+  .single-post .link-row a,
+  .article-container .link-row a,
+  .article-content .link-row a,
+  #articleRoot .link-row a{
+    max-width:42%;
+    min-width:88px;
+    padding:9px 10px!important;
+  }
+}
