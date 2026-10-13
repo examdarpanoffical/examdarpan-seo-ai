@@ -2930,7 +2930,7 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
 @media(prefers-reduced-motion:reduce){.ed-v3-shortcuts a{transition:none!important}}
 </style>"""
     if 'id="exam-darpan-student-first-home-v3"' not in text:
-        text = text.replace("</head>", premium_home_css + "\\n</head>", 1)
+        text = text.replace("</head>", premium_home_css + "\n</head>", 1)
 
     hero_markup = """<section class="ed-v3-hero" aria-labelledby="ed-v3-title">
   <div class="ed-v3-copy">
@@ -2960,7 +2960,7 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
   <article><b>◎</b><div><strong>तैयारी भी साथ</strong><span>Free practice test से अपनी तैयारी जाँचें</span></div></article>
 </section>"""
     text = re.sub(
-        r'<section class="hero card">[\\s\\S]*?</section>',
+        r'(?s)<section class="hero card">.*?</section>',
         lambda _m: hero_markup,
         text,
         count=1,
