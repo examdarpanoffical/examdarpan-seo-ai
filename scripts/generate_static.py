@@ -2654,6 +2654,29 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 </style>"""
 
+    social_cta = (
+        '<section class="ed-home-social" aria-label="Exam Darpan social channels">'
+        '<div class="ed-home-social-heading">'
+        '<strong>Exam Darpan से जुड़े रहें</strong>'
+        '<span>जरूरी अपडेट सीधे अपने मोबाइल पर पाएं</span>'
+        '</div>'
+        '<div class="ed-home-social-grid">'
+        '<a class="ed-home-social-link ed-home-wa" href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK" target="_blank" rel="noopener noreferrer" aria-label="Join Exam Darpan WhatsApp group">'
+        '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2a12.8 12.8 0 0 0-10.9 19.5L3.5 28.7l6.2-1.6A12.8 12.8 0 1 0 16 3.2Z" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M11.1 10.8c.3-.6.6-.6 1.1-.6h.8c.3 0 .6.1.8.6l1 2.2c.1.3.1.6-.1.8l-.8 1c.9 1.8 2.2 3.1 4 4l1-.8c.2-.2.5-.2.8-.1l2.2 1c.5.2.6.5.6.8v.8c0 .5 0 .8-.6 1.1-.5.3-1.3.5-2 .3-2.1-.5-4.1-1.7-5.8-3.4-1.7-1.7-2.9-3.7-3.4-5.8-.2-.7 0-1.5.4-1.9Z" fill="currentColor"/></svg>'
+        '<span><strong>WhatsApp</strong><small>Daily alerts</small></span><b>↗</b></a>'
+        '<a class="ed-home-social-link ed-home-tg" href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer" aria-label="Join Exam Darpan Telegram channel">'
+        '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="m8.5 15.7 14.4-5.5c.7-.3 1.2.1 1 1l-2.4 11.3c-.2.8-.7 1-1.4.6l-4-3-2 1.9c-.2.2-.4.4-.8.4l.3-4.1 7.4-6.7c.3-.3-.1-.5-.5-.2l-9.1 5.7-3.9-1.2c-.8-.3-.8-.8 0-1.2Z" fill="currentColor"/></svg>'
+        '<span><strong>Telegram</strong><small>Fast updates</small></span><b>↗</b></a>'
+        '<a class="ed-home-social-link ed-home-x" href="https://x.com/exam_darpan" target="_blank" rel="noopener noreferrer" aria-label="Follow Exam Darpan on X">'
+        '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 6h5.7l5.2 7 5.7-7H26l-7.1 8.8L26.4 26h-5.7l-5.7-7.7L8.8 26H6l7.6-9.3L7 6Z" fill="currentColor"/></svg>'
+        '<span><strong>Follow on X</strong><small>@exam_darpan</small></span><b>↗</b></a>'
+        '<a class="ed-home-social-link ed-home-ig" href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener noreferrer" aria-label="Follow Exam Darpan on Instagram">'
+        '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="5" width="22" height="22" rx="6" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="16" cy="16" r="5.1" fill="none" stroke="currentColor" stroke-width="2.3"/><circle cx="23" cy="9.5" r="1.4" fill="currentColor"/></svg>'
+        '<span><strong>Instagram</strong><small>Follow for updates</small></span><b>↗</b></a>'
+        '</div>'
+        '</section>'
+    )
+
     editorial = (
         '<section class="ed-home-editorial" aria-label="Editorial standards">'
         '<div class="ed-home-editorial-grid">'
@@ -2689,6 +2712,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         + homepage_category_sections
         + latest_articles
         + editorial
+        + social_cta
     )
 
 def update_home(posts: list[dict[str, Any]]) -> None:
