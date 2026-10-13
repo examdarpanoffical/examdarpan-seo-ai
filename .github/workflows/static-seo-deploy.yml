@@ -52,6 +52,10 @@ jobs:
           test -f public/sitemap.xml
           test -f public/categories.html
           grep -q '<title>Exam Darpan – Govt Jobs, Results & Exam Updates in India</title>' public/index.html
+          grep -q 'id="exam-darpan-student-first-home-v3"' public/index.html
+          grep -q 'class="ed-v3-hero"' public/index.html
+          grep -q 'सरकारी नौकरी की तैयारी में' public/index.html
+          grep -q 'ed-v3-promise' public/index.html
           grep -Fq '"alternateName":["Exam Darpan Official","examdarpan.in"]' public/index.html
 
           CATEGORY_PAGE_COUNT="$(find public -maxdepth 1 -type f -name 'category-*.html' | wc -l | tr -d ' ')"
