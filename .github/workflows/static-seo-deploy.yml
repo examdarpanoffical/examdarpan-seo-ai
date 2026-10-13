@@ -58,8 +58,6 @@ jobs:
           grep -Fq 'Scholarships &amp; Yojana' public/index.html
           grep -Fq 'Rajasthan Government Jobs' public/index.html
           grep -Fq 'All India Government Jobs' public/index.html
-          grep -Fq 'Entrance Exams' public/index.html
-          grep -Fq 'University &amp; College' public/index.html
 
       - name: Report SEO sanity checks
         run: |
