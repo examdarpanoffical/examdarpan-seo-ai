@@ -1966,6 +1966,9 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 .nav{background:#111827!important;border-top:1px solid rgba(255,255,255,.15)!important;border-bottom:0!important;box-shadow:0 5px 18px rgba(15,23,42,.12)!important}
 .nav a{color:#fff!important}
 .nav a:hover,.nav a.active{background:rgba(255,255,255,.14)!important;color:#fde68a!important}
+.ed-reference-page-heading{margin:20px 0 15px}
+.ed-reference-page-heading h1{margin:0;color:#142e59;font-size:clamp(22px,2.8vw,32px);line-height:1.25;font-weight:900;letter-spacing:-.025em}
+.ed-reference-page-heading p{margin:6px 0 0;color:#64748b;font-size:13px;line-height:1.6}
 .ed-home-live{
   margin:0 0 22px;
   background:#fff;
@@ -2986,8 +2989,16 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         '</section>'
     )
 
+    home_page_heading = (
+        '<section class="ed-reference-page-heading" aria-label="Homepage heading">'
+        '<h1>सरकारी नौकरी, Result, Admit Card और परीक्षा अपडेट</h1>'
+        '<p>राजस्थान और पूरे भारत की भर्ती, परिणाम और छात्रवृत्ति से जुड़ी जानकारी</p>'
+        '</section>'
+    )
+
     return (
         css
+        + home_page_heading
         + ticker
         + priority_panels_html
         + secondary_panels_html
