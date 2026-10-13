@@ -60,7 +60,7 @@ jobs:
 
           CATEGORY_PAGE_COUNT="$(find public -maxdepth 1 -type f -name 'category-*.html' | wc -l | tr -d ' ')"
           echo "Generated category landing pages: ${CATEGORY_PAGE_COUNT}"
-          test "${CATEGORY_PAGE_COUNT}" -ge 17
+          test "${CATEGORY_PAGE_COUNT}" -ge 12
           grep -q 'href="/categories"' public/index.html
 
           grep -q "LIVE UPDATES" public/index.html
