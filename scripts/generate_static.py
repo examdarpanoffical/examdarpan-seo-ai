@@ -3489,8 +3489,6 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         "Rajasthan Government Jobs",
         "All India Government Jobs",
         'id="daily-test"',
-        "Entrance Exams",
-        "University &amp; College",
         "Latest Articles",
     )
 
