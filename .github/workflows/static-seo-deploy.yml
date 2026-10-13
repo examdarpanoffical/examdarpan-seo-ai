@@ -54,6 +54,8 @@ jobs:
           grep -Fq 'class="ed-v3-hero"' public/index.html
           grep -Fq 'सरकारी नौकरी की तैयारी में' public/index.html
           grep -Fq 'आज के Latest Updates' public/index.html
+          grep -Fq 'class="ed-home-priority"' public/index.html
+          grep -Fq 'सभी updates देखें' public/index.html
 
       - name: Report SEO sanity checks
         run: |
