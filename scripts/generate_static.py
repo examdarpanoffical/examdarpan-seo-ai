@@ -810,7 +810,7 @@ window.edTrackScroll=function(){{
 window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
 </head>
@@ -1719,17 +1719,17 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
     secondary_css = """<style id="exam-darpan-home-secondary-panels">
 .ed-home-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 24px}
 .ed-home-secondary-card{min-width:0;padding:17px 18px 10px;background:#fff;border:1px solid #e0e7f0;border-radius:17px;box-shadow:0 7px 22px rgba(15,35,70,.04)}
-.ed-home-secondary-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;border-radius:10px;background:#a86608;color:#fff}
+.ed-home-secondary-head{display:flex;justify-content:space-between;align-items:center;gap:10px;min-width:0;padding:10px 12px;margin-bottom:8px;border-radius:10px;background:#a86608;color:#fff}
 .ed-home-secondary-card:nth-child(2) .ed-home-secondary-head{background:#6333a4}
-.ed-home-secondary-head h2{margin:0;color:#fff;font-size:14px;line-height:1.35;font-weight:850}
-.ed-home-secondary-tag{font-size:10px;font-weight:800;padding:4px 7px;border-radius:6px;background:rgba(0,0,0,.16);white-space:nowrap}
+.ed-home-secondary-head h2{min-width:0;margin:0;color:#fff;font-size:14px;line-height:1.35;font-weight:850;overflow-wrap:anywhere}
+.ed-home-secondary-tag{min-width:0;max-width:62%;font-size:10px;font-weight:800;padding:4px 7px;border-radius:6px;background:rgba(0,0,0,.16);white-space:normal;overflow-wrap:anywhere;line-height:1.4}
 .ed-home-secondary-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 2px;border-bottom:1px solid #edf1f6;color:#244d91!important;text-decoration:none!important;font-size:12px;font-weight:700;line-height:1.5}
 .ed-home-secondary-item:last-child{border-bottom:0}
 .ed-home-secondary-item:hover{text-decoration:underline!important;color:#123b78!important}
 .ed-home-secondary-badge{flex:0 0 auto;font-size:9px;font-weight:850;padding:3px 6px;border-radius:5px;background:#eff6ff;color:#1d4ed8}
 .ed-home-secondary-empty{padding:14px 2px;color:#64748b;font-size:11px;line-height:1.6}
 .ed-home-secondary-more{display:flex;justify-content:flex-end;padding:10px 0 2px;color:#1d4d91!important;font-size:11px;font-weight:850;text-decoration:none!important}
-@media(max-width:680px){.ed-home-secondary{grid-template-columns:1fr;gap:12px}.ed-home-secondary-card{padding:14px}.ed-home-secondary-item{font-size:12px}}
+@media(max-width:760px){.ed-home-secondary{grid-template-columns:minmax(0,1fr);gap:13px}.ed-home-secondary-card{padding:14px}.ed-home-secondary-head{align-items:flex-start;flex-direction:column;gap:7px}.ed-home-secondary-head h2{font-size:15px}.ed-home-secondary-tag{display:block;max-width:100%;font-size:11px;white-space:normal;overflow-wrap:anywhere}.ed-home-secondary-item{font-size:13px;gap:8px}.ed-home-secondary-badge{margin-top:1px}}
 </style>"""
     secondary_panels = []
     for icon, title, panel_id, allowed_categories, subtitle, destination in secondary_specs:
@@ -3540,6 +3540,10 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     schema_tag = '<script type="application/ld+json">' + json.dumps(schema, ensure_ascii=False, separators=(",", ":")) + '</script>'
     text = re.sub(r'<script type="application/ld\+json">\{.*?</script>', schema_tag, text, count=1, flags=re.S)
 
+    # Shared soft-search on homepage.
+    if 'src="/site-search.js"' not in text:
+        text = text.replace("</head>", '<script src="/site-search.js" defer></script>\n</head>', 1)
+
     path.write_text(text, encoding="utf-8")
 
 
@@ -3589,7 +3593,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
     robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" if filtered else "noindex,follow"
     return f'''{CATEGORY_MARKER}
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)} | Exam Darpan</title><meta name="description" content="{esc(description[:155])}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css">{ONESIGNAL_SCRIPT}
+<title>{esc(title)} | Exam Darpan</title><meta name="description" content="{esc(description[:155])}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.png">
 <script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
 <style id="exam-darpan-category-design">
