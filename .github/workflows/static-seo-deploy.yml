@@ -56,6 +56,9 @@ jobs:
           grep -Fq 'आज के Latest Updates' public/index.html
           grep -Fq 'class="ed-home-priority"' public/index.html
           grep -Fq 'सभी updates देखें' public/index.html
+          grep -Fq 'class="ed-home-secondary"' public/index.html
+          grep -Fq 'Answer Key &amp; Syllabus' public/index.html
+          grep -Fq 'Scholarships &amp; Yojana' public/index.html
 
       - name: Report SEO sanity checks
         run: |
