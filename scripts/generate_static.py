@@ -3328,12 +3328,11 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
 
     home_sections = homepage_dynamic_sections(posts)
 
+    # Keep the premium student-first hero in the FINAL homepage replacement too.
+    # The earlier hero substitution is superseded below when <main> is rebuilt.
     replacement = (
         '<main class="main container">'
-        '<header class="home-seo-heading">'
-        '<h1>सरकारी नौकरी और परीक्षाओं की भरोसेमंद जानकारी</h1>'
-        '<p>राजस्थान और केंद्र सरकार की भर्ती, एडमिट कार्ड, रिजल्ट और परीक्षा अपडेट।</p>'
-        '</header>'
+        + hero_markup
         + home_sections
         + home_community
         + '</main>'
@@ -3348,6 +3347,10 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     )
 
     required_home_sections = (
+        'id="exam-darpan-student-first-home-v3"',
+        'class="ed-v3-hero"',
+        "सरकारी नौकरी की तैयारी में",
+        "आज के Latest Updates",
         "LIVE UPDATES",
         "Rajasthan Government Jobs",
         "All India Government Jobs",
