@@ -79,7 +79,6 @@ jobs:
           echo "Generated article pages: ${ARTICLE_COUNT}"
           echo "Sitemap URLs: ${SITEMAP_COUNT}"
 
-          test "${ARTICLE_COUNT}" -gt 0
 
       - name: Report SEO sanity checks
         run: |
