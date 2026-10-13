@@ -73,13 +73,6 @@ jobs:
           grep -q 'All Rights Reserved.' public/index.html
           grep -q 'https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK' public/index.html
 
-          ARTICLE_COUNT="$(grep -rl "EXAM-DARPAN-GENERATED-ARTICLE" public/ 2>/dev/null | wc -l | tr -d ' ')"
-          SITEMAP_COUNT="$(grep -c "<loc>" public/sitemap.xml || true)"
-
-          echo "Generated article pages: ${ARTICLE_COUNT}"
-          echo "Sitemap URLs: ${SITEMAP_COUNT}"
-
-
       - name: Report SEO sanity checks
         run: |
           python scripts/seo_sanity_audit.py
