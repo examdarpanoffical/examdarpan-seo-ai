@@ -1701,6 +1701,66 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         )
     priority_panels_html = priority_css + '<section class="ed-home-priority" aria-label="Quick access categories">' + ''.join(priority_panels) + '</section>'
 
+    # Secondary two-column row mirrors the supplied reference design while using
+    # only live, published Exam Darpan article URLs and existing category hubs.
+    secondary_specs = [
+        ("📋", "Answer Key & Syllabus", "answer-key-syllabus",
+         {"Answer Key", "Syllabus"},
+         "Answer key, objection notice और exam syllabus updates",
+         "/category-answer-key"),
+        ("🎓", "Scholarships & Yojana", "scholarships-yojana",
+         {"Scholarships", "Yojana"},
+         "विद्यार्थियों के लिए scholarship और सरकारी योजना updates",
+         "/category-scholarships"),
+    ]
+    secondary_css = """<style id="exam-darpan-home-secondary-panels">
+.ed-home-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 24px}
+.ed-home-secondary-card{min-width:0;padding:17px 18px 10px;background:#fff;border:1px solid #e0e7f0;border-radius:17px;box-shadow:0 7px 22px rgba(15,35,70,.04)}
+.ed-home-secondary-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;border-radius:10px;background:#a86608;color:#fff}
+.ed-home-secondary-card:nth-child(2) .ed-home-secondary-head{background:#6333a4}
+.ed-home-secondary-head h2{margin:0;color:#fff;font-size:14px;line-height:1.35;font-weight:850}
+.ed-home-secondary-tag{font-size:10px;font-weight:800;padding:4px 7px;border-radius:6px;background:rgba(0,0,0,.16);white-space:nowrap}
+.ed-home-secondary-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 2px;border-bottom:1px solid #edf1f6;color:#244d91!important;text-decoration:none!important;font-size:12px;font-weight:700;line-height:1.5}
+.ed-home-secondary-item:last-child{border-bottom:0}
+.ed-home-secondary-item:hover{text-decoration:underline!important;color:#123b78!important}
+.ed-home-secondary-badge{flex:0 0 auto;font-size:9px;font-weight:850;padding:3px 6px;border-radius:5px;background:#eff6ff;color:#1d4ed8}
+.ed-home-secondary-empty{padding:14px 2px;color:#64748b;font-size:11px;line-height:1.6}
+.ed-home-secondary-more{display:flex;justify-content:flex-end;padding:10px 0 2px;color:#1d4d91!important;font-size:11px;font-weight:850;text-decoration:none!important}
+@media(max-width:680px){.ed-home-secondary{grid-template-columns:1fr;gap:12px}.ed-home-secondary-card{padding:14px}.ed-home-secondary-item{font-size:12px}}
+</style>"""
+    secondary_panels = []
+    for icon, title, panel_id, allowed_categories, subtitle, destination in secondary_specs:
+        matching = []
+        for post in posts:
+            if normalized_category(post) not in allowed_categories:
+                continue
+            post_slug = slugify(post.get("slug"))
+            if not post_slug or any(slugify(x.get("slug")) == post_slug for x in matching):
+                continue
+            matching.append(post)
+            if len(matching) >= 3:
+                break
+        if matching:
+            rows = "".join(
+                '<a class="ed-home-secondary-item" '
+                f'href="{esc(article_path(slugify(post.get("slug"))))}">'
+                f'<span>› {esc(post_title(post))}</span>'
+                f'<span class="ed-home-secondary-badge">{"PDF" if "syllabus" in post_title(post).lower() else "UPDATE"}</span></a>'
+                for post in matching
+            )
+        else:
+            rows = '<div class="ed-home-secondary-empty">नई verified update publish होते ही यहाँ दिखाई देगी।</div>'
+        secondary_panels.append(
+            f'<section class="ed-home-secondary-card" aria-labelledby="ed-secondary-{panel_id}">'
+            '<div class="ed-home-secondary-head">'
+            f'<h2 id="ed-secondary-{panel_id}">{icon} {esc(title)}</h2>'
+            f'<span class="ed-home-secondary-tag">{esc(subtitle)}</span></div>'
+            f'<div>{rows}</div>'
+            f'<a class="ed-home-secondary-more" href="{esc(destination)}">सभी updates देखें →</a>'
+            '</section>'
+        )
+    secondary_panels_html = secondary_css + '<section class="ed-home-secondary" aria-label="Answer key syllabus scholarships and yojana">' + ''.join(secondary_panels) + '</section>'
+
     # 2. RAJASTHAN GOVERNMENT JOBS
     rajasthan = hub_section(
         "Rajasthan Government Jobs",
@@ -2927,6 +2987,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         css
         + ticker
         + priority_panels_html
+        + secondary_panels_html
         + '<div class="ed-home-hubs">'
         + rajasthan
         + all_india
