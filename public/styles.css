@@ -9028,3 +9028,44 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+
+/* EXAM DARPAN RED-BLUE BRAND SYSTEM · shared homepage/article/category theme */
+:root{--ed-brand-red:#b91c1c;--ed-brand-blue:#1d4ed8;--ed-brand-navy:#173b78;--ed-brand-ink:#172033;--ed-brand-line:#dfe7f2;--ed-brand-soft:#f3f6fb}
+.topbar{background:linear-gradient(100deg,#b91c1c 0%,#1e3a8a 58%,#312e81 100%)!important;color:#fff!important;border-bottom:0!important}
+.topbar .container,.topbar-inner,.topbar a,.topbar span,.topbar strong{color:#fff!important}
+.topbar .live{background:rgba(255,255,255,.94)!important;color:#173b78!important;border-radius:999px!important;padding:4px 9px!important}
+.topbar .live i{background:#2563eb!important}
+.header{background:linear-gradient(100deg,#b91c1c 0%,#1e3a8a 58%,#312e81 100%)!important;color:#fff!important;border:0!important}
+.header .brand-title,.header .tagline,.header .brand-name,.header p{color:#fff!important}
+.nav{background:#111827!important;border-color:rgba(255,255,255,.12)!important;box-shadow:0 5px 18px rgba(15,23,42,.12)!important}
+.nav a{color:#fff!important}
+.nav a:hover,.nav a.active{background:rgba(255,255,255,.14)!important;color:#fde68a!important}
+.article,.article-page{background:#fff;border:1px solid #dfe7f2;box-shadow:0 10px 34px rgba(20,46,89,.06)}
+.article-page h1{color:#173b78!important;letter-spacing:-.025em}
+.article-page .breadcrumbs a,.article-page .article-content a{color:#1d4ed8!important}
+.article-page .post-badges .badge{background:#eaf1ff!important;color:#1d4ed8!important;border:1px solid #d5e4ff}
+.article-page .status-badge{border-radius:999px}
+.article-page .article-content h2{color:#173b78;border-bottom-color:#dbe7f7}
+.article-page .article-content h3{color:#1d3764}
+.article-page .article-content th{background:#173b78!important;color:#fff!important}
+.article-page .article-content table{border-color:#dbe5f2}
+.article-page .article-content td,.article-page .article-content th{border-color:#dbe5f2}
+.article-page .article-actions .btn,.ed-category-page .btn-primary{background:linear-gradient(100deg,#b91c1c,#1d4ed8)!important;border:0!important;color:#fff!important}
+.article-page .article-actions .btn:hover,.ed-category-page .btn-primary:hover{filter:brightness(1.06)}
+.ed-category-hero{background:linear-gradient(120deg,#b91c1c 0%,#1e3a8a 62%,#312e81 100%)!important}
+.ed-category-post{border-color:#dfe7f2!important;box-shadow:0 7px 22px rgba(15,35,70,.05)!important}
+.ed-category-post h3 a{color:#173b78!important}
+.ed-category-post h3 a:hover,.ed-category-read:hover{color:#1d4ed8!important}
+.ed-category-more summary{background:#f4f7fc!important;color:#173b78!important;border-color:#dbe5f2!important}
+.related-section .section-title h2,.article-content h2{color:#173b78}
+.footer{background:#111827!important}
+@media(max-width:760px){
+ .topbar-inner{flex-wrap:wrap;gap:6px 8px;padding:7px 0}
+ .topbar .topbar-note,.topbar .topbar-dot{display:none}
+ .article-page{margin-top:8px}
+ .article-page h1{font-size:clamp(23px,6.4vw,32px);line-height:1.28;overflow-wrap:anywhere}
+ .ed-category-hero{padding:22px 17px!important;border-radius:16px!important}
+ .ed-category-hero h1{font-size:clamp(25px,7vw,34px)!important;line-height:1.2!important}
+ .ed-category-actions .btn{min-height:42px}
+}
