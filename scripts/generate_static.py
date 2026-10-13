@@ -1260,7 +1260,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 
   <div class="container footer-bottom">
     <div>
-      <strong>© <span data-year></span> Exam Darpan</strong>
+      <strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong>
       <span> · Independent Education &amp; Government Job Information Portal</span>
     </div>
     <div class="footer-bottom-note">
@@ -3282,7 +3282,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 
   <div class="container footer-bottom">
     <div>
-      <strong>© <span data-year></span> Exam Darpan</strong>
+      <strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong>
       <span> · Independent Education &amp; Government Job Information Portal</span>
     </div>
     <div class="footer-bottom-note">
@@ -3670,7 +3670,7 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
 
   <div class="container footer-bottom">
     <div>
-      <strong>© <span data-year></span> Exam Darpan</strong>
+      <strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong>
       <span> · Independent Education &amp; Government Job Information Portal</span>
     </div>
     <div class="footer-bottom-note">
@@ -3762,7 +3762,7 @@ def write_category_directory(posts: list[dict[str, Any]]) -> None:
 </section>
 <div class="ed-category-directory">{"".join(cards)}</div>
 </main>
-<footer class="footer"><div class="container footer-bottom"><div><strong>© <span data-year></span> Exam Darpan</strong><span> · Independent Education &amp; Government Job Information Portal</span></div><div><a href="/editorial-policy">Editorial Policy</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div></div></footer>
+<footer class="footer"><div class="container footer-bottom"><div><strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong><span> · Independent Education &amp; Government Job Information Portal</span></div><div><a href="/editorial-policy">Editorial Policy</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div></div></footer>
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
 </body>
 </html>"""
