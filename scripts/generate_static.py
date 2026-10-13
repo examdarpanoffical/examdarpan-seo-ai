@@ -691,6 +691,9 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
         },
         "image": [img],
     }
+    keywords = search_keywords(p)
+    if keywords:
+        schema["keywords"] = keywords
     if pub:
         schema["datePublished"] = pub
     if mod:
