@@ -1632,6 +1632,75 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '</section>'
     )
 
+    # Quick-access panels inspired by the supplied design. Every article URL is
+    # generated from a real published post; never ship placeholder href="#" links.
+    priority_specs = [
+        ("🏆", "Results", "results", {"Results"}, "Result, merit list और scorecard updates"),
+        ("🎫", "Admit Card", "admit-card", {"Admit Card"}, "Hall ticket और exam entry updates"),
+        ("💼", "Latest Jobs", "government-jobs", {"Government Jobs", "Rajasthan Jobs"}, "नई भर्ती और application notices"),
+    ]
+
+    priority_css = """<style id="exam-darpan-home-priority-panels">
+.ed-home-priority{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 24px}
+.ed-home-priority-card{min-width:0;overflow:hidden;border:1px solid #e0e7f0;border-radius:17px;background:#fff;box-shadow:0 8px 24px rgba(15,35,70,.045);transition:transform .18s ease,box-shadow .18s ease}
+.ed-home-priority-card:hover{transform:translateY(-2px);box-shadow:0 13px 30px rgba(15,35,70,.09)}
+.ed-home-priority-head{display:flex;align-items:center;gap:11px;padding:15px 16px;background:#153b78;color:#fff}
+.ed-home-priority-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.12);font-size:18px}
+.ed-home-priority-head h2{margin:0;color:#fff;font-size:17px;line-height:1.25;font-weight:900;letter-spacing:-.02em}
+.ed-home-priority-head p{margin:4px 0 0;color:#dbeafe;font-size:10px;line-height:1.4}
+.ed-home-priority-list{padding:4px 14px}
+.ed-home-priority-item{display:flex;align-items:flex-start;gap:9px;padding:12px 1px;border-bottom:1px solid #edf1f6;color:#24334c!important;text-decoration:none!important;font-size:12px;font-weight:750;line-height:1.55}
+.ed-home-priority-item:last-child{border-bottom:0}
+.ed-home-priority-item:hover{color:#1d5bbf!important}
+.ed-home-priority-dot{flex:0 0 7px;width:7px;height:7px;margin-top:6px;border-radius:50%;background:#3b82f6}
+.ed-home-priority-empty{padding:15px 2px;color:#64748b;font-size:11px;line-height:1.6}
+.ed-home-priority-more{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-top:1px solid #edf1f6;background:#f8fafc;color:#1d4d91!important;text-decoration:none!important;font-size:11px;font-weight:900}
+.ed-home-priority-more:hover{background:#eff6ff}
+@media(max-width:900px){.ed-home-priority{grid-template-columns:1fr 1fr}.ed-home-priority-card:last-child{grid-column:1/-1}}
+@media(max-width:620px){.ed-home-priority{grid-template-columns:1fr;gap:12px;margin-bottom:19px}.ed-home-priority-card:last-child{grid-column:auto}.ed-home-priority-head{padding:13px 14px}.ed-home-priority-head h2{font-size:16px}.ed-home-priority-item{font-size:12px;padding:11px 1px}}
+@media(prefers-reduced-motion:reduce){.ed-home-priority-card{transition:none}}
+</style>"""
+
+    priority_panels = []
+    for icon, title, slug, allowed_categories, subtitle in priority_specs:
+        matching = []
+        for post in posts:
+            if normalized_category(post) not in allowed_categories:
+                continue
+            post_slug = slugify(post.get("slug"))
+            if not post_slug or any(slugify(x.get("slug")) == post_slug for x in matching):
+                continue
+            matching.append(post)
+            if len(matching) >= 4:
+                break
+
+        if matching:
+            rows = "".join(
+                '<a class="ed-home-priority-item" '
+                f'href="{esc(article_path(slugify(post.get("slug"))))}">'
+                '<span class="ed-home-priority-dot" aria-hidden="true"></span>'
+                f'<span>{esc(post_title(post))}</span></a>'
+                for post in matching
+            )
+        else:
+            rows = '<div class="ed-home-priority-empty">इस category में नई verified update publish होते ही यहाँ दिखाई देगी।</div>'
+
+        priority_panels.append(
+            '<section class="ed-home-priority-card" '
+            f'aria-labelledby="ed-priority-{slug}">'
+            '<div class="ed-home-priority-head">'
+            f'<span class="ed-home-priority-icon" aria-hidden="true">{icon}</span>'
+            '<div>'
+            f'<h2 id="ed-priority-{slug}">{esc(title)}</h2>'
+            f'<p>{esc(subtitle)}</p>'
+            '</div></div>'
+            f'<div class="ed-home-priority-list">{rows}</div>'
+            f'<a class="ed-home-priority-more" href="{esc(category_path(slug))}">'
+            '<span>सभी updates देखें</span><span aria-hidden="true">→</span></a>'
+            '</section>'
+        )
+    priority_panels_html = priority_css + '<section class="ed-home-priority" aria-label="Quick access categories">' + ''.join(priority_panels) + '</section>'
+
     # 2. RAJASTHAN GOVERNMENT JOBS
     rajasthan = hub_section(
         "Rajasthan Government Jobs",
@@ -2857,6 +2926,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
     return (
         css
         + ticker
+        + priority_panels_html
         + '<div class="ed-home-hubs">'
         + rajasthan
         + all_india
