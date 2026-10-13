@@ -10,6 +10,15 @@
     "trailingSlash": false,
     "headers": [
       {
+        "source": "/",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, max-age=0, must-revalidate"
+          }
+        ]
+      },
+      {
         "source": "sitemap.xml",
         "headers": [
           {
@@ -105,13 +114,12 @@
         "type": 301
       }
     ],
-"rewrites": [
-  {
-    "source": "/quiz",
-    "destination": "/quiz.html"
-  }
-]
-    
+    "rewrites": [
+      {
+        "source": "/quiz",
+        "destination": "/quiz.html"
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules",
