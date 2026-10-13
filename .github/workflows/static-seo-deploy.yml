@@ -50,15 +50,16 @@ jobs:
           test -f public/index.html
           test -f public/sitemap.xml
           test -f public/categories.html
-          grep -Fq 'id="exam-darpan-student-first-home-v3"' public/index.html
-          grep -Fq 'class="ed-v3-hero"' public/index.html
-          grep -Fq 'सरकारी नौकरी की तैयारी में' public/index.html
-          grep -Fq 'आज के Latest Updates' public/index.html
+          grep -Fq 'id="exam-darpan-home-final-order"' public/index.html
+          grep -Fq 'class="ed-home-live"' public/index.html
           grep -Fq 'class="ed-home-priority"' public/index.html
-          grep -Fq 'सभी updates देखें' public/index.html
           grep -Fq 'class="ed-home-secondary"' public/index.html
           grep -Fq 'Answer Key &amp; Syllabus' public/index.html
           grep -Fq 'Scholarships &amp; Yojana' public/index.html
+          grep -Fq 'Rajasthan Government Jobs' public/index.html
+          grep -Fq 'All India Government Jobs' public/index.html
+          grep -Fq 'Entrance Exams' public/index.html
+          grep -Fq 'University &amp; College' public/index.html
 
       - name: Report SEO sanity checks
         run: |
