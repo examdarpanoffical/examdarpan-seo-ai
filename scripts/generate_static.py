@@ -1223,6 +1223,11 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     <div class="footer-brand">
       <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
       <p>Independent Education &amp; Government Job Information Portal.</p>
+      <div class="footer-operator-contact">
+        <strong>Website Operator: LOKESH MEENA</strong>
+        <a href="mailto:lokesh636780@gmail.com">lokesh636780@gmail.com</a>
+        <a href="tel:+916367358380">+91 6367358380</a>
+      </div>
       <div class="footer-trust-line">
         <span>✓ Official-source based</span>
         <span>✓ Clear dates</span>
