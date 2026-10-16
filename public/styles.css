@@ -9641,3 +9641,28 @@ main.main article table tbody tr:nth-child(even) td{
     padding:9px 10px!important;
   }
 }
+
+
+/* Legal/business contact visibility for verification and transparency */
+.footer-operator-contact{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:5px;
+  margin:12px 0 14px;
+  padding:12px 13px;
+  border:1px solid rgba(148,163,184,.24);
+  border-left:3px solid #f59e0b;
+  border-radius:10px;
+  background:rgba(15,23,42,.28);
+  color:#e2e8f0;
+  font-size:12px;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+}
+.footer-operator-contact strong{color:#fff;font-size:12px;font-weight:850}
+.footer-operator-contact a{color:#bfdbfe;text-decoration:none;font-weight:700}
+.footer-operator-contact a:hover{color:#fff;text-decoration:underline}
+@media(max-width:640px){
+  .footer-operator-contact{font-size:12px;padding:11px}
+}
