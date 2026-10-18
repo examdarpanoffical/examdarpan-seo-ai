@@ -7,4 +7,4 @@ Disallow: /_/*
 Disallow: /__/*
 
 # Google Search Console Fast Indexing Helper
-Sitemap: https://examdarpan.in/sitemap.xml
+Sitemap: https://examdarpan.in/sitemap_index.xml
