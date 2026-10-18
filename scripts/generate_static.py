@@ -4325,7 +4325,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
         index_rows.append(f"    <loc>{xml_esc(BASE + '/' + filename)}</loc>")
         index_rows.append("  </sitemap>")
     index_rows.append("</sitemapindex>")
-    index_xml = "\\n".join(index_rows) + "\\n"
+    index_xml = "\n".join(index_rows) + "\n"
     (PUBLIC / "sitemap_index.xml").write_text(index_xml, encoding="utf-8")
 
     # Lightweight RSS feed for readers/discovery; not a replacement for sitemap.
