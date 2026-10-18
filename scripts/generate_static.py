@@ -4258,7 +4258,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
         deduped_urls.append((canonical_path, lastmod, image))
     urls = deduped_urls
 
-    xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">']
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">']
     for path, lastmod, image in urls:
         xml.append("  <url>")
         xml.append(f"    <loc>{xml_esc(BASE + path)}</loc>")
@@ -4297,6 +4297,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     def write_urlset(filename: str, entries: list[tuple[str, str | None, str | None]]) -> None:
         rows = [
             '<?xml version="1.0" encoding="UTF-8"?>',
+            '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
         ]
         for path, lastmod, image in entries:
@@ -4318,6 +4319,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
 
     index_rows = [
         '<?xml version="1.0" encoding="UTF-8"?>',
+        '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
         '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ]
     for filename in ("post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml"):
