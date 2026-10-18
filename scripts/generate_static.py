@@ -4377,6 +4377,11 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: unresolved title template in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
 
+    try:
+        sitemap_root = ET.fromstring(sitemap)
+    except ET.ParseError as exc:
+        raise RuntimeError(f"SEO verification failed: sitemap XML is invalid: {exc}") from exc
+    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     # Validate the split sitemap index and all child URL sets before deploy.
     expected_sitemaps = ("post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml")
     index_path = PUBLIC / "sitemap_index.xml"
@@ -4412,11 +4417,6 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         if any(not url.startswith(BASE + "/") and url != BASE + "/" for url in child_locs):
             raise RuntimeError(f"SEO verification failed: non-canonical host URL in {name}")
 
-    try:
-        sitemap_root = ET.fromstring(sitemap)
-    except ET.ParseError as exc:
-        raise RuntimeError(f"SEO verification failed: sitemap XML is invalid: {exc}") from exc
-    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locs = [node.text.strip() for node in sitemap_root.findall("sm:url/sm:loc", ns) if node.text]
     if len(locs) != len(set(locs)):
         raise RuntimeError("SEO verification failed: duplicate URLs in sitemap")
