@@ -2948,6 +2948,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
  .floating-whatsapp-text{display:none}
  .ed-home-social{margin-bottom:24px}
 }
+
+/* Keep focused search field inside its rounded shell; avoid browser-like square outline. */
+.header .search{border-radius:17px!important;overflow:hidden}
+.header .search input,.header .search input:focus,.header .search input:focus-visible{outline:0!important;box-shadow:none!important;border:1px solid #dbe4f0!important;border-radius:17px!important}
+.header .search input:focus{box-shadow:0 0 0 3px rgba(245,158,11,.12)!important}
 </style>"""
 
     social_cta = (
