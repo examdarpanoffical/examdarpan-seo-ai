@@ -2953,6 +2953,25 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .header .search{border-radius:17px!important;overflow:hidden}
 .header .search input,.header .search input:focus,.header .search input:focus-visible{outline:0!important;box-shadow:none!important;border:1px solid #dbe4f0!important;border-radius:17px!important}
 .header .search input:focus{box-shadow:0 0 0 3px rgba(245,158,11,.12)!important}
+
+/* v2: soften the homepage header/nav and prevent the clicked search field's square outline */
+.topbar{background:linear-gradient(100deg,#173b70 0%,#28548a 55%,#173b70 100%)!important}
+.header{background:linear-gradient(100deg,#173b70 0%,#28548a 55%,#173b70 100%)!important}
+.nav{background:#173b70!important;box-shadow:0 4px 14px rgba(23,59,112,.12)!important}
+.header .search{border-radius:17px!important;overflow:hidden!important}
+.header .search input,.header .search input:focus,.header .search input:focus-visible,.header input[type="search"]:focus,.header input[type="text"]:focus{
+  outline:none!important;border:1px solid #cbd5e1!important;border-radius:17px!important;box-shadow:none!important
+}
+.header .search input:focus,.header .search input:focus-visible,.header input[type="search"]:focus,.header input[type="text"]:focus{
+  border-color:#f59e0b!important;box-shadow:0 0 0 2px rgba(245,158,11,.13)!important
+}
+.ed-topic-section a,.ed-topic-section .category-grid a,.ed-topic-section .topic-grid a,.category-grid a,.topic-grid a,.category-card,.category-tile,.cat-card,.category-box{
+  background:#fff!important;color:#173b70!important;border-color:#dbe5f2!important;box-shadow:0 5px 16px rgba(23,59,112,.07)!important
+}
+.ed-topic-section a::after,.category-grid a::after,.topic-grid a::after{color:#b77908!important}
+.ed-topic-section a:hover,.category-grid a:hover,.topic-grid a:hover,.category-card:hover,.category-tile:hover,.cat-card:hover,.category-box:hover{
+  border-color:#f59e0b!important;box-shadow:0 10px 24px rgba(23,59,112,.12)!important
+}
 </style>"""
 
     social_cta = (

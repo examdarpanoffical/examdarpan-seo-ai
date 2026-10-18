@@ -9681,3 +9681,83 @@ main.main article table tbody tr:nth-child(even) td{
 .nav{background:#111827!important;border-top:1px solid rgba(255,255,255,.12)!important;border-bottom:0!important}
 .nav a{color:#fff!important}
 .nav a:hover,.nav a.active{background:#f59e0b!important;color:#111827!important;box-shadow:0 4px 14px rgba(245,158,11,.18)!important}
+
+
+/* Exam Darpan v2 visual polish: lighter navy, shared category cards, clean search focus */
+:root{
+  --navy:#173b70;
+  --navy2:#234d83;
+  --blue:#2563eb;
+  --gold:#f59e0b;
+  --bg:#f6f8fc;
+}
+.topbar{
+  background:linear-gradient(100deg,#173b70 0%,#28548a 55%,#173b70 100%)!important;
+  border-bottom:1px solid rgba(245,158,11,.35)!important;
+}
+.header{
+  background:linear-gradient(100deg,#173b70 0%,#28548a 55%,#173b70 100%)!important;
+  border-bottom:1px solid rgba(255,255,255,.16)!important;
+}
+.nav{
+  background:#173b70!important;
+  border-top:1px solid rgba(255,255,255,.15)!important;
+  box-shadow:0 4px 14px rgba(23,59,112,.12)!important;
+}
+.nav a:hover,.nav a.active{
+  background:#f59e0b!important;
+  color:#172033!important;
+}
+/* Search: remove the hard rectangular outline/halo on click; keep a neat saffron border. */
+.header .search,
+.search{
+  border-radius:17px!important;
+}
+.header .search input,
+.search input,
+.header .search input:focus,
+.search input:focus,
+.header .search input:focus-visible,
+.search input:focus-visible{
+  outline:none!important;
+  border:1px solid #cbd5e1!important;
+  box-shadow:none!important;
+  border-radius:17px!important;
+}
+.header .search input:focus,
+.search input:focus,
+.header .search input:focus-visible,
+.search input:focus-visible{
+  border-color:#f59e0b!important;
+  box-shadow:0 0 0 2px rgba(245,158,11,.13)!important;
+}
+/* Use the same Exam Darpan palette for category/topic cards instead of old accent colors. */
+.ed-topic-section a,
+.ed-topic-section .category-grid a,
+.ed-topic-section .topic-grid a,
+.category-grid a,
+.topic-grid a,
+.category-card,
+.category-tile,
+.cat-card,
+.category-box{
+  background:#fff!important;
+  color:#173b70!important;
+  border-color:#dbe5f2!important;
+  box-shadow:0 5px 16px rgba(23,59,112,.07)!important;
+}
+.ed-topic-section a::after,
+.category-grid a::after,
+.topic-grid a::after{
+  color:#b77908!important;
+}
+.ed-topic-section a:hover,
+.category-grid a:hover,
+.topic-grid a:hover,
+.category-card:hover,
+.category-tile:hover,
+.cat-card:hover,
+.category-box:hover{
+  border-color:#f59e0b!important;
+  box-shadow:0 10px 24px rgba(23,59,112,.12)!important;
+}
