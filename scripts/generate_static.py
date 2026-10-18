@@ -1966,14 +1966,14 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
     css = """<style id="exam-darpan-home-final-order">
 /* Full reference palette: red-to-blue masthead, dark translucent nav, amber alert. */
-.topbar{background:linear-gradient(100deg,#b91c1c 0%,#1e3a8a 54%,#312e81 100%)!important;color:#fff!important}
+.topbar{background:linear-gradient(100deg,#0b1224 0%,#163a70 58%,#0b1224 100%)!important;color:#fff!important}
 .topbar a,.topbar span,.topbar strong{color:#fff!important}
-.header{background:linear-gradient(100deg,#b91c1c 0%,#1e3a8a 54%,#312e81 100%)!important;color:#fff!important;border:0!important}
+.header{background:linear-gradient(100deg,#0b1224 0%,#163a70 58%,#0b1224 100%)!important;color:#fff!important;border:0!important}
 .header .brand-title,.header .brand-name,.header .tagline,.header p{color:#fff!important}
 .header .search,.header input[type="search"],.header input[type="text"]{background:#fff!important;color:#172033!important;border-color:#dbe4f0!important}
 .nav{background:#111827!important;border-top:1px solid rgba(255,255,255,.15)!important;border-bottom:0!important;box-shadow:0 5px 18px rgba(15,23,42,.12)!important}
 .nav a{color:#fff!important}
-.nav a:hover,.nav a.active{background:rgba(255,255,255,.14)!important;color:#fde68a!important}
+.nav a:hover,.nav a.active{background:#f59e0b!important;color:#111827!important}
 .ed-reference-page-heading{margin:20px 0 15px}
 .ed-reference-page-heading h1{margin:0;color:#142e59;font-size:clamp(22px,2.8vw,32px);line-height:1.25;font-weight:900;letter-spacing:-.025em}
 .ed-reference-page-heading p{margin:6px 0 0;color:#64748b;font-size:13px;line-height:1.6}
@@ -2039,13 +2039,13 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 .ed-home-hub-head{
   padding:17px 22px;
-  background:#557d16;
+  background:#163a70;
 }
 .ed-home-hub-green .ed-home-hub-head{
-  background:#557d16;
+  background:#163a70;
 }
 .ed-home-hub-blue .ed-home-hub-head{
-  background:#2867a8;
+  background:#2563eb;
 }
 .ed-home-hub-head h2{
   margin:0;
@@ -2079,10 +2079,10 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   height:11px;
   flex:0 0 11px;
   border-radius:50%;
-  background:#6b8f1f;
+  background:#163a70;
 }
 .ed-home-hub-blue .ed-home-hub-dot{
-  background:#2867a8;
+  background:#2563eb;
 }
 .ed-home-hub-title{
   min-width:0;
@@ -2096,7 +2096,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   flex:0 0 auto;
   padding:7px 11px;
   border-radius:7px;
-  background:#c33b32;
+  background:#f59e0b;
   color:#fff;
   font-size:12px;
   line-height:1;
@@ -2106,7 +2106,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   display:block;
   padding:17px 18px;
   background:#faf8f2;
-  color:#557d16!important;
+  color:#163a70!important;
   text-align:center;
   text-decoration:none!important;
   font-size:16px;
@@ -2114,7 +2114,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   border-top:1px solid #e4e4df;
 }
 .ed-home-hub-blue .ed-home-hub-more{
-  color:#2867a8!important;
+  color:#2563eb!important;
 }
 
 .ed-home-empty{
@@ -2393,7 +2393,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 
 .ed-home-section-head{
   padding:17px 22px;
-  background:#557d16;
+  background:#163a70;
 }
 
 .ed-home-section-head h2{
@@ -2433,7 +2433,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   height:11px;
   flex:0 0 11px;
   border-radius:50%;
-  background:#6b8f1f;
+  background:#163a70;
 }
 
 .ed-home-section-title{
@@ -2449,7 +2449,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   flex:0 0 auto;
   padding:7px 11px;
   border-radius:7px;
-  background:#c33b32;
+  background:#f59e0b;
   color:#fff;
   font-size:12px;
   line-height:1;
@@ -2460,7 +2460,7 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
   display:block;
   padding:17px 18px;
   background:#faf8f2;
-  color:#557d16!important;
+  color:#163a70!important;
   text-align:center;
   text-decoration:none!important;
   font-size:16px;
@@ -2504,13 +2504,13 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 
 .ed-home-section-green .ed-home-section-head{
-  background:#557d16;
+  background:#163a70;
 }
 .ed-home-section-green .ed-home-section-dot{
-  background:#6b8f1f;
+  background:#163a70;
 }
 .ed-home-section-green .ed-home-section-more{
-  color:#557d16!important;
+  color:#163a70!important;
 }
 
 .ed-home-section-orange .ed-home-section-head{
@@ -2534,13 +2534,13 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
 }
 
 .ed-home-section-blue .ed-home-section-head{
-  background:#2867a8;
+  background:#2563eb;
 }
 .ed-home-section-blue .ed-home-section-dot{
-  background:#2867a8;
+  background:#2563eb;
 }
 .ed-home-section-blue .ed-home-section-more{
-  color:#2867a8!important;
+  color:#2563eb!important;
 }
 
 .ed-home-section-violet .ed-home-section-head{
