@@ -27,6 +27,17 @@ TEMPLATE_LEAK = re.compile(r"\$\{\s*esc\(title\)\s*\}")
 def main() -> int:
     issues: list[tuple[str, str]] = []
     sitemap_path = PUBLIC / "sitemap.xml"
+
+    split_sitemaps = ["sitemap_index.xml", "post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml"]
+    for filename in split_sitemaps:
+        path = PUBLIC / filename
+        if not path.exists():
+            issues.append(("ERROR", f"Missing split sitemap file: {filename}"))
+            continue
+        try:
+            ET.parse(path)
+        except ET.ParseError as exc:
+            issues.append(("ERROR", f"Invalid XML in {filename}: {exc}"))
     if not sitemap_path.exists():
         print("ERROR: public/sitemap.xml is missing")
         return 2
