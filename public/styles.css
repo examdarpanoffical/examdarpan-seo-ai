@@ -9666,3 +9666,18 @@ main.main article table tbody tr:nth-child(even) td{
 @media(max-width:640px){
   .footer-operator-contact{font-size:12px;padding:11px}
 }
+
+
+/* Exam Darpan shared brand theme: consistent across homepage, articles, category and policy pages. */
+.topbar{background:linear-gradient(100deg,#0b1224 0%,#163a70 58%,#0b1224 100%)!important;color:#fff!important;border-bottom:1px solid rgba(245,158,11,.32)!important}
+.topbar .live{background:#f59e0b!important;color:#111827!important}
+.header{background:linear-gradient(100deg,#0b1224 0%,#163a70 58%,#0b1224 100%)!important;color:#fff!important;border-bottom:1px solid rgba(255,255,255,.14)!important}
+.header .brand,.header .brand-title,.header .tagline,.header .brand-name,.header p{color:#fff!important}
+.header .brand-title span{color:#f59e0b!important}
+.header .search{background:#fff!important;border-radius:17px!important}
+.header .search input{background:#fff!important;color:#172033!important;border:1px solid #dbe4f0!important;border-radius:17px!important;outline:0!important}
+.header .search input:focus,.header .search input:focus-visible{outline:0!important;border:1px solid #dbe4f0!important;box-shadow:0 0 0 3px rgba(245,158,11,.12)!important}
+.header .search span{color:#64748b!important}
+.nav{background:#111827!important;border-top:1px solid rgba(255,255,255,.12)!important;border-bottom:0!important}
+.nav a{color:#fff!important}
+.nav a:hover,.nav a.active{background:#f59e0b!important;color:#111827!important;box-shadow:0 4px 14px rgba(245,158,11,.18)!important}
