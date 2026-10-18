@@ -1222,7 +1222,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   <div class="container footer-main">
     <div class="footer-brand">
       <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
-      <p>Independent Education &amp; Government Job Information Portal.</p>
       <div class="footer-operator-contact">
         <strong>Website Operator: LOKESH MEENA</strong>
         <a href="mailto:lokesh636780@gmail.com">lokesh636780@gmail.com</a>
@@ -1270,7 +1269,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
   <div class="container footer-bottom">
     <div>
       <strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong>
-      <span> · Independent Education &amp; Government Job Information Portal</span>
+      
     </div>
     <div class="footer-bottom-note">
       Information is provided for educational purposes. Final confirmation should always be made from the official notification.
@@ -3670,7 +3669,6 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
   <div class="container footer-main">
     <div class="footer-brand">
       <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
-      <p>Independent Education &amp; Government Job Information Portal.</p>
       <div class="footer-trust-line">
         <span>✓ Official-source based</span>
         <span>✓ Clear dates</span>
@@ -3713,7 +3711,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
   <div class="container footer-bottom">
     <div>
       <strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong>
-      <span> · Independent Education &amp; Government Job Information Portal</span>
+      
     </div>
     <div class="footer-bottom-note">
       Information is provided for educational purposes. Final confirmation should always be made from the official notification.
@@ -4059,7 +4057,6 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
   <div class="container footer-main">
     <div class="footer-brand">
       <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
-      <p>Independent Education &amp; Government Job Information Portal.</p>
       <div class="footer-trust-line">
         <span>✓ Official-source based</span>
         <span>✓ Clear dates</span>
@@ -4102,7 +4099,7 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
   <div class="container footer-bottom">
     <div>
       <strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong>
-      <span> · Independent Education &amp; Government Job Information Portal</span>
+      
     </div>
     <div class="footer-bottom-note">
       Information is provided for educational purposes. Final confirmation should always be made from the official notification.
@@ -4193,7 +4190,7 @@ def write_category_directory(posts: list[dict[str, Any]]) -> None:
 </section>
 <div class="ed-category-directory">{"".join(cards)}</div>
 </main>
-<footer class="footer"><div class="container footer-bottom"><div><strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong><span> · Independent Education &amp; Government Job Information Portal</span></div><div><a href="/editorial-policy">Editorial Policy</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div></div></footer>
+<footer class="footer"><div class="container footer-bottom"><div><strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong></div><div><a href="/editorial-policy">Editorial Policy</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div></div></footer>
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
 </body>
 </html>"""
