@@ -4310,7 +4310,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
                 rows.append(f"    <image:image><image:loc>{xml_esc(image)}</image:loc></image:image>")
             rows.append("  </url>")
         rows.append("</urlset>")
-        (PUBLIC / filename).write_text("\\n".join(rows) + "\\n", encoding="utf-8")
+        (PUBLIC / filename).write_text("\n".join(rows) + "\n", encoding="utf-8")
 
     write_urlset("post-sitemap.xml", post_urls)
     write_urlset("page-sitemap.xml", page_urls)
