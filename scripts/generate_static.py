@@ -4270,6 +4270,64 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     xml.append("</urlset>")
     (PUBLIC / "sitemap.xml").write_text("\n".join(xml) + "\n", encoding="utf-8")
 
+    # Split the canonical sitemap index into focused URL sets. Keep sitemap.xml
+    # as a backwards-compatible all-URL sitemap for any existing Search Console
+    # property submissions; robots.txt advertises the index below.
+    post_paths = {
+        "/" + quote(slugify(s), safe="-._~")
+        for s in article_slugs
+        if slugify(s)
+    }
+    category_paths = {
+        "/rajasthan-government-jobs",
+        "/all-india-government-jobs",
+    }
+    for cslug in category_slugs:
+        if cslug in {"rajasthan-jobs", "government-jobs"}:
+            continue
+        cname = next((name for name, slug_name, _, _ in CATEGORIES if slug_name == cslug), None)
+        cposts = [p for p in posts if normalized_category(p) == cname] if cname else []
+        if cposts:
+            category_paths.add(category_path(cslug))
+
+    post_urls = [entry for entry in urls if entry[0] in post_paths]
+    category_urls = [entry for entry in urls if entry[0] in category_paths]
+    page_urls = [entry for entry in urls if entry[0] not in post_paths and entry[0] not in category_paths]
+
+    def write_urlset(filename: str, entries: list[tuple[str, str | None, str | None]]) -> None:
+        rows = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
+        ]
+        for path, lastmod, image in entries:
+            canonical_path = path.rstrip("/") or "/"
+            canonical_url = BASE.rstrip("/") + (canonical_path if canonical_path != "/" else "/")
+            rows.append("  <url>")
+            rows.append(f"    <loc>{xml_esc(canonical_url)}</loc>")
+            if lastmod:
+                rows.append(f"    <lastmod>{xml_esc(lastmod)}</lastmod>")
+            if image:
+                rows.append(f"    <image:image><image:loc>{xml_esc(image)}</image:loc></image:image>")
+            rows.append("  </url>")
+        rows.append("</urlset>")
+        (PUBLIC / filename).write_text("\\n".join(rows) + "\\n", encoding="utf-8")
+
+    write_urlset("post-sitemap.xml", post_urls)
+    write_urlset("page-sitemap.xml", page_urls)
+    write_urlset("category-sitemap.xml", category_urls)
+
+    index_rows = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for filename in ("post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml"):
+        index_rows.append("  <sitemap>")
+        index_rows.append(f"    <loc>{xml_esc(BASE + '/' + filename)}</loc>")
+        index_rows.append("  </sitemap>")
+    index_rows.append("</sitemapindex>")
+    index_xml = "\\n".join(index_rows) + "\\n"
+    (PUBLIC / "sitemap_index.xml").write_text(index_xml, encoding="utf-8")
+
     # Lightweight RSS feed for readers/discovery; not a replacement for sitemap.
     rss_items = []
     for p in posts[:50]:
@@ -4318,6 +4376,41 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         if re.search(r"\$\{esc\(title\)\}", txt, flags=re.I):
             raise RuntimeError(f"SEO verification failed: unresolved title template in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
+
+    # Validate the split sitemap index and all child URL sets before deploy.
+    expected_sitemaps = ("post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml")
+    index_path = PUBLIC / "sitemap_index.xml"
+    if not index_path.exists():
+        raise RuntimeError("SEO verification failed: sitemap_index.xml is missing")
+    try:
+        index_root = ET.parse(index_path).getroot()
+    except ET.ParseError as exc:
+        raise RuntimeError(f"SEO verification failed: sitemap index XML is invalid: {exc}") from exc
+    sitemap_locs = [
+        node.text.strip()
+        for node in index_root.findall("sm:sitemap/sm:loc", ns)
+        if node.text and node.text.strip()
+    ]
+    expected_locs = {f"{BASE}/{name}" for name in expected_sitemaps}
+    if set(sitemap_locs) != expected_locs or len(sitemap_locs) != len(expected_sitemaps):
+        raise RuntimeError("SEO verification failed: sitemap index must list each post/page/category sitemap exactly once")
+    for name in expected_sitemaps:
+        child = PUBLIC / name
+        if not child.exists():
+            raise RuntimeError(f"SEO verification failed: {name} is missing")
+        try:
+            child_root = ET.parse(child).getroot()
+        except ET.ParseError as exc:
+            raise RuntimeError(f"SEO verification failed: {name} XML is invalid: {exc}") from exc
+        child_locs = [
+            node.text.strip()
+            for node in child_root.findall("sm:url/sm:loc", ns)
+            if node.text and node.text.strip()
+        ]
+        if len(child_locs) != len(set(child_locs)):
+            raise RuntimeError(f"SEO verification failed: duplicate URLs in {name}")
+        if any(not url.startswith(BASE + "/") and url != BASE + "/" for url in child_locs):
+            raise RuntimeError(f"SEO verification failed: non-canonical host URL in {name}")
 
     try:
         sitemap_root = ET.fromstring(sitemap)
