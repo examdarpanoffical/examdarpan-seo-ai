@@ -118,6 +118,16 @@
         "type": 301
       },
       {
+        "source": "/rajasthan-police-si-2021-re-exam-2026-exam-city-admit-card",
+        "destination": "/rpsc-si-admit-card-2026-download",
+        "type": 301
+      },
+      {
+        "source": "/rajasthan-safai-karmchari-recruitment-2026-24752",
+        "destination": "/rajasthan-safai-karmchari-recruitment-2026",
+        "type": 301
+      },
+      {
         "source": "/article/:slug",
         "destination": "/:slug",
         "type": 301
