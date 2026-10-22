@@ -8,6 +8,7 @@ const firebaseConfig = {
   measurementId: "G-98V5L1JSTX"
 };
 window.FIREBASE_CONFIG = firebaseConfig;
+window.EXAMDARPAN_PUBLISH_TRIGGER_URL = "https://examdarpan-publish-trigger.encodetechnologies.workers.dev/";
 
 // Paste the reCAPTCHA Enterprise site key from Firebase App Check here.
 window.FIREBASE_APPCHECK_SITE_KEY = "6LfY_pstAAAAADRIMq_NIwp6eYU_ss9hDOIqSgeG";
