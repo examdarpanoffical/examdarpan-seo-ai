@@ -1,6 +1,6 @@
-# Secure Publish Trigger (staged)
+# Secure Publish Trigger (Admin Panel integration)
 
-This adds the secure Worker source and setup guide only. It does not modify the live Admin Panel or Firebase Hosting configuration. The Worker must be deployed and its URL known before connecting the browser code.
+The Admin Panel now calls the secure Worker after a successful Firestore publish. The Worker must be deployed and its URL configured before automatic dispatch can work. Draft saves do not trigger a build.
 
 ## Configure Cloudflare Worker
 
@@ -12,9 +12,21 @@ This adds the secure Worker source and setup guide only. It does not modify the 
    - `ALLOWED_ORIGIN`: `https://examdarpan.in`.
 3. Deploy Worker and copy its HTTPS URL. Keep `GITHUB_TOKEN` in Worker secrets only.
 
-## Admin Panel connection (after Worker deploy)
+## Configure the Admin Panel (after Worker deploy)
 
-Add a helper to `public/admin/dashboard.js` and replace the URL with the actual Worker URL:
+After deploying the Worker, add this line to `public/firebase-config.js` (replace the example with the exact deployed Worker URL):
+
+```js
+window.EXAMDARPAN_PUBLISH_TRIGGER_URL = 'https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev';
+```
+
+Do not put `GITHUB_TOKEN` in `firebase-config.js` or any browser file. The Admin Panel obtains the current Firebase ID token and sends it to the Worker; the Worker validates the Firebase identity against `FIREBASE_ADMIN_UID` before dispatching GitHub Actions.
+
+The Admin Panel's `save(status)` already invokes the secure trigger after Firestore save for published posts and displays a distinct message if triggering fails.
+
+## Manual test
+
+The helper has already been added to `public/admin/dashboard.js`; this is the request it performs:
 
 ```js
 const SEO_TRIGGER_URL = 'https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev';
@@ -38,7 +50,7 @@ async function triggerStaticSeoBuild() {
 }
 ```
 
-In the existing `save(status)`, call `await triggerStaticSeoBuild()` only after a successful Firestore save when `status === 'published'`. If trigger fails, report that the article saved but static rebuild was not queued. Do not trigger for drafts.
+The code triggers only after successful Firestore save when `status === 'published'`. If trigger fails, the message explicitly says the article is saved but the static build was not queued. Drafts do not trigger builds.
 
 ## Notes
 
