@@ -137,15 +137,15 @@
       {
         "source": "/quiz",
         "destination": "/quiz.html"
+      },
+      {
+        "source": "**",
+        "destination": "/article.html"
       }
     ]
   },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
-  },
-  "functions": {
-    "source": "functions",
-    "runtime": "nodejs20"
   }
 }
