@@ -1,21 +1,31 @@
-<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Government Jobs, Exams & Results | Exam Darpan</title><meta name="description" content="Exam Darpan पर नवीनतम परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी।"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><link rel="canonical" href="https://examdarpan.in/"><script>
-/* Give fallback article routes a path-specific title/canonical even if Firestore is unavailable. */
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Government Jobs, Exams & Results | Exam Darpan</title><meta name="description" content="Exam Darpan पर नवीनतम परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी।"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><script>
+/* Dynamically inject path-specific canonical & og:url immediately so Googlebot never sees homepage canonical on articles */
 (function(){
   try {
     var path = location.pathname.replace(/\/+$/, "") || "/";
     var parts = path.split("/").filter(Boolean);
     if (parts[0] === "article" && parts[1]) path = "/" + parts[1];
+    var cleanUrl = "https://examdarpan.in" + (path === "/" ? "/" : path);
+
+    var link = document.createElement("link");
+    link.rel = "canonical";
+    link.href = cleanUrl;
+    document.head.appendChild(link);
+
+    var ogUrl = document.createElement("meta");
+    ogUrl.setAttribute("property", "og:url");
+    ogUrl.content = cleanUrl;
+    document.head.appendChild(ogUrl);
+
     if (path !== "/") {
       var slug = decodeURIComponent(path.slice(1)).replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
       if (slug) {
         document.title = slug.replace(/\b\w/g, function(c){ return c.toUpperCase(); }) + " | Exam Darpan";
-        var canonical = document.querySelector('link[rel="canonical"]');
-        if (canonical) canonical.href = "https://examdarpan.in" + path;
       }
     }
   } catch (e) {}
 })();
-</script><meta property="og:type" content="article"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="Article | Exam Darpan"><meta property="og:description" content="Exam Darpan पर नवीनतम परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी।"><meta property="og:url" content="https://examdarpan.in/"><meta property="og:image" content="https://examdarpan.in/assets/og-logo.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Article | Exam Darpan"><meta name="twitter:description" content="Exam Darpan पर नवीनतम परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी।"><meta name="twitter:image" content="https://examdarpan.in/assets/og-logo.png"><link rel="icon" type="image/png" href="/assets/logo.png?v=20260924-3"><link rel="apple-touch-icon" href="/assets/logo.png?v=20260924-3"><link rel="stylesheet" href="/styles.css"><script src="/firebase-config.js"></script><!-- Google tag (gtag.js) -->
+</script><meta property="og:type" content="article"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="Article | Exam Darpan"><meta property="og:description" content="Exam Darpan पर नवीनतम परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी।"><meta property="og:image" content="https://examdarpan.in/assets/og-logo.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Article | Exam Darpan"><meta name="twitter:description" content="Exam Darpan पर नवीनतम परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी।"><meta name="twitter:image" content="https://examdarpan.in/assets/og-logo.png"><link rel="icon" type="image/png" href="/assets/logo.png?v=20260924-3"><link rel="apple-touch-icon" href="/assets/logo.png?v=20260924-3"><link rel="stylesheet" href="/styles.css"><script src="/firebase-config.js"></script><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FWB3YMTSDX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -73,7 +83,7 @@ const index=await response.json();
 const posts=Array.isArray(index.posts)?index.posts:[];
 const p=posts.find(x=>x&&x.status==='published'&&String(x.slug||'').trim()===slug);
 if(!p){root.innerHTML='<div class="empty"><h2>Article नहीं मिला</h2><p>यह article उपलब्ध नहीं है या अभी publish नहीं किया गया है।</p><a class="btn btn-dark" href="/">Home पर जाएं</a></div>';return}
-const url=absolute(p.slug),oldPath=location.pathname,title=p.title||'Exam Darpan Article',desc=(p.excerpt||'').trim()||'Exam Darpan पर परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी पढ़ें।';if(oldPath.startsWith('/article/')){history.replaceState({},'', '/'+encodeURIComponent(String(p.slug||'').trim()));}document.title=title+' | Exam Darpan';document.querySelector('link[rel="canonical"]').href=url;meta('description',desc);prop('og:title',title+' | Exam Darpan');prop('og:description',desc);prop('og:url',url);if(p.featuredImage)prop('og:image',p.featuredImage);
+const url=absolute(p.slug),oldPath=location.pathname,title=p.title||'Exam Darpan Article',desc=(p.excerpt||'').trim()||'Exam Darpan पर परीक्षा, भर्ती, रिजल्ट और सरकारी नौकरी की जानकारी पढ़ें।';if(oldPath.startsWith('/article/')){history.replaceState({},'', '/'+encodeURIComponent(String(p.slug||'').trim()));}document.title=title+' | Exam Darpan';let canEl=document.querySelector('link[rel="canonical"]');if(!canEl){canEl=document.createElement('link');canEl.rel='canonical';document.head.appendChild(canEl);}canEl.href=url;meta('description',desc);prop('og:title',title+' | Exam Darpan');prop('og:description',desc);prop('og:url',url);if(p.featuredImage)prop('og:image',p.featuredImage);
 const published=p.publishedAt?.toDate?.()?.toISOString?.()||null,modified=p.updatedAt?.toDate?.()?.toISOString?.()||published;const schema={"@context":"https://schema.org","@type":"Article","headline":title,"description":desc,"url":url,"mainEntityOfPage":{"@type":"WebPage","@id":url},"author":{"@type":"Person","name":"Lakshay Kumar","url":"https://examdarpan.in/author/lakshay","jobTitle":"Content Writer"},"publisher":{"@type":"Organization","name":"Exam Darpan","url":"https://examdarpan.in/","logo":{"@type":"ImageObject","url":"https://examdarpan.in/assets/logo.png?v=20260924-3"}},"datePublished":published,"dateModified":modified,"articleSection":p.category||'Latest Updates'};if(p.featuredImage)schema.image=[p.featuredImage];const sc=document.createElement('script');sc.type='application/ld+json';sc.textContent=JSON.stringify(schema);document.head.appendChild(sc);
 const normalizeArticleText=value=>String(value||'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
 const cleanArticleContent=(html,title)=>{
@@ -217,7 +227,7 @@ document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().get
   color:#fff!important;
   text-decoration:none!important;
   font-size:11px;
-  font-weight:900;
+  font-weight:999;
   box-shadow:0 8px 25px rgba(22,163,74,.35);
 }
 .ed-wa-float b{
@@ -229,6 +239,4 @@ document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().get
   .ed-wa-float{right:12px;bottom:14px;padding:10px 13px}
 }
 </style>
-
-
 </body></html>
