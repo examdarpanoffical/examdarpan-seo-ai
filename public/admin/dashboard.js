@@ -10,6 +10,24 @@ if(window.FIREBASE_APPCHECK_SITE_KEY){
   catch(e){console.warn('App Check initialization failed',e)}
 }
 const auth=getAuth(app),db=getFirestore(app);
+
+// Set window.EXAMDARPAN_PUBLISH_TRIGGER_URL in firebase-config.js after deploying
+// the secure Worker. Never put a GitHub token in browser-side code.
+async function triggerStaticSeoBuild(){
+  const triggerUrl=String(window.EXAMDARPAN_PUBLISH_TRIGGER_URL||'').trim();
+  if(!triggerUrl)throw new Error('Secure publish trigger URL is not configured yet.');
+  const user=auth.currentUser;
+  if(!user)throw new Error('Admin login expired. Sign in again.');
+  const token=await user.getIdToken();
+  const response=await fetch(triggerUrl,{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({reason:'admin-publish'})
+  });
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok||result.queued!==true)throw new Error(result.error||'GitHub build could not be queued.');
+  return result;
+}
 const ai=getAI(app,{backend:new GoogleAIBackend()});
 const model=getGenerativeModel(ai,{model:'gemini-3.6-flash'});
 
@@ -189,7 +207,18 @@ async function save(status){
 
     if(id)await updateDoc(doc(db,'posts',id),d);
     else await addDoc(collection(db,'posts'),{...d,createdAt:serverTimestamp()});
-    $('msg').textContent=status==='published'?'Published successfully. Static HTML rebuild is scheduled about every 5 minutes (GitHub may delay scheduled runs). Telegram auto-share is queued.':'Draft saved successfully.';
+
+    if(status==='published'){
+      try{
+        await triggerStaticSeoBuild();
+        $('msg').textContent='Published in Firestore. GitHub static HTML build/deploy has been queued; wait for the GitHub Actions run to finish. Telegram auto-share is queued.';
+      }catch(triggerError){
+        console.error('Static SEO trigger failed after Firestore save:',triggerError);
+        $('msg').textContent='Article Firestore में save/publish हो गया, लेकिन static HTML build trigger नहीं हुआ: '+(triggerError.message||triggerError)+' Configure the secure Worker URL to enable automatic deploy.';
+      }
+    }else{
+      $('msg').textContent='Draft saved successfully.';
+    }
     clearForm();await loadPosts();
   }catch(e){console.error(e);$('msg').textContent='Save error: '+(e.message||e)}
 }
