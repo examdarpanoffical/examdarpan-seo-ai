@@ -11,7 +11,7 @@ on:
   schedule:
     # Static article views do not read Firestore. Rebuild hourly to reduce
     # background full-collection Firestore reads; GitHub may delay scheduled runs.
-    - cron: "17 * * * *"
+    - cron: "*/5 * * * *"
 
 permissions:
   contents: read
