@@ -33,7 +33,7 @@ export default {
     }
     if (origin !== allowed) return reply({ error: "Origin not allowed" }, 403, headers);
     if (request.method !== "POST") return reply({ error: "Method not allowed" }, 405, headers);
-    const match = (request.headers.get("Authorization") || "").match(/^Bearer\\s+(.+)$/i);
+    const match = (request.headers.get("Authorization") || "").match(/^Bearer\s+(.+)$/i);
     if (!match) return reply({ error: "Sign in as admin first" }, 401, headers);
     if (!env.FIREBASE_API_KEY || !env.FIREBASE_ADMIN_UID || !env.GITHUB_TOKEN)
       return reply({ error: "Trigger is not configured" }, 503, headers);
