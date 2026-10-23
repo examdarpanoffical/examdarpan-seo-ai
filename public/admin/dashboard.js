@@ -173,9 +173,9 @@ function articleData(status,existingPost=null){
     officialNotificationUrl:$('notification').value.trim(),applyOnlineUrl:$('apply').value.trim(),
     officialWebsiteUrl:$('official').value.trim(),notificationPdfUrl:$('pdf').value.trim(),
     tags:$('tags').value.split(',').map(x=>x.trim()).filter(Boolean),
-    authorName:'Lakshay Kumar',
-    authorRole:'Content Writer',
-    authorUrl:'https://examdarpan.in/author/lakshay',
+    authorName:'Deepak Joshi',
+    authorRole:'Senior Content Writer & Research Editor',
+    authorUrl:'https://examdarpan.in/author/deepak-joshi',
     status,updatedAt:serverTimestamp()
   };
   // IMPORTANT: existing articles must NEVER receive a fresh publishedAt on edit.
