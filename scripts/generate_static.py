@@ -85,9 +85,9 @@ CATEGORIES = [
 CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CATEGORIES}
 RESERVED_SLUGS = {"index", "article", "about", "privacy", "contact", "disclaimer", "terms", "editorial-policy", "author", "categories", "404"}
 
-AUTHOR_NAME = "Lakshay Kumar"
-AUTHOR_ROLE = "Content Writer"
-AUTHOR_PATH = "/author/lakshay"
+AUTHOR_NAME = "Deepak Joshi"
+AUTHOR_ROLE = "Senior Content Writer & Research Editor"
+AUTHOR_PATH = "/author/deepak-joshi"
 AUTHOR_URL = f"{BASE}{AUTHOR_PATH}"
 
 MONTHS_HI = ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"]
@@ -3927,8 +3927,8 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
 
 
 def write_author_profile(posts: list[dict[str, Any]]) -> None:
-    """Generate the public Lakshay author profile page."""
-    author_dir = PUBLIC / "author" / "lakshay"
+    """Generate the public Deepak Joshi author profile page."""
+    author_dir = PUBLIC / "author" / "deepak-joshi"
     author_dir.mkdir(parents=True, exist_ok=True)
 
     latest = [
@@ -4031,9 +4031,9 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
 </div>
 
 <div class="author-intro">
-<p><strong>Lakshay Kumar</strong> Exam Darpan के लिए सरकारी नौकरी, भर्ती, प्रतियोगी परीक्षाओं, Admit Card, Result और अन्य महत्वपूर्ण exam updates पर सरल और उपयोगी content तैयार करते हैं।</p>
-<p>इनका लेखन focus विद्यार्थियों तक जरूरी जानकारी को साफ, समझने में आसान और practical तरीके से पहुँचाने पर रहता है, ताकि eligibility, application process, important dates और official updates जैसी जानकारी एक ही जगह स्पष्ट रूप से मिल सके।</p>
-<p>Content तैयार करते समय संबंधित official notification और official source को प्राथमिक reference माना जाता है। जानकारी में बदलाव होने पर articles को update रखने की कोशिश की जाती है।</p>
+<p><strong>Deepak Joshi</strong> Exam Darpan की editorial team में Senior Content Writer &amp; Research Editor के रूप में सरकारी नौकरी, भर्ती, प्रतियोगी परीक्षाओं, Admit Card, Result और शिक्षा से जुड़ी updates पर काम करते हैं। उन्हें लेखन और exam-information content तैयार करने का लगभग चार वर्षों का अनुभव है।</p>
+<p>वे जटिल भर्ती सूचनाओं को विद्यार्थियों के लिए सरल, स्पष्ट और व्यवस्थित भाषा में प्रस्तुत करने पर ध्यान देते हैं। उनके काम में official notification पढ़ना, महत्वपूर्ण तिथियों, eligibility conditions, आवेदन प्रक्रिया और उपलब्ध source links की जाँच करना तथा जरूरत पड़ने पर प्रकाशित जानकारी को review और update करना शामिल है।</p>
+<p>Exam Darpan में Deepak, editorial team के साथ मिलकर यह सुनिश्चित करने का प्रयास करते हैं कि पाठकों को जानकारी समझने में आसानी हो और वे अंतिम पुष्टि के लिए संबंधित विभाग के official source तक पहुँच सकें। भर्ती की शर्तें बदल सकती हैं, इसलिए उम्मीदवारों को आवेदन से पहले मूल notification अवश्य देखना चाहिए।</p>
 </div>
 </section>
 
