@@ -120,6 +120,11 @@
     ],
     "redirects": [
       {
+        "source": "/exam-calendar",
+        "destination": "/",
+        "type": 301
+      },
+      {
         "source": "/answer-key",
         "destination": "/category-answer-key",
         "type": 301
