@@ -10,15 +10,6 @@
     "trailingSlash": false,
     "headers": [
       {
-        "source": "/index.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, max-age=0, must-revalidate"
-          }
-        ]
-      },
-      {
         "source": "/",
         "headers": [
           {
@@ -28,7 +19,25 @@
         ]
       },
       {
-        "source": "sitemap.xml",
+        "source": "/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, max-age=0, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/content-index.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/sitemap.xml",
         "headers": [
           {
             "key": "Cache-Control",
@@ -37,11 +46,11 @@
         ]
       },
       {
-        "source": "robots.txt",
+        "source": "/robots.txt",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public, max-age=86400, must-revalidate"
+            "value": "public, max-age=3600, must-revalidate"
           }
         ]
       },
@@ -50,25 +59,34 @@
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public,max-age=2592000,stale-while-revalidate=86400"
+            "value": "public, max-age=2592000, stale-while-revalidate=86400"
           }
         ]
       },
       {
-        "source": "quiz",
+        "source": "/quiz",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
+            "value": "no-cache, no-store, max-age=0, must-revalidate"
           }
         ]
       },
       {
-        "source": "admin/dashboard.js",
+        "source": "/quiz.html",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
+            "value": "no-cache, no-store, max-age=0, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/admin/dashboard.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, max-age=0, must-revalidate"
           }
         ]
       },
@@ -77,16 +95,25 @@
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public,max-age=86400,must-revalidate"
+            "value": "public, max-age=86400, must-revalidate"
           }
         ]
       },
       {
-        "source": "/**",
+        "source": "/*.html",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public, max-age=3600, must-revalidate"
+            "value": "public, max-age=300, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300, must-revalidate"
           }
         ]
       }
@@ -100,11 +127,6 @@
       {
         "source": "/syllabus",
         "destination": "/category-syllabus",
-        "type": 301
-      },
-      {
-        "source": "/exam-calendar",
-        "destination": "/",
         "type": 301
       },
       {
