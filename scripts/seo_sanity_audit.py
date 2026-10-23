@@ -86,7 +86,7 @@ def main() -> int:
         if "<!-- EXAM_DARPAN_STATIC_ARTICLE -->" not in html:
             continue
         expected = f"{BASE}/{path.stem}"
-        canonicals = re.findall(r'<link\\b[^>]*rel=["\\']canonical["\\'][^>]*href=["\\']([^"\\']+)', html, re.I)
+        canonicals = re.findall(r"<link\\b[^>]*rel=['\"]canonical['\"][^>]*href=['\"]([^'\"]+)", html, re.I)
         if len(canonicals) == 1 and canonicals[0].rstrip("/") != expected.rstrip("/"):
             issues.append(("ERROR", f"Article canonical mismatch in {path.name}: expected {expected}; found {canonicals[0]}"))
 
