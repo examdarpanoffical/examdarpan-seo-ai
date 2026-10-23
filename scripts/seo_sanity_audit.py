@@ -53,14 +53,42 @@ def main() -> int:
     for url in duplicates:
         issues.append(("ERROR", f"Duplicate sitemap URL: {url}"))
 
-    for url in locs:
+    # Audit every generated sitemap, not just the small legacy sitemap.xml.
+    all_sitemap_urls: list[str] = []
+    for filename in split_sitemaps:
+        path = PUBLIC / filename
+        if not path.exists():
+            continue
+        try:
+            split_root = ET.parse(path).getroot()
+        except ET.ParseError:
+            continue  # Already reported above.
+        for node in split_root.findall(".//sm:loc", NS):
+            if node.text and node.text.strip():
+                all_sitemap_urls.append(node.text.strip())
+
+    for url in [*locs, *all_sitemap_urls]:
         parsed = urlparse(url)
         if parsed.scheme != "https" or parsed.netloc != "examdarpan.in":
             issues.append(("ERROR", f"Non-preferred sitemap host/scheme: {url}"))
         if parsed.path in LEGACY_SITEMAP_SUFFIXES:
             issues.append(("WARN", f"Legacy .html URL in sitemap; verify final 200 canonical URL: {url}"))
         if parsed.query or parsed.fragment:
-            issues.append(("WARN", f"Query/fragment URL in sitemap: {url}"))
+            issues.append(("ERROR", f"Query/fragment URL in sitemap: {url}"))
+
+    split_duplicates = [url for url, count in Counter(all_sitemap_urls).items() if count > 1]
+    for url in split_duplicates:
+        issues.append(("ERROR", f"Duplicate URL across generated split sitemaps: {url}"))
+
+    # Generated article files must point their canonical to their own clean URL.
+    for path in sorted(PUBLIC.glob("*.html")):
+        html = path.read_text(encoding="utf-8", errors="ignore")
+        if "<!-- EXAM_DARPAN_STATIC_ARTICLE -->" not in html:
+            continue
+        expected = f"{BASE}/{path.stem}"
+        canonicals = re.findall(r'<link\\b[^>]*rel=["\\']canonical["\\'][^>]*href=["\\']([^"\\']+)', html, re.I)
+        if len(canonicals) == 1 and canonicals[0].rstrip("/") != expected.rstrip("/"):
+            issues.append(("ERROR", f"Article canonical mismatch in {path.name}: expected {expected}; found {canonicals[0]}"))
 
     for path in sorted(PUBLIC.rglob("*.html")):
         try:
@@ -92,9 +120,8 @@ def main() -> int:
         print(f"[{level}] {message}")
     if not issues:
         print("No issues found by these checks.")
-    # This is initially report-only: legacy pages and historical content need
-    # manual decisions; do not block publishing on heuristic warnings.
-    return 0
+    # Warnings remain advisory; confirmed technical errors must block deploy.
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":
