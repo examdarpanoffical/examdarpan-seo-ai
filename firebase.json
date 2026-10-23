@@ -120,6 +120,11 @@
     ],
     "redirects": [
       {
+        "source": "/author/lakshay",
+        "destination": "/author/deepak-joshi",
+        "type": 301
+      },
+      {
         "source": "/exam-calendar",
         "destination": "/",
         "type": 301
