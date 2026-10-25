@@ -64,11 +64,9 @@ Firebase will show the exact DNS records required. Add those records in BigRock.
 
 The public article route is:
 
-`https://examdarpan.in/article/your-slug`
+`https://examdarpan.in/your-slug`
 
-Firebase Hosting rewrites `/article/**` to `article.html`, while the article page reads the published post from Firestore. The loader accepts both `/article/<slug>` and the older `article.html?slug=<slug>` format.
-
-The article page now sets a per-article title, meta description, canonical URL, Open Graph metadata, Article JSON-LD, and BreadcrumbList JSON-LD after the post is loaded. This improves crawlability, but Google rankings/indexing are never guaranteed by metadata alone. For a large publisher, server-rendered/static article HTML is still the stronger long-term SEO architecture.
+Published articles are generated as static `public/<slug>.html` files and served at the canonical extensionless URL `/<slug>` via Firebase Hosting `cleanUrls: true`. Legacy `/article/<slug>` requests are permanently redirected to `/<slug>`; the former `/article/**` rewrite is removed. The static build writes canonical, Open Graph, Twitter, JSON-LD and sitemap URLs from the same clean article URL.
 
 ## Security
 
@@ -106,8 +104,8 @@ The generated thumbnail is branded in the browser with the Exam Darpan logo and 
 
 
 ## Important deployment notes
-- Article pages use absolute `/styles.css`, `/firebase-config.js`, and `/assets/logo.png` paths so `/article/<slug>` does not fall back to an unstyled page.
-- `firebase.json` rewrites `/article/**` to `article.html`.
+- Article pages are generated as root-level static files and use clean canonical URLs `/<slug>`.
+- `firebase.json` permanently redirects `/article/<slug>` to `/<slug>`; no `/article/**` rewrite is used.
 - Article metadata, canonical URL, Open Graph, Twitter card, Article JSON-LD, and BreadcrumbList are generated when the article is loaded.
 - This is client-rendered SEO, not full server-side rendering. For maximum indexing reliability later, add a server-side/static article generation layer.
 - Gemini text uses `gemini-3.7-flash`; AI image uses `gemini-3.1-flash-image`. Firebase documents that Gemini 3.x Flash can be used with the Gemini Developer API without Blaze, while Gemini Image models require Blaze billing.

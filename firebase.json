@@ -30,17 +30,27 @@
     ],
     "redirects": [
       {
+        "source": "/article/:slug*",
+        "destination": "/:slug",
+        "type": 301
+      },
+      {
+        "source": "/index.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "regex": "^/(?P<path>.*)\\.html$",
+        "destination": "/:path",
+        "type": 301
+      },
+      {
         "source": "/rajasthan-safai-karmchari-recruitment-2026-24752",
         "destination": "/rajasthan-safai-karmchari-recruitment-2026",
         "type": 301
       }
     ],
-    "rewrites": [
-      {
-        "source": "/article/**",
-        "destination": "/article.html"
-      }
-    ]
+    "rewrites": []
   },
   "firestore": {
     "rules": "firestore.rules",

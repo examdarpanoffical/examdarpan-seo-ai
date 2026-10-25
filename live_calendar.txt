@@ -354,7 +354,7 @@ footer a{
     <a href="/">Home</a> ·
     <a href="/all-india-government-jobs">All India Jobs</a> ·
     <a href="/rajasthan-government-jobs">Rajasthan Jobs</a> ·
-    <a href="/quiz.html">Daily Quiz</a>
+    <a href="/quiz">Daily Quiz</a>
   </div>
 </footer>
 
@@ -827,7 +827,7 @@ import {
           String(post.slug || "").trim();
 
         const articleUrl =
-          "/article.html?slug=" +
+          "/" +
           encodeURIComponent(slug);
 
         const apply =

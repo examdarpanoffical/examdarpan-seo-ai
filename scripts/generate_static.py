@@ -152,7 +152,7 @@ def clean_title(value: Any) -> str:
     # Repair script-boundary imports such as "अगस्तJunior".
     text = re.sub(r"([\u0900-\u097f])(?=[A-Za-z])", r"\1 ", text)
     text = re.sub(r"([A-Za-z])(?=[\u0900-\u097f])", r"\1 ", text)
-    text = re.sub(r"\s+", " ", text).strip(" -|:;")
+    text = re.sub(r"\s+", " ", text).strip(" -|:;,")
 
     # Compare common recruitment abbreviations as their expanded forms so an
     # imported title like "JE ... Junior Engineer ..." is recognized as a
@@ -199,12 +199,12 @@ def clean_title(value: Any) -> str:
         raw_start = pos_map[j]
         raw_end = pos_map[end_j - 1] + 1
         raw_words = raw_words[:raw_start] + raw_words[raw_end:]
-        text = " ".join(raw_words).strip(" -|:;")
+        text = " ".join(raw_words).strip(" -|:;,")
         # If the duplicated clause had a short grammatical tail, remove that
         # tail too; otherwise the cleaned title can end as "31 अगस्त पदों पर भर्ती".
-        text = re.sub(r"\s+पदों\s+पर\s+भर्ती\s*$", "", text).strip(" -|:;")
+        text = re.sub(r"\s+पदों\s+पर\s+भर्ती\s*$", "", text).strip(" -|:;,")
 
-    return text or "Exam Darpan Article"
+    return re.sub(r"[\s,]+$", "", text) or "Exam Darpan Article"
 
 
 def post_title(p: dict[str, Any]) -> str:
@@ -439,10 +439,10 @@ def reading_time(content: Any) -> int:
 
 
 def seo_title(p: dict[str, Any]) -> str:
+    """Return a compact SEO title without trailing commas or whitespace."""
     value = clean_text(p.get("seoTitle"))
-    if value:
-        return value[:65].strip()
-    return post_title(p)[:65].strip()
+    candidate = value[:65] if value else post_title(p)[:65]
+    return re.sub(r"[\s,]+$", "", candidate)
 
 
 def seo_description(p: dict[str, Any]) -> str:
@@ -1252,12 +1252,12 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 
     <div class="footer-col">
       <h4>Important &amp; Legal</h4>
-      <a href="/about.html">About Us</a>
-      <a href="/editorial-policy.html">Editorial Policy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/disclaimer.html">Disclaimer</a>
-      <a href="/terms.html">Terms &amp; Conditions</a>
+      <a href="/about">About Us</a>
+      <a href="/editorial-policy">Editorial Policy</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/disclaimer">Disclaimer</a>
+      <a href="/terms">Terms &amp; Conditions</a>
     </div>
   </div>
 
@@ -3003,7 +3003,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         'करके तैयार की जाती है। किसी भी आवेदन या परीक्षा से पहले अंतिम जानकारी '
         'official notice से जरूर verify करें।'
         '</p>'
-        '<a href="/editorial-policy.html">Editorial Policy देखें →</a>'
+        '<a href="/editorial-policy">Editorial Policy देखें →</a>'
         '</div>'
         '<div class="ed-home-editorial-points">'
         '<span><b>✓</b><strong>Official Source</strong><small>Verified information</small></span>'
@@ -3659,7 +3659,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><div class="ed-category-page"><section class="ed-category-hero"><div><span class="ed-category-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="ed-category-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="ed-category-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
-<section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">IMPORTANT LATEST</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} updates</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy.html">Editorial Policy <b>→</b></a></div></aside></section></div></main>
+<section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">IMPORTANT LATEST</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} updates</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy">Editorial Policy <b>→</b></a></div></aside></section></div></main>
 <footer class="footer">
   <div class="container footer-main">
     <div class="footer-brand">
@@ -3694,12 +3694,12 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 
     <div class="footer-col">
       <h4>Important &amp; Legal</h4>
-      <a href="/about.html">About Us</a>
-      <a href="/editorial-policy.html">Editorial Policy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/disclaimer.html">Disclaimer</a>
-      <a href="/terms.html">Terms &amp; Conditions</a>
+      <a href="/about">About Us</a>
+      <a href="/editorial-policy">Editorial Policy</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/disclaimer">Disclaimer</a>
+      <a href="/terms">Terms &amp; Conditions</a>
     </div>
   </div>
 
@@ -4082,12 +4082,12 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
 
     <div class="footer-col">
       <h4>Important &amp; Legal</h4>
-      <a href="/about.html">About Us</a>
-      <a href="/editorial-policy.html">Editorial Policy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/disclaimer.html">Disclaimer</a>
-      <a href="/terms.html">Terms &amp; Conditions</a>
+      <a href="/about">About Us</a>
+      <a href="/editorial-policy">Editorial Policy</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/disclaimer">Disclaimer</a>
+      <a href="/terms">Terms &amp; Conditions</a>
     </div>
   </div>
 
@@ -4192,6 +4192,38 @@ def write_category_directory(posts: list[dict[str, Any]]) -> None:
     (PUBLIC / "categories.html").write_text(page, encoding="utf-8")
 
 
+def normalize_clean_internal_links() -> None:
+    """Use extensionless URLs for internal HTML links across generated public pages."""
+    replacements = {
+        "/index.html": "/",
+        "/about.html": "/about",
+        "/contact.html": "/contact",
+        "/editorial-policy.html": "/editorial-policy",
+        "/privacy.html": "/privacy",
+        "/disclaimer.html": "/disclaimer",
+        "/terms.html": "/terms",
+        "/answer-key.html": "/category-answer-key",
+        "/syllabus.html": "/category-syllabus",
+        "/quiz.html": "/quiz",
+    }
+    for path in PUBLIC.rglob("*.html"):
+        try:
+            content = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        original = content
+        for old_path, new_path in replacements.items():
+            content = content.replace('href="' + old_path, 'href="' + new_path)
+            content = content.replace("href='" + old_path, "href='" + new_path)
+        content = re.sub(
+            r'(?i)(href=["\'])/([A-Za-z0-9._~/-]+)\.html(?=[?#"\'])',
+            r'\1/\2',
+            content,
+        )
+        if content != original:
+            path.write_text(content, encoding="utf-8")
+
+
 def inject_category_directory_links() -> None:
     """Expose the all-categories directory from the homepage and generated pages."""
     targets = [PUBLIC / "index.html", *PUBLIC.glob("*.html"), *PUBLIC.glob("category-*.html"), PUBLIC / "author" / "lakshay" / "index.html"]
@@ -4260,7 +4292,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
             urls.append((category_path(cslug), clast, None))
 
     for p, s in zip(posts, article_slugs):
-        urls.append((f"/{quote(s, safe='-._~')}", iso(p.get("updatedAt")) or iso(p.get("publishedAt")), safe_url(p.get("featuredImage")) or None))
+        urls.append((f"/{quote(s, safe='-._~')}", iso(p.get("updatedAt")), safe_url(p.get("featuredImage")) or None))
 
     # Keep sitemap URLs unique and in canonical form.
     deduped_urls: list[tuple[str, str | None, str | None]] = []
@@ -4380,6 +4412,17 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         for pat in bad_patterns:
             if pat.search(txt):
                 raise RuntimeError(f"SEO verification failed in {path.name}: {pat.pattern}")
+    legacy_article_dir = PUBLIC / "article"
+    nested_article_files = (
+        [path for path in legacy_article_dir.rglob("*") if path.is_file()]
+        if legacy_article_dir.exists() else []
+    )
+    if nested_article_files:
+        raise RuntimeError(
+            "SEO verification failed: files remain under public/article/: "
+            + ", ".join(str(path.relative_to(PUBLIC)) for path in nested_article_files)
+        )
+
     for p in posts:
         s = slugify(p.get("slug")); path = PUBLIC / f"{s}.html"
         if not path.exists():
@@ -4438,6 +4481,15 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
     locs = [node.text.strip() for node in sitemap_root.findall("sm:url/sm:loc", ns) if node.text]
     if len(locs) != len(set(locs)):
         raise RuntimeError("SEO verification failed: duplicate URLs in sitemap")
+    forbidden_sitemap_urls = [
+        url for url in locs
+        if ".html" in url.lower() or "?" in url or "/article/" in url.lower()
+    ]
+    if forbidden_sitemap_urls:
+        raise RuntimeError(
+            "SEO verification failed: non-canonical URL(s) in sitemap: "
+            + ", ".join(forbidden_sitemap_urls[:10])
+        )
     if any("/exam-calendar" in url for url in locs):
         raise RuntimeError("SEO verification failed: removed Exam Calendar URL remains in sitemap")
 
@@ -4644,11 +4696,50 @@ def main() -> int:
     write_author_profile(posts)
     write_category_directory(posts)
     inject_category_directory_links()
+    normalize_clean_internal_links()
     write_sitemaps(posts, article_slugs, category_slugs)
 
     verify_generated_output(posts)
 
+    generated_article_files = [
+        path for path in PUBLIC.glob("*.html")
+        if ARTICLE_MARKER in path.read_text(encoding="utf-8", errors="ignore")
+    ]
+    legacy_article_files = [
+        path for path in (PUBLIC / "article").rglob("*") if path.is_file()
+    ] if (PUBLIC / "article").exists() else []
+    sitemap_root = ET.parse(PUBLIC / "sitemap.xml").getroot()
+    sitemap_locs = [
+        node.text.strip()
+        for node in sitemap_root.findall("{http://www.sitemaps.org/schemas/sitemap/0.9}url/{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+        if node.text and node.text.strip()
+    ]
+    forbidden_sitemap_locs = [
+        url for url in sitemap_locs
+        if ".html" in url.lower() or "?" in url or "/article/" in url.lower()
+    ]
     print(f"Static SEO build: {len(article_slugs)} published article pages generated + {len(category_paths)} category pages + sitemap + RSS.")
+    print(f"Verification counts: generated article HTML={len(generated_article_files)}; files under /article/={len(legacy_article_files)}; sitemap URLs={len(sitemap_locs)}; forbidden sitemap URLs={len(forbidden_sitemap_locs)}.")
+    for sample_slug in (
+        "rajasthan-cet-senior-secondary-2026-28-august-se-23-october-tak-56-din-mein-clerk-ldc-exam-ki-taiyari-kaise-kare",
+        "ssc-je-recruitment-2026",
+        "sbi-asha-scholarship-2026",
+    ):
+        sample_path = PUBLIC / f"{sample_slug}.html"
+        if not sample_path.exists():
+            print(f"Sample verification: {sample_slug}: NOT FOUND")
+            continue
+        sample_html = sample_path.read_text(encoding="utf-8", errors="ignore")
+        sample_title = re.search(r"<title>(.*?)</title>", sample_html, flags=re.I | re.S)
+        sample_canonical = re.search(r'<link rel="canonical" href="([^"]*)"', sample_html, flags=re.I)
+        sample_robots = re.search(r'<meta name="robots" content="([^"]*)"', sample_html, flags=re.I)
+        sample_body = re.search(r"<body\b[^>]*>([\s\S]*?)</body>", sample_html, flags=re.I)
+        body_start = sample_body.group(1)[:300] if sample_body else ""
+        print(f"Sample verification: {sample_slug}")
+        print(f"  title={sample_title.group(1).strip() if sample_title else 'MISSING'}")
+        print(f"  canonical={sample_canonical.group(1) if sample_canonical else 'MISSING'}")
+        print(f"  robots={sample_robots.group(1) if sample_robots else 'MISSING'}")
+        print(f"  body_first_300={body_start!r}")
     print(f"Published posts included: {len(posts)}")
     return 0
 

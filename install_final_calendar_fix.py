@@ -477,7 +477,7 @@ import {
           String(post.slug || "").trim();
 
         const articleUrl =
-          "/article.html?slug=" +
+          "/" +
           encodeURIComponent(slug);
 
         const apply =
