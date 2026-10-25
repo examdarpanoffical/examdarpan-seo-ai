@@ -8,10 +8,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-  schedule:
-    # Static article views do not read Firestore. Rebuild hourly to reduce
-    # background full-collection Firestore reads; GitHub may delay scheduled runs.
-    - cron: "0 * * * *"
 
 permissions:
   contents: read
