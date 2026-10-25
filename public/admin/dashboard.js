@@ -126,8 +126,43 @@ function fill(p){
   $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';
   $('image').value=p.featuredImage||'';$('notification').value=p.officialNotificationUrl||'';$('apply').value=p.applyOnlineUrl||'';
   $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';$('tags').value=(p.tags||[]).join(', ');
-  $('formTitle').textContent='Edit Article';window.scrollTo({top:0,behavior:'smooth'});
+  $('formTitle').textContent='Edit Article';updateSeoPreview();window.scrollTo({top:0,behavior:'smooth'});
 }
+function updateSeoPreview(){
+  const title=$('seoTitle').value.trim()||$('title').value.trim()||'Article title यहाँ दिखेगा';
+  const description=$('seoDescription').value.trim()||$('excerpt').value.trim()||'Meta description यहाँ दिखेगी.';
+  const slug=slugify($('slug').value.trim()||$('title').value.trim())||'your-article-slug';
+  $('seoTitleCount').textContent=$('seoTitle').value.length+'/65 characters · लक्ष्य: लगभग 30–60';
+  $('seoDescriptionCount').textContent=$('seoDescription').value.length+'/170 characters · लक्ष्य: लगभग 120–160';
+  $('seoPreviewTitle').textContent=title.slice(0,65);
+  $('seoPreviewUrl').textContent='examdarpan.in/'+slug;
+  $('seoPreviewDescription').textContent=description.slice(0,170);
+}
+function suggestSeoFields(){
+  const title=$('title').value.trim();
+  const excerpt=$('excerpt').value.trim();
+  const plain=String($('content').value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/\s+/g,' ').trim();
+  if(!title){$('msg').textContent='पहले Article Title भरें, फिर SEO suggestion बनाएं.';return;}
+  if(!$('seoTitle').value.trim())$('seoTitle').value=title.slice(0,65);
+  if(!$('seoDescription').value.trim()){
+    const source=(excerpt||plain).replace(/^AI-assisted draft — Human verification required before publication\.?\s*/i,'').trim();
+    $('seoDescription').value=(source?title+'. '+source:title).replace(/\s+/g,' ').slice(0,160).trim();
+  }
+  if(!$('searchKeywords').value.trim()){
+    const category=$('category').value.trim();
+    $('searchKeywords').value=[title,category].filter(Boolean).join(', ');
+  }
+  updateSeoPreview();
+}
+$('title').addEventListener('input',updateSeoPreview);
+$('slug').addEventListener('input',updateSeoPreview);
+$('seoTitle').addEventListener('input',updateSeoPreview);
+$('seoDescription').addEventListener('input',updateSeoPreview);
+$('excerpt').addEventListener('input',updateSeoPreview);
+$('suggestSeo').addEventListener('click',suggestSeoFields);
+$('clearSeo').addEventListener('click',()=>{
+  $('seoTitle').value='';$('seoDescription').value='';$('searchKeywords').value='';updateSeoPreview();
+});
 function articleData(status,existingPost=null){
   const title=$('title').value.trim();
   const category=$('category').value||'Latest Updates';
@@ -229,7 +264,7 @@ async function remove(id){
 function clearForm(){
   $('postId').value='';
   ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
-  $('formTitle').textContent='New Article';
+  $('formTitle').textContent='New Article';updateSeoPreview();
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
 }
@@ -262,6 +297,7 @@ function renderCategoryLinks(){
 }
 $('category').addEventListener('change',renderCategoryLinks);
 renderCategoryLinks();
+updateSeoPreview();
 
 $('previewArticle').onclick=()=>{
   const title=$('title').value.trim()||'Article Title Preview';
