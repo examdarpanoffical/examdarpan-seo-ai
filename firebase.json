@@ -28,6 +28,13 @@
         ]
       }
     ],
+    "redirects": [
+      {
+        "source": "/rajasthan-safai-karmchari-recruitment-2026-24752",
+        "destination": "/rajasthan-safai-karmchari-recruitment-2026",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "/article/**",
