@@ -64,11 +64,9 @@ Firebase will show the exact DNS records required. Add those records in BigRock.
 
 The public article route is:
 
-`https://examdarpan.in/article/your-slug`
+`https://examdarpan.in/your-slug`
 
-Firebase Hosting rewrites `/article/**` to `article.html`, while the article page reads the published post from Firestore. The loader accepts both `/article/<slug>` and the older `article.html?slug=<slug>` format.
-
-The article page now sets a per-article title, meta description, canonical URL, Open Graph metadata, Article JSON-LD, and BreadcrumbList JSON-LD after the post is loaded. This improves crawlability, but Google rankings/indexing are never guaranteed by metadata alone. For a large publisher, server-rendered/static article HTML is still the stronger long-term SEO architecture.
+Published articles are generated as static `public/<slug>.html` files and served at the canonical extensionless URL `/<slug>` via Firebase Hosting `cleanUrls: true`. Legacy `/article/<slug>` requests are permanently redirected to `/<slug>`; the former `/article/**` rewrite is removed. The static build writes canonical, Open Graph, Twitter, JSON-LD and sitemap URLs from the same clean article URL.
 
 ## Security
 
