@@ -104,8 +104,8 @@ The generated thumbnail is branded in the browser with the Exam Darpan logo and 
 
 
 ## Important deployment notes
-- Article pages use absolute `/styles.css`, `/firebase-config.js`, and `/assets/logo.png` paths so `/article/<slug>` does not fall back to an unstyled page.
-- `firebase.json` rewrites `/article/**` to `article.html`.
+- Article pages are generated as root-level static files and use clean canonical URLs `/<slug>`.
+- `firebase.json` permanently redirects `/article/<slug>` to `/<slug>`; no `/article/**` rewrite is used.
 - Article metadata, canonical URL, Open Graph, Twitter card, Article JSON-LD, and BreadcrumbList are generated when the article is loaded.
 - This is client-rendered SEO, not full server-side rendering. For maximum indexing reliability later, add a server-side/static article generation layer.
 - Gemini text uses `gemini-3.7-flash`; AI image uses `gemini-3.1-flash-image`. Firebase documents that Gemini 3.x Flash can be used with the Gemini Developer API without Blaze, while Gemini Image models require Blaze billing.
