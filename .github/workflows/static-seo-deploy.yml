@@ -58,6 +58,24 @@ jobs:
           grep -Fq 'Scholarships &amp; Yojana' public/index.html
           grep -Fq 'Rajasthan Government Jobs' public/index.html
           grep -Fq 'All India Government Jobs' public/index.html
+          # Fail closed if split sitemap files are missing or malformed.
+          test -s public/sitemap_index.xml
+          test -s public/post-sitemap.xml
+          test -s public/page-sitemap.xml
+          test -s public/category-sitemap.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          ns = {'sm': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+          root = ET.parse('public/sitemap_index.xml').getroot()
+          refs = [n.text.strip() for n in root.findall('sm:sitemap/sm:loc', ns) if n.text and n.text.strip()]
+          required = {'post-sitemap.xml', 'page-sitemap.xml', 'category-sitemap.xml'}
+          if len(refs) < 3 or not all(any(ref.endswith(name) for ref in refs) for name in required):
+              raise SystemExit(f'Sitemap index missing expected child sitemaps: {refs}')
+          for name in ('post-sitemap.xml', 'page-sitemap.xml', 'category-sitemap.xml'):
+              ET.parse(Path('public') / name)
+          print(f'Sitemap index references {len(refs)} child sitemap(s); XML parses successfully.')
+          PY
 
       - name: Report SEO sanity checks
         run: |
