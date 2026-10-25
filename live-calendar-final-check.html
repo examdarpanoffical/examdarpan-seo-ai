@@ -827,7 +827,7 @@ footer a{
 
       const slug = String(p.slug || "").trim();
       const url = slug
-        ? "/article.html?slug=" + encodeURIComponent(slug)
+        ? "/" + encodeURIComponent(slug)
         : "#";
 
       const apply =
