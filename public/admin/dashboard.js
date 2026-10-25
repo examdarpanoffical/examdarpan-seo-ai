@@ -132,11 +132,11 @@ function updateSeoPreview(){
   const title=$('seoTitle').value.trim()||$('title').value.trim()||'Article title यहाँ दिखेगा';
   const description=$('seoDescription').value.trim()||$('excerpt').value.trim()||'Meta description यहाँ दिखेगी.';
   const slug=slugify($('slug').value.trim()||$('title').value.trim())||'your-article-slug';
-  $('seoTitleCount').textContent=$('seoTitle').value.length+'/65 characters · लक्ष्य: लगभग 30–60';
-  $('seoDescriptionCount').textContent=$('seoDescription').value.length+'/170 characters · लक्ष्य: लगभग 120–160';
-  $('seoPreviewTitle').textContent=title.slice(0,65);
+  $('seoTitleCount').textContent=$('seoTitle').value.length+' characters · कोई input limit नहीं';
+  $('seoDescriptionCount').textContent=$('seoDescription').value.length+' characters · कोई input limit नहीं';
+  $('seoPreviewTitle').textContent=title;
   $('seoPreviewUrl').textContent='examdarpan.in/'+slug;
-  $('seoPreviewDescription').textContent=description.slice(0,170);
+  $('seoPreviewDescription').textContent=description;
 }
 function buildRelevantSearchPhrases(title,category,excerpt,plain){
   const clean=s=>String(s||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,' and ').replace(/\s+/g,' ').trim();
@@ -183,10 +183,10 @@ function suggestSeoFields(){
   const excerpt=$('excerpt').value.trim();
   const plain=String($('content').value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/\s+/g,' ').trim();
   if(!title){$('msg').textContent='पहले Article Title भरें, फिर SEO suggestion बनाएं.';return;}
-  if(!$('seoTitle').value.trim())$('seoTitle').value=title.slice(0,65);
+  if(!$('seoTitle').value.trim())$('seoTitle').value=title;
   if(!$('seoDescription').value.trim()){
     const source=(excerpt||plain).replace(/^AI-assisted draft — Human verification required before publication\.?\s*/i,'').trim();
-    $('seoDescription').value=(source?title+'. '+source:title).replace(/\s+/g,' ').slice(0,160).trim();
+    $('seoDescription').value=(source?title+'. '+source:title).replace(/\s+/g,' ').trim();
   }
   if(!$('searchKeywords').value.trim()){
     $('searchKeywords').value=buildRelevantSearchPhrases(title,$('category').value,excerpt,plain).join(', ');
@@ -233,12 +233,6 @@ function articleData(status,existingPost=null){
     .filter(Boolean)
     .slice(0,15);
 
-  if(seoTitle.length>65){
-    throw new Error('SEO Title 65 characters या उससे कम रखें.');
-  }
-  if(seoDescription.length>170){
-    throw new Error('SEO Description 170 characters या उससे कम रखें.');
-  }
 
   const base={
     title,slug:canonicalSlug,category:$('category').value||'Latest Updates',
