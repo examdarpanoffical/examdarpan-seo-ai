@@ -1,10 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /admin
 Disallow: /admin/
 Disallow: /login
-Disallow: /404
-Disallow: /_/*
-Disallow: /__/*
+Disallow: /login/
+Disallow: /api/
 
-# Google Search Console Fast Indexing Helper
+# Sitemaps
 Sitemap: https://examdarpan.in/sitemap_index.xml
