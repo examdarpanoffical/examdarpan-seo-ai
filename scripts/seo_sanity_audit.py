@@ -6,6 +6,7 @@ It reports actionable technical inconsistencies for review.
 """
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -25,6 +26,10 @@ TEMPLATE_LEAK = re.compile(r"\$\{\s*esc\(title\)\s*\}")
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--allow-missing-split-sitemaps", action="store_true",
+                        help="Treat absent generated split sitemaps as advisory during pre-build validation.")
+    args = parser.parse_args()
     issues: list[tuple[str, str]] = []
     sitemap_path = PUBLIC / "sitemap.xml"
 
@@ -32,7 +37,8 @@ def main() -> int:
     for filename in split_sitemaps:
         path = PUBLIC / filename
         if not path.exists():
-            issues.append(("ERROR", f"Missing split sitemap file: {filename}"))
+            level = "WARN" if args.allow_missing_split_sitemaps else "ERROR"
+            issues.append((level, f"Missing split sitemap file: {filename}"))
             continue
         try:
             ET.parse(path)
