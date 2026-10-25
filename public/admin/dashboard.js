@@ -138,6 +138,46 @@ function updateSeoPreview(){
   $('seoPreviewUrl').textContent='examdarpan.in/'+slug;
   $('seoPreviewDescription').textContent=description.slice(0,170);
 }
+function buildRelevantSearchPhrases(title,category,excerpt,plain){
+  const clean=s=>String(s||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,' and ').replace(/\s+/g,' ').trim();
+  const t=clean(title).replace(/[|•–—]+/g,' ').replace(/\s+/g,' ').trim();
+  const c=clean(category);
+  const source=clean((excerpt||plain).replace(/^AI-assisted draft — Human verification required before publication\.?\s*/i,''));
+  const year=(t.match(/20\d{2}/)||[])[0]||'';
+  const phrases=[t];
+  const add=(s)=>{s=clean(s);if(s&&s.length>3&&!phrases.some(x=>x.toLowerCase()===s.toLowerCase()))phrases.push(s);};
+  // Add only search intents that match the article title/topic.
+  const isRecruitment=/recruitment|vacancy|bharti|भर्ती|रिक्ति|पदों|आवेदन/i.test(t);
+  const isResult=/result|परिणाम|मेरिट लिस्ट|merit list/i.test(t);
+  const isAdmit=/admit card|प्रवेश पत्र|hall ticket|exam city/i.test(t);
+  const isAnswer=/answer key|उत्तर कुंजी/i.test(t);
+  const isSyllabus=/syllabus|पाठ्यक्रम/i.test(t);
+  if(isRecruitment){
+    add(t+' eligibility');add(t+' apply online');add(t+' last date');add(t+' official notification');
+    add(t+' योग्यता');add(t+' आवेदन की अंतिम तिथि');
+  }else if(isResult){
+    add(t+' result PDF');add(t+' merit list');add(t+' परिणाम कैसे देखें');
+  }else if(isAdmit){
+    add(t+' download');add(t+' exam date');add(t+' डाउनलोड');
+  }else if(isAnswer){
+    add(t+' PDF download');add(t+' objection date');
+  }else if(isSyllabus){
+    add(t+' PDF download');add(t+' exam pattern');
+  }else if(/yojana|scheme|योजना/i.test(t)){
+    add(t+' eligibility');add(t+' apply online');add(t+' पात्रता');add(t+' आवेदन प्रक्रिया');
+  }else if(/scholarship|छात्रवृत्ति/i.test(t)){
+    add(t+' eligibility');add(t+' last date');add(t+' आवेदन');
+  }
+  if(year && isRecruitment)add(c+' '+year+' recruitment');
+  // Category is a relevant secondary phrase, not a blanket keyword repeated everywhere.
+  if(c && !t.toLowerCase().includes(c.toLowerCase()))add(c+' '+(year||'latest update'));
+  // Include one meaningful phrase from the article summary only if it adds context.
+  if(source){
+    const first=source.split(/[.!?।\n]/)[0].trim();
+    if(first.length>=18&&first.length<=95)add(first);
+  }
+  return phrases.slice(0,10);
+}
 function suggestSeoFields(){
   const title=$('title').value.trim();
   const excerpt=$('excerpt').value.trim();
@@ -149,8 +189,7 @@ function suggestSeoFields(){
     $('seoDescription').value=(source?title+'. '+source:title).replace(/\s+/g,' ').slice(0,160).trim();
   }
   if(!$('searchKeywords').value.trim()){
-    const category=$('category').value.trim();
-    $('searchKeywords').value=[title,category].filter(Boolean).join(', ');
+    $('searchKeywords').value=buildRelevantSearchPhrases(title,$('category').value,excerpt,plain).join(', ');
   }
   updateSeoPreview();
 }
