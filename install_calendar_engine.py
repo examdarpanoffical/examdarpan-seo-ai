@@ -177,7 +177,7 @@ if (calendar && window.FIREBASE_CONFIG) {
 
       const slug = post.slug || "";
       const articleUrl =
-        "/article.html?slug=" + encodeURIComponent(slug);
+        "/" + encodeURIComponent(slug);
 
       return `
         <article
