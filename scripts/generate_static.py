@@ -4260,7 +4260,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
             urls.append((category_path(cslug), clast, None))
 
     for p, s in zip(posts, article_slugs):
-        urls.append((f"/{quote(s, safe='-._~')}", iso(p.get("updatedAt")) or iso(p.get("publishedAt")), safe_url(p.get("featuredImage")) or None))
+        urls.append((f"/{quote(s, safe='-._~')}", iso(p.get("updatedAt")), safe_url(p.get("featuredImage")) or None))
 
     # Keep sitemap URLs unique and in canonical form.
     deduped_urls: list[tuple[str, str | None, str | None]] = []
@@ -4380,6 +4380,17 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         for pat in bad_patterns:
             if pat.search(txt):
                 raise RuntimeError(f"SEO verification failed in {path.name}: {pat.pattern}")
+    legacy_article_dir = PUBLIC / "article"
+    nested_article_files = (
+        [path for path in legacy_article_dir.rglob("*") if path.is_file()]
+        if legacy_article_dir.exists() else []
+    )
+    if nested_article_files:
+        raise RuntimeError(
+            "SEO verification failed: files remain under public/article/: "
+            + ", ".join(str(path.relative_to(PUBLIC)) for path in nested_article_files)
+        )
+
     for p in posts:
         s = slugify(p.get("slug")); path = PUBLIC / f"{s}.html"
         if not path.exists():
@@ -4438,6 +4449,15 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
     locs = [node.text.strip() for node in sitemap_root.findall("sm:url/sm:loc", ns) if node.text]
     if len(locs) != len(set(locs)):
         raise RuntimeError("SEO verification failed: duplicate URLs in sitemap")
+    forbidden_sitemap_urls = [
+        url for url in locs
+        if ".html" in url.lower() or "?" in url or "/article/" in url.lower()
+    ]
+    if forbidden_sitemap_urls:
+        raise RuntimeError(
+            "SEO verification failed: non-canonical URL(s) in sitemap: "
+            + ", ".join(forbidden_sitemap_urls[:10])
+        )
     if any("/exam-calendar" in url for url in locs):
         raise RuntimeError("SEO verification failed: removed Exam Calendar URL remains in sitemap")
 
