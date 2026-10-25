@@ -65,22 +65,37 @@
   <p class="meta">इन fields से article का search title और description control होगा। Keywords केवल relevant topics के लिए रखें; keyword stuffing न करें.</p>
 
   <div class="field">
-    <label>SEO Title</label>
+    <label>SEO Title <span style="font-weight:400">(Google title)</span></label>
     <input id="seoTitle" maxlength="65"
-      placeholder="Rajasthan Veterinary Officer Recruitment 2026 – Apply Online">
+      placeholder="खाली छोड़ने पर article title इस्तेमाल होगा">
+    <p id="seoTitleCount" class="meta">0/65 characters · लक्ष्य: लगभग 30–60</p>
   </div>
 
   <div class="field">
-    <label>SEO Description</label>
+    <label>Meta Description</label>
     <textarea id="seoDescription" maxlength="170" style="min-height:80px"
-      placeholder="Rajasthan Veterinary Officer Recruitment 2026 की vacancy, eligibility, dates, application link और official notification की पूरी जानकारी."></textarea>
+      placeholder="खाली छोड़ने पर excerpt/content से description बनेगा"></textarea>
+    <p id="seoDescriptionCount" class="meta">0/170 characters · लक्ष्य: लगभग 120–160</p>
   </div>
 
   <div class="field">
-    <label>Search Keywords</label>
+    <label>Search Keywords / Related Queries</label>
     <input id="searchKeywords"
-      placeholder="Rajasthan Veterinary Officer Recruitment 2026, Veterinary Officer Vacancy, RUHS Recruitment">
-    <p class="meta">Comma separated. केवल article से सीधे जुड़े search phrases लिखें.</p>
+      placeholder="मुख्य भर्ती 2026, eligibility, last date, official notification">
+    <p class="meta">Comma separated. ये site की content/schema metadata में इस्तेमाल होते हैं; Google इन्हें ranking का direct signal नहीं मानता। 3–8 relevant phrases काफी हैं.</p>
+  </div>
+  <div class="field">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" id="suggestSeo" class="btn btn-dark">Title/Description सुझाएं</button>
+      <button type="button" id="clearSeo" class="btn btn-light">SEO fields खाली करें</button>
+    </div>
+    <p class="meta">Suggestion आपके title, excerpt और content से बनेगा—publish से पहले dates/पद/विभाग verify करें.</p>
+  </div>
+  <div class="card pad" style="background:#fff;border:1px solid #dbe3ee;margin-top:10px">
+    <strong>Google Search Preview</strong>
+    <div id="seoPreviewTitle" style="color:#1a0dab;font-size:18px;line-height:1.4;margin-top:8px;overflow-wrap:anywhere">Article title यहाँ दिखेगा</div>
+    <div id="seoPreviewUrl" style="color:#188038;font-size:13px;margin:4px 0;overflow-wrap:anywhere">examdarpan.in/your-article-slug</div>
+    <div id="seoPreviewDescription" style="color:#4b5563;font-size:13px;line-height:1.55">Meta description यहाँ दिखेगी.</div>
   </div>
 </div>
 
