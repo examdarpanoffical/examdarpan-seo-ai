@@ -4733,7 +4733,7 @@ def main() -> int:
         sample_title = re.search(r"<title>(.*?)</title>", sample_html, flags=re.I | re.S)
         sample_canonical = re.search(r'<link rel="canonical" href="([^"]*)"', sample_html, flags=re.I)
         sample_robots = re.search(r'<meta name="robots" content="([^"]*)"', sample_html, flags=re.I)
-        sample_body = re.search(r"<body\\b[^>]*>([\\s\\S]*?)</body>", sample_html, flags=re.I)
+        sample_body = re.search(r"<body\b[^>]*>([\s\S]*?)</body>", sample_html, flags=re.I)
         body_start = sample_body.group(1)[:300] if sample_body else ""
         print(f"Sample verification: {sample_slug}")
         print(f"  title={sample_title.group(1).strip() if sample_title else 'MISSING'}")
