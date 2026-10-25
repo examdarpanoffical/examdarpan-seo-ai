@@ -10,173 +10,27 @@
     "trailingSlash": false,
     "headers": [
       {
-        "source": "/",
+        "source": "**/*.@(html|json)",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "no-cache, no-store, max-age=0, must-revalidate"
+            "value": "public, max-age=0, must-revalidate"
           }
         ]
       },
       {
-        "source": "/index.html",
+        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|js|css)",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "no-cache, no-store, max-age=0, must-revalidate"
+            "value": "public, max-age=31536000, immutable"
           }
         ]
-      },
-      {
-        "source": "/content-index.json",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=300, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/sitemap.xml",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=3600, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/robots.txt",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=3600, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/assets/**",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=2592000, stale-while-revalidate=86400"
-          }
-        ]
-      },
-      {
-        "source": "/quiz",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, max-age=0, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/quiz.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, max-age=0, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/admin/dashboard.js",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, max-age=0, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "**/*.js",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=86400, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/*.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=300, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/**/*.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=300, must-revalidate"
-          }
-        ]
-      }
-    ],
-    "redirects": [
-      {
-        "source": "/sitemap.xml",
-        "destination": "/sitemap_index.xml",
-        "type": 301
-      },
-      {
-        "source": "/author/lakshay",
-        "destination": "/author/deepak-joshi",
-        "type": 301
-      },
-      {
-        "source": "/exam-calendar",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/answer-key",
-        "destination": "/category-answer-key",
-        "type": 301
-      },
-      {
-        "source": "/syllabus",
-        "destination": "/category-syllabus",
-        "type": 301
-      },
-      {
-        "source": "/category-rajasthan-jobs",
-        "destination": "/rajasthan-government-jobs",
-        "type": 301
-      },
-      {
-        "source": "/category-government-jobs",
-        "destination": "/all-india-government-jobs",
-        "type": 301
-      },
-      {
-        "source": "/rajasthan-police-si-2021-re-exam-2026-exam-city-admit-card",
-        "destination": "/rpsc-si-admit-card-2026-download",
-        "type": 301
-      },
-      {
-        "source": "/rajasthan-safai-karmchari-recruitment-2026-24752",
-        "destination": "/rajasthan-safai-karmchari-recruitment-2026",
-        "type": 301
-      },
-      {
-        "source": "/article/:slug",
-        "destination": "/:slug",
-        "type": 301
       }
     ],
     "rewrites": [
       {
-        "source": "/quiz",
-        "destination": "/quiz.html"
-      },
-      {
-        "source": "**",
+        "source": "/article/**",
         "destination": "/article.html"
       }
     ]
