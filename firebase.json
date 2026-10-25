@@ -120,6 +120,11 @@
     ],
     "redirects": [
       {
+        "source": "/sitemap.xml",
+        "destination": "/sitemap_index.xml",
+        "type": 301
+      },
+      {
         "source": "/author/lakshay",
         "destination": "/author/deepak-joshi",
         "type": 301
