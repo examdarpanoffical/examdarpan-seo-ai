@@ -4192,6 +4192,38 @@ def write_category_directory(posts: list[dict[str, Any]]) -> None:
     (PUBLIC / "categories.html").write_text(page, encoding="utf-8")
 
 
+def normalize_clean_internal_links() -> None:
+    """Use extensionless URLs for internal HTML links across generated public pages."""
+    replacements = {
+        "/index.html": "/",
+        "/about.html": "/about",
+        "/contact.html": "/contact",
+        "/editorial-policy.html": "/editorial-policy",
+        "/privacy.html": "/privacy",
+        "/disclaimer.html": "/disclaimer",
+        "/terms.html": "/terms",
+        "/answer-key.html": "/category-answer-key",
+        "/syllabus.html": "/category-syllabus",
+        "/quiz.html": "/quiz",
+    }
+    for path in PUBLIC.rglob("*.html"):
+        try:
+            content = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        original = content
+        for old_path, new_path in replacements.items():
+            content = content.replace('href="' + old_path, 'href="' + new_path)
+            content = content.replace("href='" + old_path, "href='" + new_path)
+        content = re.sub(
+            r'(?i)(href=["\'])/([A-Za-z0-9._~/-]+)\.html(?=[?#"\'])',
+            r'\1/\2',
+            content,
+        )
+        if content != original:
+            path.write_text(content, encoding="utf-8")
+
+
 def inject_category_directory_links() -> None:
     """Expose the all-categories directory from the homepage and generated pages."""
     targets = [PUBLIC / "index.html", *PUBLIC.glob("*.html"), *PUBLIC.glob("category-*.html"), PUBLIC / "author" / "lakshay" / "index.html"]
@@ -4664,6 +4696,7 @@ def main() -> int:
     write_author_profile(posts)
     write_category_directory(posts)
     inject_category_directory_links()
+    normalize_clean_internal_links()
     write_sitemaps(posts, article_slugs, category_slugs)
 
     verify_generated_output(posts)
