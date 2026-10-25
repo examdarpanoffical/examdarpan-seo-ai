@@ -4701,7 +4701,45 @@ def main() -> int:
 
     verify_generated_output(posts)
 
+    generated_article_files = [
+        path for path in PUBLIC.glob("*.html")
+        if ARTICLE_MARKER in path.read_text(encoding="utf-8", errors="ignore")
+    ]
+    legacy_article_files = [
+        path for path in (PUBLIC / "article").rglob("*") if path.is_file()
+    ] if (PUBLIC / "article").exists() else []
+    sitemap_root = ET.parse(PUBLIC / "sitemap.xml").getroot()
+    sitemap_locs = [
+        node.text.strip()
+        for node in sitemap_root.findall("{http://www.sitemaps.org/schemas/sitemap/0.9}url/{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+        if node.text and node.text.strip()
+    ]
+    forbidden_sitemap_locs = [
+        url for url in sitemap_locs
+        if ".html" in url.lower() or "?" in url or "/article/" in url.lower()
+    ]
     print(f"Static SEO build: {len(article_slugs)} published article pages generated + {len(category_paths)} category pages + sitemap + RSS.")
+    print(f"Verification counts: generated article HTML={len(generated_article_files)}; files under /article/={len(legacy_article_files)}; sitemap URLs={len(sitemap_locs)}; forbidden sitemap URLs={len(forbidden_sitemap_locs)}.")
+    for sample_slug in (
+        "rajasthan-cet-senior-secondary-2026-28-august-se-23-october-tak-56-din-mein-clerk-ldc-exam-ki-taiyari-kaise-kare",
+        "ssc-je-recruitment-2026",
+        "sbi-asha-scholarship-2026",
+    ):
+        sample_path = PUBLIC / f"{sample_slug}.html"
+        if not sample_path.exists():
+            print(f"Sample verification: {sample_slug}: NOT FOUND")
+            continue
+        sample_html = sample_path.read_text(encoding="utf-8", errors="ignore")
+        sample_title = re.search(r"<title>(.*?)</title>", sample_html, flags=re.I | re.S)
+        sample_canonical = re.search(r'<link rel="canonical" href="([^"]*)"', sample_html, flags=re.I)
+        sample_robots = re.search(r'<meta name="robots" content="([^"]*)"', sample_html, flags=re.I)
+        sample_body = re.search(r"<body\\b[^>]*>([\\s\\S]*?)</body>", sample_html, flags=re.I)
+        body_start = sample_body.group(1)[:300] if sample_body else ""
+        print(f"Sample verification: {sample_slug}")
+        print(f"  title={sample_title.group(1).strip() if sample_title else 'MISSING'}")
+        print(f"  canonical={sample_canonical.group(1) if sample_canonical else 'MISSING'}")
+        print(f"  robots={sample_robots.group(1) if sample_robots else 'MISSING'}")
+        print(f"  body_first_300={body_start!r}")
     print(f"Published posts included: {len(posts)}")
     return 0
 
