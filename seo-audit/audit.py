@@ -300,8 +300,18 @@ class SiteAuditor:
         sitemap = self.sitemap_urls(robots)
         if not sitemap:
             self.issues.append({"severity": "high", "url": self.base_url, "issue": "No sitemap URLs discovered", "evidence": "robots.txt sitemap entries and common sitemap paths returned no usable URL set"})
-            sitemap = [self.base_url]
-        selected = sitemap[:self.max_pages]
+            home_path = urllib.parse.urlsplit(self.base_url).path or "/"
+            if not any(home_path.startswith(prefix) for prefix in self.disallowed_prefixes):
+                sitemap = [self.base_url]
+        selected = []
+        for url in sitemap:
+            path = urllib.parse.urlsplit(url).path or "/"
+            if any(path.startswith(prefix) for prefix in self.disallowed_prefixes):
+                self.issues.append({"severity": "low", "url": url, "issue": "Skipped because robots.txt disallows this path", "evidence": "URL was not fetched due to a matching Disallow prefix"})
+                continue
+            selected.append(url)
+            if len(selected) >= self.max_pages:
+                break
         for url in selected:
             page = self.audit_page(url)
             if page:
