@@ -74,7 +74,7 @@ def social_media_agent(topic: str, article: dict, official_url: str) -> dict:
     link = official_url.strip() or "आधिकारिक लिंक लेख में जोड़ें"
     title = article.get("title", topic)
     whatsapp = f"📢 {topic}\n\nजरूरी जानकारी और आवेदन से पहले official notification जरूर पढ़ें।\n🔗 {link}\n\nEXAM DARPAN — Fast Exam Updates"
-    telegram = f"📌 {title}\n\nमुख्य जानकारी पढ़ें और सभी तारीखें आधिकारिक नोटिफिकेशन से verify करें।\nOfficial link: {link}\n\n#ExamDarpan #SarkariNaukri #RajasthanJobs"
+    telegram = f"📌 {topic}\n{title}\n\nमुख्य जानकारी पढ़ें और सभी तारीखें आधिकारिक नोटिफिकेशन से verify करें।\nOfficial link: {link}\n\n#ExamDarpan #SarkariNaukri #RajasthanJobs"
     instagram = f"{topic} 📢\n\nआवेदन से पहले योग्यता, तारीख और शुल्क official notification से जरूर check करें।\n\nअधिक जानकारी: {link}\n\n#ExamDarpan #GovtJobs #ExamUpdates"
     return {"agent": "Social Media Agent", "whatsapp": whatsapp, "telegram": telegram, "instagram": instagram}
 
