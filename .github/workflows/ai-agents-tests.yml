@@ -1,0 +1,23 @@
+name: AI Agents MVP tests
+on:
+  pull_request:
+    paths:
+      - 'ai-agents/**'
+      - '.github/workflows/ai-agents-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ai-agents/**'
+      - '.github/workflows/ai-agents-tests.yml'
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run unit tests
+        run: python -m unittest discover -s ai-agents -p 'test_*.py' -v
+      - name: Compile Python files
+        run: python -m py_compile ai-agents/app.py ai-agents/agents.py ai-agents/test_agents.py
