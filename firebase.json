@@ -30,6 +30,16 @@
     ],
     "redirects": [
       {
+        "source": "/article",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/latest-jobs",
+        "destination": "/all-india-government-jobs",
+        "type": 301
+      },
+      {
         "source": "/article/:slug*",
         "destination": "/:slug",
         "type": 301
