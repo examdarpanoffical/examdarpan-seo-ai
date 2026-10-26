@@ -441,15 +441,15 @@ def reading_time(content: Any) -> int:
 def seo_title(p: dict[str, Any]) -> str:
     """Return a compact SEO title without trailing commas or whitespace."""
     value = clean_text(p.get("seoTitle"))
-    candidate = value[:65] if value else post_title(p)[:65]
-    return re.sub(r"[\s,]+$", "", candidate)
+    candidate = value if value else post_title(p)
+    return re.sub(r"[\s,]+$", "", candidate).strip()
 
 
 def seo_description(p: dict[str, Any]) -> str:
     value = clean_description(p.get("seoDescription"))
     if value:
-        return value[:170].strip()
-    return short_description(p)[:170].strip()
+        return value.strip()
+    return short_description(p).strip()
 
 
 def search_keywords(p: dict[str, Any]) -> list[str]:
