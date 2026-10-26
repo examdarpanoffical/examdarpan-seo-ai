@@ -1,13 +1,13 @@
-# Exam Darpan AI Agents — MVP
+# Exam Darpan AI Agents — Quality-Gated MVP
 
-A lightweight, local-first dashboard implementing five cooperating agents without adding dependencies to the existing Firebase website.
+A lightweight, local-first dashboard for the Exam Darpan editorial workflow. It is isolated under `ai-agents/` and does not alter the existing Firebase website, Firestore, URLs, sitemap, or publishing pipeline.
 
 ## Five agents
-1. **Recruitment Research Agent** — structures supplied official-source notes and flags missing facts. It does not claim to browse or verify the web automatically.
-2. **Article Agent** — drafts a Hindi recruitment article from the topic and supplied notes.
-3. **SEO Audit Agent** — checks title/description lengths, headings, source URL presence, and missing facts.
-4. **Social Media Agent** — drafts WhatsApp, Telegram, and Instagram copy.
-5. **Supervisor** — runs the workflow in order and marks the result as requiring human approval.
+1. **Recruitment Research Agent** — structures supplied notes, catches missing/placeholder facts, and checks HTTPS URL format only.
+2. **Article Writer** — creates a Hindi draft with recruitment details, reader-oriented application checks, important links, FAQs, and SEO metadata. Unknown details remain visibly unconfirmed.
+3. **SEO Auditor** — checks title/description, headings, source presence, missing facts, and useful-content recommendations.
+4. **Social Media Agent** — drafts channel copy but marks it HOLD when source/facts are incomplete.
+5. **AI Supervisor** — summarizes blockers and keeps publishing disabled.
 
 ## Run locally
 
@@ -19,17 +19,25 @@ python ai-agents/app.py
 
 Open `http://127.0.0.1:8765`.
 
-Paste facts from the official notification and its official URL. The app runs locally and does not publish to Exam Darpan, write to Firestore, or deploy to Firebase. Copy reviewed content into the existing admin publishing workflow only after checking all facts and links.
+## Safety and quality rules
+- This MVP does **not** browse the web or independently verify government websites, PDF content, recruitment facts, or source authenticity.
+- HTTPS URL format is not proof that a website or document is official.
+- Dates, vacancies, eligibility, fees, and application links must be checked against the original notification before publishing.
+- Placeholder values such as “पुष्टि बाकी”, “TBD”, and “नोटिफिकेशन मिलने पर” are treated as missing facts and cause a HOLD.
+- The output is a draft. No automatic publishing, Firestore writes, Firebase deployment, or changes to existing site URLs occur.
+- SEO checks are editorial guidance, not a guarantee of Google ranking. No fake clicks, searches, or traffic are generated.
+- Do not put API keys or passwords into source code, notes, screenshots, or the public repository.
+- The dashboard binds to `127.0.0.1` only. Do not expose it publicly without authentication and security review.
 
-## Important MVP limits
-
-- This first version is a deterministic starter: it does not call an LLM or automatically crawl government websites. It only processes the source notes supplied by the user.
-- Dates, vacancies, eligibility, fees, and URLs must be checked against the original notification.
-- No credentials or API keys are required. Do not put secrets in frontend code.
-- The dashboard binds only to localhost by default. Do not expose it publicly without authentication and security review.
-
-## Test
+## Tests
 
 ```bash
 python -m unittest discover -s ai-agents -p 'test_*.py' -v
 ```
+
+## Next production milestones
+1. Add a controlled official-source fetcher with redirect/private-network protections and a supported PDF text extraction path.
+2. Save source URLs, retrieval time, exact evidence excerpts, and page numbers for every material claim.
+3. Add manual source-verification checklist and editorial approval.
+4. Add real-site SEO checks using read-only data; never fabricate Google searches, clicks, or traffic.
+5. Integrate publishing only in a separate reviewed change after tests and explicit approval.
