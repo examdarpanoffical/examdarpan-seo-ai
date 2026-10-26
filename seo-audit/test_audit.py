@@ -67,7 +67,7 @@ class AuditTests(unittest.TestCase):
 
     def test_run_skips_robots_disallowed_sitemap_url(self):
         auditor = SiteAuditor("https://examdarpan.in/", delay=0)
-        robots = "User-agent: *\\nDisallow: /private"
+        robots = "User-agent: *\nDisallow: /private"
         with patch.object(auditor, "read_robots", return_value=robots), patch.object(auditor, "sitemap_urls", return_value=["https://examdarpan.in/private/page", "https://examdarpan.in/public/page"]), patch.object(auditor, "audit_page", side_effect=lambda url: {"url": url, "status": 200}):
             report = auditor.run()
         self.assertEqual(report["scope"]["pages_audited"], 1)
