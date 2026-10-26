@@ -273,8 +273,8 @@ class SiteAuditor:
                     self.issues.append({"severity": "high", "url": url, "issue": "Canonical points outside allowed HTTPS host", "evidence": parser.canonical})
                 elif canon.rstrip("/") != (target or "").rstrip("/"):
                     self.issues.append({"severity": "medium", "url": url, "issue": "Canonical differs from sitemap URL", "evidence": f"canonical={canon}; sitemap={target}"})
-            if "noindex" in parser.robots_meta:
-                self.issues.append({"severity": "high", "url": url, "issue": "Page has noindex directive", "evidence": f"robots meta={parser.robots_meta}"})
+            if "noindex" in parser.robots:
+                self.issues.append({"severity": "high", "url": url, "issue": "Page has noindex directive", "evidence": f"robots meta={parser.robots}"})
             if parser.h1_count == 0:
                 self.issues.append({"severity": "medium", "url": url, "issue": "Missing H1", "evidence": "No H1 heading found"})
             elif parser.h1_count > 1:
