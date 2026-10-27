@@ -364,63 +364,79 @@ async function generateQuizWithGemini(){
   const source=$('quizAiSource').value.trim();
   if(!uid){msg.textContent='Admin session verify नहीं हुआ। कृपया दोबारा login करें।';return}
   if(!topic){msg.textContent='पहले Topic / विषय भरें।';$('quizAiTopic').focus();return}
-  if(Number($('quizAiCount').value)!==count){$('quizAiCount').value=count}
+  $('quizAiCount').value=count;
   if(/current affairs|करंट अफेयर्स|समसामयिकी/i.test(topic+' '+exam)&&!source){
     if(!confirm('Current Affairs के लिए source text खाली है। इससे तारीख/तथ्य गलत हो सकते हैं। क्या फिर भी सामान्य knowledge के आधार पर draft बनाना है?'))return;
   }
-  btn.disabled=true;btn.textContent='Gemini सवाल बना रही है…';
-  msg.textContent=count+' प्रश्न, विकल्प, सही उत्तर और छोटी explanations तैयार हो रही हैं। कृपया इस tab को बंद न करें।';
+  btn.disabled=true;
   const difficultyText={mixed:'आसान, मध्यम और कठिन का संतुलित मिश्रण',easy:'आसान',medium:'मध्यम, परीक्षा-स्तर',hard:'कठिन'}[difficulty]||difficulty;
   const styleText={mixed:'तथ्य, समझ, कथन और application का संतुलित मिश्रण',factual:'तथ्य आधारित',conceptual:'अवधारणा/समझ आधारित',statement:'कथन आधारित (हर प्रश्न में कथन स्पष्ट लिखें)',application:'तर्क और व्यावहारिक उपयोग आधारित'}[style]||style;
-  const prompt=`Exam Darpan के लिए एक उच्च गुणवत्ता वाला हिन्दी MCQ quiz draft बनाओ। Return ONLY valid JSON; markdown fences या अतिरिक्त text नहीं।
+  const parseJsonResponse=(value)=>{
+    let raw=String(value||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+    const first=raw.indexOf('{'),last=raw.lastIndexOf('}');
+    if(first>=0&&last>first)raw=raw.slice(first,last+1);
+    return JSON.parse(raw);
+  };
+  const validateQuestion=(q,i)=>{
+    if(!q||typeof q.question!=='string'||!q.question.trim())throw new Error('प्रश्न '+(i+1)+' का text खाली है।');
+    if(!Array.isArray(q.options)||q.options.length!==4||q.options.some(o=>typeof o!=='string'||!o.trim()))throw new Error('प्रश्न '+(i+1)+' के चार विकल्प सही नहीं हैं।');
+    const answerIndex=Number(q.answerIndex);
+    if(!Number.isInteger(answerIndex)||answerIndex<0||answerIndex>3)throw new Error('प्रश्न '+(i+1)+' का सही उत्तर valid नहीं है।');
+    if(typeof q.explanation!=='string'||!q.explanation.trim())throw new Error('प्रश्न '+(i+1)+' की explanation खाली है।');
+    return {question:q.question.trim(),options:[...q.options.map(o=>o.trim()),'अनुत्तरित प्रश्न'],answerIndex,explanation:q.explanation.trim()};
+  };
+  const baseRules=`Exam Darpan के लिए उच्च गुणवत्ता वाले हिन्दी MCQ बनाओ। केवल valid JSON object लौटाओ, markdown fences या अतिरिक्त text नहीं।
 TOPIC: ${topic}
 EXAM/CLASS: ${exam||'लागू नहीं'}
-EXACT QUESTION COUNT: ${count}
 DIFFICULTY: ${difficultyText}
 QUESTION STYLE: ${styleText}
-SOURCE TEXT (यदि दिया गया है तो factual authority यही है):
-${source||'(कोई source text नहीं दिया गया; केवल भरोसेमंद स्थापित तथ्यों का उपयोग करो। हालिया/current facts, तारीखें, आँकड़े या official claims मत गढ़ो।)'}
+SOURCE TEXT (दिया हो तो factual authority यही है):
+${source||'(कोई source text नहीं दिया गया। केवल भरोसेमंद स्थापित तथ्यों का उपयोग करो। हालिया/current facts, तारीखें, आँकड़े या official claims मत गढ़ो।)'}
 
 RULES:
-- Exactly ${count} distinct questions; repeat/near-duplicate questions नहीं।
-- हर question हिन्दी में, clear और unambiguous हो; exactly 4 meaningful MCQ options हों।
-- options array में 4 strings हों। answerIndex zero-based integer 0-3 हो और केवल एक सही उत्तर हो।
-- explanation हर सवाल की छोटी, helpful हिन्दी explanation हो (आमतौर पर 1-3 वाक्य); केवल सही विकल्प दोहराना नहीं, कारण बताना।
-- Exam-oriented, useful, plausible distractors; 'उपरोक्त सभी' से बचो जब तक जरूरी न हो।
-- Source text दिया है तो उसी के facts/terms follow करो; unsupported dates, figures, URLs या claims invent मत करो। Source से तय न हो सकने वाला प्रश्न न बनाओ।
-- Current affairs के source के बिना किसी हालिया घटना के specific facts मत गढ़ो।
-- Questions और options में HTML, markdown, answer labels A/B/C/D या "सही उत्तर" मत डालो।
-- Output schema exactly:
-{"title":"छोटा quiz title","description":"1-2 वाक्य का short student-facing explanation","questions":[{"question":"...","options":["A text","B text","C text","D text"],"answerIndex":0,"explanation":"..."}]}
-- Quiz को publish नहीं करना; केवल draft data लौटाना।`;
+- हर प्रश्न अलग, स्पष्ट, हिन्दी में और परीक्षा-उपयोगी हो।
+- हर प्रश्न में exactly 4 meaningful options हों; answerIndex zero-based integer 0-3 हो और केवल एक सही उत्तर हो।
+- हर explanation छोटी लेकिन उपयोगी हिन्दी में 1-3 वाक्यों की हो और सही उत्तर का कारण बताए।
+- Plausible distractors बनाओ; अनावश्यक 'उपरोक्त सभी' से बचो।
+- Source दिया हो तो unsupported facts, dates, figures, URLs या claims invent मत करो।
+- Current affairs के source के बिना हालिया घटनाओं के specific facts मत गढ़ो।
+- HTML/Markdown मत डालो; options में A/B/C/D labels मत जोड़ो।
+- Schema: {"questions":[{"question":"...","options":["...","...","...","..."],"answerIndex":0,"explanation":"..."}]}`;
   try{
-    const result=await model.generateContent(prompt);
-    let raw=result?.response?.text?.()||'';
-    if(!raw.trim())throw new Error('Gemini ने empty response दिया।');
-    raw=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
-    const parsed=JSON.parse(raw);
-    if(!parsed||!Array.isArray(parsed.questions))throw new Error('Gemini response में questions array नहीं मिला।');
-    if(parsed.questions.length!==count)throw new Error('Gemini ने '+parsed.questions.length+' प्रश्न दिए, जबकि '+count+' मांगे थे। कृपया कम संख्या चुनकर फिर कोशिश करें।');
-    const built=parsed.questions.map((q,i)=>{
-      if(!q||typeof q.question!=='string'||!q.question.trim())throw new Error('प्रश्न '+(i+1)+' का text खाली है।');
-      if(!Array.isArray(q.options)||q.options.length!==4||q.options.some(o=>typeof o!=='string'||!o.trim()))throw new Error('प्रश्न '+(i+1)+' के चार विकल्प सही नहीं हैं।');
-      const answerIndex=Number(q.answerIndex);
-      if(!Number.isInteger(answerIndex)||answerIndex<0||answerIndex>3)throw new Error('प्रश्न '+(i+1)+' का answerIndex गलत है।');
-      if(typeof q.explanation!=='string'||!q.explanation.trim())throw new Error('प्रश्न '+(i+1)+' की explanation खाली है।');
-      return {question:q.question.trim(),options:[...q.options.map(o=>o.trim()),'अनुत्तरित प्रश्न'],answerIndex,explanation:q.explanation.trim()};
-    });
+    const built=[];
+    const batchSize=10;
+    const batches=Math.ceil(count/batchSize);
+    for(let offset=0;offset<count;offset+=batchSize){
+      const wanted=Math.min(batchSize,count-offset);
+      const batchNo=Math.floor(offset/batchSize)+1;
+      btn.textContent='Gemini Draft… '+batchNo+'/'+batches;
+      msg.textContent='प्रश्न तैयार हो रहे हैं: '+Math.min(offset+1,count)+'–'+Math.min(offset+wanted,count)+' / '+count+'। बड़े quiz को छोटे हिस्सों में बनाया जा रहा है ताकि JSON error न आए।';
+      const prompt=baseRules+`\nइस हिस्से में exactly ${wanted} प्रश्न लौटाओ। ये पूरे quiz के प्रश्न क्रम ${offset+1} से ${offset+wanted} होंगे। पहले के प्रश्नों से अलग रहना। केवल इस JSON schema का उपयोग करो: {"questions":[...]}`;
+      let parsed=null,lastError=null;
+      for(let attempt=1;attempt<=2;attempt++){
+        try{
+          const result=await model.generateContent(prompt);
+          parsed=parseJsonResponse(result?.response?.text?.()||'');
+          if(!parsed||!Array.isArray(parsed.questions))throw new Error('JSON में questions array नहीं मिला।');
+          if(parsed.questions.length!==wanted)throw new Error('इस batch में '+parsed.questions.length+' प्रश्न मिले; '+wanted+' चाहिए थे।');
+          break;
+        }catch(e){lastError=e;parsed=null}
+      }
+      if(!parsed)throw new Error('प्रश्न '+(offset+1)+'–'+(offset+wanted)+' वाला हिस्सा तैयार नहीं हुआ: '+(lastError?.message||lastError));
+      parsed.questions.forEach((q,i)=>built.push(validateQuestion(q,offset+i)));
+    }
     quizQuestions=built;
-    $('quizTitle').value=String(parsed.title||topic+' — Practice Quiz').trim();
-    $('quizDescription').value=String(parsed.description||topic+' पर आधारित अभ्यास प्रश्न।').trim();
+    $('quizTitle').value=topic+' — Practice Quiz';
+    $('quizDescription').value=topic+' पर आधारित '+count+' अभ्यास प्रश्न। प्रत्येक प्रश्न के बाद सही उत्तर की explanation दी गई है।';
     renderQuizEditor();
-    msg.textContent='Draft तैयार है: '+built.length+' प्रश्न। अब हर उत्तर, विकल्प और explanation verify करें; फिर Save Quiz Draft या Publish चुनें। Gemini ने इसे publish नहीं किया।';
-    document.querySelector('.admin-quiz-box')?.scrollIntoView({behavior:'smooth',block:'start'});
+    msg.textContent='Draft तैयार है: '+built.length+' प्रश्न, 4 विकल्प, सही उत्तर और explanations। अब verify करें; फिर Save Quiz Draft या Publish चुनें। Gemini ने इसे publish नहीं किया।';
     $('quizQuestions')?.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
     console.error('Gemini quiz generation failed',e);
-    msg.textContent='Quiz draft नहीं बन पाया: '+(e?.message||e)+' कृपया count/source जाँचकर फिर कोशिश करें।';
+    msg.textContent='Quiz draft नहीं बन पाया: '+(e?.message||e)+' कृपया दोबारा कोशिश करें।';
   }finally{btn.disabled=false;btn.textContent='Gemini से Quiz Draft बनाएं'}
 }
+
 function newQuizQuestion(q={}){
   const base=Array.isArray(q.options)?q.options.slice(0,4):['','','',''];
   while(base.length<4)base.push('');
