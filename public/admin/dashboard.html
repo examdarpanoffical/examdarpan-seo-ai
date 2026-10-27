@@ -169,6 +169,21 @@
     <strong>MARKING PREVIEW</strong><br>
     Correct: +1 · Wrong: −0.33 · Skipped: 0
   </div>
+  <div class="card pad" style="margin:14px 0;background:#f8fafc;border:1px solid #dbe3ee">
+    <div class="section-label">GEMINI AI QUIZ BUILDER</div>
+    <h3 style="margin:4px 0 8px">Topic दें — पूरा Quiz Draft अपने-आप बनेगा</h3>
+    <p class="meta">Gemini सवाल, 4 विकल्प, सही उत्तर और हर सवाल की छोटी explanation भरेगी। Draft अपने-आप publish नहीं होगा; आप verify करके Save Draft या Publish करें।</p>
+    <div class="field"><label>Topic / विषय *</label><input id="quizAiTopic" placeholder="जैसे राजस्थान का भूगोल, भारतीय संविधान, CET Current Affairs"></div>
+    <div class="admin-form-grid">
+      <div class="field"><label>कितने प्रश्न बनाने हैं?</label><input id="quizAiCount" type="number" min="1" max="100" value="10"></div>
+      <div class="field"><label>कठिनाई स्तर</label><select id="quizAiDifficulty"><option value="mixed">आसान + मध्यम + कठिन (मिश्रित)</option><option value="easy">आसान</option><option value="medium">मध्यम / परीक्षा स्तर</option><option value="hard">कठिन</option></select></div>
+      <div class="field"><label>सवालों का प्रकार</label><select id="quizAiStyle"><option value="mixed">मिश्रित MCQ</option><option value="factual">तथ्य आधारित</option><option value="conceptual">अवधारणा आधारित</option><option value="statement">कथन आधारित</option><option value="application">तर्क / उपयोग आधारित</option></select></div>
+      <div class="field"><label>Exam / Class (वैकल्पिक)</label><input id="quizAiExam" placeholder="जैसे Rajasthan CET 12th Level"></div>
+    </div>
+    <div class="field"><label>Source text / नोट्स / आधिकारिक सामग्री (वैकल्पिक, लेकिन Current Affairs के लिए जरूरी)</label><textarea id="quizAiSource" rows="4" placeholder="यहाँ नोट्स या verified source का text paste करें। Gemini इसी को प्राथमिक आधार बनाएगी।"></textarea></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="generateQuizWithGemini" class="btn btn-gold">Gemini से Quiz Draft बनाएं</button></div>
+    <p id="quizAiMsg" class="meta" aria-live="polite"></p>
+  </div>
   <div class="field"><label>Quiz Title</label><input id="quizTitle" placeholder="Daily Current Affairs Quiz — 6 September 2026"></div>
   <div class="field"><label>Short Description</label><textarea id="quizDescription" style="min-height:70px" placeholder="आज के 10 महत्वपूर्ण प्रश्न..."></textarea></div>
   <div id="quizQuestions" class="quiz-admin-questions"></div>
@@ -206,7 +221,7 @@
 <div class="field"><label>Official Source Text</label><textarea id="aiSource" style="min-height:200px" placeholder="Official notification/PDF का relevant text यहाँ paste करें…"></textarea></div>
 <button id="aiGenerate" class="btn btn-gold">Generate Draft with Gemini</button><p id="aiMsg" class="meta"></p></section>
 <section><div class="form"><h2>Posts</h2><input id="filter" placeholder="Search posts" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:11px"><div id="posts" style="margin-top:12px"></div></div></section></div></main>
-<script type="module" src="dashboard.js?v=20261025-seo-unlimited1"></script>
+<script type="module" src="dashboard.js?v=20261027-gemini-quiz-builder1"></script>
 <dialog id="articlePreviewDialog" style="width:min(1100px,96vw);max-width:1100px;height:92vh;max-height:92vh;padding:0;border:1px solid #dbe3ee;border-radius:18px;box-shadow:0 20px 70px #0f172a55">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:#0b1730;color:#fff">
     <strong>Article Preview — Exam Darpan Standard Layout</strong>
