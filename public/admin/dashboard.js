@@ -354,6 +354,73 @@ $('logout').onclick=()=>signOut(auth);
 /* ---------------- Daily Quiz CMS ---------------- */
 let quizQuestions=[];
 function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+async function generateQuizWithGemini(){
+  const btn=$('generateQuizWithGemini'),msg=$('quizAiMsg');
+  const topic=$('quizAiTopic').value.trim();
+  const count=Math.max(1,Math.min(100,Number($('quizAiCount').value)||10));
+  const difficulty=$('quizAiDifficulty').value;
+  const style=$('quizAiStyle').value;
+  const exam=$('quizAiExam').value.trim();
+  const source=$('quizAiSource').value.trim();
+  if(!uid){msg.textContent='Admin session verify नहीं हुआ। कृपया दोबारा login करें।';return}
+  if(!topic){msg.textContent='पहले Topic / विषय भरें।';$('quizAiTopic').focus();return}
+  if(Number($('quizAiCount').value)!==count){$('quizAiCount').value=count}
+  if(/current affairs|करंट अफेयर्स|समसामयिकी/i.test(topic+' '+exam)&&!source){
+    if(!confirm('Current Affairs के लिए source text खाली है। इससे तारीख/तथ्य गलत हो सकते हैं। क्या फिर भी सामान्य knowledge के आधार पर draft बनाना है?'))return;
+  }
+  btn.disabled=true;btn.textContent='Gemini सवाल बना रही है…';
+  msg.textContent=count+' प्रश्न, विकल्प, सही उत्तर और छोटी explanations तैयार हो रही हैं। कृपया इस tab को बंद न करें।';
+  const difficultyText={mixed:'आसान, मध्यम और कठिन का संतुलित मिश्रण',easy:'आसान',medium:'मध्यम, परीक्षा-स्तर',hard:'कठिन'}[difficulty]||difficulty;
+  const styleText={mixed:'तथ्य, समझ, कथन और application का संतुलित मिश्रण',factual:'तथ्य आधारित',conceptual:'अवधारणा/समझ आधारित',statement:'कथन आधारित (हर प्रश्न में कथन स्पष्ट लिखें)',application:'तर्क और व्यावहारिक उपयोग आधारित'}[style]||style;
+  const prompt=`Exam Darpan के लिए एक उच्च गुणवत्ता वाला हिन्दी MCQ quiz draft बनाओ। Return ONLY valid JSON; markdown fences या अतिरिक्त text नहीं।
+TOPIC: ${topic}
+EXAM/CLASS: ${exam||'लागू नहीं'}
+EXACT QUESTION COUNT: ${count}
+DIFFICULTY: ${difficultyText}
+QUESTION STYLE: ${styleText}
+SOURCE TEXT (यदि दिया गया है तो factual authority यही है):
+${source||'(कोई source text नहीं दिया गया; केवल भरोसेमंद स्थापित तथ्यों का उपयोग करो। हालिया/current facts, तारीखें, आँकड़े या official claims मत गढ़ो।)'}
+
+RULES:
+- Exactly ${count} distinct questions; repeat/near-duplicate questions नहीं।
+- हर question हिन्दी में, clear और unambiguous हो; exactly 4 meaningful MCQ options हों।
+- options array में 4 strings हों। answerIndex zero-based integer 0-3 हो और केवल एक सही उत्तर हो।
+- explanation हर सवाल की छोटी, helpful हिन्दी explanation हो (आमतौर पर 1-3 वाक्य); केवल सही विकल्प दोहराना नहीं, कारण बताना।
+- Exam-oriented, useful, plausible distractors; 'उपरोक्त सभी' से बचो जब तक जरूरी न हो।
+- Source text दिया है तो उसी के facts/terms follow करो; unsupported dates, figures, URLs या claims invent मत करो। Source से तय न हो सकने वाला प्रश्न न बनाओ।
+- Current affairs के source के बिना किसी हालिया घटना के specific facts मत गढ़ो।
+- Questions और options में HTML, markdown, answer labels A/B/C/D या "सही उत्तर" मत डालो।
+- Output schema exactly:
+{"title":"छोटा quiz title","description":"1-2 वाक्य का short student-facing explanation","questions":[{"question":"...","options":["A text","B text","C text","D text"],"answerIndex":0,"explanation":"..."}]}
+- Quiz को publish नहीं करना; केवल draft data लौटाना।`;
+  try{
+    const result=await model.generateContent(prompt);
+    let raw=result?.response?.text?.()||'';
+    if(!raw.trim())throw new Error('Gemini ने empty response दिया।');
+    raw=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+    const parsed=JSON.parse(raw);
+    if(!parsed||!Array.isArray(parsed.questions))throw new Error('Gemini response में questions array नहीं मिला।');
+    if(parsed.questions.length!==count)throw new Error('Gemini ने '+parsed.questions.length+' प्रश्न दिए, जबकि '+count+' मांगे थे। कृपया कम संख्या चुनकर फिर कोशिश करें।');
+    const built=parsed.questions.map((q,i)=>{
+      if(!q||typeof q.question!=='string'||!q.question.trim())throw new Error('प्रश्न '+(i+1)+' का text खाली है।');
+      if(!Array.isArray(q.options)||q.options.length!==4||q.options.some(o=>typeof o!=='string'||!o.trim()))throw new Error('प्रश्न '+(i+1)+' के चार विकल्प सही नहीं हैं।');
+      const answerIndex=Number(q.answerIndex);
+      if(!Number.isInteger(answerIndex)||answerIndex<0||answerIndex>3)throw new Error('प्रश्न '+(i+1)+' का answerIndex गलत है।');
+      if(typeof q.explanation!=='string'||!q.explanation.trim())throw new Error('प्रश्न '+(i+1)+' की explanation खाली है।');
+      return {question:q.question.trim(),options:[...q.options.map(o=>o.trim()),'अनुत्तरित प्रश्न'],answerIndex,explanation:q.explanation.trim()};
+    });
+    quizQuestions=built;
+    $('quizTitle').value=String(parsed.title||topic+' — Practice Quiz').trim();
+    $('quizDescription').value=String(parsed.description||topic+' पर आधारित अभ्यास प्रश्न।').trim();
+    renderQuizEditor();
+    msg.textContent='Draft तैयार है: '+built.length+' प्रश्न। अब हर उत्तर, विकल्प और explanation verify करें; फिर Save Quiz Draft या Publish चुनें। Gemini ने इसे publish नहीं किया।';
+    document.querySelector('.admin-quiz-box')?.scrollIntoView({behavior:'smooth',block:'start'});
+    $('quizQuestions')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    console.error('Gemini quiz generation failed',e);
+    msg.textContent='Quiz draft नहीं बन पाया: '+(e?.message||e)+' कृपया count/source जाँचकर फिर कोशिश करें।';
+  }finally{btn.disabled=false;btn.textContent='Gemini से Quiz Draft बनाएं'}
+}
 function newQuizQuestion(q={}){
   const base=Array.isArray(q.options)?q.options.slice(0,4):['','','',''];
   while(base.length<4)base.push('');
@@ -528,6 +595,7 @@ async function deleteQuiz(id){
   try{await deleteDoc(doc(db,'quizzes',id));await loadQuizzes()}catch(e){alert(e.message||'Delete failed')}
 }
 $('quizDate')?.addEventListener('focus',()=>{if(!$('quizDate').value)$('quizDate').value=todayISO()});
+$('generateQuizWithGemini')?.addEventListener('click',generateQuizWithGemini);
 $('addQuizQuestion')?.addEventListener('click',()=>newQuizQuestion());
 $('saveQuizDraft')?.addEventListener('click',()=>saveQuiz('draft'));
 $('publishQuiz')?.addEventListener('click',()=>saveQuiz('published'));
