@@ -40,10 +40,42 @@ jobs:
         run: |
           python scripts/generate_static.py
 
+      - name: Redirect Firebase default domains to primary .in domain
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          public = Path("public")
+          snippet = """<script id="ed-primary-domain-redirect">
+          (function () {
+            var host = window.location.hostname.toLowerCase();
+            if (host === "examdarpan-dd963.web.app" || host === "examdarpan-dd963.firebaseapp.com") {
+              window.location.replace("https://examdarpan.in" + window.location.pathname + window.location.search + window.location.hash);
+            }
+          })();
+          </script>"""
+          count = 0
+          for path in public.rglob("*.html"):
+            text = path.read_text(encoding="utf-8")
+            if 'id="ed-primary-domain-redirect"' in text:
+              continue
+            if re.search(r"</head\s*>", text, flags=re.I):
+              text = re.sub(r"</head\s*>", snippet + "\\n</head>", text, count=1, flags=re.I)
+            else:
+              text = snippet + "\\n" + text
+            path.write_text(text, encoding="utf-8")
+            count += 1
+          if count == 0:
+            raise SystemExit("No HTML files were updated with the primary-domain redirect.")
+          print(f"Added primary-domain redirect to {count} HTML files.")
+          PY
+
       - name: Verify generated homepage
         run: |
           set -euo pipefail
           test -f public/index.html
+          grep -Fq 'ed-primary-domain-redirect' public/index.html
           test -f public/sitemap.xml
           test -f public/categories.html
           grep -Fq 'id="exam-darpan-home-final-order"' public/index.html
