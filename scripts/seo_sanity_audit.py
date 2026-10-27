@@ -119,6 +119,108 @@ def main() -> int:
         if len(h1s) > 1:
             issues.append(("WARN", f"Multiple H1 elements ({len(h1s)}) in {rel}"))
 
+    # Check canonical and Open Graph URL consistency across all HTML pages.
+    # The legacy article.html shell injects these tags at runtime, so validate its
+    # implementation separately instead of requiring literal tags in source HTML.
+    def tag_attrs(tag: str) -> dict[str, str]:
+        attrs: dict[str, str] = {}
+        for match in re.finditer(r"""([a-zA-Z_:][-a-zA-Z0-9_:.]*)\\s*=\\s*(['"])(.*?)\\2""", tag, re.I | re.S):
+            attrs[match.group(1).lower()] = match.group(3).strip()
+        return attrs
+
+    forbidden_hosts = {"examdarpan-dd963.web.app", "examdarpan-dd963.firebaseapp.com"}
+    for path in sorted(PUBLIC.rglob("*.html")):
+        try:
+            page_html = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError as exc:
+            issues.append(("WARN", f"Could not inspect SEO tags in {path.relative_to(PUBLIC)}: {exc}"))
+            continue
+        rel = path.relative_to(PUBLIC).as_posix()
+        canonical_tags = [
+            tag_attrs(tag) for tag in re.findall(r"<link\\b[^>]*>", page_html, re.I | re.S)
+            if tag_attrs(tag).get("rel", "").lower() == "canonical"
+        ]
+        og_url_tags = [
+            tag_attrs(tag) for tag in re.findall(r"<meta\\b[^>]*>", page_html, re.I | re.S)
+            if tag_attrs(tag).get("property", "").lower() == "og:url"
+        ]
+
+        # Canonical tags must always use the one preferred HTTPS host.
+        for attrs in canonical_tags:
+            value = attrs.get("href", "")
+            parsed = urlparse(value)
+            if parsed.scheme != "https" or parsed.netloc.lower() != "examdarpan.in":
+                issues.append(("ERROR", f"Non-preferred canonical URL in {rel}: {value or 'missing href'}"))
+            if parsed.query or parsed.fragment:
+                issues.append(("ERROR", f"Canonical URL has query/fragment in {rel}: {value}"))
+            if parsed.path.lower().endswith(".html"):
+                issues.append(("WARN", f"Canonical URL still has .html extension in {rel}: {value}"))
+
+        # Open Graph URL should be a single URL and match the page canonical.
+        for attrs in og_url_tags:
+            value = attrs.get("content", "")
+            parsed = urlparse(value)
+            if parsed.scheme != "https" or parsed.netloc.lower() != "examdarpan.in":
+                issues.append(("ERROR", f"Non-preferred og:url in {rel}: {value or 'missing content'}"))
+        if len(canonical_tags) == 1 and len(og_url_tags) == 1:
+            canonical = canonical_tags[0].get("href", "").rstrip("/")
+            og_url = og_url_tags[0].get("content", "").rstrip("/")
+            if canonical != og_url:
+                issues.append(("ERROR", f"og:url does not match canonical in {rel}: {og_url} != {canonical}"))
+        elif rel != "article.html" and (len(canonical_tags) != 1 or len(og_url_tags) != 1):
+            issues.append(("WARN", f"Expected one canonical and one og:url in {rel}; found {len(canonical_tags)} and {len(og_url_tags)}"))
+
+    # The article shell uses JavaScript to create URL tags; guard against regressions.
+    article_shell = PUBLIC / "article.html"
+    if article_shell.exists():
+        shell_html = article_shell.read_text(encoding="utf-8", errors="ignore")
+        if "document.createElement(\\"link\\")" not in shell_html or "document.createElement(\\"meta\\")" not in shell_html or "og:url" not in shell_html:
+            issues.append(("ERROR", "article.html no longer contains its runtime canonical/og:url implementation"))
+
+    # Robots.txt must advertise only the preferred-domain sitemap.
+    robots_path = PUBLIC / "robots.txt"
+    if not robots_path.exists():
+        issues.append(("ERROR", "public/robots.txt is missing"))
+    else:
+        robots_text = robots_path.read_text(encoding="utf-8", errors="ignore")
+        sitemap_lines = [line.split(":", 1)[1].strip() for line in robots_text.splitlines()
+                         if line.strip().lower().startswith("sitemap:")]
+        if not sitemap_lines:
+            issues.append(("ERROR", "robots.txt has no Sitemap directive"))
+        for sitemap_url in sitemap_lines:
+            parsed = urlparse(sitemap_url)
+            if parsed.scheme != "https" or parsed.netloc.lower() != "examdarpan.in":
+                issues.append(("ERROR", f"Non-preferred Sitemap URL in robots.txt: {sitemap_url}"))
+        if any(host in robots_text.lower() for host in forbidden_hosts):
+            issues.append(("ERROR", "Firebase default domain found in robots.txt"))
+
+    # Search all sitemap XML files for any non-preferred host, not just known <loc> paths.
+    for sitemap_file in sorted(PUBLIC.glob("*sitemap*.xml")):
+        try:
+            raw_xml = sitemap_file.read_text(encoding="utf-8", errors="ignore")
+            ET.fromstring(raw_xml)
+        except (OSError, ET.ParseError) as exc:
+            issues.append(("ERROR", f"Could not parse sitemap XML {sitemap_file.name}: {exc}"))
+            continue
+        if any(host in raw_xml.lower() for host in forbidden_hosts):
+            issues.append(("ERROR", f"Firebase default domain found in {sitemap_file.name}"))
+        for loc in re.findall(r"<loc>\\s*(.*?)\\s*</loc>", raw_xml, re.I | re.S):
+            parsed = urlparse(loc.strip())
+            if parsed.scheme != "https" or parsed.netloc.lower() != "examdarpan.in":
+                issues.append(("ERROR", f"Non-preferred sitemap host/scheme in {sitemap_file.name}: {loc.strip()}"))
+
+    # Check SEO URL values in HTML for accidental Firebase-host canonicals/OG URLs.
+    for path in sorted(PUBLIC.rglob("*.html")):
+        page_html = path.read_text(encoding="utf-8", errors="ignore")
+        rel = path.relative_to(PUBLIC).as_posix()
+        for tag in re.findall(r"<(?:link|meta)\\b[^>]*>", page_html, re.I | re.S):
+            attrs = tag_attrs(tag)
+            is_seo_url = attrs.get("rel", "").lower() == "canonical" or attrs.get("property", "").lower() == "og:url"
+            if is_seo_url:
+                value = attrs.get("href", "") or attrs.get("content", "")
+                if any(host in value.lower() for host in forbidden_hosts):
+                    issues.append(("ERROR", f"Firebase default domain found in canonical/og:url in {rel}: {value}"))
+
     errors = sum(level == "ERROR" for level, _ in issues)
     warnings = sum(level == "WARN" for level, _ in issues)
     print(f"Exam Darpan SEO sanity audit: {len(locs)} sitemap URLs; {errors} errors; {warnings} warnings.")
