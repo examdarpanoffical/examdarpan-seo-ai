@@ -124,7 +124,7 @@ def main() -> int:
     # implementation separately instead of requiring literal tags in source HTML.
     def tag_attrs(tag: str) -> dict[str, str]:
         attrs: dict[str, str] = {}
-        for match in re.finditer(r"""([a-zA-Z_:][-a-zA-Z0-9_:.]*)\\s*=\\s*(['"])(.*?)\\2""", tag, re.I | re.S):
+        for match in re.finditer(r"""([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(['"])(.*?)\2""", tag, re.I | re.S):
             attrs[match.group(1).lower()] = match.group(3).strip()
         return attrs
 
@@ -137,15 +137,14 @@ def main() -> int:
             continue
         rel = path.relative_to(PUBLIC).as_posix()
         canonical_tags = [
-            tag_attrs(tag) for tag in re.findall(r"<link\\b[^>]*>", page_html, re.I | re.S)
+            tag_attrs(tag) for tag in re.findall(r"<link\b[^>]*>", page_html, re.I | re.S)
             if tag_attrs(tag).get("rel", "").lower() == "canonical"
         ]
         og_url_tags = [
-            tag_attrs(tag) for tag in re.findall(r"<meta\\b[^>]*>", page_html, re.I | re.S)
+            tag_attrs(tag) for tag in re.findall(r"<meta\b[^>]*>", page_html, re.I | re.S)
             if tag_attrs(tag).get("property", "").lower() == "og:url"
         ]
 
-        # Canonical tags must always use the one preferred HTTPS host.
         for attrs in canonical_tags:
             value = attrs.get("href", "")
             parsed = urlparse(value)
@@ -156,7 +155,6 @@ def main() -> int:
             if parsed.path.lower().endswith(".html"):
                 issues.append(("WARN", f"Canonical URL still has .html extension in {rel}: {value}"))
 
-        # Open Graph URL should be a single URL and match the page canonical.
         for attrs in og_url_tags:
             value = attrs.get("content", "")
             parsed = urlparse(value)
@@ -170,11 +168,11 @@ def main() -> int:
         elif rel != "article.html" and (len(canonical_tags) != 1 or len(og_url_tags) != 1):
             issues.append(("WARN", f"Expected one canonical and one og:url in {rel}; found {len(canonical_tags)} and {len(og_url_tags)}"))
 
-    # The article shell uses JavaScript to create URL tags; guard against regressions.
+    # The legacy article shell creates these tags with JavaScript at runtime.
     article_shell = PUBLIC / "article.html"
     if article_shell.exists():
         shell_html = article_shell.read_text(encoding="utf-8", errors="ignore")
-        if "document.createElement(\\"link\\")" not in shell_html or "document.createElement(\\"meta\\")" not in shell_html or "og:url" not in shell_html:
+        if 'document.createElement("link")' not in shell_html or 'document.createElement("meta")' not in shell_html or "og:url" not in shell_html:
             issues.append(("ERROR", "article.html no longer contains its runtime canonical/og:url implementation"))
 
     # Robots.txt must advertise only the preferred-domain sitemap.
@@ -194,7 +192,7 @@ def main() -> int:
         if any(host in robots_text.lower() for host in forbidden_hosts):
             issues.append(("ERROR", "Firebase default domain found in robots.txt"))
 
-    # Search all sitemap XML files for any non-preferred host, not just known <loc> paths.
+    # Parse every sitemap XML and ensure all <loc> values use the preferred host.
     for sitemap_file in sorted(PUBLIC.glob("*sitemap*.xml")):
         try:
             raw_xml = sitemap_file.read_text(encoding="utf-8", errors="ignore")
@@ -204,7 +202,7 @@ def main() -> int:
             continue
         if any(host in raw_xml.lower() for host in forbidden_hosts):
             issues.append(("ERROR", f"Firebase default domain found in {sitemap_file.name}"))
-        for loc in re.findall(r"<loc>\\s*(.*?)\\s*</loc>", raw_xml, re.I | re.S):
+        for loc in re.findall(r"<loc>\s*(.*?)\s*</loc>", raw_xml, re.I | re.S):
             parsed = urlparse(loc.strip())
             if parsed.scheme != "https" or parsed.netloc.lower() != "examdarpan.in":
                 issues.append(("ERROR", f"Non-preferred sitemap host/scheme in {sitemap_file.name}: {loc.strip()}"))
@@ -213,7 +211,7 @@ def main() -> int:
     for path in sorted(PUBLIC.rglob("*.html")):
         page_html = path.read_text(encoding="utf-8", errors="ignore")
         rel = path.relative_to(PUBLIC).as_posix()
-        for tag in re.findall(r"<(?:link|meta)\\b[^>]*>", page_html, re.I | re.S):
+        for tag in re.findall(r"<(?:link|meta)\b[^>]*>", page_html, re.I | re.S):
             attrs = tag_attrs(tag)
             is_seo_url = attrs.get("rel", "").lower() == "canonical" or attrs.get("property", "").lower() == "og:url"
             if is_seo_url:
