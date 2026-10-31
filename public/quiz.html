@@ -4335,6 +4335,14 @@ body{
     });
   });
 </script>
+<script id="ed-primary-domain-redirect">
+(function () {
+  var host = window.location.hostname.toLowerCase();
+  if (host === "examdarpan-dd963.web.app" || host === "examdarpan-dd963.firebaseapp.com") {
+    window.location.replace("https://examdarpan.in" + window.location.pathname + window.location.search + window.location.hash);
+  }
+})();
+</script>
 </head>
 <body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
@@ -4346,7 +4354,7 @@ body{
 <section id="quizResult" class="quiz-result card" hidden></section>
 <section id="previous" class="card previous-quizzes"><div class="section-title"><div><span class="eyebrow">HISTORY</span><h2>Previous Quizzes</h2></div></div><div id="previousList" class="previous-list"><div class="empty">Previous quizzes load हो रहे हैं…</div></div></section>
 </main>
-<footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p></div><div><h4>Important</h4><p><a href="/">Home</a></p><p><a href="/editorial-policy.html">Editorial Policy</a></p></div><div><h4>Legal</h4><p><a href="/privacy.html">Privacy Policy</a></p><p><a href="/disclaimer.html">Disclaimer</a></p></div></div></footer>
+<footer class="footer"><div class="container footer-grid"><div><h4>EXAM DARPAN</h4><p>Independent Education &amp; Government Job Information Portal.</p></div><div><h4>Important</h4><p><a href="/">Home</a></p><p><a href="/editorial-policy">Editorial Policy</a></p></div><div><h4>Legal</h4><p><a href="/privacy">Privacy Policy</a></p><p><a href="/disclaimer">Disclaimer</a></p></div></div></footer>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js';
 import{getAuth,signInAnonymously}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js';
