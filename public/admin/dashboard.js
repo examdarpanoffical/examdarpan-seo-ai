@@ -273,8 +273,22 @@ async function save(status){
 
     const d=articleData(status,existingPost);
 
-    if(id)await updateDoc(doc(db,'posts',id),d);
-    else await addDoc(collection(db,'posts'),{...d,createdAt:serverTimestamp()});
+    let savedRef;
+    if(id){
+      savedRef=doc(db,'posts',id);
+      await updateDoc(savedRef,d);
+    }else{
+      savedRef=await addDoc(collection(db,'posts'),{...d,createdAt:serverTimestamp()});
+    }
+
+    // Read-after-write verification: do not queue a static build until Firestore
+    // confirms that this exact article is published with the expected slug.
+    const savedSnap=await getDoc(savedRef);
+    if(!savedSnap.exists())throw new Error('Firestore save verification failed: article record not found.');
+    const savedData=savedSnap.data()||{};
+    if(savedData.status!==status)throw new Error('Firestore save verification failed: status mismatch.');
+    if(status==='published' && String(savedData.slug||'').trim()!==String(d.slug||'').trim())
+      throw new Error('Firestore save verification failed: published slug mismatch.');
 
     if(status==='published'){
       try{
