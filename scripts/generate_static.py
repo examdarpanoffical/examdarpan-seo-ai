@@ -4439,7 +4439,7 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: incorrect og:url in {path.name}; expected {expected_url}")
         if not re.search(r'<meta name="description" content="[^"]+">', txt, flags=re.I):
             raise RuntimeError(f"SEO verification failed: missing article description in {path.name}")
-        if not re.search(r'<script type="application/ld\\+json">.*?"@type":"Article".*?</script>', txt, flags=re.S | re.I):
+        if not re.search(r'<script type="application/ld\+json">.*?"@type":"Article".*?</script>', txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing Article JSON-LD in {path.name}")
         if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
