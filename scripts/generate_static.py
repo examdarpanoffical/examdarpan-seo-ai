@@ -4428,8 +4428,19 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
         if not path.exists():
             raise RuntimeError(f"SEO verification failed: missing {path.name}")
         txt = path.read_text(encoding="utf-8", errors="ignore")
+        expected_url = article_url(s)
         if txt.count('<link rel="canonical"') != 1:
             raise RuntimeError(f"SEO verification failed: canonical count != 1 in {path.name}")
+        canonical_match = re.search(r'<link rel="canonical" href="([^"]+)"', txt, flags=re.I)
+        if not canonical_match or html.unescape(canonical_match.group(1)) != expected_url:
+            raise RuntimeError(f"SEO verification failed: incorrect article canonical in {path.name}; expected {expected_url}")
+        og_url_match = re.search(r'<meta property="og:url" content="([^"]+)"', txt, flags=re.I)
+        if not og_url_match or html.unescape(og_url_match.group(1)) != expected_url:
+            raise RuntimeError(f"SEO verification failed: incorrect og:url in {path.name}; expected {expected_url}")
+        if not re.search(r'<meta name="description" content="[^"]+">', txt, flags=re.I):
+            raise RuntimeError(f"SEO verification failed: missing article description in {path.name}")
+        if not re.search(r'<script type="application/ld\+json">.*?"@type":"Article".*?</script>', txt, flags=re.S | re.I):
+            raise RuntimeError(f"SEO verification failed: missing Article JSON-LD in {path.name}")
         if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
         if not re.search(r"<h1\b[^>]*>\s*.+?\s*</h1>", txt, flags=re.S | re.I):

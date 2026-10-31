@@ -60,7 +60,12 @@
         "type": 301
       }
     ],
-    "rewrites": []
+    "rewrites": [
+      {
+        "source": "/:slug",
+        "destination": "/article.html"
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules",
