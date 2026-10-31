@@ -511,13 +511,31 @@ def fetch_posts() -> list[dict[str, Any]]:
     db = firestore.client()
 
     posts: list[dict[str, Any]] = []
-    for doc in db.collection("posts").where("status", "==", "published").stream():
-        p = doc.to_dict()
+    skipped: list[str] = []
+    # Read the collection and normalize status values. This prevents a published
+    # article with legacy casing/whitespace (for example "Published") from being
+    # silently omitted by Firestore's exact-match query.
+    for doc in db.collection("posts").stream():
+        p = doc.to_dict() or {}
+        status = str(p.get("status") or "").strip().lower()
+        if status != "published":
+            continue
         p["id"] = doc.id
-        s = slugify(p.get("slug"))
-        if s and s not in RESERVED_SLUGS:
-            p["slug"] = s
-            posts.append(p)
+        raw_slug = p.get("slug") or p.get("urlSlug") or p.get("seoSlug") or ""
+        s = slugify(raw_slug)
+        if not s:
+            skipped.append(f"{doc.id}: missing/invalid slug")
+            continue
+        if s in RESERVED_SLUGS:
+            skipped.append(f"{doc.id}: reserved slug '{s}'")
+            continue
+        p["slug"] = s
+        posts.append(p)
+
+    if skipped:
+        raise RuntimeError(
+            "Published posts were excluded from static generation: " + "; ".join(skipped[:25])
+        )
 
     # Newest first, then deterministic id for equal timestamps.
     posts.sort(key=lambda p: (as_datetime(p.get("publishedAt")) or datetime.min.replace(tzinfo=timezone.utc), str(p.get("id", ""))), reverse=True)
