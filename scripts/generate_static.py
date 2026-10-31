@@ -4734,6 +4734,14 @@ def main() -> int:
         path for path in PUBLIC.glob("*.html")
         if ARTICLE_MARKER in path.read_text(encoding="utf-8", errors="ignore")
     ]
+    expected_article_files = {PUBLIC / f"{slug}.html" for slug in article_slugs}
+    missing_article_files = sorted(str(path.name) for path in expected_article_files if not path.is_file())
+    if missing_article_files or len(generated_article_files) != len(posts):
+        raise RuntimeError(
+            "Static article output is incomplete: "
+            f"published posts={len(posts)}, generated HTML={len(generated_article_files)}, "
+            f"missing files={missing_article_files[:25]}"
+        )
     legacy_article_files = [
         path for path in (PUBLIC / "article").rglob("*") if path.is_file()
     ] if (PUBLIC / "article").exists() else []
