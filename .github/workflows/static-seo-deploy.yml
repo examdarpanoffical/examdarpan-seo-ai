@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: examdarpan-static-seo
@@ -39,6 +39,22 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
         run: |
           python scripts/generate_static.py
+
+      - name: Sync generated static pages to GitHub
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # The generator creates article HTML and sitemap files in the runner.
+          # Persist those outputs in public/ so they are visible in the repository too.
+          git add -A public
+          if git diff --cached --quiet; then
+            echo "No generated public files changed."
+          else
+            git commit -m "chore: sync generated public pages [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
 
       - name: Redirect Firebase default domains to primary .in domain
         run: |
