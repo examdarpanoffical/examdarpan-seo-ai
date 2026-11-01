@@ -121,7 +121,7 @@ function renderList(){
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>fill(all.find(p=>p.id===b.dataset.edit)));
   document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>remove(b.dataset.delete));
   document.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>{
-    const message=(b.dataset.title||'Exam Darpan Update')+'\\n'+b.dataset.share;
+    const message=(b.dataset.title||'Exam Darpan Update')+'\n'+b.dataset.share;
     window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener');
   });
 }
