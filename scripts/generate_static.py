@@ -13,6 +13,7 @@ Design goals:
 from __future__ import annotations
 import xml.etree.ElementTree as ET
 
+import base64
 import html
 import json
 import os
@@ -469,6 +470,26 @@ def short_description(p: dict[str, Any]) -> str:
     return desc[:155].strip() or "Exam Darpan पर सरकारी नौकरी, परीक्षा, Admit Card और Result की verified जानकारी पढ़ें।"
 
 
+def materialize_featured_image(p: dict[str, Any], slug: str) -> str:
+    """Turn Admin-generated PNG data URLs into public static OG images."""
+    raw = str(p.get("featuredImage") or "").strip()
+    match = re.fullmatch(r"data:image/png;base64,([A-Za-z0-9+/=]+)", raw)
+    if match:
+        try:
+            payload = base64.b64decode(match.group(1), validate=True)
+        except (ValueError, base64.binascii.Error) as exc:
+            raise RuntimeError(f"Invalid generated PNG thumbnail for {slug}") from exc
+        if not payload.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+            raise RuntimeError(f"Generated thumbnail is not a valid PNG for {slug}")
+        if len(payload) > 900_000:
+            raise RuntimeError(f"Generated thumbnail is too large for {slug}; use a public image URL")
+        image_dir = PUBLIC / "og-images"
+        image_dir.mkdir(parents=True, exist_ok=True)
+        (image_dir / f"{slug}.png").write_bytes(payload)
+        return f"{BASE}/og-images/{quote(slug)}.png"
+    return safe_url(raw)
+
+
 def safe_url(value: Any) -> str:
     u = str(value or "").strip()
     return u if u.startswith(("https://", "http://")) else ""
@@ -689,7 +710,7 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
     seo_headline = seo_title(p)
     pub = iso(p.get("publishedAt"))
     mod = iso(p.get("updatedAt")) or pub
-    img = safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.png"
+    img = safe_url(p.get("_featured_image_url")) or safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.png"
     schema: dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -4713,6 +4734,7 @@ def main() -> int:
                 f"Duplicate generated article slug '{s}'."
             )
 
+        p["_featured_image_url"] = materialize_featured_image(p, s)
         (PUBLIC / f"{s}.html").write_text(
             article_page(p, posts),
             encoding="utf-8",
