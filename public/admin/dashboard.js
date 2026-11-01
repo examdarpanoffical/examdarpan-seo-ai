@@ -112,9 +112,18 @@ async function loadPosts(){
 function renderList(){
   const term=($('filter').value||'').toLowerCase().trim();
   const list=all.filter(p=>(p.title||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term));
-  $('posts').innerHTML=list.map(p=>`<div class="card pad" style="margin-bottom:10px"><strong>${escapeHtml(p.title||'Untitled')}</strong><div class="meta">${escapeHtml(p.category||'')} · ${escapeHtml(p.status||'')} · ${p.publishedAt?'Published':'Draft'}${p.telegramSentAt?' · Telegram sent':(p.status==='published'?' · Telegram pending':'')}</div><div style="margin-top:8px"><button class="btn btn-dark" data-edit="${p.id}">Edit</button> <button class="btn btn-gold" data-delete="${p.id}">Delete</button></div></div>`).join('')||'<div class="empty">No posts found.</div>';
+  $('posts').innerHTML=list.map(p=>{
+    const slug=slugify(p.slug||'');
+    const articleUrl=slug?'https://examdarpan.in/'+slug:'';
+    const share=p.status==='published'&&articleUrl?'<button class="btn btn-primary" data-share="'+escapeHtml(articleUrl)+'" data-title="'+escapeHtml(p.title||'Exam Darpan Update')+'">Share on WhatsApp</button>':'';
+    return '<div class="card pad" style="margin-bottom:10px"><strong>'+escapeHtml(p.title||'Untitled')+'</strong><div class="meta">'+escapeHtml(p.category||'')+' · '+escapeHtml(p.status||'')+' · '+(p.publishedAt?'Published':'Draft')+(p.telegramSentAt?' · Telegram sent':(p.status==='published'?' · Telegram pending':''))+'</div><div style="margin-top:8px"><button class="btn btn-dark" data-edit="'+p.id+'">Edit</button> <button class="btn btn-gold" data-delete="'+p.id+'">Delete</button> '+share+'</div></div>';
+  }).join('')||'<div class="empty">No posts found.</div>';
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>fill(all.find(p=>p.id===b.dataset.edit)));
   document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>remove(b.dataset.delete));
+  document.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>{
+    const message=(b.dataset.title||'Exam Darpan Update')+'\\n'+b.dataset.share;
+    window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener');
+  });
 }
 function fill(p){
   if(!p)return;
@@ -758,20 +767,27 @@ $('aiGenerate').onclick=async()=>{
 /* Free-plan thumbnail: no Gemini Image API, no Blaze required.
    It creates a lightweight branded SVG thumbnail locally from the article title. */
 $('aiImageGenerate').onclick=()=>{
-  const title=$('title').value.trim()||$('aiTopic').value.trim();
-  const category=$('category').value||'Latest Updates',m=$('aiImageMsg');
-  if(!title){m.textContent='पहले Article Title या Topic भरें.';return}
-  const safe=escapeHtml(title).slice(0,120);
-  const cat=escapeHtml(category).slice(0,40);
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
-  <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f172a"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
-  <rect width="1280" height="720" fill="url(#g)"/><circle cx="1080" cy="150" r="250" fill="#f59e0b" opacity=".14"/><circle cx="1160" cy="580" r="300" fill="#fff" opacity=".05"/>
-  <rect x="60" y="58" rx="10" width="260" height="54" fill="#f59e0b"/><text x="82" y="94" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#111827">${cat}</text>
-  <text x="60" y="230" font-family="Arial,sans-serif" font-size="52" font-weight="800" fill="#fff">${safe}</text>
-  <rect x="60" y="600" width="1160" height="2" fill="#f59e0b"/><text x="60" y="650" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#fff">EXAM DARPAN</text><text x="290" y="650" font-family="Arial,sans-serif" font-size="22" fill="#e2e8f0">Vacancy Se Result Tak, Har Jankari Ek Jagah</text>
-  </svg>`;
-  const data='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
-  $('image').value=data;
-  $('aiImagePreview').innerHTML=`<img src="${data}" alt="${safe}" style="width:100%;border-radius:14px;border:1px solid #e2e8f0">`;
-  m.textContent='Free branded thumbnail तैयार है. यह Gemini Image API का उपयोग नहीं करती, इसलिए Blaze की जरूरत नहीं.';
-};
+   const title=$('title').value.trim()||$('aiTopic').value.trim();
+   const category=$('category').value||'Latest Updates',m=$('aiImageMsg');
+   if(!title){m.textContent='पहले Article Title या Topic भरें.';return}
+   const safe=escapeHtml(title).slice(0,120),cat=escapeHtml(category).slice(0,40);
+   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+   <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f172a"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
+   <rect width="1280" height="720" fill="url(#g)"/><circle cx="1080" cy="150" r="250" fill="#f59e0b" opacity=".14"/><circle cx="1160" cy="580" r="300" fill="#fff" opacity=".05"/>
+   <rect x="60" y="58" rx="10" width="260" height="54" fill="#f59e0b"/><text x="82" y="94" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#111827">${cat}</text>
+   <text x="60" y="230" font-family="Arial,sans-serif" font-size="52" font-weight="800" fill="#fff">${safe}</text>
+   <rect x="60" y="600" width="1160" height="2" fill="#f59e0b"/><text x="60" y="650" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#fff">EXAM DARPAN</text><text x="290" y="650" font-family="Arial,sans-serif" font-size="22" fill="#e2e8f0">Vacancy Se Result Tak, Har Jankari Ek Jagah</text></svg>`;
+   const svgData='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg),source=new Image();
+   m.textContent='PNG thumbnail तैयार हो रही है…';
+   source.onload=()=>{
+     const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=675;
+     const ctx=canvas.getContext('2d');
+     if(!ctx){m.textContent='Canvas उपलब्ध नहीं है. कृपया image URL डालें.';return}
+     ctx.drawImage(source,0,0,1200,675);
+     const png=canvas.toDataURL('image/png');$('image').value=png;
+     $('aiImagePreview').innerHTML='<img src="'+png+'" alt="'+safe+'" style="width:100%;border-radius:14px;border:1px solid #e2e8f0">';
+     m.textContent='PNG thumbnail तैयार है. Publish पर यह public HTTPS image में बदलकर WhatsApp Preview में इस्तेमाल होगी.';
+   };
+   source.onerror=()=>{m.textContent='Thumbnail convert नहीं हुई. कृपया दोबारा कोशिश करें.';};
+   source.src=svgData;
+ };
