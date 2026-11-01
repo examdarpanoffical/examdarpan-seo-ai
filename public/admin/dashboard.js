@@ -122,7 +122,7 @@ function renderList(){
   document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>remove(b.dataset.delete));
   document.querySelectorAll('[data-share-wa]').forEach(b=>b.onclick=()=>{
     const post=all.find(p=>'https://examdarpan.in/'+slugify(p.slug||'')===b.dataset.shareWa);
-    const message=(post?.title||'Exam Darpan Update')+'\\n'+b.dataset.shareWa;
+    const message=(post?.title||'Exam Darpan Update')+'\n'+b.dataset.shareWa;
     window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener');
   });
   document.querySelectorAll('[data-share-fb]').forEach(b=>b.onclick=()=>{
