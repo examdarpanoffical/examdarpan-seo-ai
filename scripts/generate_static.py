@@ -479,7 +479,7 @@ def materialize_featured_image(p: dict[str, Any], slug: str) -> str:
             payload = base64.b64decode(match.group(1), validate=True)
         except (ValueError, base64.binascii.Error) as exc:
             raise RuntimeError(f"Invalid generated PNG thumbnail for {slug}") from exc
-        if not payload.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+        if payload[:8] != bytes([137, 80, 78, 71, 13, 10, 26, 10]):
             raise RuntimeError(f"Generated thumbnail is not a valid PNG for {slug}")
         if len(payload) > 900_000:
             raise RuntimeError(f"Generated thumbnail is too large for {slug}; use a public image URL")
