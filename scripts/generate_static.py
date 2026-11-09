@@ -692,7 +692,7 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
     img = safe_url(p.get("_featured_image_url")) or safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.png"
     schema: dict[str, Any] = {
         "@context": "https://schema.org",
-        "@type": "Article",
+        "@type": "NewsArticle",
         "headline": seo_headline[:110],
         "description": desc,
         "url": url,
@@ -700,12 +700,21 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
         "articleSection": cat,
         "inLanguage": "hi-IN",
         "isAccessibleForFree": True,
-        "author": {"@type": "Person", "name": AUTHOR_NAME, "url": AUTHOR_URL, "jobTitle": AUTHOR_ROLE},
+        "author": {
+            "@type": "Person",
+            "name": AUTHOR_NAME,
+            "url": AUTHOR_URL,
+            "jobTitle": AUTHOR_ROLE,
+        },
         "publisher": {
             "@type": "Organization",
             "name": "Exam Darpan",
             "url": f"{BASE}/",
             "logo": {"@type": "ImageObject", "url": f"{BASE}/assets/logo.png"},
+            "founder": {
+                "@type": "Person",
+                "name": "Lokesh Meena",
+            },
         },
         "image": [img],
     }
@@ -4324,12 +4333,24 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
         deduped_urls.append((canonical_path, lastmod, image))
     urls = deduped_urls
 
+    def changefreq_for_path(path: str) -> str:
+        if path == "/":
+            return "daily"
+        if path in {"/privacy", "/terms", "/disclaimer"}:
+            return "yearly"
+        if path in {"/about", "/contact", "/editorial-policy"}:
+            return "monthly"
+        if path.startswith("/category-") or path in {"/rajasthan-government-jobs", "/all-india-government-jobs"}:
+            return "daily"
+        return "weekly"
+
     xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">']
     for path, lastmod, image in urls:
         xml.append("  <url>")
         xml.append(f"    <loc>{xml_esc(BASE + path)}</loc>")
         if lastmod:
             xml.append(f"    <lastmod>{xml_esc(lastmod)}</lastmod>")
+        xml.append(f"    <changefreq>{changefreq_for_path(path)}</changefreq>")
         if image:
             xml.append(f"    <image:image><image:loc>{xml_esc(image)}</image:loc></image:image>")
         xml.append("  </url>")
@@ -4373,6 +4394,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
             rows.append(f"    <loc>{xml_esc(canonical_url)}</loc>")
             if lastmod:
                 rows.append(f"    <lastmod>{xml_esc(lastmod)}</lastmod>")
+            rows.append(f"    <changefreq>{changefreq_for_path(canonical_path)}</changefreq>")
             if image:
                 rows.append(f"    <image:image><image:loc>{xml_esc(image)}</image:loc></image:image>")
             rows.append("  </url>")
@@ -4457,7 +4479,7 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: incorrect og:url in {path.name}; expected {expected_url}")
         if not re.search(r'<meta name="description" content="[^"]+">', txt, flags=re.I):
             raise RuntimeError(f"SEO verification failed: missing article description in {path.name}")
-        if not re.search(r'<script type="application/ld\+json">.*?"@type":"Article".*?</script>', txt, flags=re.S | re.I):
+        if not re.search(r'<script type="application/ld\+json">.*?"@type":"NewsArticle".*?</script>', txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing Article JSON-LD in {path.name}")
         if not re.search(r"<title>.+?</title>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
