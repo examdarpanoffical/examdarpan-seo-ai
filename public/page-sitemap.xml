@@ -3,29 +3,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://examdarpan.in/author/deepak-joshi</loc>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/</loc>
+    <changefreq>daily</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/categories</loc>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/about</loc>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/contact</loc>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/editorial-policy</loc>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/privacy</loc>
+    <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/disclaimer</loc>
+    <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://examdarpan.in/terms</loc>
+    <changefreq>yearly</changefreq>
   </url>
 </urlset>
