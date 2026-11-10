@@ -56,10 +56,20 @@ $('publishHtmlQuiz')?.addEventListener('click',async()=>{
       headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
       body:JSON.stringify({action:'publish-html-quiz',title,slug,html})
     });
-    const result=await response.json().catch(()=>({}));
-    if(!response.ok||!result.published)throw new Error(result.error||'Quiz publish नहीं हो पाया।');
+    const responseText=await response.text();
+    let result={};
+    try{result=JSON.parse(responseText)}catch(_){}
+    if(result.queued===true&&!result.published){
+      throw new Error('Worker ने पुराना SEO workflow response दिया (HTTP '+response.status+'). Live Cloudflare Worker में publish-html-quiz वाला नया worker.js deploy नहीं है। GitHub workflow चलाने से quiz publish नहीं होगी।');
+    }
+    if(!response.ok||!result.published){
+      const detail=result.error||result.message||responseText.slice(0,240)||'कोई response detail नहीं मिली';
+      throw new Error('Publish failed (HTTP '+response.status+'): '+detail);
+    }
     const url=result.url;
-    $('htmlQuizPublishedUrl').innerHTML='<a href="'+url+'" target="_blank" rel="noopener">'+url+'</a>';
+    const link=document.createElement('a');
+    link.href=url;link.target='_blank';link.rel='noopener';link.textContent=url;
+    $('htmlQuizPublishedUrl').replaceChildren(link);
     $('htmlQuizCopyLink').disabled=false;
     $('htmlQuizCopyLink').onclick=async()=>{await navigator.clipboard.writeText(url);setMessage('Quiz link copied. WhatsApp पर share कर सकते हो।')};
     setMessage('GitHub पर Quiz commit हो गया। Firebase Hosting deployment पूरा होने के बाद यह URL LIVE होगा।');
