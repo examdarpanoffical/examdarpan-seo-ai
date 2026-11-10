@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>राजस्थान CET (सीनियर सैकण्डरी स्तर) 2026 - 120 प्रश्न ऑनलाइन मॉक टेस्ट</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+    body {
+      font-family: 'Hind', sans-serif;
+      background-color: #f8fafc;
+    }
+    .font-eng {
+      font-family: 'Poppins', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+    /* Subtle watermark for question cards */
+    .exam-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-15deg);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: rgba(99, 102, 241, 0.06);
+      letter-spacing: 0.15em;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      font-family: 'Poppins', sans-serif;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-950 text-white shadow-xl sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
+        <div>
+          <div class="flex items-center justify-center md:justify-start gap-2">
+            <span class="text-2xl animate-bounce">🚀</span>
+            <h1 class="text-sm md:text-base font-bold tracking-wide">
+              हर दिन सबसे तेज़ और भरोसेमंद <span class="text-yellow-300 font-eng">Education Updates❗</span> 📚
+            </h1>
+          </div>
+          <p class="text-xs text-blue-200 mt-0.5 font-medium">
+            ✅ शिक्षा विभाग व रोजगार की हर छोटी बड़ी अपडेट | 👇 अभी <span class="text-yellow-300 font-bold">Follow</span> करें <span class="text-yellow-300 font-bold">New Update</span> मिस न करें ❗
+          </p>
+        </div>
+        
+        <!-- Social Channels Buttons Top -->
+        <div class="flex flex-wrap items-center justify-center gap-2">
+          <a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener noreferrer" 
+             class="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-full text-xs font-bold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+            <span>WhatsApp</span>
+          </a>
+          <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer" 
+             class="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-full text-xs font-bold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
+            <i class="fa-brands fa-telegram text-sm"></i>
+            <span>Telegram</span>
+          </a>
+          <a href="https://youtube.com/@examdarpanoffical?si=63RsD8IB0oOdWGhC" target="_blank" rel="noopener noreferrer" 
+             class="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FF0000] hover:bg-[#cc0000] text-white rounded-full text-xs font-bold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
+            <i class="fa-brands fa-youtube text-sm"></i>
+            <span>YouTube</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="bg-white border-b border-slate-200 shadow-sm py-2 px-4 sticky top-[75px] md:top-[61px] z-30">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm">
+      <div class="flex items-center gap-2">
+        <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-0.5 rounded">RSSB CET (10+2) Exam 2026</span>
+        <span class="text-slate-600 font-semibold hidden sm:inline">नवीनतम पाठ्यक्रम अनुसार <b>संपूर्ण मॉडल पेपर (120 प्रश्न | 240 अंक | 1/3 नेगेटिव)</b></span>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="flex items-center gap-3 font-semibold">
+        <div class="text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
+          <i class="fa-solid fa-circle-check"></i> हल किए: <span id="stat-solved">0</span>/120
+        </div>
+        <div class="text-indigo-700 bg-indigo-50 px-2 py-1 rounded border border-indigo-200">
+          <i class="fa-solid fa-trophy"></i> अंक: <span id="stat-score">0.00</span> / 240
+        </div>
+        <button onclick="submitQuizDirectly()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg shadow-sm font-bold transition flex items-center gap-1">
+          <i class="fa-solid fa-flag-checkered"></i> सबमिट
+        </button>
+      </div>
+    </div>
+
+    <!-- 120 Question Fast Jump Palette -->
+    <div class="max-w-6xl mx-auto mt-2 pt-2 border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1">
+      <span class="text-[11px] text-slate-500 font-bold whitespace-nowrap mr-1">प्रश्न सूची:</span>
+      <div id="jump-buttons-container" class="flex gap-1"></div>
+    </div>
+  </div>
+
+  <main class="flex-grow max-w-5xl w-full mx-auto px-3 sm:px-4 py-5">
+    
+    <!-- View Switcher -->
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+      <div class="flex items-center gap-2 text-xs font-bold text-slate-700">
+        <span>मोड चुनें:</span>
+        <button id="btn-mode-all" onclick="setMode('all')" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition">
+          <i class="fa-solid fa-list-ol mr-1"></i> सभी 120 प्रश्न
+        </button>
+        <button id="btn-mode-single" onclick="setMode('single')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+          <i class="fa-solid fa-clone mr-1"></i> एक-एक प्रश्न
+        </button>
+      </div>
+      <div class="text-xs text-indigo-700 font-semibold bg-indigo-50 px-2.5 py-1 rounded-md">
+        💡 सही उत्तर: +2.0 अंक | गलत उत्तर: -0.66 अंक (1/3 नकारात्मक अंकन)
+      </div>
+    </div>
+
+    <!-- Questions Injection Container -->
+    <div id="questions-wrapper" class="space-y-5"></div>
+
+    <!-- Single Question Nav Buttons (Visible only in single question mode) -->
+    <div id="single-nav-bar" class="hidden mt-6 bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+      <button onclick="prevQuestion()" id="btn-prev" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+        <i class="fa-solid fa-arrow-left"></i> पिछला
+      </button>
+      <span class="text-sm font-bold text-indigo-900" id="current-q-indicator">प्रश्न 1 / 120</span>
+      <button onclick="nextQuestion()" id="btn-next" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition flex items-center gap-2">
+        अगला <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Bottom Submit Button -->
+    <div class="mt-8 text-center">
+      <button onclick="submitQuizDirectly()" class="px-8 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:opacity-95 text-white text-base font-bold rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5">
+        <i class="fa-solid fa-circle-check mr-2"></i> क्विज समाप्त करें और परिणाम देखें
+      </button>
+    </div>
+  </main>
+
+  <div id="social-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 text-center border border-indigo-100 animate-in fade-in zoom-in duration-200">
+      <div class="w-16 h-16 bg-gradient-to-tr from-amber-400 to-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-md text-3xl">
+        🎉
+      </div>
+      <h3 class="text-xl font-bold text-slate-900" id="milestone-title">शानदार तैयारी! आपने 20 प्रश्न हल कर लिए</h3>
+      <p class="text-xs text-slate-600 mt-1 mb-4 font-medium">
+        शिक्षा विभाग व रोजगार की हर छोटी-बड़ी भर्ती, मॉडल आंसर की और न्यू अपडेट सबसे पहले पाने के लिए अभी जुड़ें:
+      </p>
+
+      <!-- Official Channel Cards inside Modal -->
+      <div class="space-y-2.5 mb-5">
+        <a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center justify-between px-4 py-3 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-2xl font-bold text-sm shadow transition transform hover:-translate-y-0.5">
+          <div class="flex items-center gap-3">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+            <div class="text-left leading-tight">
+              <span class="block">WhatsApp Channel</span>
+              <span class="text-[11px] font-normal opacity-90">दैनिक स्टडी व भर्ती अपडेट</span>
+            </div>
+          </div>
+          <span class="bg-white/25 px-3 py-1 rounded-full text-xs">Join Now ➜</span>
+        </a>
+
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center justify-between px-4 py-3 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-2xl font-bold text-sm shadow transition transform hover:-translate-y-0.5">
+          <div class="flex items-center gap-3">
+            <i class="fa-brands fa-telegram text-2xl"></i>
+            <div class="text-left leading-tight">
+              <span class="block">Telegram Channel</span>
+              <span class="text-[11px] font-normal opacity-90">PDF नोट्स व टेस्ट पेपर</span>
+            </div>
+          </div>
+          <span class="bg-white/25 px-3 py-1 rounded-full text-xs">Join Now ➜</span>
+        </a>
+
+        <a href="https://youtube.com/@examdarpanoffical?si=63RsD8IB0oOdWGhC" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center justify-between px-4 py-3 bg-[#FF0000] hover:bg-[#cc0000] text-white rounded-2xl font-bold text-sm shadow transition transform hover:-translate-y-0.5">
+          <div class="flex items-center gap-3">
+            <i class="fa-brands fa-youtube text-2xl"></i>
+            <div class="text-left leading-tight">
+              <span class="block">YouTube Channel</span>
+              <span class="text-[11px] font-normal opacity-90">ऑनलाइन क्लासेज व समाधान</span>
+            </div>
+          </div>
+          <span class="bg-white/25 px-3 py-1 rounded-full text-xs">Subscribe ➜</span>
+        </a>
+      </div>
+
+      <button onclick="closeSocialModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition">
+        क्विज जारी रखें (Continue Quiz)
+      </button>
+    </div>
+  </div>
+
+  <div id="result-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-8 text-center my-6 border border-slate-100">
+      <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-4xl font-bold shadow-inner">
+        🏆
+      </div>
+      <h2 class="text-2xl md:text-3xl font-black text-slate-800">आपका फाइनल परिणाम</h2>
+      <p class="text-sm text-slate-500 font-medium">समान पात्रता परीक्षा (CET 10+2 स्तर) - 2026 संपूर्ण मॉक टेस्ट (120 प्रश्न)</p>
+
+      <!-- Marks Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-5">
+        <div class="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
+          <span class="text-xs text-slate-500 font-bold">कुल प्रश्न</span>
+          <p class="text-2xl font-black text-slate-800">120</p>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 p-3 rounded-2xl">
+          <span class="text-xs text-blue-600 font-bold">हल किए</span>
+          <p class="text-2xl font-black text-blue-800" id="res-attempted">0</p>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl">
+          <span class="text-xs text-emerald-600 font-bold">सही उत्तर</span>
+          <p class="text-2xl font-black text-emerald-800" id="res-correct">0</p>
+        </div>
+        <div class="bg-rose-50 border border-rose-200 p-3 rounded-2xl">
+          <span class="text-xs text-rose-600 font-bold">गलत उत्तर</span>
+          <p class="text-2xl font-black text-rose-800" id="res-wrong">0</p>
+        </div>
+      </div>
+
+      <!-- Score & Accuracy Panel (2 Marks Per Question, 1/3 Negative Marking) -->
+      <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 p-4 rounded-2xl mb-6">
+        <div class="flex justify-around items-center">
+          <div>
+            <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">कुल प्राप्तांक (Marks)</span>
+            <p class="text-3xl font-black text-indigo-700" id="res-score">0.00 / 240</p>
+            <span class="text-[10px] text-slate-400">(सही: +2.0, गलत: -0.66 [1/3 नेगेटिव])</span>
+          </div>
+          <div class="h-12 w-px bg-slate-300"></div>
+          <div>
+            <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">सटीकता (Accuracy)</span>
+            <p class="text-3xl font-black text-purple-700" id="res-accuracy">0%</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Big Screen Social Promotion Buttons -->
+      <div class="border-t-2 border-dashed border-slate-200 pt-5 mb-5">
+        <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1">
+          🚀 हर दिन सबसे तेज़ और भरोसेमंद <span class="text-indigo-600 font-eng">Education Updates❗</span> 📚
+        </h3>
+        <p class="text-xs text-slate-600 mb-4 font-semibold">
+          ✅ शिक्षा विभाग व रोजगार की हर छोटी बड़ी अपडेट | 👇 अभी Follow करें New Update मिस न करें ❗
+        </p>
+
+        <!-- Large Button Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener noreferrer" 
+             class="flex flex-col items-center justify-center p-3.5 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-2xl font-bold shadow-lg transition transform hover:-translate-y-1">
+            <i class="fa-brands fa-whatsapp text-3xl mb-1"></i>
+            <span class="text-sm">📢 WhatsApp</span>
+            <span class="text-[10px] font-normal opacity-90 mt-0.5">चैनल फॉलो करें</span>
+          </a>
+
+          <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer" 
+             class="flex flex-col items-center justify-center p-3.5 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-2xl font-bold shadow-lg transition transform hover:-translate-y-1">
+            <i class="fa-brands fa-telegram text-3xl mb-1"></i>
+            <span class="text-sm">📚 Telegram</span>
+            <span class="text-[10px] font-normal opacity-90 mt-0.5">टेलीग्राम जॉइन करें</span>
+          </a>
+
+          <a href="https://youtube.com/@examdarpanoffical?si=63RsD8IB0oOdWGhC" target="_blank" rel="noopener noreferrer" 
+             class="flex flex-col items-center justify-center p-3.5 bg-[#FF0000] hover:bg-[#cc0000] text-white rounded-2xl font-bold shadow-lg transition transform hover:-translate-y-1">
+            <i class="fa-brands fa-youtube text-3xl mb-1"></i>
+            <span class="text-sm">▶️ YouTube</span>
+            <span class="text-[10px] font-normal opacity-90 mt-0.5">सब्सक्राइब करें</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button onclick="reviewAnswers()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition text-sm shadow">
+          <i class="fa-solid fa-list-check mr-1"></i> सभी उत्तरों की समीक्षा करें
+        </button>
+        <button onclick="restartQuiz()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition text-sm">
+          <i class="fa-solid fa-rotate-right mr-1"></i> पुनः टेस्ट दें
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-auto bg-slate-900 text-slate-300 border-t border-slate-800 py-6 px-4">
+    <div class="max-w-5xl mx-auto text-center">
+      <div class="mb-3">
+        <h4 class="text-base font-bold text-white mb-1">💙 Share | Follow 🔔</h4>
+        <p class="text-xs text-slate-400 max-w-xl mx-auto">
+          प्रतियोगी परीक्षाओं की तैयारी करने वाले अपने सभी साथियों के साथ इस टेस्ट को अवश्य साझा करें।
+        </p>
+      </div>
+
+      <!-- Social Links in Footer -->
+      <div class="flex flex-wrap justify-center items-center gap-3 mt-3">
+        <a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-2 px-4 py-2 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl text-xs font-bold transition shadow">
+          <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp चैनल
+        </a>
+        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-2 px-4 py-2 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-xl text-xs font-bold transition shadow">
+          <i class="fa-brands fa-telegram text-base"></i> Telegram चैनल
+        </a>
+        <a href="https://youtube.com/@examdarpanoffical?si=63RsD8IB0oOdWGhC" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-2 px-4 py-2 bg-[#FF0000] hover:bg-[#cc0000] text-white rounded-xl text-xs font-bold transition shadow">
+          <i class="fa-brands fa-youtube text-base"></i> YouTube चैनल
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Complete 120 Questions for Rajasthan CET (Senior Secondary Level) 2026
+    // Total Marks: 240 (+2.0 per question, -1/3 i.e. -0.66 negative marking)
+    const quizData = [
+      {
+            "id": 1,
+            "q": "कालीबंगा सभ्यता के संदर्भ में निम्नलिखित में से कौन-सा कथन सत्य है?",
+            "o": [
+                  "यहाँ से जुते हुए खेत के प्राचीनतम साक्ष्य मिले हैं।",
+                  "इसकी खोज रत्नचंद्र अग्रवाल ने की थी।",
+                  "यह बनास नदी के तट पर स्थित है।",
+                  "यहाँ से केवल ताम्र युगीन अवशेष प्राप्त हुए हैं।"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: कालीबंगा (हनुमानगढ़) घग्गर नदी के किनारे स्थित है। इसकी खोज 1952 में अमलानंद घोष ने की थी और यहाँ से प्राक्-हड़प्पा कालीन जुते हुए खेत के साक्ष्य मिले हैं।"
+      },
+      {
+            "id": 2,
+            "q": "आहड़ सभ्यता को किस अन्य नाम से भी जाना जाता है?",
+            "o": [
+                  "ताम्रवती नगरी",
+                  "लोह युगीन नगरी",
+                  "सिंधु घाटी का प्रवेश द्वार",
+                  "मृतकों का टीला"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: उदयपुर में आयड़/बेड़च नदी के किनारे स्थित आहड़ सभ्यता को तांबे के औजारों की अधिकता के कारण 'ताम्रवती नगरी' तथा स्थानीय भाषा में 'धूलकोट' कहा जाता है।"
+      },
+      {
+            "id": 3,
+            "q": "अशोक का 'भाब्रू शिलालेख' राजस्थान के किस पुरातात्विक स्थल से प्राप्त हुआ है?",
+            "o": [
+                  "बैराठ",
+                  "गणेश्वर",
+                  "बागोर",
+                  "बालाथल"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: बैराठ (विराटनगर) की बीजक की पहाड़ी से 1837 ई. में कैप्टन बर्ट को अशोक का भाब्रू शिलालेख मिला था, जो अशोक के बौद्ध धर्म के प्रति निष्ठा को दर्शाता है।"
+      },
+      {
+            "id": 4,
+            "q": "महाराणा कुम्भा द्वारा रचित प्रमुख संगीत ग्रंथ कौन-सा नहीं है?",
+            "o": [
+                  "संगीत राज",
+                  "संगीत मीमांसा",
+                  "सूड प्रबंध",
+                  "पृथ्वीराज विजय"
+            ],
+            "ans": 4,
+            "r": "व्याख्या: 'पृथ्वीराज विजय' की रचना जयानक ने की थी। संगीत राज, संगीत मीमांसा और सूड प्रबंध महाराणा कुम्भा द्वारा रचित ग्रंथ हैं।"
+      },
+      {
+            "id": 5,
+            "q": "खानवा का युद्ध (1527 ई.) बाबर और किस राजपूत शासक के मध्य लड़ा गया था?",
+            "o": [
+                  "महाराणा सांगा",
+                  "महाराणा प्रताप",
+                  "राव मालदेव",
+                  "पृथ्वीराज चौहान तृतीय"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: खानवा का युद्ध 17 मार्च 1527 को रूपवास (भरतपुर) के पास बाबर और मेवाड़ के महाराणा संग्राम सिंह (सांगा) के मध्य लड़ा गया था।"
+      },
+      {
+            "id": 6,
+            "q": "मारवाड़ के किस शासक को 'हसमत वाला राजा' (फारसी इतिहासकारों द्वारा) कहा गया है?",
+            "o": [
+                  "राव मालदेव",
+                  "राव चंद्रसेन",
+                  "महाराजा जसवंत सिंह",
+                  "राव जोधा"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: मारवाड़ के शासक राव मालदेव को फारसी इतिहासकारों ने 'हसमत वाला राजा' (शानो-शौकत एवं शक्ति संपन्न शासक) की संज्ञा दी थी।"
+      },
+      {
+            "id": 7,
+            "q": "1857 की क्रांति के समय कोटा रियासत में ब्रिटिश पॉलिटिकल एजेंट कौन था?",
+            "o": [
+                  "मेजर बर्टन",
+                  "मैक मोसन",
+                  "मेजर शॉवर्स",
+                  "कैप्टन ईडन"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: कोटा में 15 अक्टूबर 1857 को जयदयाल और मेहराब खां के नेतृत्व में जनविद्रोह हुआ, जिसमें पॉलिटिकल एजेंट मेजर बर्टन मारा गया था।"
+      },
+      {
+            "id": 8,
+            "q": "बिजौलिया किसान आंदोलन के प्रथम चरण का नेतृत्व किसने किया था?",
+            "o": [
+                  "साधु सीताराम दास",
+                  "विजय सिंह पथिक",
+                  "माणिक्यलाल वर्मा",
+                  "जमनालाल बजाज"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: भारत के सबसे लंबे अहिंसात्मक किसान आंदोलन 'बिजौलिया किसान आंदोलन' (1897-1941) के प्रथम चरण का नेतृत्व साधु सीताराम दास ने किया था; 1916 में विजय सिंह पथिक इससे जुड़े।"
+      },
+      {
+            "id": 9,
+            "q": "गोविंद गिरी द्वारा 'सम्प सभा' की स्थापना किस वर्ष की गई थी?",
+            "o": [
+                  "1883 ई.",
+                  "1913 ई.",
+                  "1921 ई.",
+                  "1897 ई."
+            ],
+            "ans": 1,
+            "r": "व्याख्या: भील एवं गरासिया जनजाति में सामाजिक व राजनीतिक जागृति लाने हेतु गोविंद गिरी ने 1883 ई. में सिरोही में 'सम्प सभा' की स्थापना की थी।"
+      },
+      {
+            "id": 10,
+            "q": "मेवाड़ प्रजामंडल की स्थापना (24 अप्रैल 1938) में प्रमुख भूमिका किसकी रही?",
+            "o": [
+                  "माणिक्यलाल वर्मा",
+                  "कपूरचंद पाटनी",
+                  "पंडित नयनूराम शर्मा",
+                  "भोगीलाल पंड्या"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: मेवाड़ प्रजामंडल की स्थापना 24 अप्रैल 1938 को माणिक्यलाल वर्मा के प्रयासों से उदयपुर में हुई तथा इसके प्रथम अध्यक्ष बलवंत सिंह मेहता थे।"
+      },
+      {
+            "id": 11,
+            "q": "राजस्थान के एकीकरण के चतुर्थ चरण 'वृहत् राजस्थान' का उद्घाटन 30 मार्च 1949 को किसने किया?",
+            "o": [
+                  "सरदार वल्लभभाई पटेल",
+                  "पंडित जवाहरलाल नेहरू",
+                  "एन.वी. गाडगिल",
+                  "लॉर्ड माउंटबेटन"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: चतुर्थ चरण (वृहत् राजस्थान) का उद्घाटन 30 मार्च 1949 को जयपुर में सरदार वल्लभभाई पटेल द्वारा किया गया। इसी कारण 30 मार्च को राजस्थान दिवस मनाया जाता है।"
+      },
+      {
+            "id": 12,
+            "q": "'रास्तापाल कांड' (डूंगरपुर) में अपने शिक्षक की रक्षा करते हुए किस बालिका ने अपने प्राणों की आहुति दी?",
+            "o": [
+                  "कालीबाई",
+                  "अमृता देवी",
+                  "रमा देवी",
+                  "जानकी देवी बजाज"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जून 1947 में डूंगरपुर के रास्तापाल गाँव में अपने शिक्षक सेंगाभाई को पुलिस के ट्रक से बांधकर घसीटे जाने पर 13 वर्षीय भील बालिका कालीबाई ने रस्सी काट दी और पुलिस की गोलियों से शहीद हो गईं।"
+      },
+      {
+            "id": 13,
+            "q": "यूनेस्को की विश्व धरोहर सूची में शामिल राजस्थान के 6 पहाड़ी दुर्गों में कौन-सा दुर्ग शामिल नहीं है?",
+            "o": [
+                  "मेहरानगढ़ (जोधपुर)",
+                  "चित्तौड़गढ़",
+                  "गागरोन (झालावाड़)",
+                  "रणथम्भौर (सवाई माधोपुर)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जून 2013 में यूनेस्को द्वारा राजस्थान के 6 दुर्ग (चित्तौड़गढ़, कुम्भलगढ़, गागरोन, जैसलमेर, रणथम्भौर, आमेर - ट्रिक: चीकू गाजर आम) विश्व धरोहर घोषित किए गए, इसमें मेहरानगढ़ शामिल नहीं है।"
+      },
+      {
+            "id": 14,
+            "q": "विश्व प्रसिद्ध 'बणी-ठणी' चित्रकला किस चित्रशैली से संबंधित है?",
+            "o": [
+                  "किशनगढ़ शैली",
+                  "बूंदी शैली",
+                  "नाथद्वारा शैली",
+                  "मारवाड़ शैली"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: किशनगढ़ शैली के शासक सावंत सिंह (नागरीदास) के काल में चित्रकार मोरध्वज निहालचंद ने 'बणी-ठणी' का चित्र बनाया, जिसे एरिक डिक्सन ने 'भारत की मोनालिसा' कहा।"
+      },
+      {
+            "id": 15,
+            "q": "निम्नलिखित में से कौन-सा वाद्य यंत्र 'तत् वाद्य' (तार से बजने वाला) है?",
+            "o": [
+                  "रावणहत्था",
+                  "अलगोजा",
+                  "मांदल",
+                  "झांझ"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: रावणहत्था में 9 तार होते हैं और यह गज की सहायता से बजाया जाने वाला प्रमुख तत् वाद्य है। अलगोजा सुषिर वाद्य, मांदल अवनद्ध और झांझ घन वाद्य है।"
+      },
+      {
+            "id": 16,
+            "q": "'तेरहताली नृत्य' किस लोकदेवता की आराधना में कामड़ जाति की महिलाओं द्वारा किया जाता है?",
+            "o": [
+                  "बाबा रामदेव जी",
+                  "गोगाजी",
+                  "तेजाजी",
+                  "पाबूजी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: तेरहताली नृत्य रामदेव जी के मेले (रुणिचा, जैसलमेर) में कामड़ पंथ की महिलाओं द्वारा शरीर पर 13 मंजीरे बांधकर बैठकर किया जाने वाला व्यावसायिक लोक नृत्य है।"
+      },
+      {
+            "id": 17,
+            "q": "विश्नोई संप्रदाय के प्रवर्तक गुरु जम्भेश्वर जी (जाम्भोजी) ने अपने अनुयायियों के लिए कितने नियम निर्धारित किए?",
+            "o": [
+                  "29 नियम",
+                  "36 नियम",
+                  "42 नियम",
+                  "20 नियम"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जाम्भोजी ने 1485 ई. में समराथल धोरा (बीकानेर) पर विश्नोई संप्रदाय की स्थापना की, जिसमें 20 + 9 = 29 नियमों का पालन किया जाता है।"
+      },
+      {
+            "id": 18,
+            "q": "ऊँटों के देवता के रूप में किस लोकदेवता की पूजा की जाती है?",
+            "o": [
+                  "पाबूजी",
+                  "हड़बूजी",
+                  "मल्लीनाथ जी",
+                  "देवनारायण जी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: मारवाड़ में सर्वप्रथम ऊँट लाने का श्रेय पाबूजी को दिया जाता है। ऊँट के बीमार होने पर पाबूजी की पूजा की जाती है और रेबारी/रायका जाति इन्हें आराध्य देव मानती है।"
+      },
+      {
+            "id": 19,
+            "q": "महिलाओं द्वारा 'बोरला' आभूषण शरीर के किस अंग पर पहना जाता है?",
+            "o": [
+                  "सिर (मस्तक)",
+                  "गला",
+                  "कमर",
+                  "कलाई"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: बोरला, रखड़ी, शीशफूल, मेमंद और टीका महिलाओं द्वारा सिर/मस्तक पर पहने जाने वाले प्रमुख आभूषण हैं।"
+      },
+      {
+            "id": 20,
+            "q": "राजस्थान में स्त्रियों का सर्वाधिक लोकप्रिय त्योहार 'गणगौर' किस तिथि को मनाया जाता है?",
+            "o": [
+                  "चैत्र शुक्ल तृतीया",
+                  "श्रावण शुक्ल तृतीया",
+                  "भाद्रपद कृष्ण तृतीया",
+                  "वैशाख शुक्ल तृतीया"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: गणगौर का पर्व चैत्र शुक्ल तृतीया को शिव (ईसर) और पार्वती (गौर) के अखंड सौभाग्य के प्रतीक रूप में मनाया जाता है।"
+      },
+      {
+            "id": 21,
+            "q": "डिंगल और पिंगल क्या हैं?",
+            "o": [
+                  "राजस्थानी साहित्य की काव्य शैलियाँ",
+                  "लोक वाद्य यंत्रों के प्रकार",
+                  "राजस्थानी पगड़ियों के प्रकार",
+                  "प्राचीन सिंचाई प्रणालियाँ"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: पश्चिमी राजस्थानी (मारवाड़ी) का साहित्यिक रूप 'डिंगल' तथा पूर्वी राजस्थानी (ब्रज मिश्रित) का साहित्यिक रूप 'पिंगल' कहलाता है।"
+      },
+      {
+            "id": 22,
+            "q": "'धरती धोरां री' और 'पीथल और पाथल' जैसी कालजयी रचनाओं के रचयिता कौन हैं?",
+            "o": [
+                  "कन्हैयालाल सेठिया",
+                  "विजयदान देथा",
+                  "सूर्यमल मिश्रण",
+                  "केसरीसिंह बारहठ"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: चूरू (सुजानगढ़) के प्रसिद्ध कवि कन्हैयालाल सेठिया ने 'धरती धोरां री', 'लीलटांस' और 'पीथल और पाथल' की रचना की थी।"
+      },
+      {
+            "id": 23,
+            "q": "सीकर, झुंझुनूं और चूरू (शेखावाटी क्षेत्र) में होली के अवसर पर पुरुषों द्वारा किया जाने वाला नृत्य कौन-सा है?",
+            "o": [
+                  "गीदड़ नृत्य",
+                  "बम नृत्य",
+                  "ढोल नृत्य",
+                  "अग्नि नृत्य"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: गीदड़ नृत्य और चंग नृत्य शेखावाटी क्षेत्र के प्रमुख पुरुष प्रधान नृत्य हैं जो होली के अवसर पर किए जाते हैं।"
+      },
+      {
+            "id": 24,
+            "q": "प्रसिद्ध 'थेवा कला' (कांच पर सोने का सूक्ष्म चित्रांकन) राजस्थान के किस जिले की पहचान है?",
+            "o": [
+                  "प्रतापगढ़",
+                  "नाथद्वारा",
+                  "बीकानेर",
+                  "जयपुर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: प्रतापगढ़ का राजसोनी परिवार हरे रंग के बेल्जियम कांच पर सोने की सूक्ष्म नक्काशी वाली 'थेवा कला' के लिए विश्व प्रसिद्ध है।"
+      },
+      {
+            "id": 25,
+            "q": "प्रायद्वीपीय भारत की सबसे लंबी नदी कौन-सी है?",
+            "o": [
+                  "गोदावरी",
+                  "कृष्णा",
+                  "कावेरी",
+                  "नर्मदा"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: गोदावरी नदी (1465 किमी) प्रायद्वीपीय भारत की सबसे लंबी नदी है, इसे 'दक्षिण गंगा' या 'वृद्ध गंगा' भी कहा जाता है।"
+      },
+      {
+            "id": 26,
+            "q": "भारत की सबसे ऊँची पर्वत चोटी 'गॉडविन ऑस्टिन' (K2) किस पर्वत श्रेणी में स्थित है?",
+            "o": [
+                  "काराकोरम श्रेणी",
+                  "जास्कर श्रेणी",
+                  "पीर पंजाल श्रेणी",
+                  "शिवालिक श्रेणी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: K2 (8611 मीटर) ट्रांस हिमालय की काराकोरम पर्वत श्रेणी में स्थित भारत की सर्वोच्च चोटी है।"
+      },
+      {
+            "id": 27,
+            "q": "भारत का एकमात्र तैरता हुआ राष्ट्रीय उद्यान 'केबुल लामजाओ नेशनल पार्क' किस राज्य में स्थित है?",
+            "o": [
+                  "मणिपुर",
+                  "असम",
+                  "मिजोरम",
+                  "अरुणाचल प्रदेश"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: मणिपुर की प्रसिद्ध लोकटक झील में स्थित 'केबुल लामजाओ' विश्व का एकमात्र तैरता हुआ राष्ट्रीय उद्यान है, जो 'संगाई हिरण' के लिए प्रसिद्ध है।"
+      },
+      {
+            "id": 28,
+            "q": "भारत की सबसे बड़ी तटीय खारे पानी की लैगून झील कौन-सी है?",
+            "o": [
+                  "चिल्का झील (ओडिशा)",
+                  "पुलिकट झील",
+                  "वेम्बनाद झील",
+                  "सांभर झील"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: ओडिशा के तट पर स्थित चिल्का झील भारत की सबसे बड़ी लैगून (तटीय खारे पानी की) झील है।"
+      },
+      {
+            "id": 29,
+            "q": "'हीराकुंड बांध' किस नदी पर बनाया गया है?",
+            "o": [
+                  "महानदी",
+                  "दामोदर",
+                  "सतलज",
+                  "भागीरथी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: ओडिशा में महानदी पर स्थित हीराकुंड बांध भारत का सबसे लंबा बांध है।"
+      },
+      {
+            "id": 30,
+            "q": "राष्ट्रीय आपदा प्रबंधन प्राधिकरण (NDMA) का पदेन अध्यक्ष कौन होता है?",
+            "o": [
+                  "भारत के प्रधानमंत्री",
+                  "केंद्रीय गृह मंत्री",
+                  "भारत के राष्ट्रपति",
+                  "रक्षा मंत्री"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: आपदा प्रबंधन अधिनियम, 2005 के तहत गठित राष्ट्रीय आपदा प्रबंधन प्राधिकरण (NDMA) के पदेन अध्यक्ष प्रधानमंत्री होते हैं।"
+      },
+      {
+            "id": 31,
+            "q": "'एक सींग वाले गैंडे' के संरक्षण के लिए प्रसिद्ध काजीरंगा राष्ट्रीय उद्यान किस राज्य में है?",
+            "o": [
+                  "असम",
+                  "पश्चिम बंगाल",
+                  "उत्तराखंड",
+                  "मध्य प्रदेश"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: असम में ब्रह्मपुत्र नदी के किनारे स्थित काजीरंगा राष्ट्रीय उद्यान एक सींग वाले भारतीय गैंडे के लिए विश्व प्रसिद्ध है।"
+      },
+      {
+            "id": 32,
+            "q": "पश्चिमी घाट को किस अन्य नाम से भी जाना जाता है?",
+            "o": [
+                  "सह्याद्रि",
+                  "हिमाद्रि",
+                  "अरावली",
+                  "विंध्यन"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: पश्चिमी घाट पर्वत श्रृंखला को महाराष्ट्र और कर्नाटक में 'सह्याद्रि' के नाम से जाना जाता है तथा यह एक प्रमुख जैव-विविधता हॉटस्पॉट है।"
+      },
+      {
+            "id": 33,
+            "q": "अरावली पर्वतमाला की सर्वोच्च चोटी 'गुरु शिखर' (1722 मीटर) किस जिले में स्थित है?",
+            "o": [
+                  "सिरोही",
+                  "उदयपुर",
+                  "राजसमंद",
+                  "अजमेर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: गुरु शिखर (1722 मी.) सिरोही जिले के माउंट आबू में स्थित है। कर्नल जेम्स टॉड ने इसे 'संतों का शिखर' कहा था।"
+      },
+      {
+            "id": 34,
+            "q": "कोपेन के जलवायु वर्गीकरण के अनुसार जैसलमेर और पश्चिमी बीकानेर किस जलवायु प्रदेश में आते हैं?",
+            "o": [
+                  "BWhw (उष्ण कटिबंधीय शुष्क मरुस्थलीय)",
+                  "BShw (अर्द्ध-शुष्क)",
+                  "Aw (उष्ण कटिबंधीय आर्द्र)",
+                  "Cwg (उपाद्र)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: कोपेन ने पश्चिमी राजस्थान के अत्यंत शुष्क मरुस्थलीय क्षेत्र (जैसलमेर, पश्चिमी बीकानेर, गंगानगर का दक्षिणी भाग) को 'BWhw' वर्ग में रखा है।"
+      },
+      {
+            "id": 35,
+            "q": "हाड़ौती के पठार (कोटा, बूंदी, बारां, झालावाड़) में मुख्य रूप से किस प्रकार की मृदा पाई जाती है?",
+            "o": [
+                  "मध्यम काली मृदा (वर्टिसोल्स)",
+                  "लाल लोमी मृदा",
+                  "बलुई रेतीली मृदा (एरिडीसोल्स)",
+                  "जलोढ़ मृदा (अल्फीसोल्स)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: दक्षिणी-पूर्वी राजस्थान (हाड़ौती पठार) में बेसाल्ट लावा के विखंडन से निर्मित मध्यम काली मृदा (वैज्ञानिक नाम: वर्टिसोल्स) पाई जाती है, जो कपास व सोयाबीन हेतु उत्तम है।"
+      },
+      {
+            "id": 36,
+            "q": "कर्क रेखा को दो बार पार करने वाली राजस्थान की एकमात्र नदी कौन-सी है?",
+            "o": [
+                  "माही नदी",
+                  "चंबल नदी",
+                  "लूनी नदी",
+                  "बनास नदी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 'दक्षिणी राजस्थान की स्वर्ण रेखा' कहलाने वाली माही नदी बांसवाड़ा और डूंगरपुर से बहते हुए उल्टे 'U' आकार में कर्क रेखा को दो बार काटती है।"
+      },
+      {
+            "id": 37,
+            "q": "राजस्थान में पूर्णतः बहने वाली सबसे लंबी नदी कौन-सी है?",
+            "o": [
+                  "बनास",
+                  "चंबल",
+                  "लूनी",
+                  "बाणगंगा"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: राजसमंद में खमनौर की पहाड़ियों से निकलने वाली बनास नदी ('वन की आशा') पूर्णतः राजस्थान में बहने वाली सबसे लंबी नदी है।"
+      },
+      {
+            "id": 38,
+            "q": "जावर (उदयपुर) तथा रामपुरा-आगूचा (भीलवाड़ा) किस खनिज के उत्पादन के लिए प्रसिद्ध हैं?",
+            "o": [
+                  "सीसा एवं जस्ता",
+                  "तांबा",
+                  "टंगस्टन",
+                  "जिप्सम"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: उदयपुर की जावर खानें, भीलवाड़ा का रामपुरा-आगूचा और राजसमंद का राजपुरा-दरीबा सीसा-जस्ता (जुड़वां खनिज) व चांदी उत्पादन के प्रमुख केंद्र हैं।"
+      },
+      {
+            "id": 39,
+            "q": "20वीं पशुगणना के अनुसार राजस्थान का कुल पशुधन की दृष्टि से देश में कौन-सा स्थान है?",
+            "o": [
+                  "द्वितीय",
+                  "प्रथम",
+                  "तृतीय",
+                  "चतुर्थ"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 20वीं पशुगणना के अनुसार उत्तर प्रदेश के बाद राजस्थान कुल पशुधन (568 लाख) के मामले में देश में दूसरे स्थान पर है, जबकि बकरी, भेड़ व ऊँट में प्रथम है।"
+      },
+      {
+            "id": 40,
+            "q": "केवलादेव राष्ट्रीय उद्यान (घना पक्षी विहार) किस जिले में स्थित है?",
+            "o": [
+                  "भरतपुर",
+                  "सवाई माधोपुर",
+                  "अलवर",
+                  "कोटा"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: भरतपुर में स्थित केवलादेव राष्ट्रीय उद्यान प्रवासी पक्षी 'साइबेरियन क्रेन' के लिए प्रसिद्ध है। इसे 1981 में रामसर साइट तथा 1985 में यूनेस्को विश्व धरोहर घोषित किया गया।"
+      },
+      {
+            "id": 41,
+            "q": "जनगणना 2011 के अनुसार राजस्थान का सर्वाधिक साक्षरता दर वाला जिला कौन-सा है?",
+            "o": [
+                  "कोटा",
+                  "जयपुर",
+                  "झुंझुनूं",
+                  "सीकर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जनगणना 2011 के अनुसार राजस्थान की कुल साक्षरता 66.11% है, जिसमें सर्वाधिक साक्षरता दर कोटा जिले (76.6%) की तथा न्यूनतम जालोर (54.9%) की है।"
+      },
+      {
+            "id": 42,
+            "q": "राजस्थान की किस जनजाति को भारत सरकार द्वारा 'आदिम जनजाति समूह' (PVTG) की सूची में शामिल किया गया है?",
+            "o": [
+                  "सहरिया",
+                  "भील",
+                  "मीणा",
+                  "गरासिया"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: मुख्यतः बारां जिले की किशनगंज और शाहबाद तहसीलों में निवास करने वाली 'सहरिया' जनजाति राज्य की एकमात्र आदिम जनजाति समूह (PVTG) में शामिल जनजाति है।"
+      },
+      {
+            "id": 43,
+            "q": "राजस्थान पर्यटन विकास निगम (RTDC) की स्थापना किस वर्ष की गई थी?",
+            "o": [
+                  "1978-79",
+                  "1955",
+                  "1989",
+                  "2001"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: राज्य में पर्यटन सुविधाओं के विस्तार हेतु राजस्थान पर्यटन विकास निगम (RTDC) की स्थापना नवंबर 1978 में की गई तथा अप्रैल 1979 से इसने कार्य प्रारंभ किया।"
+      },
+      {
+            "id": 44,
+            "q": "पश्चिमी राजस्थान में पाई जाने वाली 'सेवण' और 'धामण' क्या हैं?",
+            "o": [
+                  "पौष्टिक घास की किस्में",
+                  "भेड़ की नस्लें",
+                  "मृदा के प्रकार",
+                  "पारंपरिक जल संरक्षण विधियाँ"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जैसलमेर के लाठी सीरीज क्षेत्र में पाई जाने वाली सेवण (लसीउरस सिडिकस) और धामण मरुस्थलीय क्षेत्र की अत्यंत पौष्टिक घास हैं।"
+      },
+      {
+            "id": 45,
+            "q": "भारतीय संविधान की प्रस्तावना में 'समाजवादी', 'पंथनिरपेक्ष' और 'अखंडता' शब्द किस संविधान संशोधन द्वारा जोड़े गए?",
+            "o": [
+                  "42वें संविधान संशोधन (1976)",
+                  "44वें संविधान संशोधन (1978)",
+                  "86वें संविधान संशोधन (2002)",
+                  "73वें संविधान संशोधन (1992)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: स्वर्ण सिंह समिति की सिफारिश पर 42वें संविधान संशोधन अधिनियम, 1976 द्वारा उद्देशिका में समाजवादी, पंथनिरपेक्ष और अखंडता शब्द जोड़े गए।"
+      },
+      {
+            "id": 46,
+            "q": "डॉ. भीमराव अंबेडकर ने भारतीय संविधान के किस अनुच्छेद को 'संविधान की आत्मा और हृदय' कहा है?",
+            "o": [
+                  "अनुच्छेद 32 (संवैधानिक उपचारों का अधिकार)",
+                  "अनुच्छेद 19 (वाक् स्वतंत्रता)",
+                  "अनुच्छेद 21 (प्राण एवं दैहिक स्वतंत्रता)",
+                  "अनुच्छेद 14 (समानता का अधिकार)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: अनुच्छेद 32 नागरिकों को मौलिक अधिकारों के हनन पर सीधे सर्वोच्च न्यायालय जाने की गारंटी देता है, इसलिए डॉ. अंबेडकर ने इसे संविधान की आत्मा कहा।"
+      },
+      {
+            "id": 47,
+            "q": "राज्य के नीति निदेशक तत्वों (DPSP) के तहत 'समान नागरिक संहिता' (Uniform Civil Code) का उल्लेख किस अनुच्छेद में है?",
+            "o": [
+                  "अनुच्छेद 44",
+                  "अनुच्छेद 40",
+                  "अनुच्छेद 48",
+                  "अनुच्छेद 50"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: संविधान के भाग-4 (नीति निदेशक तत्व) के अनुच्छेद 44 में नागरिकों के लिए एक समान सिविल संहिता का प्रावधान है, जबकि अनुच्छेद 40 ग्राम पंचायतों के गठन से संबंधित है।"
+      },
+      {
+            "id": 48,
+            "q": "भारत के राष्ट्रपति को उसके पद से हटाने के लिए 'महाभियोग' की प्रक्रिया का उल्लेख किस अनुच्छेद में है?",
+            "o": [
+                  "अनुच्छेद 61",
+                  "अनुच्छेद 52",
+                  "अनुच्छेद 72",
+                  "अनुच्छेद 123"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: संविधान के अतिक्रमण के आधार पर अनुच्छेद 61 के तहत संसद के किसी भी सदन द्वारा राष्ट्रपति पर महाभियोग लगाया जा सकता है।"
+      },
+      {
+            "id": 49,
+            "q": "राज्य के राज्यपाल की नियुक्ति संविधान के किस अनुच्छेद के अंतर्गत राष्ट्रपति द्वारा की जाती है?",
+            "o": [
+                  "अनुच्छेद 155",
+                  "अनुच्छेद 153",
+                  "अनुच्छेद 164",
+                  "अनुच्छेद 213"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: अनुच्छेद 153 में राज्यों के लिए राज्यपाल का प्रावधान है तथा अनुच्छेद 155 के तहत राज्यपाल की नियुक्ति राष्ट्रपति द्वारा की जाती है।"
+      },
+      {
+            "id": 50,
+            "q": "राजस्थान विधानसभा में कुल कितनी सीटें निर्धारित हैं?",
+            "o": [
+                  "200",
+                  "250",
+                  "180",
+                  "160"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: छठी विधानसभा (1977) के समय परिसीमन के बाद से राजस्थान विधानसभा की कुल सदस्य संख्या 200 निर्धारित है।"
+      },
+      {
+            "id": 51,
+            "q": "राजस्थान उच्च न्यायालय की मुख्य पीठ कहाँ स्थित है?",
+            "o": [
+                  "जोधपुर",
+                  "जयपुर",
+                  "अजमेर",
+                  "उदयपुर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: सत्यनारायण राव समिति की सिफारिश पर राजस्थान उच्च न्यायालय की मुख्य पीठ जोधपुर में रखी गई है तथा इसकी खंडपीठ जयपुर में स्थित है।"
+      },
+      {
+            "id": 52,
+            "q": "राजस्थान लोक सेवा आयोग (RPSC) के अध्यक्ष एवं सदस्यों का कार्यकाल कितना होता है?",
+            "o": [
+                  "6 वर्ष या 62 वर्ष की आयु (जो भी पहले हो)",
+                  "5 वर्ष या 65 वर्ष की आयु",
+                  "6 वर्ष या 65 वर्ष की आयु",
+                  "5 वर्ष या 60 वर्ष की आयु"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: राज्य लोक सेवा आयोग (RPSC) के अध्यक्ष व सदस्यों का कार्यकाल पद ग्रहण करने से 6 वर्ष या 62 वर्ष की आयु तक (जो भी पहले हो) होता है।"
+      },
+      {
+            "id": 53,
+            "q": "भारत में त्रिस्तरीय पंचायती राज व्यवस्था का शुभारंभ 2 अक्टूबर 1959 को राजस्थान के किस जिले से हुआ?",
+            "o": [
+                  "नागौर (बगदरी गाँव)",
+                  "जयपुर (सांगानेर)",
+                  "अजमेर (पुष्कर)",
+                  "उदयपुर (गोगुन्दा)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: बलवंत राय मेहता समिति की सिफारिश पर 2 अक्टूबर 1959 को तत्कालीन प्रधानमंत्री पं. जवाहरलाल नेहरू ने नागौर के बगदरी गाँव से पंचायती राज का उद्घाटन किया।"
+      },
+      {
+            "id": 54,
+            "q": "राजस्थान राज्य मानवाधिकार आयोग के अध्यक्ष एवं सदस्यों की नियुक्ति राज्यपाल द्वारा किसकी अध्यक्षता वाली समिति की सिफारिश पर की जाती है?",
+            "o": [
+                  "मुख्यमंत्री",
+                  "उच्च न्यायालय के मुख्य न्यायाधीश",
+                  "विधानसभा अध्यक्ष",
+                  "मुख्य सचिव"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: राज्य मानवाधिकार आयोग के अध्यक्ष व सदस्यों की नियुक्ति राज्यपाल द्वारा मुख्यमंत्री की अध्यक्षता वाली चयन समिति की सिफारिश पर की जाती है।"
+      },
+      {
+            "id": 55,
+            "q": "राजस्थान में औद्योगिक विकास एवं निवेश को गति देने वाली शीर्ष संस्था 'रीको' (RIICO) की स्वतंत्र रूप से स्थापना कब हुई?",
+            "o": [
+                  "जनवरी 1980",
+                  "मार्च 1969",
+                  "अप्रैल 1955",
+                  "जून 1979"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: मार्च 1969 में RIMDC की स्थापना हुई, जिसका पुनर्गठन कर 1 जनवरी 1980 को स्वतंत्र रूप से रीको (RIICO) का गठन किया गया।"
+      },
+      {
+            "id": 56,
+            "q": "लघु, मध्यम एवं कुटीर उद्योगों को वित्तीय सहायता एवं ऋण उपलब्ध कराने हेतु राजस्थान वित्त निगम (RFC) की स्थापना किस वर्ष हुई?",
+            "o": [
+                  "1955",
+                  "1961",
+                  "1980",
+                  "1975"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: राज्य वित्त निगम अधिनियम, 1951 के तहत 17 जनवरी 1955 को जयपुर में राजस्थान वित्त निगम (RFC) की स्थापना की गई।"
+      },
+      {
+            "id": 57,
+            "q": "राजस्थान किस तिलहन फसल के उत्पादन में देश में प्रथम स्थान पर है और उसे 'सरसों का प्रदेश' कहा जाता है?",
+            "o": [
+                  "राइ एवं सरसों",
+                  "मूंगफली",
+                  "सोयाबीन",
+                  "सूरजमुखी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: भारत के कुल सरसों उत्पादन का लगभग 45% से अधिक भाग अकेले राजस्थान में उत्पादित होता है, तथा सेवर (भरतपुर) में राष्ट्रीय सरसों अनुसंधान केंद्र स्थित है।"
+      },
+      {
+            "id": 58,
+            "q": "ग्रामीण क्षेत्रों में आजीविका सुरक्षा सुनिश्चित करने हेतु 'महात्मा गांधी राष्ट्रीय ग्रामीण रोजगार गारंटी अधिनियम' (MGNREGA) कब पारित किया गया?",
+            "o": [
+                  "वर्ष 2005",
+                  "वर्ष 2000",
+                  "वर्ष 2009",
+                  "वर्ष 2014"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: नरेगा अधिनियम संसद द्वारा अगस्त 2005 में पारित हुआ और 2 फरवरी 2006 से लागू हुआ। 2 अक्टूबर 2009 को इसका नाम महात्मा गांधी नरेगा (MGNREGA) किया गया।"
+      },
+      {
+            "id": 59,
+            "q": "विकसित भारत के संकल्प के तहत ग्रामीण क्षेत्रों में रोजगार एवं आजीविका संवर्धन हेतु पाठ्यक्रम में उल्लिखित 'VB-G RAM G' का पूर्ण रूप क्या है?",
+            "o": [
+                  "Viksit Bharat Guarantee for Rozgar and Aajeevika Mission - Gramin",
+                  "Viksit Bharat Gramin Rozgar and Agriculture Mission Group",
+                  "Viksit Bharat Global Rural Aajeevika Management Guarantee",
+                  "Village Bharat Guarantee for Rozgar and Aajeevika Mission"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: आधिकारिक CET पाठ्यक्रम के अनुसार 'VB-G RAM G' का अर्थ 'विकसित भारत रोजगार एवं आजीविका के लिए गारंटी मिशन (ग्रामीण) / Viksit Bharat Guarantee for Rozgar and Aajeevika Mission - Gramin' है।"
+      },
+      {
+            "id": 60,
+            "q": "'ब्लू पॉटरी' (चीनी मिट्टी के बर्तनों पर नीले रंग की चित्रकारी) हस्तशिल्प के लिए राजस्थान का कौन-सा शहर विश्व प्रसिद्ध है?",
+            "o": [
+                  "जयपुर",
+                  "बीकानेर",
+                  "जोधपुर",
+                  "अलवर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जयपुर की ब्लू पॉटरी को महाराजा रामसिंह द्वितीय के काल में संरक्षण मिला तथा कृपाल सिंह शेखावत ने इसे अंतरराष्ट्रीय पहचान दिलाई।"
+      },
+      {
+            "id": 61,
+            "q": "राजस्थान में अकाल एवं सूखे का प्रमुख प्राकृतिक कारण क्या है?",
+            "o": [
+                  "मानसून की अनिश्चितता, अनियमितता एवं अपर्याप्त वर्षा",
+                  "अत्यधिक नहरी सिंचाई",
+                  "वनों का अत्यधिक विस्तार",
+                  "शीतकालीन चक्रवात"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: अरावली की स्थिति दक्षिण-पश्चिम मानसून की अरब सागरीय शाखा के समानांतर होने एवं मानसून की अनियमितता के कारण राजस्थान में बार-बार सूखा पड़ता है।"
+      },
+      {
+            "id": 62,
+            "q": "राजस्थान की अर्थव्यवस्था में प्रचलित मूल्यों पर सकल राज्य मूल्य वर्धन (GSVA) में किस क्षेत्र का योगदान सर्वाधिक रहता है?",
+            "o": [
+                  "सेवा क्षेत्र (Service Sector)",
+                  "कृषि एवं संबद्ध क्षेत्र",
+                  "उद्योग क्षेत्र",
+                  "खनन क्षेत्र"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: राजस्थान की आर्थिक समीक्षा के अनुसार राज्य के GSVA में सर्वाधिक योगदान सेवा क्षेत्र (लगभग 42-44%) का है, जिसके बाद कृषि एवं उद्योग का स्थान है।"
+      },
+      {
+            "id": 63,
+            "q": "73वें संविधान संशोधन के तहत पंचायती राज संस्थाओं को ग्रामीण विकास से जुड़े कितने विषय (11वीं अनुसूची में) सौंपे गए हैं?",
+            "o": [
+                  "29 विषय",
+                  "18 विषय",
+                  "24 विषय",
+                  "15 विषय"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: संविधान की 11वीं अनुसूची के अंतर्गत पंचायती राज संस्थाओं को ग्रामीण विकास, कृषि, पेयजल, सड़क आदि से संबंधित कुल 29 विषय प्रदान किए गए हैं।"
+      },
+      {
+            "id": 64,
+            "q": "राजस्थान में गैर-कृषि क्षेत्र (हस्तशिल्प, चर्म, ऊन, खनिज आधारित ग्रामीण उद्योग) के विकास हेतु गठित संस्था 'रूडा' (RUDA) की स्थापना कब हुई?",
+            "o": [
+                  "नवंबर 1995",
+                  "अप्रैल 1980",
+                  "मार्च 1961",
+                  "जनवरी 2002"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: ग्रामीण गैर-कृषि विकास अभिकरण (RUDA - Rural Non-Farm Development Agency) की स्थापना नवंबर 1995 में जयपुर में की गई।"
+      },
+      {
+            "id": 65,
+            "q": "निम्नलिखित में से कौन-सा 'रासायनिक परिवर्तन' (Chemical Change) का उदाहरण है?",
+            "o": [
+                  "दूध से दही का बनना",
+                  "बर्फ का पिघलना",
+                  "पानी में चीनी का घुलना",
+                  "मोम का पिघलना"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: दूध से दही बनना एक अनुत्क्रमणीय (Irreversible) प्रक्रिया है जिसमें नया पदार्थ (लैक्टिक अम्ल) बनता है, अतः यह रासायनिक परिवर्तन है।"
+      },
+      {
+            "id": 66,
+            "q": "बेकिंग सोडा (खाने का सोडा) का रासायनिक नाम और सूत्र क्या है?",
+            "o": [
+                  "सोडियम बाइकार्बोनेट (NaHCO3)",
+                  "सोडियम कार्बोनेट (Na2CO3)",
+                  "कैल्शियम ऑक्सीक्लोराइड (CaOCl2)",
+                  "सोडियम हाइड्रॉक्साइड (NaOH)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: खाने के सोडे का रासायनिक नाम सोडियम हाइड्रोजन कार्बोनेट या सोडियम बाइकार्बोनेट (NaHCO3) है, जबकि धावन सोडा सोडियम कार्बोनेट होता है।"
+      },
+      {
+            "id": 67,
+            "q": "प्राकृतिक रूप से ज्ञात सर्वाधिक कठोर पदार्थ 'हीरा' किस तत्व का अपररूप (Allotrope) है?",
+            "o": [
+                  "कार्बन",
+                  "सिलिकॉन",
+                  "सल्फर",
+                  "फॉस्फोरस"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: हीरा, ग्रेफाइट और फुलरीन कार्बन के क्रिस्टलीय अपररूप हैं। हीरे में प्रत्येक कार्बन परमाणु चार अन्य कार्बन परमाणुओं से चतुष्फलकीय रूप में जुड़ा होता है।"
+      },
+      {
+            "id": 68,
+            "q": "वायुयानों व वाहनों में ईंधन के रूप में प्रयुक्त सी.एन.जी. (CNG) का मुख्य घटक कौन-सी गैस है?",
+            "o": [
+                  "मीथेन (CH4)",
+                  "ब्यूटेन",
+                  "प्रोपेन",
+                  "एथेन"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: संपीड़ित प्राकृतिक गैस (CNG - Compressed Natural Gas) में मुख्य घटक मीथेन (लगभग 80-90%) होता है, जबकि LPG में ब्यूटेन और प्रोपेन होती है।"
+      },
+      {
+            "id": 69,
+            "q": "निकट दृष्टि दोष (Myopia) के निवारण के लिए चश्मे में किस लेंस का प्रयोग किया जाता है?",
+            "o": [
+                  "अवतल लेंस (Concave Lens)",
+                  "उत्तल लेंस (Convex Lens)",
+                  "बेलनाकार लेंस",
+                  "समतल दर्पण"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: निकट दृष्टि दोष में पास की वस्तुएं स्पष्ट दिखती हैं परंतु दूर की नहीं; इसके निवारण के लिए अपसारी यानी अवतल लेंस का प्रयोग किया जाता है।"
+      },
+      {
+            "id": 70,
+            "q": "आनुवंशिकी का जनक (Father of Genetics) किसे कहा जाता है, जिन्होंने मटर के पौधे पर प्रयोग किए?",
+            "o": [
+                  "ग्रेगर जॉन मेंडल",
+                  "चार्ल्स डार्विन",
+                  "हरगोविंद खुराना",
+                  "वाटसन एवं क्रिक"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: ग्रेगर जॉन मेंडल ने उद्यान मटर (पाइसम सटाइवम) पर संकरण प्रयोग कर आनुवंशिकता के तीन नियम (प्रभाविता, पृथक्करण, स्वतंत्र अपव्यूहन) प्रतिपादित किए।"
+      },
+      {
+            "id": 71,
+            "q": "मानव में सामान्यतः गुणसूत्रों (Chromosomes) की संख्या कितनी होती है?",
+            "o": [
+                  "46 (23 जोड़े)",
+                  "44 (22 जोड़े)",
+                  "48 (24 जोड़े)",
+                  "42 (21 जोड़े)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: मनुष्य की कोशिकाओं में 23 जोड़े अर्थात् कुल 46 गुणसूत्र होते हैं, जिनमें 22 जोड़े अलिंग गुणसूत्र (Autosomes) और 1 जोड़ा लिंग गुणसूत्र (XX या XY) होता है।"
+      },
+      {
+            "id": 72,
+            "q": "पारिस्थितिकी तंत्र में एक पोषी स्तर से दूसरे पोषी स्तर में ऊर्जा स्थानांतरण का '10 प्रतिशत का नियम' किसने दिया?",
+            "o": [
+                  "रेमंड लिंडमान",
+                  "अर्नेस्ट हेकेल",
+                  "ए.जी. टांसले",
+                  "चार्ल्स एल्टन"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 1942 में लिंडमान ने 10% ऊर्जा प्रवाह का नियम दिया, जिसके अनुसार एक पोषी स्तर से अगले पोषी स्तर में केवल 10% ऊर्जा ही स्थानांतरित होती है।"
+      },
+      {
+            "id": 73,
+            "q": "किस रक्त समूह को 'सार्वत्रिक दाता' (Universal Donor) कहा जाता है?",
+            "o": [
+                  "O ऋणात्मक (O-)",
+                  "AB धनात्मक (AB+)",
+                  "A धनात्मक (A+)",
+                  "B ऋणात्मक (B-)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: रक्त समूह 'O-' में कोई भी एंटीजन (A, B या Rh) नहीं पाया जाता, इसलिए यह किसी भी व्यक्ति को रक्तदान कर सकता है। 'AB+' सार्वत्रिक ग्राही होता है।"
+      },
+      {
+            "id": 74,
+            "q": "भारतीय अंतरिक्ष अनुसंधान संगठन (ISRO) का मुख्यालय कहाँ स्थित है?",
+            "o": [
+                  "बेंगलुरु",
+                  "श्रीहरिकोटा",
+                  "तिरुवनंतपुरम",
+                  "अहमदाबाद"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: इसरो (ISRO) की स्थापना 15 अगस्त 1969 को हुई थी और इसका मुख्यालय बेंगलुरु (कर्नाटक) में स्थित है।"
+      },
+      {
+            "id": 75,
+            "q": "आनुवंशिक अभियांत्रिकी द्वारा विकसित कीट-प्रतिरोधी 'बीटी-कपास' (Bt-Cotton) में 'Bt' किस जीवाणु को दर्शाता है?",
+            "o": [
+                  "बैसिलस थुरिंजिएंसिस (Bacillus thuringiensis)",
+                  "बीटा टोबैको",
+                  "बैक्टीरियल टिश्यू",
+                  "बायो ट्रांसजेनिक"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: बीटी-कपास एक ट्रांसजेनिक (पराजीनी) फसल है जिसमें मृदा जीवाणु 'बैसिलस थुरिंजिएंसिस' का Cry जीन डाला गया है जो बॉलवर्म कीट से रक्षा करता है।"
+      },
+      {
+            "id": 76,
+            "q": "मानव शरीर में 'रतौंधी' (Night Blindness) रोग किस विटामिन की कमी से होता है?",
+            "o": [
+                  "विटामिन A (रेटिनॉल)",
+                  "विटामिन B1 (थायमिन)",
+                  "विटामिन C (एस्कॉर्बिक अम्ल)",
+                  "विटामिन D (कैल्सीफेरॉल)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: विटामिन A की कमी से रतौंधी व जीरोफ्थैल्मिया, विटामिन B1 से बेरी-बेरी, विटामिन C से स्कर्वी और विटामिन D से रिकेट्स रोग होता है।"
+      },
+      {
+            "id": 77,
+            "q": "दी गई संख्या श्रेणी में अगला पद ज्ञात कीजिए: 3, 8, 15, 24, 35, ?",
+            "o": [
+                  "48",
+                  "46",
+                  "50",
+                  "49"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: पदों का अंतर क्रमशः +5, +7, +9, +11 है। अगला अंतर +13 होगा, अतः 35 + 13 = 48 (या सूत्र n²-1: 2²-1=3, ..., 7²-1=48)।"
+      },
+      {
+            "id": 78,
+            "q": "यदि किसी कूट भाषा में 'JAIPUR' को 'KBJQVS' लिखा जाता है, तो उसी कूट भाषा में 'KOTA' को क्या लिखा जाएगा?",
+            "o": [
+                  "LPUB",
+                  "JNSZ",
+                  "LQVC",
+                  "KPUA"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: प्रत्येक अक्षर में +1 किया गया है (J+1=K, A+1=B...)। इसी प्रकार K+1=L, O+1=P, T+1=U, A+1=B = LPUB।"
+      },
+      {
+            "id": 79,
+            "q": "एक तस्वीर की ओर इशारा करते हुए सुरेश ने कहा, 'वह मेरे पिता के इकलौते पुत्र की पत्नी है।' तस्वीर वाली महिला का सुरेश से क्या संबंध है?",
+            "o": [
+                  "पत्नी",
+                  "बहन",
+                  "माता",
+                  "भाभी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 'मेरे पिता का इकलौता पुत्र' स्वयं सुरेश हुआ। अतः सुरेश की पत्नी ही तस्वीर वाली महिला है।"
+      },
+      {
+            "id": 80,
+            "q": "दो संख्याओं का अनुपात 3 : 4 है और उनका महत्तम समापवर्त्य (HCF) 5 है, तो उनका लघुत्तम समापवर्त्य (LCM) क्या होगा?",
+            "o": [
+                  "60",
+                  "45",
+                  "35",
+                  "80"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: संख्याएं = 3×5 = 15 और 4×5 = 20 होंगी। LCM = 5 × 3 × 4 = 60।"
+      },
+      {
+            "id": 81,
+            "q": "प्रथम 5 अभाज्य संख्याओं (Prime Numbers) का औसत कितना होता है?",
+            "o": [
+                  "5.6",
+                  "5.0",
+                  "6.2",
+                  "4.8"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: प्रथम 5 अभाज्य संख्याएं 2, 3, 5, 7, 11 हैं। इनका योग = 2 + 3 + 5 + 7 + 11 = 28। औसत = 28 / 5 = 5.6।"
+      },
+      {
+            "id": 82,
+            "q": "एक वस्तु को ₹ 450 में बेचने पर 10% की हानि होती है। 20% का लाभ कमाने के लिए उसे कितने रुपये में बेचना चाहिए?",
+            "o": [
+                  "₹ 600",
+                  "₹ 550",
+                  "₹ 540",
+                  "₹ 625"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 90% = 450 ⇒ क्रय मूल्य (100%) = (450/90)×100 = ₹ 500। अब 20% लाभ हेतु विक्रय मूल्य = 500 × 120/100 = ₹ 600।"
+      },
+      {
+            "id": 83,
+            "q": "₹ 5000 की धनराशि पर 8% वार्षिक दर से 3 वर्ष का साधारण ब्याज कितना होगा?",
+            "o": [
+                  "₹ 1200",
+                  "₹ 1000",
+                  "₹ 1400",
+                  "₹ 1500"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: साधारण ब्याज = (मूलधन × दर × समय) / 100 = (5000 × 8 × 3) / 100 = ₹ 1200।"
+      },
+      {
+            "id": 84,
+            "q": "A किसी कार्य को 10 दिन में तथा B उसी कार्य को 15 दिन में पूरा कर सकता है। दोनों मिलकर उस कार्य को कितने दिनों में पूरा करेंगे?",
+            "o": [
+                  "6 दिन",
+                  "8 दिन",
+                  "5 दिन",
+                  "12 दिन"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: दोनों का 1 दिन का कार्य = 1/10 + 1/15 = (3+2)/30 = 5/30 = 1/6। अतः दोनों मिलकर कार्य 6 दिन में पूरा करेंगे।"
+      },
+      {
+            "id": 85,
+            "q": "एक रेलगाड़ी 72 किमी/घंटा की चाल से चल रही है। मीटर/सेकंड में इसकी चाल क्या होगी?",
+            "o": [
+                  "20 मीटर/सेकंड",
+                  "25 मीटर/सेकंड",
+                  "18 मीटर/सेकंड",
+                  "15 मीटर/सेकंड"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: किमी/घंटा को मीटर/सेकंड में बदलने के लिए 5/18 से गुणा करते हैं: 72 × (5/18) = 4 × 5 = 20 मीटर/सेकंड।"
+      },
+      {
+            "id": 86,
+            "q": "यदि एक वृत्त की त्रिज्या 7 सेमी है, तो उसका क्षेत्रफल कितना होगा? (π = 22/7 लें)",
+            "o": [
+                  "154 वर्ग सेमी",
+                  "44 वर्ग सेमी",
+                  "144 वर्ग सेमी",
+                  "308 वर्ग सेमी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: वृत्त का क्षेत्रफल = πr² = (22/7) × 7 × 7 = 22 × 7 = 154 वर्ग सेमी।"
+      },
+      {
+            "id": 87,
+            "q": "एक घन (Cube) की प्रत्येक भुजा 5 सेमी है, तो उस घन का आयतन क्या होगा?",
+            "o": [
+                  "125 घन सेमी",
+                  "150 घन सेमी",
+                  "25 घन सेमी",
+                  "100 घन सेमी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: घन का आयतन = (भुजा)³ = 5³ = 5 × 5 × 5 = 125 घन सेमी।"
+      },
+      {
+            "id": 88,
+            "q": "किसी घड़ी में 3 बजकर 30 मिनट (3:30) पर घंटे और मिनट की सुइयों के बीच कितने डिग्री का कोण बनेगा?",
+            "o": [
+                  "75°",
+                  "90°",
+                  "60°",
+                  "105°"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: कोण = |30H - (11/2)M| = |30×3 - (11/2)×30| = |90 - 165| = 75°।"
+      },
+      {
+            "id": 89,
+            "q": "राजस्थान सार्वजनिक परीक्षा (भर्ती में अनुचित साधनों की रोकथाम के अध्युपाय) अधिनियम, 2022 (यथा संशोधित) के तहत अनुचित साधनों में लिप्त परीक्षार्थी के लिए न्यूनतम जुर्माने का क्या प्रावधान है?",
+            "o": [
+                  "न्यूनतम ₹ 1,00,000/- जुर्माना एवं 3 वर्ष तक का कारावास",
+                  "न्यूनतम ₹ 10,000/- जुर्माना",
+                  "केवल परीक्षा से निष्कासन",
+                  "₹ 50,000/- जुर्माना एवं 6 माह कारावास"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: पाठ्यक्रम एवं विज्ञप्ति की धारा 16 के अनुसार अनुचित साधनों में लिप्त परीक्षार्थी के लिए 3 वर्ष तक के कठोर कारावास एवं न्यूनतम ₹ 1,00,000/- (एक लाख रुपये) जुर्माने तथा 2 वर्ष तक परीक्षा से विवर्जित करने का प्रावधान है।"
+      },
+      {
+            "id": 90,
+            "q": "राजस्थान सार्वजनिक परीक्षा अधिनियम, 2022 के तहत परीक्षार्थी के अतिरिक्त किसी अन्य व्यक्ति/गिरोह द्वारा पेपर लीक या षड्यंत्र करने पर न्यूनतम कितनी सजा एवं जुर्माने का प्रावधान है?",
+            "o": [
+                  "न्यूनतम 5 वर्ष का कारावास (जो 10 वर्ष तक हो सकता है) एवं न्यूनतम ₹ 10 लाख जुर्माना (जो 10 करोड़ तक हो सकता है)",
+                  "2 वर्ष का कारावास एवं ₹ 1 लाख जुर्माना",
+                  "3 वर्ष का कारावास एवं ₹ 5 लाख जुर्माना",
+                  "1 वर्ष का कारावास एवं ₹ 50 हजार जुर्माना"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: अधिनियम 2022 (यथा संशोधित) के अनुसार षड्यंत्र या पेपर लीक में लिप्त अन्य व्यक्ति के लिए न्यूनतम 5 वर्ष से 10 वर्ष तक कारावास एवं न्यूनतम 10 लाख रुपये से 10 करोड़ रुपये तक के जुर्माने का कठोर प्रावधान है।"
+      },
+      {
+            "id": 91,
+            "q": "भारतीय संविधान के किस भाग और अनुच्छेद में नागरिकों के 'मूल कर्तव्यों' (Fundamental Duties) का समावेश किया गया है?",
+            "o": [
+                  "भाग-4क (अनुच्छेद 51क)",
+                  "भाग-3 (अनुच्छेद 35)",
+                  "भाग-4 (अनुच्छेद 50)",
+                  "भाग-5 (अनुच्छेद 52)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: सरदार स्वर्ण सिंह समिति की अनुशंसा पर 42वें संशोधन (1976) द्वारा भाग-4क के अनुच्छेद 51क में मूल कर्तव्य जोड़े गए। वर्तमान में इनकी संख्या 11 है।"
+      },
+      {
+            "id": 92,
+            "q": "बोर्ड (RSSB) के नवीनतम ओ.एम.आर. (OMR) नियमों के अनुसार यदि कोई अभ्यर्थी किसी प्रश्न को हल नहीं करना चाहता है, तो उसे कौन-सा विकल्प भरना अनिवार्य है?",
+            "o": [
+                  "विकल्प E (पाँचवाँ गोला)",
+                  "विकल्प D",
+                  "कोई भी गोला नहीं भरना है",
+                  "विकल्प A और D दोनों"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: बोर्ड के विशेष निर्देशों के अनुसार प्रत्येक प्रश्न में 5 विकल्प (A, B, C, D, E) होंगे। प्रश्न हल नहीं करने पर पाँचवाँ विकल्प 'E' गहरा करना अनिवार्य है।"
+      },
+      {
+            "id": 93,
+            "q": "ओ.एम.आर. (OMR) पत्रक में कितने प्रतिशत से अधिक प्रश्नों में पाँचों गोलों (A, B, C, D, E) में से कोई भी गोला गहरा नहीं भरने पर अभ्यर्थी को अयोग्य (Disqualified) घोषित कर दिया जाएगा?",
+            "o": [
+                  "10 प्रतिशत से अधिक प्रश्नों में",
+                  "5 प्रतिशत से अधिक प्रश्नों में",
+                  "25 प्रतिशत से अधिक प्रश्नों में",
+                  "20 प्रतिशत से अधिक प्रश्नों में"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: विज्ञप्ति के निर्देश बिंदु 3 व 5 के अनुसार 10% तक गोला खाली छोड़ने पर प्रत्येक प्रश्न का 1/3 अंक कटेगा तथा 10% से अधिक प्रश्नों में कोई भी गोला नहीं भरने पर अभ्यर्थी को अयोग्य किया जाएगा।"
+      },
+      {
+            "id": 94,
+            "q": "अंतरिक्ष प्रौद्योगिकी में भारत ने किस तिथि को चंद्रयान-3 के विक्रम लैंडर की चंद्रमा के दक्षिणी ध्रुव पर सफल सॉफ्ट लैंडिंग कर इतिहास रचा, जिसे 'राष्ट्रीय अंतरिक्ष दिवस' घोषित किया गया?",
+            "o": [
+                  "23 अगस्त",
+                  "15 अगस्त",
+                  "14 जुलाई",
+                  "26 नवंबर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 23 अगस्त 2023 को चंद्रयान-3 की चंद्रमा के दक्षिणी ध्रुव पर सफल लैंडिंग की स्मृति में भारत सरकार ने प्रतिवर्ष 23 अगस्त को 'राष्ट्रीय अंतरिक्ष दिवस' मनाने की घोषणा की।"
+      },
+      {
+            "id": 95,
+            "q": "राजस्थान में सौर ऊर्जा उत्पादन की अपार संभावनाओं के कारण विश्व का सबसे बड़ा सोलर पार्क 'भड़ला सोलर पार्क' किस जिले में स्थापित किया गया है?",
+            "o": [
+                  "जोधपुर (फलौदी क्षेत्र)",
+                  "जैसलमेर",
+                  "बाड़मेर",
+                  "बीकानेर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: भड़ला सोलर पार्क (लगभग 2245 मेगावाट क्षमता) जोधपुर/फलौदी क्षेत्र में स्थित विश्व के सबसे बड़े सौर ऊर्जा पार्कों में से एक है।"
+      },
+      {
+            "id": 96,
+            "q": "ओ.एम.आर. सीट में सभी पाँचों विकल्पों में से एक गोला भरा गया है या नहीं, यह सुनिश्चित करने के लिए निर्धारित समय के बाद अभ्यर्थी को कितना अतिरिक्त समय दिया जाता है?",
+            "o": [
+                  "10 मिनट अतिरिक्त समय",
+                  "5 मिनट अतिरिक्त समय",
+                  "15 मिनट अतिरिक्त समय",
+                  "30 मिनट अतिरिक्त समय"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: बोर्ड के निर्देश बिंदु 4 के अनुसार निर्धारित परीक्षा समय के बाद प्रत्येक प्रश्न का एक गोला भरना सुनिश्चित करने हेतु अभ्यर्थी को 10 मिनट का अतिरिक्त समय दिया जाता है।"
+      },
+      {
+            "id": 97,
+            "q": "आपातकालीन प्राथमिक चिकित्सा में हृदयाघात (Cardiac Arrest) होने पर व्यक्ति की जान बचाने के लिए दी जाने वाली प्रक्रिया 'CPR' का पूर्ण रूप क्या है?",
+            "o": [
+                  "Cardiopulmonary Resuscitation (कार्डियोपल्मोनरी रिससिटेशन)",
+                  "Cardiac Pulse Recovery",
+                  "Central Pulmonary Respiration",
+                  "Cardio Pressure Regulation"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: CPR का पूर्ण रूप Cardiopulmonary Resuscitation (कार्डियोपल्मोनरी पुनर्जीवन) है, जिसमें छाती को दबाकर (Chest Compressions) हृदय व मस्तिष्क में रक्त प्रवाह बनाए रखा जाता है।"
+      },
+      {
+            "id": 98,
+            "q": "वयस्क व्यक्ति को हैंड्स-ओनली सीपीआर (CPR) देते समय प्रति मिनट छाती को दबाने (Chest Compression) की आदर्श दर क्या होनी चाहिए?",
+            "o": [
+                  "100 से 120 बार प्रति मिनट",
+                  "30 से 40 बार प्रति मिनट",
+                  "60 से 70 बार प्रति मिनट",
+                  "200 बार प्रति मिनट"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: चिकित्सा मानकों (AHA) के अनुसार CPR देते समय छाती को लगभग 2 इंच गहराई तक 100 से 120 बार प्रति मिनट की गति से दबाना चाहिए।"
+      },
+      {
+            "id": 99,
+            "q": "प्राथमिक चिकित्सा (First Aid) के प्रसिद्ध नियम 'ABC' में A, B और C का सही अर्थ क्या है?",
+            "o": [
+                  "Airway, Breathing, Circulation (वायुमार्ग, श्वसन, रक्त परिसंचरण)",
+                  "Alert, Bandage, Care",
+                  "Action, Blood, Cure",
+                  "Aid, Breath, Control"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: प्राथमिक चिकित्सा में जीवन रक्षक ABC नियम का अर्थ Airway (श्वसन मार्ग खोलना), Breathing (साँस की जाँच) और Circulation (रक्त संचार/नाड़ी की जाँच) है।"
+      },
+      {
+            "id": 100,
+            "q": "तंबाकू में पाया जाने वाला प्रमुख नशीला एवं लत लगाने वाला रासायनिक पदार्थ कौन-सा है?",
+            "o": [
+                  "निकोटीन (Nicotine)",
+                  "कैफीन",
+                  "मॉर्फिन",
+                  "कोकीन"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: तंबाकू में 'निकोटीन' नामक एल्कलॉइड पाया जाता है जो रक्तचाप बढ़ाता है और शरीर में तीव्र लत पैदा करता है।"
+      },
+      {
+            "id": 101,
+            "q": "युवाओं में सोशल मीडिया की अत्यधिक लत (Social Media Addiction) से होने वाला प्रमुख मानसिक एवं शारीरिक स्वास्थ्य जोखिम क्या है?",
+            "o": [
+                  "अनिद्रा (Insomnia), चिंता (Anxiety), अवसाद और आँखों में डिजिटल स्ट्रेन",
+                  "हड्डियों के घनत्व में वृद्धि",
+                  "रोग प्रतिरोधक क्षमता में तीव्र वृद्धि",
+                  "फेफड़ों की क्षमता बढ़ना"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: देर रात तक स्क्रीन देखने से मेलाटोनिन हार्मोन बाधित होता है जिससे अनिद्रा, एकाग्रता में कमी, साइबर एंग्जायटी और डिजिटल आई स्ट्रेन जैसी समस्याएं होती हैं।"
+      },
+      {
+            "id": 102,
+            "q": "विश्व स्वास्थ्य संगठन (WHO) द्वारा प्रतिवर्ष 'विश्व तंबाकू निषेध दिवस' (World No Tobacco Day) कब मनाया जाता है?",
+            "o": [
+                  "31 मई",
+                  "7 अप्रैल",
+                  "21 जून",
+                  "1 दिसंबर"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: तंबाकू एवं नशीले पदार्थों के दुष्प्रभावों के प्रति जागरूकता फैलाने हेतु प्रतिवर्ष 31 मई को विश्व तंबाकू निषेध दिवस मनाया जाता है।"
+      },
+      {
+            "id": 103,
+            "q": "कंप्यूटर में 'RAM' (रैम) किस प्रकार की मेमोरी होती है?",
+            "o": [
+                  "प्राथमिक एवं अस्थायी (Volatile) मेमोरी",
+                  "द्वितीयक एवं स्थायी (Non-Volatile) मेमोरी",
+                  "केवल पढ़ने योग्य मेमोरी",
+                  "ऑप्टिकल मेमोरी"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: RAM (Random Access Memory) कंप्यूटर की मुख्य/प्राथमिक और अस्थायी (Volatile) मेमोरी है; बिजली बंद होने पर इसमें मौजूद डेटा नष्ट हो जाता है।"
+      },
+      {
+            "id": 104,
+            "q": "निम्नलिखित में से कौन-सा एक 'आउटपुट डिवाइस' (Output Device) है?",
+            "o": [
+                  "प्लॉटर एवं मॉनिटर",
+                  "स्कैनर",
+                  "जॉयस्टिक",
+                  "ओएमआर (OMR)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: प्लॉटर (उच्च गुणवत्ता के ग्राफ/नक्शे छापने हेतु) और मॉनिटर आउटपुट डिवाइस हैं, जबकि स्कैनर, जॉयस्टिक और OMR इनपुट डिवाइस हैं।"
+      },
+      {
+            "id": 105,
+            "q": "कंप्यूटर सिस्टम का 'मस्तिष्क' (Brain of Computer) किसे कहा जाता है?",
+            "o": [
+                  "सीपीयू (CPU - Central Processing Unit)",
+                  "हार्ड डिस्क",
+                  "मदरबोर्ड",
+                  "यूपीएस (UPS)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: CPU (सेंट्रल प्रोसेसिंग यूनिट) कंप्यूटर की सभी अंकगणितीय और तार्किक गणनाओं को नियंत्रित करता है, इसलिए इसे कंप्यूटर का मस्तिष्क कहते हैं।"
+      },
+      {
+            "id": 106,
+            "q": "एमएस एक्सेल (MS Excel) में किसी भी फॉर्मूले (Formula) की शुरुआत किस चिन्ह से होती है?",
+            "o": [
+                  "= (बराबर का चिन्ह)",
+                  "+ (प्लस)",
+                  "# (हैश)",
+                  "@ (एट द रेट)"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: MS Excel स्प्रेडशीट में कोई भी फॉर्मूला या फंक्शन (जैसे =SUM(A1:A5)) हमेशा बराबर (=) के चिन्ह से शुरू होता है।"
+      },
+      {
+            "id": 107,
+            "q": "एमएस पॉवरपॉइंट (MS PowerPoint) में प्रेजेंटेशन को प्रथम स्लाइड से शुरू करने (Slide Show) की शॉर्टकट कुंजी क्या है?",
+            "o": [
+                  "F5",
+                  "F7",
+                  "F12",
+                  "Ctrl + P"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: MS PowerPoint में पहली स्लाइड से स्लाइड शो शुरू करने के लिए F5 तथा वर्तमान स्लाइड से शुरू करने के लिए Shift + F5 कुंजी का प्रयोग होता है।"
+      },
+      {
+            "id": 108,
+            "q": "विंडोज ऑपरेटिंग सिस्टम में 'NTFS' और 'FAT32' किसके उदाहरण हैं?",
+            "o": [
+                  "फाइल सिस्टम (File System)",
+                  "एंटीवायरस सॉफ्टवेयर",
+                  "एमएस ऑफिस फॉन्ट",
+                  "वेब ब्राउज़र"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: NTFS (New Technology File System) और FAT (File Allocation Table) हार्ड डिस्क या स्टोरेज ड्राइव में फाइलों को व्यवस्थित करने वाले फाइल सिस्टम हैं।"
+      },
+      {
+            "id": 109,
+            "q": "'अन्वेषण' शब्द का सही संधि-विच्छेद क्या होगा?",
+            "o": [
+                  "अनु + एषण",
+                  "अन्व + एषण",
+                  "अनू + एषण",
+                  "अन्वे + क्षण"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 'अनु + एषण = अन्वेषण' में यण् स्वर संधि है (उ + ए = वे)।"
+      },
+      {
+            "id": 110,
+            "q": "'पीताम्बर' (पीत है अम्बर जिसका अर्थात् श्रीकृष्ण) में कौन-सा समास है?",
+            "o": [
+                  "बहुव्रीहि समास",
+                  "द्विगु समास",
+                  "द्वन्द्व समास",
+                  "तत्पुरुष समास"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जहाँ दोनों पद मिलकर किसी तीसरे विशेष अर्थ (श्रीकृष्ण/विष्णु) की ओर संकेत करते हैं, वहाँ बहुव्रीहि समास होता है।"
+      },
+      {
+            "id": 111,
+            "q": "निम्नलिखित में से वर्तनी की दृष्टि से 'शुद्ध' शब्द कौन-सा है?",
+            "o": [
+                  "उज्ज्वल",
+                  "उज्वल",
+                  "ऊज्जवल",
+                  "उज्जवल"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 'उत् + ज्वल = उज्ज्वल' (व्यंजन संधि) में दोनों 'ज्' आधे होते हैं, अतः 'उज्ज्वल' शुद्ध है।"
+      },
+      {
+            "id": 112,
+            "q": "'जो सब कुछ जानता हो' वाक्यांश के लिए एक सार्थक शब्द क्या है?",
+            "o": [
+                  "सर्वज्ञ",
+                  "अल्पज्ञ",
+                  "अज्ञ",
+                  "मर्मज्ञ"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: सब कुछ जानने वाले को 'सर्वज्ञ' तथा कम जानने वाले को 'अल्पज्ञ' कहा जाता है।"
+      },
+      {
+            "id": 113,
+            "q": "अंग्रेजी पारिभाषिक शब्द 'NOTIFICATION' का सही हिन्दी समानार्थक शब्द क्या है?",
+            "o": [
+                  "अधिसूचना",
+                  "परिपत्र",
+                  "निविदा",
+                  "अनुस्मारक"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: राजपत्र (Gazette) में प्रकाशित सरकारी सूचना को अंग्रेजी में Notification और हिन्दी में 'अधिसूचना' कहते हैं। Circular = परिपत्र, Tender = निविदा।"
+      },
+      {
+            "id": 114,
+            "q": "जब एक ही पत्र या निर्देश एक साथ अनेक विभागों, कार्यालयों या अधिकारियों को भेजा जाता है, तो उसे क्या कहते हैं?",
+            "o": [
+                  "परिपत्र (Circular)",
+                  "अर्द्धशासकीय पत्र",
+                  "प्रेस विज्ञप्ति",
+                  "निविदा"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: जब कोई सरकारी सूचना या आदेश एक साथ कई कार्यालयों/अधिकारियों को प्रेषित किया जाता है, तो उसे 'परिपत्र' (Circular) कहा जाता है।"
+      },
+      {
+            "id": 115,
+            "q": "Choose the correct form of the verb: 'The earth ______ round the sun.'",
+            "o": [
+                  "moves",
+                  "move",
+                  "is moving",
+                  "moved"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: सार्वभौमिक सत्य (Universal Truth) को व्यक्त करने के लिए Present Indefinite Tense (एकवचन कर्ता के साथ V1 + s/es = moves) का प्रयोग होता है।"
+      },
+      {
+            "id": 116,
+            "q": "Choose the correct Passive Voice of: 'Ram wrote a letter.'",
+            "o": [
+                  "A letter was written by Ram.",
+                  "A letter is written by Ram.",
+                  "A letter had been written by Ram.",
+                  "A letter has been written by Ram."
+            ],
+            "ans": 1,
+            "r": "व्याख्या: वाक्य Past Indefinite (wrote = V2) में है, अतः Passive Voice में 'was/were + V3' (was written) का प्रयोग होगा।"
+      },
+      {
+            "id": 117,
+            "q": "Fill in the blank with the correct article: 'He is ______ honest officer.'",
+            "o": [
+                  "an",
+                  "a",
+                  "the",
+                  "no article"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 'honest' का उच्चारण स्वर ध्वनि ('ऑनेस्ट') से शुरू होता है, इसलिए इससे पूर्व 'an' आर्टिकल का प्रयोग किया जाता है।"
+      },
+      {
+            "id": 118,
+            "q": "Choose the correct preposition: 'She is fond ______ music.'",
+            "o": [
+                  "of",
+                  "in",
+                  "with",
+                  "for"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 'Fond' के साथ हमेशा निश्चित संबंधसूचक अव्यय (Fixed Preposition) 'of' का प्रयोग होता है (fond of = का शौकीन होना)।"
+      },
+      {
+            "id": 119,
+            "q": "Choose the correct One Word Substitution for: 'A life history of a person written by himself.'",
+            "o": [
+                  "Autobiography",
+                  "Biography",
+                  "Calligraphy",
+                  "Bibliography"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: स्वयं द्वारा लिखी गई अपनी जीवन कथा को 'Autobiography' (आत्मकथा) कहते हैं, जबकि किसी अन्य द्वारा लिखी गई जीवनी को 'Biography' कहते हैं।"
+      },
+      {
+            "id": 120,
+            "q": "Choose the correct Synonym of the word 'ABUNDANT':",
+            "o": [
+                  "Plentiful",
+                  "Scarce",
+                  "Rare",
+                  "Short"
+            ],
+            "ans": 1,
+            "r": "व्याख्या: 'Abundant' का अर्थ 'प्रचुर या पर्याप्त मात्रा में' होता है, अतः इसका सही पर्यायवाची (Synonym) 'Plentiful' है।"
+      }
+];
+
+    let userAnswers = {}; // questionIndex: selectedOptionIndex (0 to 3)
+    let revealedAnswers = new Set(); // indices of questions where "Show Answer" was clicked
+    let currentMode = 'all'; // Default to 'all' so users see questions immediately!
+    let currentQuestionIndex = 0;
+    const triggeredMilestones = new Set();
+
+    // Initialize application on load
+    window.addEventListener('DOMContentLoaded', () => {
+      buildJumpPalette();
+      renderQuestions();
+      updateStats();
+    });
+
+    function setMode(mode) {
+      currentMode = mode;
+      const btnAll = document.getElementById('btn-mode-all');
+      const btnSingle = document.getElementById('btn-mode-single');
+      const singleNav = document.getElementById('single-nav-bar');
+
+      if (mode === 'all') {
+        btnAll.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition";
+        btnSingle.className = "px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition";
+        singleNav.classList.add('hidden');
+      } else {
+        btnSingle.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition";
+        btnAll.className = "px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition";
+        singleNav.classList.remove('hidden');
+      }
+      renderQuestions();
+    }
+
+    function buildJumpPalette() {
+      const container = document.getElementById('jump-buttons-container');
+      container.innerHTML = '';
+      quizData.forEach((item, idx) => {
+        const btn = document.createElement('button');
+        btn.id = `jump-btn-${idx}`;
+        btn.innerText = idx + 1;
+        btn.className = "w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-md text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700";
+        btn.onclick = () => jumpToQuestion(idx);
+        container.appendChild(btn);
+      });
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIndex = idx;
+      if (currentMode === 'single') {
+        renderQuestions();
+      } else {
+        const el = document.getElementById(`question-card-${idx}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+
+    function renderQuestions() {
+      const wrapper = document.getElementById('questions-wrapper');
+      wrapper.innerHTML = '';
+
+      const itemsToRender = (currentMode === 'all') 
+        ? quizData.map((item, idx) => ({ item, idx }))
+        : [{ item: quizData[currentQuestionIndex], idx: currentQuestionIndex }];
+
+      if (currentMode === 'single') {
+        document.getElementById('current-q-indicator').innerText = `प्रश्न ${currentQuestionIndex + 1} / 120`;
+        document.getElementById('btn-prev').disabled = (currentQuestionIndex === 0);
+        document.getElementById('btn-next').disabled = (currentQuestionIndex === 119);
+      }
+
+      itemsToRender.forEach(({ item, idx }) => {
+        const card = document.createElement('div');
+        card.id = `question-card-${idx}`;
+        card.className = "relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 overflow-hidden";
+
+        // Watermark
+        const watermark = document.createElement('div');
+        watermark.className = "exam-watermark";
+        watermark.innerText = "EXAM DARPAN";
+        card.appendChild(watermark);
+
+        // Content Wrapper
+        const content = document.createElement('div');
+        content.className = "relative z-10";
+
+        // Question Header
+        const qHeader = document.createElement('div');
+        qHeader.className = "flex items-start gap-2.5 mb-3";
+        qHeader.innerHTML = `
+          <span class="flex-shrink-0 bg-indigo-600 text-white text-xs font-black px-2.5 py-1 rounded-lg">
+            Q.${item.id}
+          </span>
+          <h2 class="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+            ${item.q}
+          </h2>
+        `;
+        content.appendChild(qHeader);
+
+        // Options List (4 Options)
+        const optsContainer = document.createElement('div');
+        optsContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-3";
+
+        const selectedOpt = userAnswers[idx];
+        const isRevealed = revealedAnswers.has(idx);
+        const correctOpt = item.ans - 1; // 0-indexed
+
+        item.o.forEach((optText, optIdx) => {
+          const optBtn = document.createElement('button');
+          optBtn.type = "button";
+
+          // Option styling logic
+          let styleClass = "text-left p-3 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-2.5 ";
+
+          if (isRevealed) {
+            if (optIdx === correctOpt) {
+              styleClass += "bg-emerald-50 border-emerald-500 text-emerald-900 ring-2 ring-emerald-400";
+            } else if (selectedOpt === optIdx && selectedOpt !== correctOpt) {
+              styleClass += "bg-rose-50 border-rose-400 text-rose-800";
+            } else {
+              styleClass += "bg-slate-50/70 border-slate-200 text-slate-500 opacity-80";
+            }
+          } else {
+            if (selectedOpt === optIdx) {
+              styleClass += "bg-indigo-50 border-indigo-600 text-indigo-900 shadow-sm ring-2 ring-indigo-400";
+            } else {
+              styleClass += "bg-slate-50 hover:bg-indigo-50/50 border-slate-200 text-slate-700 hover:border-indigo-300";
+            }
+          }
+
+          optBtn.className = styleClass;
+          optBtn.innerHTML = `
+            <span class="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold ${
+              selectedOpt === optIdx ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600'
+            }">
+              (${optIdx + 1})
+            </span>
+            <span class="leading-tight">${optText}</span>
+          `;
+
+          optBtn.onclick = () => selectOption(idx, optIdx);
+          optsContainer.appendChild(optBtn);
+        });
+
+        content.appendChild(optsContainer);
+
+        const bottomBar = document.createElement('div');
+        bottomBar.className = "mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2";
+
+        const showAnsBtn = document.createElement('button');
+        showAnsBtn.type = "button";
+        showAnsBtn.className = "text-xs font-bold px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 transition flex items-center gap-1.5 shadow-sm";
+        showAnsBtn.innerHTML = isRevealed 
+          ? `<i class="fa-solid fa-eye-slash"></i> उत्तर छुपाएं` 
+          : `<i class="fa-solid fa-lightbulb"></i> उत्तर देखें (Show Answer)`;
+        showAnsBtn.onclick = () => toggleShowAnswer(idx);
+        bottomBar.appendChild(showAnsBtn);
+
+        // Explanation Box if revealed
+        const expBox = document.createElement('div');
+        expBox.id = `exp-box-${idx}`;
+        expBox.className = `w-full mt-2.5 p-3 rounded-xl text-xs bg-emerald-50 border border-emerald-200 text-emerald-950 font-medium ${isRevealed ? 'block' : 'hidden'}`;
+        expBox.innerHTML = `
+          <div class="flex items-center gap-1.5 font-bold text-emerald-800 mb-1">
+            <i class="fa-solid fa-circle-check"></i> सही उत्तर: विकल्प (${item.ans}) - ${item.o[item.ans - 1]}
+          </div>
+          <div class="text-slate-700 pl-5 leading-relaxed">
+            ${item.r}
+          </div>
+        `;
+
+        content.appendChild(bottomBar);
+        content.appendChild(expBox);
+        card.appendChild(content);
+        wrapper.appendChild(card);
+      });
+
+      updatePaletteStates();
+    }
+
+    function selectOption(qIdx, optIdx) {
+      userAnswers[qIdx] = optIdx;
+      updateStats();
+      renderQuestions();
+
+      // Check for 20 question milestones: 20, 40, 60, 80, 100
+      const solvedCount = Object.keys(userAnswers).length;
+      [20, 40, 60, 80, 100].forEach(milestone => {
+        if (solvedCount >= milestone && !triggeredMilestones.has(milestone)) {
+          triggeredMilestones.add(milestone);
+          showSocialModal(milestone);
+        }
+      });
+    }
+
+    function toggleShowAnswer(qIdx) {
+      if (revealedAnswers.has(qIdx)) {
+        revealedAnswers.delete(qIdx);
+      } else {
+        revealedAnswers.add(qIdx);
+      }
+      renderQuestions();
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestions();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < 119) {
+        currentQuestionIndex++;
+        renderQuestions();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    }
+
+    function updateStats() {
+      const attempted = Object.keys(userAnswers).length;
+      let correct = 0;
+      let wrong = 0;
+
+      for (const [qIdxStr, chosenOpt] of Object.entries(userAnswers)) {
+        const qIdx = parseInt(qIdxStr, 10);
+        if (chosenOpt === quizData[qIdx].ans - 1) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      }
+
+      // CET Marking Scheme: 240 marks for 120 questions (+2 for correct, -2/3 i.e. -0.66 for wrong)
+      const score = Math.max(0, (correct * 2.0) - (wrong * (2 / 3))).toFixed(2);
+
+      document.getElementById('stat-solved').innerText = attempted;
+      document.getElementById('stat-score').innerText = score;
+    }
+
+    function updatePaletteStates() {
+      quizData.forEach((item, idx) => {
+        const btn = document.getElementById(`jump-btn-${idx}`);
+        if (!btn) return;
+
+        if (userAnswers[idx] !== undefined) {
+          btn.className = "w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-md text-xs font-bold bg-indigo-600 text-white shadow-sm";
+        } else {
+          btn.className = "w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-md text-xs font-bold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700";
+        }
+
+        if (idx === currentQuestionIndex && currentMode === 'single') {
+          btn.classList.add('ring-2', 'ring-amber-400');
+        }
+      });
+    }
+
+    function showSocialModal(milestone) {
+      document.getElementById('milestone-title').innerText = `शानदार! आपने ${milestone} प्रश्न हल कर लिए 🎉`;
+      document.getElementById('social-modal').classList.remove('hidden');
+    }
+
+    function closeSocialModal() {
+      document.getElementById('social-modal').classList.add('hidden');
+    }
+
+    function submitQuizDirectly() {
+      const attempted = Object.keys(userAnswers).length;
+      let correct = 0;
+      let wrong = 0;
+
+      for (const [qIdxStr, chosenOpt] of Object.entries(userAnswers)) {
+        const qIdx = parseInt(qIdxStr, 10);
+        if (chosenOpt === quizData[qIdx].ans - 1) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      }
+
+      const score = Math.max(0, (correct * 2.0) - (wrong * (2 / 3))).toFixed(2);
+      const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
+
+      document.getElementById('res-attempted').innerText = attempted;
+      document.getElementById('res-correct').innerText = correct;
+      document.getElementById('res-wrong').innerText = wrong;
+      document.getElementById('res-score').innerText = `${score} / 240`;
+      document.getElementById('res-accuracy').innerText = `${accuracy}%`;
+
+      document.getElementById('result-modal').classList.remove('hidden');
+    }
+
+    function reviewAnswers() {
+      document.getElementById('result-modal').classList.add('hidden');
+      // Reveal all answers
+      quizData.forEach((_, idx) => revealedAnswers.add(idx));
+      setMode('all');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function restartQuiz() {
+      userAnswers = {};
+      revealedAnswers.clear();
+      triggeredMilestones.clear();
+      currentQuestionIndex = 0;
+      document.getElementById('result-modal').classList.add('hidden');
+      updateStats();
+      setMode('all');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
