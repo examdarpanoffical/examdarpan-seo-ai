@@ -1,3 +1,9 @@
 {
-  "quizzes": []
+  "quizzes": [
+    {
+      "title": "CET Mock Test",
+      "slug": "cet-mock-test",
+      "publishedAt": "2026-11-10"
+    }
+  ]
 }
