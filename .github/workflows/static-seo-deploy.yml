@@ -40,6 +40,48 @@ jobs:
         run: |
           python scripts/generate_static.py
 
+      - name: Generate static mock-test sitemap
+        run: |
+          python - <<'PY'
+          import json
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          public = Path("public")
+          manifest_path = public / "mock-tests" / "manifest.json"
+          sitemap_path = public / "mock-tests-sitemap.xml"
+          index_path = public / "sitemap_index.xml"
+          base = "https://examdarpan.in"
+          ns = "http://www.sitemaps.org/schemas/sitemap/0.9"
+          ET.register_namespace("", ns)
+
+          data = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {"quizzes": []}
+          root = ET.Element(f"{{{ns}}}urlset")
+          for quiz in data.get("quizzes", []):
+              slug = str(quiz.get("slug", "")).strip()
+              if not slug or not (public / "mock-tests" / f"{slug}.html").is_file():
+                  continue
+              node = ET.SubElement(root, f"{{{ns}}}url")
+              ET.SubElement(node, f"{{{ns}}}loc").text = f"{base}/mock-tests/{slug}"
+              published = str(quiz.get("publishedAt", ""))[:10]
+              if len(published) == 10:
+                  ET.SubElement(node, f"{{{ns}}}lastmod").text = published
+          ET.ElementTree(root).write(sitemap_path, encoding="utf-8", xml_declaration=True)
+
+          if not index_path.exists():
+              raise SystemExit("Main sitemap index missing before mock-test sitemap update.")
+          tree = ET.parse(index_path)
+          index_root = tree.getroot()
+          target = f"{base}/mock-tests-sitemap.xml"
+          existing = [el.text for el in index_root.findall(f"{{{ns}}}sitemap/{{{ns}}}loc")]
+          if target not in existing:
+              entry = ET.SubElement(index_root, f"{{{ns}}}sitemap")
+              ET.SubElement(entry, f"{{{ns}}}loc").text = target
+          tree.write(index_path, encoding="utf-8", xml_declaration=True)
+          print("Generated static mock-test sitemap.")
+          PY
+
       - name: Redirect Firebase default domains to primary .in domain
         run: |
           python - <<'PY'
@@ -91,6 +133,9 @@ jobs:
           test -s public/post-sitemap.xml
           test -s public/page-sitemap.xml
           test -s public/category-sitemap.xml
+          test -s public/mock-tests/index.html
+          test -s public/mock-tests/manifest.json
+          test -s public/mock-tests-sitemap.xml
           python - <<'PY'
           import xml.etree.ElementTree as ET
           from pathlib import Path
