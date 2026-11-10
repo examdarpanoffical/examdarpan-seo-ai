@@ -1,0 +1,29 @@
+name: SEO Audit Tests
+
+on:
+  pull_request:
+    paths:
+      - "seo-audit/**"
+      - ".github/workflows/seo-audit-tests.yml"
+  push:
+    branches:
+      - seo-audit-agent-20261026
+    paths:
+      - "seo-audit/**"
+      - ".github/workflows/seo-audit-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run offline tests
+        run: python -m unittest discover -s seo-audit -p "test_*.py" -v
