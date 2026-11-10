@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="hi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Online Mock Tests | Exam Darpan</title>
+<meta name="description" content="Exam Darpan पर Rajasthan CET और अन्य प्रतियोगी परीक्षाओं के online mock tests और practice papers दें।">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://examdarpan.in/mock-tests/">
+<link rel="stylesheet" href="/styles.css">
+<script id="ed-primary-domain-redirect">(function(){var h=location.hostname.toLowerCase();if(h==="examdarpan-dd963.web.app"||h==="examdarpan-dd963.firebaseapp.com"){location.replace("https://examdarpan.in"+location.pathname+location.search+location.hash)}})();</script>
+<style>
+.mock-wrap{max-width:1050px;margin:32px auto;padding:16px}.mock-hero{padding:32px;border-radius:22px;background:linear-gradient(130deg,#0f172a,#1d4ed8);color:#fff}.mock-hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,42px)}.mock-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}.mock-card{display:block;padding:22px;border:1px solid #e2e8f0;border-radius:18px;background:#fff;text-decoration:none;color:#0f172a;box-shadow:0 8px 24px #0f172a0d}.mock-card:hover{border-color:#93c5fd;transform:translateY(-2px)}.mock-card small{color:#64748b}.mock-card h2{font-size:19px;margin:8px 0}.mock-empty{padding:24px;background:#f8fafc;border-radius:14px;color:#475569}
+</style></head><body><main class="mock-wrap"><header class="mock-hero"><p>EXAM DARPAN · PRACTICE ZONE</p><h1>Online Mock Tests</h1><p>अपनी तैयारी जांचें — Quiz चुनें और अभी टेस्ट शुरू करें।</p></header><section id="mockList" class="mock-list" aria-live="polite"><p class="mock-empty">Mock tests load हो रहे हैं…</p></section></main>
+<script>
+fetch('/mock-tests/manifest.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('List unavailable');return r.json()}).then(data=>{const rows=Array.isArray(data.quizzes)?data.quizzes:[];const root=document.getElementById('mockList');root.innerHTML=rows.length?rows.map(q=>'<a class="mock-card" href="/mock-tests/'+encodeURIComponent(q.slug)+'.html"><small>ONLINE MOCK TEST · '+new Date(q.publishedAt).toLocaleDateString('en-IN')+'</small><h2>'+String(q.title||'Mock Test').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</h2><span>Start Test →</span></a>').join(''):'<p class="mock-empty">अभी कोई Mock Test publish नहीं हुआ है। जल्द नया test आएगा।</p>'}).catch(()=>{document.getElementById('mockList').innerHTML='<p class="mock-empty">Mock tests अभी load नहीं हो पाए।</p>'});
+</script></body></html>
