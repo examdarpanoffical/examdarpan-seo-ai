@@ -840,7 +840,7 @@ window.edTrackScroll=function(){{
 window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/article.css?v=20261111-1"><script src="/site-search.js" defer></script>
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
 </head>
