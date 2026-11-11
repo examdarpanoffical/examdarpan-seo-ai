@@ -630,10 +630,10 @@ def place_toc_after_intro(content: str, toc_html: str) -> str:
     if not toc_html:
         return content
 
-    first_heading = re.search(r"<h2\\b", content, flags=re.I)
+    first_heading = re.search(r"<h2\b", content, flags=re.I)
     intro_end = first_heading.start() if first_heading else len(content)
     intro = content[:intro_end]
-    paragraphs = list(re.finditer(r"</p\\s*>", intro, flags=re.I))
+    paragraphs = list(re.finditer(r"</p\s*>", intro, flags=re.I))
 
     if paragraphs:
         # Keep the opening explanation readable before showing navigation.
