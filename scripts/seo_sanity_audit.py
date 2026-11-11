@@ -22,6 +22,10 @@ LEGACY_SITEMAP_SUFFIXES = {
     "/about.html", "/contact.html", "/privacy.html", "/disclaimer.html",
     "/terms.html", "/policy.html", "/exam-calendar.html",
 }
+NON_PUBLIC_OR_RUNTIME_HTML = {
+    "404.html", "article.html", "calendar-date-debug.html", "firebase-init.html",
+    "admin/dashboard.html", "admin/login.html",
+}
 TEMPLATE_LEAK = re.compile(r"\$\{\s*esc\(title\)\s*\}")
 
 
@@ -103,6 +107,8 @@ def main() -> int:
             issues.append(("WARN", f"Could not read {path.relative_to(PUBLIC)}: {exc}"))
             continue
         rel = path.relative_to(PUBLIC).as_posix()
+        if rel in NON_PUBLIC_OR_RUNTIME_HTML:
+            continue  # 404, admin tools, debug utilities and runtime shells are not indexable content pages.
         titles = re.findall(r"<title\b[^>]*>(.*?)</title>", html, re.I | re.S)
         if len(titles) != 1 or not re.sub(r"<[^>]+>", "", titles[0]).strip():
             issues.append(("WARN", f"Expected exactly one non-empty title; found {len(titles)} in {rel}"))
@@ -136,6 +142,8 @@ def main() -> int:
             issues.append(("WARN", f"Could not inspect SEO tags in {path.relative_to(PUBLIC)}: {exc}"))
             continue
         rel = path.relative_to(PUBLIC).as_posix()
+        if rel in NON_PUBLIC_OR_RUNTIME_HTML:
+            continue
         canonical_tags = [
             tag_attrs(tag) for tag in re.findall(r"<link\b[^>]*>", page_html, re.I | re.S)
             if tag_attrs(tag).get("rel", "").lower() == "canonical"
@@ -218,6 +226,23 @@ def main() -> int:
                 value = attrs.get("href", "") or attrs.get("content", "")
                 if any(host in value.lower() for host in forbidden_hosts):
                     issues.append(("ERROR", f"Firebase default domain found in canonical/og:url in {rel}: {value}"))
+
+    # These generated indexable landing pages require matching canonical and OG URLs.
+    for relative_path, expected_url in (
+        ("author/deepak-joshi/index.html", f"{BASE}/author/deepak-joshi"),
+        ("categories.html", f"{BASE}/categories"),
+    ):
+        landing_path = PUBLIC / relative_path
+        if not landing_path.exists():
+            issues.append(("ERROR", f"Missing required landing page: {relative_path}"))
+            continue
+        landing_html = landing_path.read_text(encoding="utf-8", errors="ignore")
+        canonical_match = re.search(r'<link[^>]*rel="canonical"[^>]*href="([^"]+)', landing_html, re.I)
+        og_url_match = re.search(r'<meta[^>]*property="og:url"[^>]*content="([^"]+)', landing_html, re.I)
+        if not canonical_match or canonical_match.group(1).rstrip("/") != expected_url.rstrip("/"):
+            issues.append(("ERROR", f"Incorrect canonical URL in {relative_path}"))
+        if not og_url_match or og_url_match.group(1).rstrip("/") != expected_url.rstrip("/"):
+            issues.append(("ERROR", f"Missing or incorrect og:url in {relative_path}"))
 
     errors = sum(level == "ERROR" for level, _ in issues)
     warnings = sum(level == "WARN" for level, _ in issues)
