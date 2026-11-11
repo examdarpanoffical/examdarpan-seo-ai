@@ -233,6 +233,38 @@ function parseArticleSourceLinks(value){
     return {label:label||'Official source',url};
   }).slice(0,12);
 }
+function validatePublishQuality(){
+  const sourceLinks=parseArticleSourceLinks($('sourceLinks').value);
+  const officialUrls=[$('notification').value.trim(),$('official').value.trim(),$('pdf').value.trim()].filter(Boolean);
+  const hasHttpsOfficial=officialUrls.some(url=>/^https:\/\//i.test(url));
+  if(!sourceLinks.length&&!hasHttpsOfficial){
+    throw new Error('Publish रोक दिया गया: कम-से-कम एक वास्तविक official source URL (notification / official website / PDF या Source Links) जोड़ें।');
+  }
+  if(officialUrls.some(url=>!/^https:\/\//i.test(url))){
+    throw new Error('Official Notification, Website और PDF के URLs HTTPS होने चाहिए।');
+  }
+  const verified=$('lastVerifiedAt').value.trim();
+  if(!verified)throw new Error('Publish से पहले Last Source Verification Date भरें।');
+  const today=new Date();today.setHours(0,0,0,0);
+  const verifiedDate=new Date(verified+'T00:00:00');
+  if(Number.isNaN(verifiedDate.getTime())||verifiedDate>today){
+    throw new Error('Source Verification Date सही और आज या उससे पहले की तारीख होनी चाहिए।');
+  }
+  const checks=['qualityFactsChecked','qualityStatusChecked','qualityValueChecked'];
+  const missing=checks.filter(id=>!$(id)?.checked);
+  if(missing.length){
+    throw new Error('Publish से पहले Quality Checklist के तीनों बिंदु स्वयं जाँचकर tick करें।');
+  }
+  const content=normalizeArticleContent($('content').value,$('title').value.trim());
+  const plain=content.replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/\s+/g,' ').trim();
+  if(plain.length<650){
+    throw new Error('Article अभी बहुत संक्षिप्त है। पाठक के सवालों का पूरा जवाब, प्रक्रिया और जरूरी सावधानियाँ जोड़कर फिर publish करें।');
+  }
+  if(/\b(lorem ipsum|insert content|content goes here|details will be updated soon)\b/i.test(plain)){
+    throw new Error('Article में placeholder text मिला। उसे हटाकर verified जानकारी जोड़ें।');
+  }
+  return true;
+}
 function articleData(status,existingPost=null){
   const title=$('title').value.trim();
   const category=$('category').value||'Latest Updates';
@@ -348,7 +380,7 @@ async function remove(id){
 }
 function clearForm(){
   $('postId').value='';
-  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
+  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource','qualityFactsChecked','qualityStatusChecked','qualityValueChecked'].forEach(id=>{if($(id))$(id).value=''});
   $('formTitle').textContent='New Article';updateSeoPreview();
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
