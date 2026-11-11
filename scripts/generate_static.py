@@ -4233,6 +4233,7 @@ def write_author_profile(posts: list[dict[str, Any]]) -> None:
 <meta name="description" content="{esc(AUTHOR_NAME)} Exam Darpan पर सरकारी नौकरी, भर्ती, परीक्षा, Admit Card और Result से जुड़ी जानकारी लिखते हैं।">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="{AUTHOR_URL}">
+<meta property="og:url" content="{AUTHOR_URL}">
 <link rel="stylesheet" href="/styles.css">
 {ADSENSE_SCRIPT}
 <script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script>
@@ -4400,6 +4401,7 @@ def write_category_directory(posts: list[dict[str, Any]]) -> None:
 <meta name="description" content="Exam Darpan की सभी categories एक जगह देखें: Rajasthan Jobs, All India Jobs, Railway, SSC, Banking, Admit Card, Results, Answer Key, Syllabus, Scholarships और अधिक।">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="{BASE}/categories">
+<meta property="og:url" content="{BASE}/categories">
 <link rel="icon" href="/assets/favicon.png">
 <link rel="stylesheet" href="/styles.css">
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>
