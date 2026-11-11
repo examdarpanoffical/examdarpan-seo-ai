@@ -44,6 +44,46 @@ def main() -> int:
             ET.parse(path)
         except ET.ParseError as exc:
             issues.append(("ERROR", f"Invalid XML in {filename}: {exc}"))
+    # Lightweight browser indexes must remain metadata-only. Full article bodies
+    # and quiz questions belong to their own static pages / quiz payloads.
+    posts_index_path = PUBLIC / "posts-index.json"
+    quiz_index_path = PUBLIC / "quiz-index.json"
+    for index_path in (posts_index_path, quiz_index_path):
+        if not index_path.is_file() or index_path.stat().st_size == 0:
+            issues.append(("ERROR", f"Missing or empty lightweight index: {index_path.name}"))
+    if posts_index_path.is_file():
+        try:
+            posts_data = __import__("json").loads(posts_index_path.read_text(encoding="utf-8"))
+            post_rows = posts_data.get("posts", []) if isinstance(posts_data, dict) else []
+            if not isinstance(post_rows, list):
+                issues.append(("ERROR", "posts-index.json posts must be an array"))
+            else:
+                for row in post_rows:
+                    if not isinstance(row, dict) or not row.get("slug") or not row.get("title"):
+                        issues.append(("ERROR", "posts-index.json contains a row without title/slug"))
+                        break
+                    if "content" in row or "html" in row:
+                        issues.append(("ERROR", "posts-index.json must not contain full article content"))
+                        break
+        except Exception as exc:
+            issues.append(("ERROR", f"posts-index.json is invalid: {exc}"))
+    if quiz_index_path.is_file():
+        try:
+            quiz_data = __import__("json").loads(quiz_index_path.read_text(encoding="utf-8"))
+            quiz_rows = quiz_data.get("quizzes", []) if isinstance(quiz_data, dict) else []
+            if not isinstance(quiz_rows, list):
+                issues.append(("ERROR", "quiz-index.json quizzes must be an array"))
+            else:
+                for row in quiz_rows:
+                    if not isinstance(row, dict) or "questionCount" not in row:
+                        issues.append(("ERROR", "quiz-index.json row is missing questionCount"))
+                        break
+                    if "questions" in row:
+                        issues.append(("ERROR", "quiz-index.json must not contain quiz question payloads"))
+                        break
+        except Exception as exc:
+            issues.append(("ERROR", f"quiz-index.json is invalid: {exc}"))
+
     if not sitemap_path.exists():
         print("ERROR: public/sitemap.xml is missing")
         return 2
