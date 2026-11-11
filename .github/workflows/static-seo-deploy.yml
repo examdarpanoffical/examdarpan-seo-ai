@@ -117,6 +117,8 @@ jobs:
         run: |
           set -euo pipefail
           test -f public/index.html
+          test -s public/posts-index.json
+          test -s public/quiz-index.json
           grep -Fq 'ed-primary-domain-redirect' public/index.html
           test -f public/sitemap.xml
           test -f public/categories.html
