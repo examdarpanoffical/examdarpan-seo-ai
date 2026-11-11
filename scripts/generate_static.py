@@ -431,6 +431,16 @@ def clean_article_content(value: Any, article_title: str = "") -> str:
     text = re.sub(r'<h1\b([^>]*)>', r'<h2\1>', text, flags=re.I)
     text = re.sub(r'</h1\s*>', '</h2>', text, flags=re.I)
 
+    # Wrap stored tables so 2-column tables fit phones and wider tables scroll locally.
+    def _wrap_article_table(match: re.Match[str]) -> str:
+        table_html = match.group(0)
+        first_row = re.search(r'<tr\b[^>]*>([\s\S]*?)</tr>', table_html, flags=re.I)
+        cells = re.findall(r'<(?:th|td)\b', first_row.group(1), flags=re.I) if first_row else []
+        columns = max(1, min(6, len(cells)))
+        return f'<div class="ed-table-scroll ed-table-cols-{columns}" role="region" aria-label="Table, scroll horizontally" tabindex="0">{table_html}</div>'
+
+    text = re.sub(r'<table\b[^>]*>[\s\S]*?</table>', _wrap_article_table, text, flags=re.I)
+
     return re.sub(r'\n{3,}', "\n\n", text).strip()
 
 def reading_time(content: Any) -> int:
@@ -840,7 +850,7 @@ window.edTrackScroll=function(){{
 window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/article.css?v=20261111-1"><script src="/site-search.js" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/article.css?v=20261111-2"><script src="/site-search.js" defer></script>
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
 </head>
