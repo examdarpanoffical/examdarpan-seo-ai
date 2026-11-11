@@ -227,6 +227,23 @@ def main() -> int:
                 if any(host in value.lower() for host in forbidden_hosts):
                     issues.append(("ERROR", f"Firebase default domain found in canonical/og:url in {rel}: {value}"))
 
+    # These generated indexable landing pages require matching canonical and OG URLs.
+    for relative_path, expected_url in (
+        ("author/deepak-joshi/index.html", f"{BASE}/author/deepak-joshi"),
+        ("categories.html", f"{BASE}/categories"),
+    ):
+        landing_path = PUBLIC / relative_path
+        if not landing_path.exists():
+            issues.append(("ERROR", f"Missing required landing page: {relative_path}"))
+            continue
+        landing_html = landing_path.read_text(encoding="utf-8", errors="ignore")
+        canonical_match = re.search(r'<link[^>]*rel="canonical"[^>]*href="([^"]+)', landing_html, re.I)
+        og_url_match = re.search(r'<meta[^>]*property="og:url"[^>]*content="([^"]+)', landing_html, re.I)
+        if not canonical_match or canonical_match.group(1).rstrip("/") != expected_url.rstrip("/"):
+            issues.append(("ERROR", f"Incorrect canonical URL in {relative_path}"))
+        if not og_url_match or og_url_match.group(1).rstrip("/") != expected_url.rstrip("/"):
+            issues.append(("ERROR", f"Missing or incorrect og:url in {relative_path}"))
+
     errors = sum(level == "ERROR" for level, _ in issues)
     warnings = sum(level == "WARN" for level, _ in issues)
     print(f"Exam Darpan SEO sanity audit: {len(locs)} sitemap URLs; {errors} errors; {warnings} warnings.")
