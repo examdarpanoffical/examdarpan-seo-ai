@@ -497,7 +497,15 @@ def add_article_toc(content: str) -> tuple[str, str]:
             section_id = f"{base_id}-{suffix}"
             suffix += 1
         used_ids.add(section_id)
-        if not existing:
+        if existing:
+            attrs = re.sub(
+                r'\bid=["\'][^"\']+["\']',
+                f'id="{esc(section_id)}"',
+                attrs,
+                count=1,
+                flags=re.I,
+            )
+        else:
             attrs = f'{attrs} id="{esc(section_id)}"'
         if tag.lower() == "h2":
             headings.append((section_id, label))
