@@ -111,7 +111,15 @@
 <div class="field"><label>Content HTML</label><textarea id="content" style="min-height:300px" placeholder="AI draft यहाँ आएगा; आप review/edit कर सकते हैं."></textarea><p class="meta">Standard layout: content में headings, paragraphs, lists, tables और official links रखें। Custom colors/inline CSS हटाकर publish पर सभी articles में एक consistent style लागू होगी। Publish से पहले Preview Article देखें.</p></div>
 <div class="field"><label>Featured Image</label><input id="image" type="url" inputmode="url" placeholder="https://your-image-host.com/vacancy-thumbnail.jpg"><p class="meta">अपनी बनाई हुई image को public image hosting या website के public folder में upload करें और उसका direct HTTPS image URL यहाँ paste करें। यही image WhatsApp/Facebook preview में दिखेगी; preview पर click करने से पूरा article खुलेगा।</p><div id="featuredImagePreview" style="margin-top:10px"></div></div>
 
-<div class="field"><label>Official Notification URL</label><input id="notification"></div><div class="field"><label>Apply Online URL</label><input id="apply"></div><div class="field"><label>Official Website URL</label><input id="official"></div><div class="field"><label>Notification PDF URL</label><input id="pdf"></div><div class="field"><label>Tags (comma separated)</label><input id="tags"></div>
+<div class="field"><label>Official Notification URL</label><input id="notification"></div><div class="field"><label>Apply Online URL</label><input id="apply"></div><div class="field"><label>Official Website URL</label><input id="official"></div><div class="field"><label>Notification PDF URL</label><input id="pdf"></div>
+<div class="card pad" style="margin:14px 0;background:#f8fafc;border:1px solid #dbe3ee">
+  <strong>Sources &amp; Editorial Review</strong>
+  <p class="meta">हर स्रोत की एक लाइन लिखें: स्रोत का नाम | पूरा HTTPS URL. केवल वास्तव में जाँचे गए स्रोत जोड़ें।</p>
+  <div class="field"><label>Source Links</label><textarea id="sourceLinks" rows="4" placeholder="RSSB Official Notification | https://rssb.rajasthan.gov.in/..."></textarea></div>
+  <div class="field"><label>Last Source Verification Date</label><input id="lastVerifiedAt" type="date"></div>
+  <div class="field"><label>Reviewed By (optional)</label><input id="reviewerName" placeholder="वास्तविक reviewer का नाम"></div>
+</div>
+<div class="field"><label>Tags (comma separated)</label><input id="tags"></div>
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button id="previewArticle" type="button" class="btn btn-gold">Preview Article</button><button id="saveDraft" class="btn btn-dark">Save Draft</button><button id="publish" class="btn btn-primary">Publish</button><button id="clear" class="btn btn-gold">Clear</button></div><p id="msg" class="meta"></p>
 <hr style="border:0;border-top:1px solid #e2e8f0;margin:20px 0">
 <section class="card pad" id="staticHtmlQuizPublisher" style="margin:18px 0;border:1px solid #bfdbfe;background:#f8fbff">
