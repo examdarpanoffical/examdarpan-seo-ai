@@ -227,13 +227,16 @@ $('clearSeo').addEventListener('click',()=>{
   $('seoTitle').value='';$('seoDescription').value='';$('searchKeywords').value='';updateSeoPreview();
 });
 function parseArticleSourceLinks(value){
-  return String(value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map((line,index)=>{
+  const lines=String(value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(lines.length>12)throw new Error('अधिकतम 12 source links जोड़ें।');
+  return lines.map((line,index)=>{
     const parts=line.split('|');
     if(parts.length<2)throw new Error('Source line '+(index+1)+': स्रोत का नाम | HTTPS URL format इस्तेमाल करें।');
     const label=parts.shift().trim(),url=parts.join('|').trim();
+    if(!label)throw new Error('Source line '+(index+1)+': स्रोत का स्पष्ट नाम लिखें।');
     if(!/^https:\/\//i.test(url))throw new Error('Source line '+(index+1)+': केवल HTTPS source URL स्वीकार है।');
-    return {label:label||'Official source',url};
-  }).slice(0,12);
+    return {label,url};
+  });
 }
 function validatePublishQuality(){
   const sourceLinks=parseArticleSourceLinks($('sourceLinks').value);
