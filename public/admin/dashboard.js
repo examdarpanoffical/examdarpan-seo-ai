@@ -136,7 +136,7 @@ function fill(p){
   $('seoTitle').value=p.seoTitle||'';
   $('seoDescription').value=p.seoDescription||'';
   $('searchKeywords').value=Array.isArray(p.searchKeywords)?p.searchKeywords.join(', '):(p.searchKeywords||'');
-  $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';
+  $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';resetEditorialWorkspace();
   $('image').value=p.featuredImage||'';updateFeaturedImagePreview();$('notification').value=p.officialNotificationUrl||'';$('apply').value=p.applyOnlineUrl||'';
   $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';
   $('sourceLinks').value=Array.isArray(p.sourceLinks)?p.sourceLinks.map(x=>(x.label||x.title||'Source')+' | '+(x.url||'')).join('\n'):(p.sourceLinks||'');
@@ -387,7 +387,7 @@ function clearForm(){
   $('postId').value='';
   ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
   ['qualityFactsChecked','qualityStatusChecked','qualityValueChecked'].forEach(id=>{if($(id))$(id).checked=false});
-  $('formTitle').textContent='New Article';updateSeoPreview();
+  $('formTitle').textContent='New Article';resetEditorialWorkspace();updateSeoPreview();
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
 }
@@ -781,8 +781,10 @@ async function loadQuizAnalytics(){
 }
 
 /* ---------------- Human Editorial Workspace ---------------- */
-function getArticleDraftPlainText(){
-  return String($('content').value||'').replace(/<\/?[^>]+>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/\s+/g,' ').trim();
+function resetEditorialWorkspace(){
+  if($('editorialRevision'))$('editorialRevision').value='';
+  if($('editorialReviewResult')){$('editorialReviewResult').textContent='';$('editorialReviewResult').style.display='none';}
+  if($('editorialWorkspaceMsg'))$('editorialWorkspaceMsg').textContent='';
 }
 function getEditorialSource(){
   return String($('aiSource')?.value||'').trim();
