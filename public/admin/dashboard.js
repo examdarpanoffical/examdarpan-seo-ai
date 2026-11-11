@@ -280,9 +280,7 @@ function articleData(status,existingPost=null){
     sourceLinks:parseArticleSourceLinks($('sourceLinks').value),
     lastVerifiedAt:$('lastVerifiedAt').value.trim(),
     reviewerName:$('reviewerName').value.trim(),
-    sourceLinks:parseArticleSourceLinks($('sourceLinks').value),
-    lastVerifiedAt:$('lastVerifiedAt').value.trim(),
-    reviewerName:$('reviewerName').value.trim(),
+
     tags:$('tags').value.split(',').map(x=>x.trim()).filter(Boolean),
     authorName:'Deepak Joshi',
     authorRole:'Senior Content Writer & Research Editor',
