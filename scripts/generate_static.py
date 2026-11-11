@@ -664,17 +664,11 @@ def reading_time(content: Any) -> int:
     return max(1, (words + 179) // 180)
 
 
-def fit_meta_text(value: Any, limit: int = 160, minimum: int = 70) -> str:
+def fit_meta_text(value: Any, limit: int = 160) -> str:
     """Keep search snippets concise without cutting in the middle of a word."""
-    text = re.sub(r"\s+", " ", clean_text(value)).strip()
+    text = re.sub(r"\\s+", " ", clean_text(value)).strip()
     if len(text) > limit:
         text = text[:limit + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
-    if len(text) < minimum:
-        suffix = " अधिक जानकारी और आधिकारिक निर्देश यहाँ देखें।"
-        if text and suffix not in text:
-            text = text.rstrip("।.! ") + "।" + suffix
-        if len(text) > limit:
-            text = text[:limit + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
     return text
 
 
@@ -689,7 +683,12 @@ def seo_title(p: dict[str, Any]) -> str:
 
 def seo_description(p: dict[str, Any]) -> str:
     value = clean_description(p.get("seoDescription"))
-    return fit_meta_text(value or short_description(p), limit=160, minimum=70)
+    candidate = value.strip()
+    if len(candidate) < 70:
+        richer = short_description(p).strip()
+        if len(richer) > len(candidate):
+            candidate = richer
+    return fit_meta_text(candidate, limit=160)
 
 
 def search_keywords(p: dict[str, Any]) -> list[str]:
@@ -3909,7 +3908,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
     robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" if filtered else "noindex,follow"
     return f'''{CATEGORY_MARKER}
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(fit_meta_text(title + " | Exam Darpan", limit=60, minimum=0))}</title><meta name="description" content="{esc(fit_meta_text(description, limit=160, minimum=70))}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
+<title>{esc(fit_meta_text(title + " | Exam Darpan", limit=60))}</title><meta name="description" content="{esc(fit_meta_text(description, limit=160))}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.png">
 <script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
 <style id="exam-darpan-category-design">
