@@ -141,6 +141,8 @@ function fill(p){
   $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';
   $('sourceLinks').value=Array.isArray(p.sourceLinks)?p.sourceLinks.map(x=>(x.label||x.title||'Source')+' | '+(x.url||'')).join('\n'):(p.sourceLinks||'');
   $('lastVerifiedAt').value=p.lastVerifiedAt||'';$('reviewerName').value=p.reviewerName||'';
+  // Require a fresh human confirmation for every edit.
+  ['qualityFactsChecked','qualityStatusChecked','qualityValueChecked'].forEach(id=>{if($(id))$(id).checked=false});
   $('formTitle').textContent='Edit Article';updateSeoPreview();window.scrollTo({top:0,behavior:'smooth'});
 }
 function updateFeaturedImagePreview(){
@@ -236,13 +238,10 @@ function parseArticleSourceLinks(value){
 function validatePublishQuality(){
   const sourceLinks=parseArticleSourceLinks($('sourceLinks').value);
   const officialUrls=[$('notification').value.trim(),$('official').value.trim(),$('pdf').value.trim()].filter(Boolean);
-  const hasHttpsOfficial=officialUrls.some(url=>/^https:\/\//i.test(url));
-  if(!sourceLinks.length&&!hasHttpsOfficial){
-    throw new Error('Publish रोक दिया गया: कम-से-कम एक वास्तविक official source URL (notification / official website / PDF या Source Links) जोड़ें।');
-  }
-  if(officialUrls.some(url=>!/^https:\/\//i.test(url))){
-    throw new Error('Official Notification, Website और PDF के URLs HTTPS होने चाहिए।');
-  }
+  const validHttpsUrl=value=>{try{const u=new URL(value);return u.protocol==='https:'&&!!u.hostname&&u.hostname.includes('.')}catch{return false}};
+  if(officialUrls.some(url=>!validHttpsUrl(url)))throw new Error('Official Notification, Website और PDF में valid HTTPS URLs होने चाहिए।');
+  if(sourceLinks.some(item=>!item.label.trim()||!validHttpsUrl(item.url)))throw new Error('हर Source Link में स्रोत का स्पष्ट नाम और valid HTTPS URL दें।');
+  if(!sourceLinks.length&&!officialUrls.some(validHttpsUrl))throw new Error('Publish रोक दिया गया: कम-से-कम एक पढ़ा और जाँचा हुआ official source URL जोड़ें।');
   const verified=$('lastVerifiedAt').value.trim();
   if(!verified)throw new Error('Publish से पहले Last Source Verification Date भरें।');
   const today=new Date();today.setHours(0,0,0,0);
@@ -257,8 +256,8 @@ function validatePublishQuality(){
   }
   const content=normalizeArticleContent($('content').value,$('title').value.trim());
   const plain=content.replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/\s+/g,' ').trim();
-  if(plain.length<650){
-    throw new Error('Article अभी बहुत संक्षिप्त है। पाठक के सवालों का पूरा जवाब, प्रक्रिया और जरूरी सावधानियाँ जोड़कर फिर publish करें।');
+  if(!plain){
+    throw new Error('Publish रोक दिया गया: article में पढ़ने योग्य content नहीं मिला।');
   }
   if(/\b(lorem ipsum|insert content|content goes here|details will be updated soon)\b/i.test(plain)){
     throw new Error('Article में placeholder text मिला। उसे हटाकर verified जानकारी जोड़ें।');
@@ -383,7 +382,8 @@ async function remove(id){
 }
 function clearForm(){
   $('postId').value='';
-  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource','qualityFactsChecked','qualityStatusChecked','qualityValueChecked'].forEach(id=>{if($(id))$(id).value=''});
+  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
+  ['qualityFactsChecked','qualityStatusChecked','qualityValueChecked'].forEach(id=>{if($(id))$(id).checked=false});
   $('formTitle').textContent='New Article';updateSeoPreview();
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
