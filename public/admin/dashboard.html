@@ -117,7 +117,14 @@
 <p class="meta">हर वास्तविक स्रोत की एक लाइन लिखें: स्रोत का नाम | पूरा HTTPS URL. केवल वही स्रोत जोड़ें जिन्हें आपने पढ़कर जाँचा हो।</p>
 <div class="field"><label>Source Links</label><textarea id="sourceLinks" rows="4" placeholder="RSSB Official Notice | https://rssb.rajasthan.gov.in/..."></textarea></div>
 <div class="field"><label>Last Source Verification Date</label><input id="lastVerifiedAt" type="date"></div>
-<div class="field"><label>Reviewed By (optional)</label><input id="reviewerName" placeholder="वास्तविक reviewer का नाम"></div>
+<div class="field"><label>Reviewed By (optional)</label><input id="reviewerName" placeholder="वास्तविक reviewer का नाम"><p class="meta">नाम तभी लिखें जब उस व्यक्ति ने सच में review किया हो।</p></div>
+<div style="border-top:1px solid #dbe3ee;padding-top:12px;margin-top:12px">
+  <strong>Publish Quality Checklist</strong>
+  <p class="meta">ये जाँच हर publish पर जरूरी है। AI draft अपने-आप verified नहीं माना जाएगा।</p>
+  <label style="display:flex;gap:9px;align-items:flex-start;margin:10px 0"><input id="qualityFactsChecked" type="checkbox" style="margin-top:3px"><span>मैंने पद, vacancy, eligibility, age, fee, dates और selection details को official notification/source से मिलाया है।</span></label>
+  <label style="display:flex;gap:9px;align-items:flex-start;margin:10px 0"><input id="qualityStatusChecked" type="checkbox" style="margin-top:3px"><span>मैंने आवेदन की स्थिति, अंतिम तारीख और latest update को दोबारा जाँचा है; अनुमानित जानकारी को official तथ्य की तरह नहीं लिखा।</span></label>
+  <label style="display:flex;gap:9px;align-items:flex-start;margin:10px 0"><input id="qualityValueChecked" type="checkbox" style="margin-top:3px"><span>Article में notification से आगे उपयोगी जानकारी, स्पष्ट प्रक्रिया/सावधानियाँ और पाठक के वास्तविक सवालों के जवाब हैं; केवल copy या सामान्य AI text नहीं।</span></label>
+</div>
 </div>
 
 <div class="field"><label>Tags (comma separated)</label><input id="tags"></div>
