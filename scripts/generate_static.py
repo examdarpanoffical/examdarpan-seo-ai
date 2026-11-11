@@ -588,7 +588,7 @@ def clean_article_content(value: Any, article_title: str = "") -> str:
 def add_article_toc(content: str) -> tuple[str, str]:
     # Remove any previously stored/generated TOC so each article has exactly one.
     content = re.sub(
-        r'<nav\\b[^>]*class=["\\'][^"\\']*\\barticle-toc\\b[^"\\']*["\\'][^>]*>[\\s\\S]*?</nav>',
+        r'<nav\b[^>]*class=["\'][^"\']*\barticle-toc\b[^"\']*["\'][^>]*>[\s\S]*?</nav>',
         '',
         content,
         flags=re.I,
@@ -637,12 +637,12 @@ def place_toc_after_intro(content: str, toc_html: str) -> str:
     if not toc_html:
         return content
 
-    headings = list(re.finditer(r"<h2\\b", content, flags=re.I))
+    headings = list(re.finditer(r"<h2\b", content, flags=re.I))
     # Treat the first section as the introduction even when an article begins
     # with an H2 instead of a lead paragraph.
     intro_end = headings[1].start() if len(headings) > 1 else len(content)
     intro = content[:intro_end]
-    paragraphs = list(re.finditer(r"</p\\s*>", intro, flags=re.I))
+    paragraphs = list(re.finditer(r"</p\s*>", intro, flags=re.I))
 
     if paragraphs:
         target = paragraphs[min(1, len(paragraphs) - 1)].end()
@@ -650,7 +650,7 @@ def place_toc_after_intro(content: str, toc_html: str) -> str:
 
     if headings:
         first_heading = headings[0]
-        first_paragraph = re.search(r"</p\\s*>", content[first_heading.end():intro_end], flags=re.I)
+        first_paragraph = re.search(r"</p\s*>", content[first_heading.end():intro_end], flags=re.I)
         if first_paragraph:
             target = first_heading.end() + first_paragraph.end()
             return content[:target] + toc_html + content[target:]
