@@ -109,6 +109,26 @@
 
 <div class="field"><label>Excerpt</label><textarea id="excerpt" style="min-height:90px"></textarea></div>
 <div class="field"><label>Content HTML</label><textarea id="content" style="min-height:300px" placeholder="AI draft यहाँ आएगा; आप review/edit कर सकते हैं."></textarea><p class="meta">Standard layout: content में headings, paragraphs, lists, tables और official links रखें। Custom colors/inline CSS हटाकर publish पर सभी articles में एक consistent style लागू होगी। Publish से पहले Preview Article देखें.</p></div>
+<section class="card pad" id="humanEditorialWorkspace" style="margin:14px 0;border:1px solid #cbd5e1;background:#f8fafc">
+  <div class="section-label">HUMAN EDITORIAL WORKSPACE</div>
+  <h3 style="margin:4px 0 8px">Draft Review &amp; Human Editing</h3>
+  <p class="meta">यहाँ AI draft की भाषा, दोहराव और पाठक के लिए उपयोगिता की समीक्षा कर सकता है। AI source की सच्चाई प्रमाणित नहीं कर सकता। अंतिम बदलाव, तथ्य-जाँच और publish का निर्णय आपका होगा।</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+    <button type="button" id="reviewArticleDraft" class="btn btn-dark">Review Draft</button>
+    <button type="button" id="rewriteArticleDraft" class="btn btn-gold">Readability सुधार का सुझाव</button>
+  </div>
+  <div id="editorialReviewResult" class="card pad" style="display:none;background:#fff;border:1px solid #dbe3ee;white-space:pre-wrap;line-height:1.7;margin:10px 0"></div>
+  <div class="field">
+    <label>Suggested Edited Version — इसे खुद पढ़कर बदलें</label>
+    <textarea id="editorialRevision" rows="14" placeholder="AI का readability suggestion यहाँ आएगा। इसे आप सीधे edit कर सकते हैं; मूल Content HTML तब तक नहीं बदलेगा जब तक आप नीचे Apply न दबाएँ।"></textarea>
+    <p class="meta">यह AI का सुझाव है, human-written होने का प्रमाण नहीं। किसी AI detector को चकमा देने के लिए नहीं, बल्कि भाषा स्पष्ट और स्वाभाविक बनाने के लिए इस्तेमाल करें।</p>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button type="button" id="applyEditorialRevision" class="btn btn-primary">Edited Version को Content HTML में लगाएँ</button>
+    <button type="button" id="clearEditorialWorkspace" class="btn btn-light">Review साफ करें</button>
+  </div>
+  <p id="editorialWorkspaceMsg" class="meta" aria-live="polite"></p>
+</section>
 <div class="field"><label>Featured Image</label><input id="image" type="url" inputmode="url" placeholder="https://your-image-host.com/vacancy-thumbnail.jpg"><p class="meta">अपनी बनाई हुई image को public image hosting या website के public folder में upload करें और उसका direct HTTPS image URL यहाँ paste करें। यही image WhatsApp/Facebook preview में दिखेगी; preview पर click करने से पूरा article खुलेगा।</p><div id="featuredImagePreview" style="margin-top:10px"></div></div>
 
 <div class="field"><label>Official Notification URL</label><input id="notification"></div><div class="field"><label>Apply Online URL</label><input id="apply"></div><div class="field"><label>Official Website URL</label><input id="official"></div><div class="field"><label>Notification PDF URL</label><input id="pdf"></div>
