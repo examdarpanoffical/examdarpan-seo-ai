@@ -664,18 +664,31 @@ def reading_time(content: Any) -> int:
     return max(1, (words + 179) // 180)
 
 
+def fit_meta_text(value: Any, limit: int = 160) -> str:
+    """Keep search snippets concise without cutting in the middle of a word."""
+    text = re.sub(r"\\s+", " ", clean_text(value)).strip()
+    if len(text) > limit:
+        text = text[:limit + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return text
+
+
 def seo_title(p: dict[str, Any]) -> str:
-    """Return a compact SEO title without trailing commas or whitespace."""
+    """Return a concise, readable search title (maximum 60 characters)."""
     value = clean_text(p.get("seoTitle"))
-    candidate = value if value else post_title(p)
-    return re.sub(r"[\s,]+$", "", candidate).strip()
+    candidate = re.sub(r"[\s,]+$", "", value if value else post_title(p)).strip()
+    if len(candidate) > 60:
+        candidate = candidate[:61].rsplit(" ", 1)[0].rstrip(" -|:;,")
+    return candidate
 
 
 def seo_description(p: dict[str, Any]) -> str:
     value = clean_description(p.get("seoDescription"))
-    if value:
-        return value.strip()
-    return short_description(p).strip()
+    candidate = value.strip()
+    if len(candidate) < 70:
+        richer = short_description(p).strip()
+        if len(richer) > len(candidate):
+            candidate = richer
+    return fit_meta_text(candidate, limit=160)
 
 
 def search_keywords(p: dict[str, Any]) -> list[str]:
@@ -3895,7 +3908,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
     robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" if filtered else "noindex,follow"
     return f'''{CATEGORY_MARKER}
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)} | Exam Darpan</title><meta name="description" content="{esc(description[:155])}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
+<title>{esc(fit_meta_text(title + " | Exam Darpan", limit=60))}</title><meta name="description" content="{esc(fit_meta_text(description, limit=160))}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.png">
 <script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
 <style id="exam-darpan-category-design">
@@ -4448,8 +4461,8 @@ def write_category_directory(posts: list[dict[str, Any]]) -> None:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>All Categories: Rajasthan Jobs, Admit Card, Results &amp; More | Exam Darpan</title>
-<meta name="description" content="Exam Darpan की सभी categories एक जगह देखें: Rajasthan Jobs, All India Jobs, Railway, SSC, Banking, Admit Card, Results, Answer Key, Syllabus, Scholarships और अधिक।">
+<title>Government Jobs Categories &amp; Exam Updates | Exam Darpan</title>
+<meta name="description" content="Rajasthan और All India सरकारी नौकरी, Railway, SSC, Banking, Admit Card, Result, Answer Key और Scholarship updates की सभी categories यहाँ देखें।">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="{BASE}/categories">
 <meta property="og:url" content="{BASE}/categories">
