@@ -766,7 +766,7 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
     seo_headline = seo_title(p)
     pub = iso(p.get("publishedAt"))
     mod = iso(p.get("updatedAt")) or pub
-    img = safe_url(p.get("_featured_image_url")) or safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.png"
+    img = safe_url(p.get("_featured_image_url")) or safe_url(p.get("featuredImage"))
     schema: dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "NewsArticle",
@@ -793,8 +793,9 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
                 "name": "Lokesh Meena",
             },
         },
-        "image": [img],
     }
+    if img:
+        schema["image"] = [img]
     keywords = search_keywords(p)
     if keywords:
         schema["keywords"] = keywords
@@ -1312,19 +1313,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </article>
 
 </main>
-<a class="floating-whatsapp-group"
-   href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
-   target="_blank"
-   rel="noopener"
-   aria-label="WhatsApp Group Join Now"
-   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_floating')">
-  <span class="floating-whatsapp-icon" aria-hidden="true"><img src="{ICON_WHATSAPP_GREEN}" alt="" aria-hidden="true">
-  </span>
-  <span class="floating-whatsapp-text">
-    <small>WhatsApp Group</small>
-    <strong>Join Now</strong>
-  </span>
-</a>
 
 <footer class="footer">
   <div class="container footer-main">
