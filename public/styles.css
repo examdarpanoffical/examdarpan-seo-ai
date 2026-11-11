@@ -9761,3 +9761,21 @@ main.main article table tbody tr:nth-child(even) td{
   border-color:#f59e0b!important;
   box-shadow:0 10px 24px rgba(23,59,112,.12)!important;
 }
+
+
+/* EXAM DARPAN — category discovery / internal navigation */
+.ed-home-category-directory{margin:30px 0;padding:24px;border:1px solid #dbe4f0;border-radius:20px;background:#fff;box-shadow:0 8px 26px rgba(15,35,70,.045)}
+.ed-home-category-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:17px}
+.ed-home-category-heading>div>span{color:#2563eb;font-size:9px;font-weight:950;letter-spacing:.14em}
+.ed-home-category-heading h2{margin:5px 0 6px;color:#10244a;font-size:clamp(20px,3vw,27px);line-height:1.25}
+.ed-home-category-heading p{margin:0;color:#64748b;font-size:12px;line-height:1.65}
+.ed-home-category-heading>a{flex:0 0 auto;color:#1d4ed8;font-size:11px;font-weight:900;text-decoration:none}
+.ed-home-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ed-home-category-card{display:flex;min-width:0;flex-direction:column;gap:5px;padding:14px;border:1px solid #e5eaf2;border-radius:13px;background:#fbfdff;color:#172033;text-decoration:none;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.ed-home-category-card:hover{transform:translateY(-2px);border-color:#93c5fd;box-shadow:0 8px 18px rgba(30,64,175,.07)}
+.ed-home-category-card strong{font-size:13px;line-height:1.4}
+.ed-home-category-card span{color:#1d4ed8;font-size:10px;font-weight:850}
+.ed-home-category-card small{color:#64748b;font-size:10px;line-height:1.55}
+@media(max-width:850px){.ed-home-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.ed-home-category-directory{margin:22px 0;padding:16px;border-radius:16px}.ed-home-category-heading{align-items:flex-start;flex-direction:column;gap:8px}.ed-home-category-grid{grid-template-columns:1fr;gap:8px}.ed-home-category-card{padding:12px}}
+@media(prefers-reduced-motion:reduce){.ed-home-category-card{transition:none}}
