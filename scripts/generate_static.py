@@ -1356,16 +1356,16 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 
 </style>
 <style id="ed-article-topic-navigation-css">
-.ed-article-topic-nav{margin:28px 0 8px;padding:16px 18px;border:1px solid #dbe5f2;border-radius:15px;background:#f8fbff}
-.ed-article-topic-nav>p{margin:0 0 9px;color:#475569;font-size:13px;line-height:1.7}
-.ed-article-topic-nav>p a{color:#174ea6;font-weight:800;text-decoration:none}
-.ed-article-topic-nav .ed-topic-links{margin:0;padding:0;border:0;background:transparent}
-.ed-topic-links{margin:20px 0;padding:14px 16px;border:1px solid #e2e8f0;border-radius:13px;background:#f8fafc}
-.ed-topic-links strong{display:block;margin-bottom:9px;color:#334155;font-size:12px}
-.ed-topic-links>div{display:flex;flex-wrap:wrap;gap:8px}
-.ed-topic-links a{display:inline-flex;padding:7px 10px;border:1px solid #dbe5f2;border-radius:999px;background:#fff;color:#174ea6;font-size:11px;font-weight:800;text-decoration:none}
-.ed-topic-links a:hover{border-color:#93c5fd;background:#eff6ff}
-@media(max-width:600px){.ed-article-topic-nav{padding:13px}.ed-topic-links{padding:12px}.ed-topic-links>div{gap:6px}}
+.ed-article-topic-nav{{margin:28px 0 8px;padding:16px 18px;border:1px solid #dbe5f2;border-radius:15px;background:#f8fbff}}
+.ed-article-topic-nav>p{{margin:0 0 9px;color:#475569;font-size:13px;line-height:1.7}}
+.ed-article-topic-nav>p a{{color:#174ea6;font-weight:800;text-decoration:none}}
+.ed-article-topic-nav .ed-topic-links{{margin:0;padding:0;border:0;background:transparent}}
+.ed-topic-links{{margin:20px 0;padding:14px 16px;border:1px solid #e2e8f0;border-radius:13px;background:#f8fafc}}
+.ed-topic-links strong{{display:block;margin-bottom:9px;color:#334155;font-size:12px}}
+.ed-topic-links>div{{display:flex;flex-wrap:wrap;gap:8px}}
+.ed-topic-links a{{display:inline-flex;padding:7px 10px;border:1px solid #dbe5f2;border-radius:999px;background:#fff;color:#174ea6;font-size:11px;font-weight:800;text-decoration:none}}
+.ed-topic-links a:hover{{border-color:#93c5fd;background:#eff6ff}}
+@media(max-width:600px){{.ed-article-topic-nav{{padding:13px}}.ed-topic-links{{padding:12px}}.ed-topic-links>div{{gap:6px}}}}
 </style>
 {cover}
 {quick_facts(p)}
@@ -3888,14 +3888,14 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 @media(max-width:650px){{.ed-category-posts{{grid-template-columns:1fr}}.ed-category-more-grid{{grid-template-columns:1fr}}.ed-category-toolbar{{align-items:flex-start;flex-direction:column}}}}
 </style>
 <style id="ed-category-guide-css">
-.ed-category-guide{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.75fr);gap:16px;margin:0 0 22px;padding:20px;border:1px solid #dbe5f2;border-radius:17px;background:#fff;box-shadow:0 6px 20px rgba(15,23,42,.035)}
-.ed-category-guide-kicker{color:#2563eb;font-size:9px;font-weight:950;letter-spacing:.12em}
-.ed-category-guide h2{margin:6px 0 8px;color:#172033;font-size:19px}
-.ed-category-guide p{margin:0;color:#536176;font-size:12px;line-height:1.8}
-.ed-category-guide-note{grid-column:1/-1;padding-top:12px;border-top:1px solid #edf1f6;font-size:11px!important}
-.ed-category-guide-note a{color:#1d4ed8;font-weight:800}
-.ed-category-guide .ed-topic-links{margin:0;align-self:start}
-@media(max-width:760px){.ed-category-guide{grid-template-columns:1fr;padding:16px}.ed-category-guide-note{grid-column:auto}}
+.ed-category-guide{{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.75fr);gap:16px;margin:0 0 22px;padding:20px;border:1px solid #dbe5f2;border-radius:17px;background:#fff;box-shadow:0 6px 20px rgba(15,23,42,.035)}}
+.ed-category-guide-kicker{{color:#2563eb;font-size:9px;font-weight:950;letter-spacing:.12em}}
+.ed-category-guide h2{{margin:6px 0 8px;color:#172033;font-size:19px}}
+.ed-category-guide p{{margin:0;color:#536176;font-size:12px;line-height:1.8}}
+.ed-category-guide-note{{grid-column:1/-1;padding-top:12px;border-top:1px solid #edf1f6;font-size:11px!important}}
+.ed-category-guide-note a{{color:#1d4ed8;font-weight:800}}
+.ed-category-guide .ed-topic-links{{margin:0;align-self:start}}
+@media(max-width:760px){{.ed-category-guide{{grid-template-columns:1fr;padding:16px}}.ed-category-guide-note{{grid-column:auto}}}}
 </style>
 
 </head><body>
