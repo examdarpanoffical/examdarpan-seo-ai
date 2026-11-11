@@ -146,3 +146,22 @@
 .article-page .source-note ul{margin:8px 0 0}
 .article-page .source-note a{font-weight:750}
 @media(max-width:640px){.article-page .article-toc{padding:14px}.article-page .article-toc a{font-size:13px}}
+
+
+/* Editorial quality v1: navigation, source transparency and quick facts */
+.article-page .article-facts{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(145px,1fr))!important;gap:9px!important;margin:18px 0 22px!important}
+.article-page .article-facts .quick-fact{min-width:0!important;padding:12px 13px!important;border:1px solid #dce7f4!important;border-radius:12px!important;background:#f8fbff!important}
+.article-page .article-facts .quick-fact span{display:block!important;color:#64748b!important;font-size:11px!important;font-weight:700!important}
+.article-page .article-facts .quick-fact strong{display:block!important;margin-top:4px!important;color:#173b70!important;font-size:15px!important;line-height:1.45!important;overflow-wrap:anywhere}
+.article-page .article-toc{margin:20px 0 26px!important;padding:17px 19px!important;border:1px solid #dbe5f1!important;border-radius:14px!important;background:#f8fbff!important}
+.article-page .article-toc>strong{display:block;color:#173b70!important;font-size:16px!important;margin-bottom:8px!important}
+.article-page .article-toc ol{margin:0!important;padding-left:22px!important}
+.article-page .article-toc li{margin:5px 0!important;padding-left:2px!important}
+.article-page .article-toc a{color:#24558d!important;text-decoration:none!important;font-size:14px!important;line-height:1.55!important}
+.article-page .article-toc a:hover{text-decoration:underline!important}
+.article-page .article-content h2[id]{scroll-margin-top:90px}
+.article-page .source-note{margin:28px 0!important;padding:18px!important;border:1px solid #dbe5f1!important;border-radius:14px!important;background:#fbfdff!important}
+.article-page .source-note h2{margin:0 0 8px!important;padding:0!important;border:0!important;background:none!important;font-size:19px!important}
+.article-page .source-note ul{margin:8px 0 0!important}
+.article-page .source-note a{font-weight:750!important}
+@media(max-width:640px){.article-page .article-facts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}.article-page .article-facts .quick-fact{padding:10px!important}.article-page .article-toc{padding:14px!important}.article-page .article-toc a{font-size:13px!important}}
