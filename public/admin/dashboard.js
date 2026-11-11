@@ -329,6 +329,9 @@ function articleData(status,existingPost=null){
   return base;
 }
 async function save(status){
+  if(status==='published'){
+    try{validatePublishQuality()}catch(qualityError){$('msg').textContent=qualityError.message;return}
+  }
   if(!$('title').value.trim()){alert('Title required');return}
   if(!$('content').value.trim()){alert('Article content required');return}
   try{
