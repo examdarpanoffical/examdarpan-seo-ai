@@ -9779,3 +9779,30 @@ main.main article table tbody tr:nth-child(even) td{
 @media(max-width:850px){.ed-home-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.ed-home-category-directory{margin:22px 0;padding:16px;border-radius:16px}.ed-home-category-heading{align-items:flex-start;flex-direction:column;gap:8px}.ed-home-category-grid{grid-template-columns:1fr;gap:8px}.ed-home-category-card{padding:12px}}
 @media(prefers-reduced-motion:reduce){.ed-home-category-card{transition:none}}
+
+
+/* EXAM DARPAN — author and editorial transparency */
+.ed-article-author-card{
+  margin:24px 0;
+  padding:18px 20px;
+  border:1px solid #dbe5f2;
+  border-left:4px solid #2563eb;
+  border-radius:14px;
+  background:#f8fbff;
+}
+.ed-article-author-card>div:first-child{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px 10px}
+.ed-article-author-card>div:first-child .eyebrow{width:100%;color:#2563eb;font-size:10px;font-weight:900;letter-spacing:.1em}
+.ed-article-author-card>div:first-child strong{color:#173b70;font-size:17px}
+.ed-article-author-card>div:first-child span:last-child{color:#64748b;font-size:12px}
+.ed-article-author-card p{margin:10px 0;color:#475569;font-size:13px;line-height:1.75}
+.ed-article-author-links{display:flex;flex-wrap:wrap;gap:8px 14px}
+.ed-article-author-links a,.author-expertise a{color:#1d4ed8;font-size:12px;font-weight:800;text-decoration:none}
+.ed-article-author-links a:hover,.author-expertise a:hover{text-decoration:underline}
+.author-expertise{margin-top:20px;padding:18px;border:1px solid #dbe5f2;border-radius:14px;background:#f8fbff}
+.author-expertise h2{margin-top:0;color:#173b70;font-size:20px}
+.author-expertise li{margin:7px 0;color:#475569;line-height:1.7}
+.author-expertise p{color:#475569;font-size:13px;line-height:1.75}
+.ed-trust-nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px;padding:13px;border:1px solid #dbe5f2;border-radius:12px;background:#f8fbff}
+.ed-trust-nav a{color:#1d4ed8;font-size:13px;font-weight:800;text-decoration:none}
+.ed-trust-nav a:hover{text-decoration:underline}
+@media(max-width:600px){.ed-article-author-card{padding:15px}.ed-article-author-links{gap:9px 12px}}
