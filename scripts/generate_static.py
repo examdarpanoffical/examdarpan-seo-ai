@@ -83,6 +83,113 @@ CATEGORIES = [
     ("Latest Updates", "latest-updates", "Latest Updates", "Exam Darpan की नवीनतम परीक्षा, भर्ती और शिक्षा अपडेट्स।"),
 ]
 CATEGORY_BY_NAME = {name: (slug, title, desc) for name, slug, title, desc in CATEGORIES}
+CATEGORY_RELATED = {
+    "Rajasthan Jobs": ("Government Jobs", "Admit Card", "Results", "Answer Key", "Syllabus", "Scholarships", "Yojana", "Entrance Exams"),
+    "Government Jobs": ("Rajasthan Jobs", "Railway Jobs", "SSC Jobs", "Banking Jobs", "Police & Defence Jobs", "Teaching Jobs", "UPSC Jobs"),
+    "Police & Defence Jobs": ("Government Jobs", "Rajasthan Jobs", "Admit Card", "Results", "Answer Key"),
+    "Teaching Jobs": ("Government Jobs", "Rajasthan Jobs", "Syllabus", "Admit Card", "Results"),
+    "Railway Jobs": ("Government Jobs", "Admit Card", "Results", "Answer Key", "Syllabus"),
+    "Banking Jobs": ("Government Jobs", "Admit Card", "Results", "Answer Key", "Syllabus"),
+    "SSC Jobs": ("Government Jobs", "Admit Card", "Results", "Answer Key", "Syllabus"),
+    "UPSC Jobs": ("Government Jobs", "Admit Card", "Results", "Answer Key", "Syllabus"),
+    "Admit Card": ("Rajasthan Jobs", "Government Jobs", "Railway Jobs", "SSC Jobs", "Results", "Answer Key"),
+    "Results": ("Rajasthan Jobs", "Government Jobs", "Admit Card", "Answer Key", "Railway Jobs", "SSC Jobs"),
+    "Answer Key": ("Rajasthan Jobs", "Government Jobs", "Admit Card", "Results", "Railway Jobs", "SSC Jobs"),
+    "Syllabus": ("Rajasthan Jobs", "Government Jobs", "Teaching Jobs", "SSC Jobs", "Railway Jobs", "UPSC Jobs"),
+    "Entrance Exams": ("Scholarships", "University & College", "Syllabus", "Yojana"),
+    "Scholarships": ("Yojana", "University & College", "Entrance Exams", "Rajasthan Jobs"),
+    "University & College": ("Entrance Exams", "Scholarships", "Yojana"),
+    "Yojana": ("Scholarships", "Rajasthan Jobs", "University & College"),
+    "Latest Updates": ("Rajasthan Jobs", "Government Jobs", "Admit Card", "Results", "Answer Key", "Syllabus"),
+}
+
+CATEGORY_GUIDES = {
+    "Rajasthan Jobs": "राजस्थान की राज्य स्तरीय भर्तियों, आयोगों, विभागों और परीक्षा अपडेट्स को एक जगह व्यवस्थित रखें। किसी भर्ती की जानकारी पढ़ते समय पदों की संख्या, योग्यता, आयु सीमा, आवेदन की तारीख, चयन प्रक्रिया और आधिकारिक विज्ञापन को अलग-अलग जाँचें।",
+    "Government Jobs": "केंद्र सरकार और विभिन्न राज्यों की भर्तियों को विभाग और परीक्षा के अनुसार देखें। आवेदन करने से पहले आधिकारिक नोटिफिकेशन में पात्रता, जरूरी दस्तावेज, शुल्क, आवेदन की अंतिम तिथि और चयन प्रक्रिया की पुष्टि करें।",
+    "Police & Defence Jobs": "पुलिस, अर्धसैनिक बल और रक्षा विभागों की भर्ती से जुड़ी सूचनाएँ यहाँ मिलेंगी। लिखित परीक्षा के साथ शारीरिक परीक्षा, मेडिकल मानदंड और दस्तावेजों की शर्तें हर भर्ती के आधिकारिक विज्ञापन से ही जाँचें।",
+    "Teaching Jobs": "शिक्षक भर्ती, पात्रता परीक्षाओं और शिक्षा विभाग की नियुक्तियों के अपडेट्स देखें। आवेदन से पहले विषय, शैक्षणिक योग्यता, शिक्षक पात्रता, अनुभव और चयन प्रक्रिया से जुड़ी आधिकारिक शर्तें ध्यान से पढ़ें।",
+    "Railway Jobs": "रेलवे भर्ती, अप्रेंटिस, तकनीकी और गैर-तकनीकी पदों के अपडेट्स को साथ देखें। अलग-अलग रेलवे भर्ती बोर्डों के नोटिफिकेशन में आयु, ट्रेड, योग्यता, मेडिकल मानक और आवेदन प्रक्रिया अलग हो सकती है।",
+    "Banking Jobs": "बैंकिंग क्षेत्र की भर्ती, परीक्षा और परिणाम से जुड़ी जानकारी देखें। पद के अनुसार शैक्षणिक योग्यता, आयु सीमा, स्थानीय भाषा, परीक्षा चरण और आवेदन शुल्क की पुष्टि संबंधित बैंक या भर्ती संस्था की वेबसाइट से करें।",
+    "SSC Jobs": "SSC की विभिन्न परीक्षाओं, आवेदन, परीक्षा तिथि, एडमिट कार्ड और परिणाम के अपडेट्स देखें। परीक्षा के स्तर, पद-वरीयता, आयु सीमा और चयन चरणों के लिए आधिकारिक SSC नोटिस को प्राथमिकता दें।",
+    "UPSC Jobs": "UPSC की सिविल सेवा और अन्य भर्ती परीक्षाओं की सूचनाएँ व्यवस्थित रूप से देखें। पात्रता, प्रयासों की सीमा, परीक्षा चरण, आवेदन और दस्तावेज संबंधी नियमों के लिए UPSC की आधिकारिक अधिसूचना ही अंतिम आधार है।",
+    "Admit Card": "एडमिट कार्ड जारी होने की सूचना, डाउनलोड पेज और परीक्षा से जुड़े अपडेट्स यहाँ देखें। प्रवेश पत्र पर नाम, रोल नंबर, परीक्षा केंद्र, तारीख और निर्देशों को समय रहते जाँचें; किसी समस्या पर आधिकारिक परीक्षा पोर्टल से संपर्क करें।",
+    "Results": "भर्ती और परीक्षा परिणाम, मेरिट सूची तथा स्कोर कार्ड से जुड़ी सूचनाएँ देखें। परिणाम को संबंधित आयोग या विभाग की आधिकारिक वेबसाइट पर उपलब्ध PDF या लॉगिन से मिलान करके ही अंतिम मानें।",
+    "Answer Key": "प्रोविजनल और फाइनल उत्तर कुंजी, रिस्पॉन्स शीट तथा आपत्ति संबंधी अपडेट्स देखें। आपत्ति की समय-सीमा, निर्धारित शुल्क और प्रमाण के नियम हर परीक्षा के आधिकारिक नोटिस में अलग हो सकते हैं।",
+    "Syllabus": "परीक्षा का नवीनतम पाठ्यक्रम, पेपर पैटर्न और चयन चरण समझने के लिए संबंधित भर्ती का आधिकारिक सिलेबस देखें। तैयारी शुरू करने से पहले विषयवार टॉपिक्स और अंक-विभाजन की पुष्टि करें।",
+    "Entrance Exams": "प्रवेश परीक्षाओं, आवेदन, परीक्षा कार्यक्रम और काउंसलिंग से जुड़ी जानकारी देखें। कोर्स, पात्रता, सीट आवंटन और फीस की पुष्टि संबंधित विश्वविद्यालय या परीक्षा प्राधिकरण से करें।",
+    "Scholarships": "छात्रवृत्ति योजनाओं की पात्रता, आवेदन अवधि और जरूरी दस्तावेज समझने के लिए संबंधित योजना के आधिकारिक दिशा-निर्देश पढ़ें। आय, श्रेणी, संस्थान और नवीनीकरण की शर्तें योजना के अनुसार बदल सकती हैं।",
+    "University & College": "विश्वविद्यालय और कॉलेज से जुड़ी प्रवेश, परीक्षा, परिणाम और अकादमिक सूचनाएँ देखें। आवेदन या प्रवेश से पहले संबंधित संस्थान की आधिकारिक वेबसाइट पर पाठ्यक्रम, फीस और समय-सारणी की पुष्टि करें।",
+    "Yojana": "सरकारी योजनाओं के लाभ, पात्रता और आवेदन प्रक्रिया की जानकारी देखें। योजना का लाभ मिलने की पुष्टि केवल संबंधित विभाग के आधिकारिक पोर्टल और प्रकाशित दिशा-निर्देशों से करें।",
+    "Latest Updates": "भर्ती, परीक्षा, एडमिट कार्ड, परिणाम और शिक्षा से जुड़ी नई प्रकाशित सूचनाएँ यहाँ व्यवस्थित हैं। हर अपडेट में संबंधित आधिकारिक स्रोत और लागू तारीखों को प्राथमिकता दें।",
+}
+
+
+def category_discovery_links(category_name: str, posts: list[dict[str, Any]], limit: int = 6) -> str:
+    available = {normalized_category(post) for post in posts}
+    names = [name for name in CATEGORY_RELATED.get(category_name, ()) if name in available and name != category_name]
+    links = []
+    for name in names[:limit]:
+        slug, label, _ = CATEGORY_BY_NAME[name]
+        links.append(f'<a href="{esc(category_path(slug))}">{esc(label)}</a>')
+    if not links:
+        return ""
+    return (
+        '<nav class="ed-topic-links" aria-label="Related Exam Darpan categories">'
+        '<strong>संबंधित सेक्शन</strong><div>' + "".join(links) + '</div></nav>'
+    )
+
+
+def category_guide_html(category_name: str, posts: list[dict[str, Any]]) -> str:
+    guide = CATEGORY_GUIDES.get(category_name, CATEGORY_GUIDES["Latest Updates"])
+    related = category_discovery_links(category_name, posts)
+    return (
+        '<section class="ed-category-guide" aria-labelledby="ed-category-guide-title">'
+        '<div><span class="ed-category-guide-kicker">HOW TO USE THIS SECTION</span>'
+        '<h2 id="ed-category-guide-title">इस सेक्शन में क्या मिलेगा?</h2>'
+        f'<p>{esc(guide)}</p></div>'
+        f'{related}'
+        '<p class="ed-category-guide-note">Exam Darpan सूचना-सहायता पोर्टल है। आवेदन, शुल्क, पात्रता और तारीखों की अंतिम पुष्टि संबंधित विभाग की आधिकारिक अधिसूचना से करें। '
+        '<a href="/editorial-policy">हमारी संपादकीय नीति पढ़ें</a>।</p>'
+        '</section>'
+    )
+
+
+def article_topic_navigation(post: dict[str, Any], posts: list[dict[str, Any]]) -> str:
+    category = normalized_category(post)
+    slug, label, _ = CATEGORY_BY_NAME.get(category, CATEGORY_BY_NAME["Latest Updates"])
+    related = category_discovery_links(category, posts, limit=4)
+    return (
+        '<section class="ed-article-topic-nav" aria-label="Explore related Exam Darpan sections">'
+        f'<p>इस विषय की अन्य अपडेट्स: <a href="{esc(category_path(slug))}">{esc(label)}</a> '
+        '<span aria-hidden="true">·</span> <a href="/categories">सभी कैटेगरी</a></p>'
+        f'{related}'
+        '</section>'
+    )
+
+
+def home_category_directory(posts: list[dict[str, Any]]) -> str:
+    cards = []
+    for name, slug, title, description in CATEGORIES:
+        count = sum(1 for post in posts if normalized_category(post) == name)
+        if not count:
+            continue
+        cards.append(
+            f'<a class="ed-home-category-card" href="{esc(category_path(slug))}">'
+            f'<strong>{esc(title)}</strong><span>{count} प्रकाशित अपडेट</span>'
+            f'<small>{esc(description)}</small></a>'
+        )
+    if not cards:
+        return ""
+    return (
+        '<section class="ed-home-category-directory" aria-labelledby="ed-home-category-title">'
+        '<div class="ed-home-category-heading"><div><span>EXPLORE BY CATEGORY</span>'
+        '<h2 id="ed-home-category-title">अपनी जरूरत की जानकारी चुनें</h2>'
+        '<p>भर्ती, परीक्षा, परिणाम और छात्र योजनाओं के अपडेट विषय के अनुसार देखें।</p></div>'
+        '<a href="/categories">सभी कैटेगरी देखें →</a></div>'
+        '<div class="ed-home-category-grid">' + "".join(cards) + '</div></section>'
+    )
+
+
 RESERVED_SLUGS = {"index", "article", "about", "privacy", "contact", "disclaimer", "terms", "editorial-policy", "author", "categories", "404"}
 
 AUTHOR_NAME = "Deepak Joshi"
@@ -753,8 +860,11 @@ def related_posts(post: dict[str, Any], posts: list[dict[str, Any]], limit: int 
         if other.get("id") == current_id or other.get("slug") == post.get("slug"):
             continue
         score = 0
-        if normalized_category(other) == current_cat:
+        other_cat = normalized_category(other)
+        if other_cat == current_cat:
             score += 5
+        elif other_cat in CATEGORY_RELATED.get(current_cat, ()):
+            score += 2
         tags = {str(x).strip().lower() for x in (other.get("tags") or []) if str(x).strip()}
         score += min(3, len(current_tags & tags))
         title_words = set(re.findall(r"[a-z0-9]{3,}|[\u0900-\u097f]{3,}", post_title(post).lower()))
@@ -844,6 +954,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     content = optimize_article_images(content)
     content, toc_html = add_article_toc(content)
     read_minutes = reading_time(content)
+    topic_navigation_html = article_topic_navigation(p, posts)
 
     related_html = ""
     if related:
@@ -1244,6 +1355,18 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 }}
 
 </style>
+<style id="ed-article-topic-navigation-css">
+.ed-article-topic-nav{margin:28px 0 8px;padding:16px 18px;border:1px solid #dbe5f2;border-radius:15px;background:#f8fbff}
+.ed-article-topic-nav>p{margin:0 0 9px;color:#475569;font-size:13px;line-height:1.7}
+.ed-article-topic-nav>p a{color:#174ea6;font-weight:800;text-decoration:none}
+.ed-article-topic-nav .ed-topic-links{margin:0;padding:0;border:0;background:transparent}
+.ed-topic-links{margin:20px 0;padding:14px 16px;border:1px solid #e2e8f0;border-radius:13px;background:#f8fafc}
+.ed-topic-links strong{display:block;margin-bottom:9px;color:#334155;font-size:12px}
+.ed-topic-links>div{display:flex;flex-wrap:wrap;gap:8px}
+.ed-topic-links a{display:inline-flex;padding:7px 10px;border:1px solid #dbe5f2;border-radius:999px;background:#fff;color:#174ea6;font-size:11px;font-weight:800;text-decoration:none}
+.ed-topic-links a:hover{border-color:#93c5fd;background:#eff6ff}
+@media(max-width:600px){.ed-article-topic-nav{padding:13px}.ed-topic-links{padding:12px}.ed-topic-links>div{gap:6px}}
+</style>
 {cover}
 {quick_facts(p)}
 {toc_html}
@@ -1252,6 +1375,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 {action_html}
 <section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
 {source_references(p)}
+{topic_navigation_html}
 {related_html}
 <section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
   <div class="ed-article-follow-head">
@@ -3609,6 +3733,7 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         '<main class="main container">'
         + home_sections
         + home_community
+        + home_category_directory(posts)
         + '</main>'
     )
 
@@ -3619,6 +3744,9 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         count=1,
         flags=re.S,
     )
+
+    if 'class="ed-home-category-directory"' not in text:
+        raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: category discovery directory missing")
 
     required_home_sections = (
         'id="exam-darpan-home-final-order"',
@@ -3680,6 +3808,7 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
 def category_page(category_name: str, category_slug: str, title: str, description: str, posts: list[dict[str, Any]]) -> str:
     filtered = [p for p in posts if normalized_category(p) == category_name]
     url = f"{BASE}{category_path(category_slug)}"
+    guide_html = category_guide_html(category_name, posts)
     def render_category_item(p: dict[str, Any]) -> str:
         s = slugify(p.get("slug"))
         return (
@@ -3758,11 +3887,22 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
 @media(max-width:900px){{.ed-category-layout{{grid-template-columns:1fr}}}}
 @media(max-width:650px){{.ed-category-posts{{grid-template-columns:1fr}}.ed-category-more-grid{{grid-template-columns:1fr}}.ed-category-toolbar{{align-items:flex-start;flex-direction:column}}}}
 </style>
+<style id="ed-category-guide-css">
+.ed-category-guide{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.75fr);gap:16px;margin:0 0 22px;padding:20px;border:1px solid #dbe5f2;border-radius:17px;background:#fff;box-shadow:0 6px 20px rgba(15,23,42,.035)}
+.ed-category-guide-kicker{color:#2563eb;font-size:9px;font-weight:950;letter-spacing:.12em}
+.ed-category-guide h2{margin:6px 0 8px;color:#172033;font-size:19px}
+.ed-category-guide p{margin:0;color:#536176;font-size:12px;line-height:1.8}
+.ed-category-guide-note{grid-column:1/-1;padding-top:12px;border-top:1px solid #edf1f6;font-size:11px!important}
+.ed-category-guide-note a{color:#1d4ed8;font-weight:800}
+.ed-category-guide .ed-topic-links{margin:0;align-self:start}
+@media(max-width:760px){.ed-category-guide{grid-template-columns:1fr;padding:16px}.ed-category-guide-note{grid-column:auto}}
+</style>
 
 </head><body>
 <div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
 <header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><div class="ed-category-page"><section class="ed-category-hero"><div><span class="ed-category-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="ed-category-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="ed-category-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
+{guide_html}
 <section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">IMPORTANT LATEST</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} updates</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy">Editorial Policy <b>→</b></a></div></aside></section></div></main>
 <footer class="footer">
   <div class="container footer-main">
@@ -3971,7 +4111,8 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
             count=1,
         )
 
-        hub_posts = _hub_category_posts(posts, category_name)[:40]
+        hub_posts = _hub_category_posts(posts, category_name)
+        related_category_html = category_discovery_links(category_name, posts, limit=7)
 
         cards = "".join(
             _hub_crawl_card(post)
@@ -3985,6 +4126,7 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
             f'<h2 id="ed-hub-crawl-{category_name.lower().replace(" ", "-")}">'
             f'{esc(heading)}</h2>'
             '<p>Latest published updates with direct internal links for easy navigation.</p>'
+            f'{related_category_html}'
             f'<div class="ed-hub-crawl-grid">{cards}</div>'
             f'</section>\n'
             f"{end_marker}"
