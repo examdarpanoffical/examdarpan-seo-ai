@@ -22,6 +22,10 @@ LEGACY_SITEMAP_SUFFIXES = {
     "/about.html", "/contact.html", "/privacy.html", "/disclaimer.html",
     "/terms.html", "/policy.html", "/exam-calendar.html",
 }
+NON_PUBLIC_OR_RUNTIME_HTML = {
+    "404.html", "article.html", "calendar-date-debug.html", "firebase-init.html",
+    "admin/dashboard.html", "admin/login.html",
+}
 TEMPLATE_LEAK = re.compile(r"\$\{\s*esc\(title\)\s*\}")
 
 
@@ -103,6 +107,8 @@ def main() -> int:
             issues.append(("WARN", f"Could not read {path.relative_to(PUBLIC)}: {exc}"))
             continue
         rel = path.relative_to(PUBLIC).as_posix()
+        if rel in NON_PUBLIC_OR_RUNTIME_HTML:
+            continue  # 404, admin tools, debug utilities and runtime shells are not indexable content pages.
         titles = re.findall(r"<title\b[^>]*>(.*?)</title>", html, re.I | re.S)
         if len(titles) != 1 or not re.sub(r"<[^>]+>", "", titles[0]).strip():
             issues.append(("WARN", f"Expected exactly one non-empty title; found {len(titles)} in {rel}"))
@@ -136,6 +142,8 @@ def main() -> int:
             issues.append(("WARN", f"Could not inspect SEO tags in {path.relative_to(PUBLIC)}: {exc}"))
             continue
         rel = path.relative_to(PUBLIC).as_posix()
+        if rel in NON_PUBLIC_OR_RUNTIME_HTML:
+            continue
         canonical_tags = [
             tag_attrs(tag) for tag in re.findall(r"<link\b[^>]*>", page_html, re.I | re.S)
             if tag_attrs(tag).get("rel", "").lower() == "canonical"
