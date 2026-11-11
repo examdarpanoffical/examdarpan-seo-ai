@@ -136,7 +136,7 @@ function fill(p){
   $('seoTitle').value=p.seoTitle||'';
   $('seoDescription').value=p.seoDescription||'';
   $('searchKeywords').value=Array.isArray(p.searchKeywords)?p.searchKeywords.join(', '):(p.searchKeywords||'');
-  $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';
+  $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';resetEditorialWorkspace();
   $('image').value=p.featuredImage||'';updateFeaturedImagePreview();$('notification').value=p.officialNotificationUrl||'';$('apply').value=p.applyOnlineUrl||'';
   $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';
   $('sourceLinks').value=Array.isArray(p.sourceLinks)?p.sourceLinks.map(x=>(x.label||x.title||'Source')+' | '+(x.url||'')).join('\n'):(p.sourceLinks||'');
@@ -387,7 +387,7 @@ function clearForm(){
   $('postId').value='';
   ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
   ['qualityFactsChecked','qualityStatusChecked','qualityValueChecked'].forEach(id=>{if($(id))$(id).checked=false});
-  $('formTitle').textContent='New Article';updateSeoPreview();
+  $('formTitle').textContent='New Article';resetEditorialWorkspace();updateSeoPreview();
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
 }
@@ -779,6 +779,87 @@ async function loadQuizAnalytics(){
     </td></tr>`;
   }
 }
+
+/* ---------------- Human Editorial Workspace ---------------- */
+function resetEditorialWorkspace(){
+  if($('editorialRevision'))$('editorialRevision').value='';
+  if($('editorialReviewResult')){$('editorialReviewResult').textContent='';$('editorialReviewResult').style.display='none';}
+  if($('editorialWorkspaceMsg'))$('editorialWorkspaceMsg').textContent='';
+}
+function getEditorialSource(){
+  return String($('aiSource')?.value||'').trim();
+}
+async function runEditorialReview(){
+  const btn=$('reviewArticleDraft'),msg=$('editorialWorkspaceMsg'),resultBox=$('editorialReviewResult');
+  const draft=$('content').value.trim(),source=getEditorialSource();
+  if(!uid){msg.textContent='Admin session verify नहीं हुआ।';return}
+  if(!draft){msg.textContent='पहले Content HTML में draft डालें या Gemini से draft बनाएं।';return}
+  btn.disabled=true;btn.textContent='Review हो रहा है…';msg.textContent='Draft की editorial समीक्षा तैयार हो रही है…';
+  try{
+    const prompt=`आप Exam Darpan के Hindi editorial reviewer हैं। दिए गए draft की आलोचनात्मक समीक्षा करें; नया article न लिखें।
+नियम:
+- भाषा की स्वाभाविकता, दोहराव, generic/खोखले वाक्य, headings, पाठक की जरूरत और practical usefulness देखें।
+- source text दिया हो तो dates, amounts, vacancy, eligibility, fees, URLs और process के दावों को उससे मिलाकर संभावित mismatch बताएं।
+- source text न हो तो तथ्य verified होने का दावा न करें; स्पष्ट लिखें कि factual verification बाकी है।
+- वर्तमान तारीख/बाहरी जानकारी का अनुमान न लगाएं। पुरानी/समय-संवेदनशील बातों को “manual date check required” कहें।
+- AI detection score या “AI-free” होने का दावा न करें।
+- रिपोर्ट हिंदी में दें: (1) क्या अच्छा है, (2) हटाने/छोटा करने योग्य दोहराव, (3) तथ्य जिन्हें इंसान को source से मिलाना है, (4) पाठक के लिए छूटी उपयोगी जानकारी, (5) अधिकतम 10 ठोस सुधार।
+OFFICIAL SOURCE TEXT (may be empty):
+${source||'[कोई source text नहीं दिया गया — factual verification संभव नहीं]'}
+ARTICLE DRAFT:
+${draft}`;
+    const response=await model.generateContent(prompt);
+    const report=response?.response?.text?.()||'';
+    if(!report.trim())throw new Error('Review खाली मिला।');
+    resultBox.textContent=report;resultBox.style.display='block';
+    msg.textContent='Review तैयार है। सुझावों को source से मिलाकर खुद लागू करें।';
+  }catch(e){console.error(e);msg.textContent='Review error: '+(e?.message||e)}
+  finally{btn.disabled=false;btn.textContent='Review Draft'}
+}
+async function suggestEditorialRewrite(){
+  const btn=$('rewriteArticleDraft'),msg=$('editorialWorkspaceMsg');
+  const draft=$('content').value.trim(),source=getEditorialSource();
+  if(!uid){msg.textContent='Admin session verify नहीं हुआ।';return}
+  if(!draft){msg.textContent='पहले Content HTML में draft डालें।';return}
+  btn.disabled=true;btn.textContent='सुझाव तैयार हो रहा है…';msg.textContent='Readability edit तैयार हो रहा है; मूल article सुरक्षित रहेगा…';
+  try{
+    const prompt=`आप Exam Darpan के Hindi copy editor हैं। दिए गए article का readability edit बनाएं।
+उद्देश्य भाषा को साफ, सहज, सटीक और पाठक-केंद्रित बनाना है — AI detector से बचना या AI origin छिपाना नहीं।
+सख्त तथ्य नियम:
+- supplied source text ही factual authority है। उसमें न मिलने वाले facts न जोड़ें।
+- सभी numbers, dates, fees, vacancies, post names, eligibility, URLs और official process ज्यों के त्यों रखें।
+- कोई source न दिया हो तो factual content को rewrite करते समय नए दावे न जोड़ें; uncertain facts को verify करने के लिए unchanged रखें।
+- कोई expired deadline या latest status अपनी ओर से update न करें; उसे editor के manual check के लिए छोड़ें।
+- repeated lines, filler, keyword stuffing और fake urgency हटाएं।
+- उपयोगी instructions, tables, links और reader cautions न हटाएं।
+- natural Indian Hindi, varied sentence structure और छोटे स्पष्ट paragraphs रखें।
+OUTPUT: केवल clean HTML दें; allowed tags: h2,h3,p,ul,ol,li,strong,table,thead,tbody,tr,th,td,a,blockquote. कोई commentary या markdown fence नहीं।
+OFFICIAL SOURCE TEXT:
+${source||'[कोई source text नहीं दिया गया — कोई नया factual claim न जोड़ें]'}
+CURRENT ARTICLE:
+${draft}`;
+    const response=await model.generateContent(prompt);
+    const revised=response?.response?.text?.()||'';
+    if(!revised.trim())throw new Error('Edited suggestion खाली मिला।');
+    $('editorialRevision').value=cleanContent(revised);
+    msg.textContent='सुझाव अलग editor में तैयार है। पूरा पढ़ें, खुद बदलाव करें, फिर ही Apply करें।';
+    $('editorialRevision').scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){console.error(e);msg.textContent='Rewrite suggestion error: '+(e?.message||e)}
+  finally{btn.disabled=false;btn.textContent='Readability सुधार का सुझाव'}
+}
+$('reviewArticleDraft')?.addEventListener('click',runEditorialReview);
+$('rewriteArticleDraft')?.addEventListener('click',suggestEditorialRewrite);
+$('applyEditorialRevision')?.addEventListener('click',()=>{
+  const revised=$('editorialRevision').value.trim();
+  if(!revised){$('editorialWorkspaceMsg').textContent='पहले suggested version तैयार करें और उसे पढ़ें।';return}
+  if(!confirm('क्या आपने suggested version पूरा पढ़ लिया है और इसे Content HTML में लगाना चाहते हैं? मूल draft replace हो जाएगा।'))return;
+  $('content').value=cleanContent(revised);
+  $('editorialWorkspaceMsg').textContent='Edited version Content HTML में लग गया। Publish से पहले facts और links स्वयं verify करें।';
+  $('content').scrollIntoView({behavior:'smooth',block:'center'});
+});
+$('clearEditorialWorkspace')?.addEventListener('click',()=>{
+  $('editorialRevision').value='';$('editorialReviewResult').textContent='';$('editorialReviewResult').style.display='none';$('editorialWorkspaceMsg').textContent='';
+});
 
 const AI_PROMPT=`You are the senior Hindi editorial assistant for Exam Darpan, an independent Indian education and government-job information portal.
 
