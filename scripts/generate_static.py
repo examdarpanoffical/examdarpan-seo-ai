@@ -149,7 +149,7 @@ def category_guide_html(category_name: str, posts: list[dict[str, Any]]) -> str:
         f'<p>{esc(guide)}</p></div>'
         f'{related}'
         '<p class="ed-category-guide-note">Exam Darpan सूचना-सहायता पोर्टल है। आवेदन, शुल्क, पात्रता और तारीखों की अंतिम पुष्टि संबंधित विभाग की आधिकारिक अधिसूचना से करें। '
-        '<a href="/editorial-policy">हमारी संपादकीय नीति पढ़ें</a>।</p>'
+        '<a href="/categories">सभी कैटेगरी देखें</a> · <a href="/editorial-policy">हमारी संपादकीय नीति पढ़ें</a>।</p>'
         '</section>'
     )
 
@@ -4704,6 +4704,11 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
         if not re.search(r"<h1\b[^>]*>\s*.+?\s*</h1>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing H1 in generated article {path.name}")
+        expected_category_path = category_path(CATEGORY_BY_NAME.get(normalized_category(p), CATEGORY_BY_NAME["Latest Updates"])[0])
+        if f'href="{expected_category_path}"' not in txt:
+            raise RuntimeError(f"SEO verification failed: generated article has no parent-category link in {path.name}")
+        if 'href="/categories"' not in txt:
+            raise RuntimeError(f"SEO verification failed: generated article has no category-directory link in {path.name}")
         if re.search(r"\$\{esc\(title\)\}", txt, flags=re.I):
             raise RuntimeError(f"SEO verification failed: unresolved title template in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
