@@ -625,6 +625,33 @@ def add_article_toc(content: str) -> tuple[str, str]:
     return content, '<nav class="article-toc" aria-label="इस लेख के विषय"><strong>इस लेख में</strong><ol>' + items + '</ol></nav>'
 
 
+def place_toc_after_intro(content: str, toc_html: str) -> str:
+    """Place the contents list after the opening explanation, not above the article."""
+    if not toc_html:
+        return content
+
+    headings = list(re.finditer(r"<h2\\b", content, flags=re.I))
+    # Treat the first section as the introduction even when an article begins
+    # with an H2 instead of a lead paragraph.
+    intro_end = headings[1].start() if len(headings) > 1 else len(content)
+    intro = content[:intro_end]
+    paragraphs = list(re.finditer(r"</p\\s*>", intro, flags=re.I))
+
+    if paragraphs:
+        target = paragraphs[min(1, len(paragraphs) - 1)].end()
+        return content[:target] + toc_html + content[target:]
+
+    if headings:
+        first_heading = headings[0]
+        first_paragraph = re.search(r"</p\\s*>", content[first_heading.end():intro_end], flags=re.I)
+        if first_paragraph:
+            target = first_heading.end() + first_paragraph.end()
+            return content[:target] + toc_html + content[target:]
+        target = first_heading.end()
+        return content[:target] + toc_html + content[target:]
+
+    return toc_html + content
+
 def reading_time(content: Any) -> int:
     words = len(clean_text(content).split())
     return max(1, (words + 179) // 180)
@@ -900,12 +927,16 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
             "name": AUTHOR_NAME,
             "url": AUTHOR_URL,
             "jobTitle": AUTHOR_ROLE,
+            "knowsAbout": ["Government recruitment information", "Competitive examinations", "Admit cards", "Examination results", "Official notification research"],
         },
         "publisher": {
             "@type": "Organization",
             "name": "Exam Darpan",
             "url": f"{BASE}/",
+            "description": "Independent education and government-job information portal providing recruitment, examination, admit-card, result and scholarship updates with links to relevant official sources.",
             "logo": {"@type": "ImageObject", "url": f"{BASE}/assets/logo.png"},
+            "sameAs": [WHATSAPP, TELEGRAM, INSTAGRAM, X_SOCIAL],
+            "email": "Supportexamdarpan@gmail.com",
             "founder": {
                 "@type": "Person",
                 "name": "Lokesh Meena",
@@ -953,6 +984,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     content = clean_article_content(p.get("content"), title) or "<p>इस article का content अभी उपलब्ध नहीं है।</p>"
     content = optimize_article_images(content)
     content, toc_html = add_article_toc(content)
+    content = place_toc_after_intro(content, toc_html)
     read_minutes = reading_time(content)
     topic_navigation_html = article_topic_navigation(p, posts)
 
@@ -1371,6 +1403,11 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 {quick_facts(p)}
 {toc_html}
 <div class="article-content">{content}</div>
+<section class="ed-article-author-card" aria-label="लेखक और संपादकीय जानकारी">
+  <div><span class="eyebrow">ABOUT THE AUTHOR</span><strong>{AUTHOR_NAME}</strong><span>{AUTHOR_ROLE}</span></div>
+  <p>इस लेख की जानकारी Exam Darpan की editorial workflow के अंतर्गत तैयार की जाती है। भर्ती से जुड़ी तिथियों, पात्रता और आवेदन संबंधी अंतिम पुष्टि संबंधित विभाग की नवीनतम official notification से करें।</p>
+  <div class="ed-article-author-links"><a href="{AUTHOR_PATH}">लेखक की प्रोफ़ाइल देखें</a><a href="/editorial-policy">हमारी Editorial Policy</a><a href="/contact">Correction / Feedback भेजें</a></div>
+</section>
 <div class="notice"><strong>महत्वपूर्ण:</strong> आवेदन, फीस, पात्रता, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई से पहले संबंधित विभाग की official notification जरूर verify करें।</div>
 {action_html}
 <section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
@@ -4210,6 +4247,8 @@ def write_author_profile(posts: list[dict[str, Any]]) -> None:
             "name": AUTHOR_NAME,
             "url": AUTHOR_URL,
             "jobTitle": AUTHOR_ROLE,
+            "description": "Senior Content Writer and Research Editor covering government recruitment information, competitive examinations, admit cards and results for Exam Darpan.",
+            "knowsAbout": ["Government recruitment information", "Competitive examinations", "Admit cards", "Examination results", "Official notification research"],
             "worksFor": {
                 "@type": "Organization",
                 "name": "Exam Darpan",
@@ -4280,8 +4319,14 @@ gtag('config','{GA4_ID}',{{send_page_view:true}});
 <div class="author-intro">
 <p><strong>Deepak Joshi</strong> Exam Darpan की editorial team में Senior Content Writer &amp; Research Editor के रूप में सरकारी नौकरी, भर्ती, प्रतियोगी परीक्षाओं, Admit Card, Result और शिक्षा से जुड़ी updates पर काम करते हैं। उन्हें लेखन और exam-information content तैयार करने का लगभग चार वर्षों का अनुभव है।</p>
 <p>वे जटिल भर्ती सूचनाओं को विद्यार्थियों के लिए सरल, स्पष्ट और व्यवस्थित भाषा में प्रस्तुत करने पर ध्यान देते हैं। उनके काम में official notification पढ़ना, महत्वपूर्ण तिथियों, eligibility conditions, आवेदन प्रक्रिया और उपलब्ध source links की जाँच करना तथा जरूरत पड़ने पर प्रकाशित जानकारी को review और update करना शामिल है।</p>
-<p>Exam Darpan में Deepak, editorial team के साथ मिलकर यह सुनिश्चित करने का प्रयास करते हैं कि पाठकों को जानकारी समझने में आसानी हो और वे अंतिम पुष्टि के लिए संबंधित विभाग के official source तक पहुँच सकें। भर्ती की शर्तें बदल सकती हैं, इसलिए उम्मीदवारों को आवेदन से पहले मूल notification अवश्य देखना चाहिए।</p>
+<p>Exam Darpan में Deepak, editorial team के साथ मिलकर पाठकों को जानकारी समझने और अंतिम पुष्टि के लिए संबंधित विभाग के official source तक पहुँचने में मदद करते हैं। भर्ती की शर्तें बदल सकती हैं, इसलिए उम्मीदवारों को आवेदन से पहले मूल notification अवश्य देखना चाहिए।</p>
 </div>
+<section class="author-expertise" aria-labelledby="author-expertise-title">
+<h2 id="author-expertise-title">Research Areas &amp; Editorial Work</h2>
+<ul><li>सरकारी भर्ती notifications और corrigendum को समझना</li><li>महत्वपूर्ण तिथियों, eligibility और application process की जानकारी व्यवस्थित करना</li><li>Admit Card, परीक्षा कार्यक्रम और परिणाम संबंधी updates</li><li>Readers के लिए official source links और जरूरी next steps स्पष्ट करना</li></ul>
+<p>यह प्रोफ़ाइल लेखक की Exam Darpan में भूमिका बताती है; किसी सरकारी भर्ती संस्था से affiliation या official authority होने का दावा नहीं करती।</p>
+<p><a href="/editorial-policy">Editorial Policy</a> · <a href="/about">About Exam Darpan</a> · <a href="/contact">Contact / Corrections</a></p>
+</section>
 </section>
 
 <section style="margin-top:28px">
