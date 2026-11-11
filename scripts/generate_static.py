@@ -630,20 +630,27 @@ def place_toc_after_intro(content: str, toc_html: str) -> str:
     if not toc_html:
         return content
 
-    first_heading = re.search(r"<h2\b", content, flags=re.I)
-    intro_end = first_heading.start() if first_heading else len(content)
+    headings = list(re.finditer(r"<h2\\b", content, flags=re.I))
+    # Treat the first section as the introduction even when an article begins
+    # with an H2 instead of a lead paragraph.
+    intro_end = headings[1].start() if len(headings) > 1 else len(content)
     intro = content[:intro_end]
-    paragraphs = list(re.finditer(r"</p\s*>", intro, flags=re.I))
+    paragraphs = list(re.finditer(r"</p\\s*>", intro, flags=re.I))
 
     if paragraphs:
-        # Keep the opening explanation readable before showing navigation.
         target = paragraphs[min(1, len(paragraphs) - 1)].end()
         return content[:target] + toc_html + content[target:]
 
-    # If an article starts directly with headings or a facts table, keep the TOC
-    # immediately before the first section heading rather than above its metadata.
-    return content[:intro_end] + toc_html + content[intro_end:]
+    if headings:
+        first_heading = headings[0]
+        first_paragraph = re.search(r"</p\\s*>", content[first_heading.end():intro_end], flags=re.I)
+        if first_paragraph:
+            target = first_heading.end() + first_paragraph.end()
+            return content[:target] + toc_html + content[target:]
+        target = first_heading.end()
+        return content[:target] + toc_html + content[target:]
 
+    return toc_html + content
 
 def reading_time(content: Any) -> int:
     words = len(clean_text(content).split())
