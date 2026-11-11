@@ -588,9 +588,67 @@ def _json_default(value: Any) -> str:
 
 
 def write_content_index(posts: list[dict[str, Any]], quizzes: list[dict[str, Any]]) -> None:
-    payload={"version":1,"generatedAt":datetime.now(timezone.utc).isoformat(),"posts":posts,"quizzes":quizzes}
+    """Write the legacy full index plus lightweight indexes for routine page UI.
+
+    Article pages, search and overview hubs should never need to download every
+    article body or quiz question just to render a list of links.
+    """
+    generated_at = datetime.now(timezone.utc).isoformat()
+    payload={"version":1,"generatedAt":generated_at,"posts":posts,"quizzes":quizzes}
     (PUBLIC/"content-index.json").write_text(
         json.dumps(payload,ensure_ascii=False,separators=(",",":"),default=_json_default),
+        encoding="utf-8"
+    )
+
+    def public_value(value: Any) -> Any:
+        parsed = as_datetime(value)
+        if parsed:
+            return iso(parsed)
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return value
+        return str(value)
+
+    public_posts = []
+    for post in posts:
+        public_posts.append({
+            "id": str(post.get("id") or ""),
+            "title": post_title(post),
+            "slug": slugify(post.get("slug")),
+            "category": normalized_category(post),
+            "excerpt": short_description(post),
+            "tags": post.get("tags") if isinstance(post.get("tags"), list) else [],
+            "publishedAt": iso(post.get("publishedAt")),
+            "updatedAt": iso(post.get("updatedAt")) or iso(post.get("publishedAt")),
+            "featuredImage": safe_url(post.get("featuredImage")),
+            "status": "published",
+            "readingTimeMinutes": reading_time(post.get("content")),
+            "totalPosts": public_value(date_value(post, "totalPosts", "vacancies", "vacancy")),
+            "applicationStatus": public_value(date_value(post, "applicationStatus", "jobStatus", "statusLabel")),
+            "applicationStartDate": public_value(date_value(post, "applicationStartDate", "startDate", "applyStartDate")),
+            "applicationLastDate": public_value(date_value(post, "applicationLastDate", "lastDate", "lastDateTime", "applyLastDate")),
+            "examDate": public_value(date_value(post, "examDate", "examDateTime")),
+        })
+
+    (PUBLIC/"posts-index.json").write_text(
+        json.dumps({"version":1,"generatedAt":generated_at,"posts":public_posts},
+                   ensure_ascii=False,separators=(",",":"),default=_json_default),
+        encoding="utf-8"
+    )
+
+    quiz_summaries = []
+    for quiz in quizzes:
+        quiz_summaries.append({
+            "id": str(quiz.get("id") or ""),
+            "title": clean_text(quiz.get("title")),
+            "description": clean_text(quiz.get("description")),
+            "quizDate": public_value(quiz.get("quizDate")),
+            "durationMinutes": public_value(quiz.get("durationMinutes")) or 10,
+            "questionCount": len(quiz.get("questions") or []) if isinstance(quiz.get("questions"), list) else 0,
+            "status": "published" if str(quiz.get("status") or "").lower() == "published" else "",
+        })
+    (PUBLIC/"quiz-index.json").write_text(
+        json.dumps({"version":1,"generatedAt":generated_at,"quizzes":quiz_summaries},
+                   ensure_ascii=False,separators=(",",":"),default=_json_default),
         encoding="utf-8"
     )
 
