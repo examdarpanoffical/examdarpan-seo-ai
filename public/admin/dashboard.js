@@ -1,14 +1,17 @@
-import{initializeApp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js';
-import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js';
-import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs,addDoc,updateDoc,deleteDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js';
-import{getAI,getGenerativeModel,GoogleAIBackend}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-ai.js';
-import{initializeAppCheck,ReCaptchaEnterpriseProvider}from'https://www.gstatic.com/firebasejs/12.5.0/firebase-app-check.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs,addDoc,updateDoc,deleteDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+import{getAI,getGenerativeModel,GoogleAIBackend}from'https://www.gstatic.com/firebasejs/12.14.0/firebase-ai.js';
+import{initializeAppCheck,ReCaptchaEnterpriseProvider}from'https://www.gstatic.com/firebasejs/12.14.0/firebase-app-check.js';
 
 const app=initializeApp(window.FIREBASE_CONFIG);
-if(window.FIREBASE_APPCHECK_SITE_KEY){
-  try{initializeAppCheck(app,{provider:new ReCaptchaEnterpriseProvider(window.FIREBASE_APPCHECK_SITE_KEY),isTokenAutoRefreshEnabled:true});}
-  catch(e){console.warn('App Check initialization failed',e)}
+if(!window.FIREBASE_APPCHECK_SITE_KEY){
+  throw new Error('Firebase App Check site key is missing. Configure the production reCAPTCHA Enterprise key before using Gemini.');
 }
+const appCheck=initializeAppCheck(app,{
+  provider:new ReCaptchaEnterpriseProvider(window.FIREBASE_APPCHECK_SITE_KEY),
+  isTokenAutoRefreshEnabled:true
+});
 const auth=getAuth(app),db=getFirestore(app);
 
 // Set window.EXAMDARPAN_PUBLISH_TRIGGER_URL in firebase-config.js after deploying
@@ -28,7 +31,11 @@ async function triggerStaticSeoBuild(){
   if(!response.ok||result.queued!==true)throw new Error(result.error||'GitHub build could not be queued.');
   return result;
 }
-const ai=getAI(app,{backend:new GoogleAIBackend()});
+// Firebase AI Logic replay protection requires limited-use App Check tokens.
+const ai=getAI(app,{
+  backend:new GoogleAIBackend(),
+  useLimitedUseAppCheckTokens:true
+});
 const model=getGenerativeModel(ai,{model:'gemini-3.6-flash'});
 
 let uid=null,all=[];
