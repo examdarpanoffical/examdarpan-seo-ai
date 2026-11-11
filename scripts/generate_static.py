@@ -586,6 +586,13 @@ def clean_article_content(value: Any, article_title: str = "") -> str:
     return re.sub(r'\n{3,}', "\n\n", text).strip()
 
 def add_article_toc(content: str) -> tuple[str, str]:
+    # Remove any previously stored/generated TOC so each article has exactly one.
+    content = re.sub(
+        r'<nav\\b[^>]*class=["\\'][^"\\']*\\barticle-toc\\b[^"\\']*["\\'][^>]*>[\\s\\S]*?</nav>',
+        '',
+        content,
+        flags=re.I,
+    )
     headings: list[tuple[str, str]] = []
     used_ids: set[str] = set()
 
@@ -1401,7 +1408,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </style>
 {cover}
 {quick_facts(p)}
-{toc_html}
 <div class="article-content">{content}</div>
 <section class="ed-article-author-card" aria-label="लेखक और संपादकीय जानकारी">
   <div><span class="eyebrow">ABOUT THE AUTHOR</span><strong>{AUTHOR_NAME}</strong><span>{AUTHOR_ROLE}</span></div>
