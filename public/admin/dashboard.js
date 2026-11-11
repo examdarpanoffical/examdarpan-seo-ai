@@ -141,9 +141,6 @@ function fill(p){
   $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';
   $('sourceLinks').value=Array.isArray(p.sourceLinks)?p.sourceLinks.map(x=>(x.label||x.title||'Source')+' | '+(x.url||'')).join('\n'):(p.sourceLinks||'');
   $('lastVerifiedAt').value=p.lastVerifiedAt||'';$('reviewerName').value=p.reviewerName||'';
-  $('sourceLinks').value=Array.isArray(p.sourceLinks)?p.sourceLinks.map(x=>(x.label||x.title||'Source')+' | '+(x.url||'')).join('\n'):(p.sourceLinks||'');
-  $('lastVerifiedAt').value=p.lastVerifiedAt||'';$('reviewerName').value=p.reviewerName||'';
-  $('tags').value=(p.tags||[]).join(', ');
   $('formTitle').textContent='Edit Article';updateSeoPreview();window.scrollTo({top:0,behavior:'smooth'});
 }
 function updateFeaturedImagePreview(){
