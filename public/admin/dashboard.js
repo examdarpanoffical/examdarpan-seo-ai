@@ -138,7 +138,9 @@ function fill(p){
   $('searchKeywords').value=Array.isArray(p.searchKeywords)?p.searchKeywords.join(', '):(p.searchKeywords||'');
   $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';
   $('image').value=p.featuredImage||'';updateFeaturedImagePreview();$('notification').value=p.officialNotificationUrl||'';$('apply').value=p.applyOnlineUrl||'';
-  $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';$('tags').value=(p.tags||[]).join(', ');
+  $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';
+  $('sourceLinks').value=Array.isArray(p.sourceLinks)?p.sourceLinks.map(x=>(x.label||x.title||'Source')+' | '+(x.url||'')).join('\n'):(p.sourceLinks||'');
+  $('lastVerifiedAt').value=p.lastVerifiedAt||'';$('reviewerName').value=p.reviewerName||'';
   $('formTitle').textContent='Edit Article';updateSeoPreview();window.scrollTo({top:0,behavior:'smooth'});
 }
 function updateFeaturedImagePreview(){
@@ -222,6 +224,15 @@ $('suggestSeo').addEventListener('click',suggestSeoFields);
 $('clearSeo').addEventListener('click',()=>{
   $('seoTitle').value='';$('seoDescription').value='';$('searchKeywords').value='';updateSeoPreview();
 });
+function parseArticleSourceLinks(value){
+  return String(value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map((line,index)=>{
+    const parts=line.split('|');
+    if(parts.length<2)throw new Error('Source line '+(index+1)+': स्रोत का नाम | HTTPS URL format इस्तेमाल करें।');
+    const label=parts.shift().trim(),url=parts.join('|').trim();
+    if(!/^https:\/\//i.test(url))throw new Error('Source line '+(index+1)+': केवल HTTPS source URL स्वीकार है।');
+    return {label:label||'Official source',url};
+  }).slice(0,12);
+}
 function articleData(status,existingPost=null){
   const title=$('title').value.trim();
   const category=$('category').value||'Latest Updates';
@@ -263,6 +274,10 @@ function articleData(status,existingPost=null){
     excerpt,content,featuredImage:$('image').value.trim(),
     officialNotificationUrl:$('notification').value.trim(),applyOnlineUrl:$('apply').value.trim(),
     officialWebsiteUrl:$('official').value.trim(),notificationPdfUrl:$('pdf').value.trim(),
+    sourceLinks:parseArticleSourceLinks($('sourceLinks').value),
+    lastVerifiedAt:$('lastVerifiedAt').value.trim(),
+    reviewerName:$('reviewerName').value.trim(),
+
     tags:$('tags').value.split(',').map(x=>x.trim()).filter(Boolean),
     authorName:'Deepak Joshi',
     authorRole:'Senior Content Writer & Research Editor',
@@ -333,7 +348,7 @@ async function remove(id){
 }
 function clearForm(){
   $('postId').value='';
-  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
+  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
   $('formTitle').textContent='New Article';updateSeoPreview();
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
@@ -375,7 +390,7 @@ $('previewArticle').onclick=()=>{
   const content=normalizeArticleContent($('content').value,title);
   const excerpt=$('excerpt').value.trim();
   const frame=$('articlePreviewFrame');
-  const doc='<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Preview</title><link rel="stylesheet" href="https://examdarpan.in/styles.css"><style>body{margin:0;padding:22px 12px;background:#f4f7fb}.preview-wrap{max-width:1050px;margin:0 auto}.preview-label{max-width:1000px;margin:0 auto 12px;color:#64748b;font:700 12px Arial,sans-serif}.article.article-page{display:block}.preview-excerpt{max-width:790px;margin:0 auto 18px;color:#64748b;font-size:14px;line-height:1.7}</style></head><body><div class="preview-wrap"><div class="preview-label">LIVE STYLE PREVIEW · Exam Darpan article template</div><article class="article article-page"><nav class="breadcrumbs"><a href="#">Home</a><span>›</span><span>'+escapeHtml(category)+'</span><span>›</span><span>Article Preview</span></nav><div class="post-badges"><span class="badge">'+escapeHtml(category)+'</span><span class="status-badge">PREVIEW</span></div><h1>'+escapeHtml(title)+'</h1><div class="ed-author-byline"><span class="ed-author-name">By Lakshay Kumar</span></div><div class="article-meta"><span>Publish date preview</span><span>•</span><span>Official source verify करें</span></div>'+(excerpt?'<p class="preview-excerpt">'+escapeHtml(excerpt)+'</p>':'')+'<div class="article-facts"><div class="quick-fact"><span>Article layout</span><strong>Standard template</strong></div><div class="quick-fact"><span>Mobile friendly</span><strong>Responsive design</strong></div></div><div class="article-content">'+content+'</div><div class="notice"><strong>महत्वपूर्ण:</strong> कार्रवाई से पहले official notification verify करें।</div></article></div></body></html>';
+  const doc='<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Preview</title><link rel="stylesheet" href="https://examdarpan.in/styles.css"><link rel="stylesheet" href="https://examdarpan.in/article.css?v=20261111-3"><style>body{margin:0;padding:22px 12px;background:#f4f7fb}.preview-wrap{max-width:1050px;margin:0 auto}.preview-label{max-width:1000px;margin:0 auto 12px;color:#64748b;font:700 12px Arial,sans-serif}.article.article-page{display:block}.preview-excerpt{max-width:790px;margin:0 auto 18px;color:#64748b;font-size:14px;line-height:1.7}</style></head><body><div class="preview-wrap"><div class="preview-label">LIVE STYLE PREVIEW · Exam Darpan article template</div><article class="article article-page"><nav class="breadcrumbs"><a href="#">Home</a><span>›</span><span>'+escapeHtml(category)+'</span><span>›</span><span>Article Preview</span></nav><div class="post-badges"><span class="badge">'+escapeHtml(category)+'</span><span class="status-badge">PREVIEW</span></div><h1>'+escapeHtml(title)+'</h1><div class="ed-author-byline"><span class="ed-author-name">By Deepak Joshi</span></div><div class="article-meta"><span>Publish date preview</span><span>•</span><span>Official source verify करें</span></div>'+(excerpt?'<p class="preview-excerpt">'+escapeHtml(excerpt)+'</p>':'')+'<div class="article-facts"><div class="quick-fact"><span>Article layout</span><strong>Standard template</strong></div><div class="quick-fact"><span>Mobile friendly</span><strong>Responsive design</strong></div></div><div class="article-content">'+content+'</div><div class="notice"><strong>महत्वपूर्ण:</strong> कार्रवाई से पहले official notification verify करें।</div></article></div></body></html>';
   frame.srcdoc=doc;
   $('articlePreviewDialog').showModal();
 };

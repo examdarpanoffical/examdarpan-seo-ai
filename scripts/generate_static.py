@@ -258,9 +258,44 @@ def application_status(p: dict[str, Any]) -> tuple[str, str]:
 
 def verification_line(p: dict[str, Any]) -> str:
     verified = date_value(p, "lastVerifiedAt", "verifiedAt", "sourceVerifiedAt")
-    if not verified:
+    reviewer = clean_text(p.get("reviewerName") or p.get("reviewedBy"))
+    if not verified and not reviewer:
         return ""
-    return f'<div class="verified-line"><span>✓</span> Official source last verified: <strong>{esc(date_hi(verified))}</strong></div>'
+    parts = []
+    if verified:
+        parts.append(f'स्रोत जाँच: <strong>{esc(date_hi(verified))}</strong>')
+    if reviewer:
+        parts.append(f'समीक्षा: <strong>{esc(reviewer)}</strong>')
+    return '<div class="verified-line"><span>✓</span> ' + ' · '.join(parts) + '</div>'
+
+
+def source_references(p: dict[str, Any]) -> str:
+    raw = p.get("sourceLinks") or []
+    if isinstance(raw, str):
+        sources = []
+        for line in raw.splitlines():
+            label, sep, url = line.partition("|")
+            if sep:
+                sources.append({"label": label.strip(), "url": url.strip()})
+    elif isinstance(raw, list):
+        sources = raw
+    else:
+        sources = []
+
+    links = []
+    seen = set()
+    for item in sources[:12]:
+        if not isinstance(item, dict):
+            continue
+        url = safe_url(item.get("url"))
+        if not url or not url.lower().startswith("https://") or url in seen:
+            continue
+        seen.add(url)
+        label = clean_text(item.get("label") or item.get("title") or "Official source")
+        links.append(f'<li><a href="{esc(url)}" target="_blank" rel="noopener">{esc(label)}</a></li>')
+    if not links:
+        return ""
+    return '<section class="source-note card pad"><h2>स्रोत और आधिकारिक संदर्भ</h2><p>लेख तैयार करते समय देखे गए स्रोत:</p><ul>' + ''.join(links) + '</ul></section>'
 
 
 def quick_facts(p: dict[str, Any]) -> str:
@@ -442,6 +477,46 @@ def clean_article_content(value: Any, article_title: str = "") -> str:
     text = re.sub(r'<table\b[^>]*>[\s\S]*?</table>', _wrap_article_table, text, flags=re.I)
 
     return re.sub(r'\n{3,}', "\n\n", text).strip()
+
+def add_article_toc(content: str) -> tuple[str, str]:
+    headings: list[tuple[str, str]] = []
+    used_ids: set[str] = set()
+
+    def add_id(match: re.Match[str]) -> str:
+        tag, attrs, inner = match.group(1), match.group(2) or "", match.group(3)
+        label = clean_text(inner)
+        if not label:
+            return match.group(0)
+        existing = re.search(r'\bid=["\']([^"\']+)["\']', attrs, re.I)
+        base_id = existing.group(1) if existing else re.sub(r"[^\w\u0900-\u097f-]+", "-", label.lower()).strip("-")
+        if not base_id:
+            base_id = f"section-{len(headings) + 1}"
+        section_id = base_id
+        suffix = 2
+        while section_id in used_ids:
+            section_id = f"{base_id}-{suffix}"
+            suffix += 1
+        used_ids.add(section_id)
+        if existing:
+            attrs = re.sub(
+                r'\bid=["\'][^"\']+["\']',
+                f'id="{esc(section_id)}"',
+                attrs,
+                count=1,
+                flags=re.I,
+            )
+        else:
+            attrs = f'{attrs} id="{esc(section_id)}"'
+        if tag.lower() == "h2":
+            headings.append((section_id, label))
+        return f"<{tag}{attrs}>{inner}</{tag}>"
+
+    content = re.sub(r"<(h2|h3)\b([^>]*)>([\s\S]*?)</\1>", add_id, content, flags=re.I)
+    if len(headings) < 3:
+        return content, ""
+    items = ''.join(f'<li><a href="#{esc(section_id)}">{esc(label)}</a></li>' for section_id, label in headings)
+    return content, '<nav class="article-toc" aria-label="इस लेख के विषय"><strong>इस लेख में</strong><ol>' + items + '</ol></nav>'
+
 
 def reading_time(content: Any) -> int:
     words = len(clean_text(content).split())
@@ -699,7 +774,7 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
     seo_headline = seo_title(p)
     pub = iso(p.get("publishedAt"))
     mod = iso(p.get("updatedAt")) or pub
-    img = safe_url(p.get("_featured_image_url")) or safe_url(p.get("featuredImage")) or f"{BASE}/assets/logo.png"
+    img = safe_url(p.get("_featured_image_url")) or safe_url(p.get("featuredImage"))
     schema: dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "NewsArticle",
@@ -726,8 +801,9 @@ def schema_article(p: dict[str, Any], url: str) -> dict[str, Any]:
                 "name": "Lokesh Meena",
             },
         },
-        "image": [img],
     }
+    if img:
+        schema["image"] = [img]
     keywords = search_keywords(p)
     if keywords:
         schema["keywords"] = keywords
@@ -766,6 +842,8 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     related = related_posts(p, posts, limit=8)
     content = clean_article_content(p.get("content"), title) or "<p>इस article का content अभी उपलब्ध नहीं है।</p>"
     content = optimize_article_images(content)
+    content, toc_html = add_article_toc(content)
+    read_minutes = reading_time(content)
 
     related_html = ""
     if related:
@@ -861,7 +939,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
 <div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
-<div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span></div>
+<div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{read_minutes} मिनट पढ़ने में</span></div>
 {verification_line(p)}
 
 
@@ -1168,10 +1246,12 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </style>
 {cover}
 {quick_facts(p)}
+{toc_html}
 <div class="article-content">{content}</div>
 <div class="notice"><strong>महत्वपूर्ण:</strong> आवेदन, फीस, पात्रता, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई से पहले संबंधित विभाग की official notification जरूर verify करें।</div>
 {action_html}
 <section class="source-note card pad"><strong>Official source verification</strong><p>इस जानकारी पर कार्रवाई करने से पहले संबंधित विभाग की official notification/website पर नवीनतम विवरण जरूर verify करें।</p>{('<p><a href="'+esc(safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')))+'" target="_blank" rel="nofollow noopener">Official source खोलें ↗</a></p>') if safe_url(p.get('officialWebsiteUrl') or p.get('officialNotificationUrl')) else ''}</section>
+{source_references(p)}
 {related_html}
 <section class="ed-article-follow" aria-label="Exam Darpan Social Updates">
   <div class="ed-article-follow-head">
@@ -1241,19 +1321,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </article>
 
 </main>
-<a class="floating-whatsapp-group"
-   href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK?s=cl&p=a&mlu=4&ilr=4"
-   target="_blank"
-   rel="noopener"
-   aria-label="WhatsApp Group Join Now"
-   onclick="window.edTrackCommunity&&window.edTrackCommunity('whatsapp_group_floating')">
-  <span class="floating-whatsapp-icon" aria-hidden="true"><img src="{ICON_WHATSAPP_GREEN}" alt="" aria-hidden="true">
-  </span>
-  <span class="floating-whatsapp-text">
-    <small>WhatsApp Group</small>
-    <strong>Join Now</strong>
-  </span>
-</a>
 
 <footer class="footer">
   <div class="container footer-main">

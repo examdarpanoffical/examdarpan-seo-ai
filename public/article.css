@@ -131,3 +131,37 @@
 .article-page .article-content .ed-table-scroll th:last-child,.article-page .article-content .ed-table-scroll td:last-child{border-right:0!important}
 @media(max-width:640px){.article-page.article,.article-page{width:calc(100% - 20px)!important;margin:12px auto 24px!important;padding:18px 14px!important;border-radius:16px!important}.article-page>h1{font-size:26px!important;line-height:1.3!important}.article-page .article-content{font-size:15.5px!important;line-height:1.85!important}.article-page .article-content h2{margin-top:27px!important;padding:11px 12px!important;font-size:19px!important}.article-page .article-content h3{font-size:17px!important}.article-page .article-content .ed-table-scroll{margin:17px -1px 22px!important;border-radius:11px}.article-page .article-content .ed-table-scroll>table{font-size:13px!important}.article-page .article-content .ed-table-scroll th,.article-page .article-content .ed-table-scroll td{padding:10px 9px!important}}
 @media(max-width:380px){.article-page.article,.article-page{width:calc(100% - 14px)!important;padding:15px 11px!important}.article-page .article-content .ed-table-scroll.ed-table-cols-2 th,.article-page .article-content .ed-table-scroll.ed-table-cols-2 td{padding:9px 7px!important;font-size:12px!important}}
+
+
+/* Editorial quality v1: section navigation and verified source references */
+.article-page .article-toc{margin:20px 0 26px;padding:17px 19px;border:1px solid #dbe5f1;border-radius:14px;background:#f8fbff}
+.article-page .article-toc>strong{display:block;color:#173b70;font-size:16px;margin-bottom:8px}
+.article-page .article-toc ol{margin:0;padding-left:22px}
+.article-page .article-toc li{margin:5px 0;padding-left:2px}
+.article-page .article-toc a{color:#24558d;text-decoration:none;font-size:14px;line-height:1.55}
+.article-page .article-toc a:hover{text-decoration:underline}
+.article-page .article-content h2[id]{scroll-margin-top:90px}
+.article-page .source-note{margin:26px 0;padding:18px;border:1px solid #dbe5f1;border-radius:14px;background:#fbfdff}
+.article-page .source-note h2{margin:0 0 8px;padding:0;border:0;background:none;font-size:19px}
+.article-page .source-note ul{margin:8px 0 0}
+.article-page .source-note a{font-weight:750}
+@media(max-width:640px){.article-page .article-toc{padding:14px}.article-page .article-toc a{font-size:13px}}
+
+
+/* Editorial quality v1: navigation, source transparency and quick facts */
+.article-page .article-facts{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(145px,1fr))!important;gap:9px!important;margin:18px 0 22px!important}
+.article-page .article-facts .quick-fact{min-width:0!important;padding:12px 13px!important;border:1px solid #dce7f4!important;border-radius:12px!important;background:#f8fbff!important}
+.article-page .article-facts .quick-fact span{display:block!important;color:#64748b!important;font-size:11px!important;font-weight:700!important}
+.article-page .article-facts .quick-fact strong{display:block!important;margin-top:4px!important;color:#173b70!important;font-size:15px!important;line-height:1.45!important;overflow-wrap:anywhere}
+.article-page .article-toc{margin:20px 0 26px!important;padding:17px 19px!important;border:1px solid #dbe5f1!important;border-radius:14px!important;background:#f8fbff!important}
+.article-page .article-toc>strong{display:block;color:#173b70!important;font-size:16px!important;margin-bottom:8px!important}
+.article-page .article-toc ol{margin:0!important;padding-left:22px!important}
+.article-page .article-toc li{margin:5px 0!important;padding-left:2px!important}
+.article-page .article-toc a{color:#24558d!important;text-decoration:none!important;font-size:14px!important;line-height:1.55!important}
+.article-page .article-toc a:hover{text-decoration:underline!important}
+.article-page .article-content h2[id]{scroll-margin-top:90px}
+.article-page .source-note{margin:28px 0!important;padding:18px!important;border:1px solid #dbe5f1!important;border-radius:14px!important;background:#fbfdff!important}
+.article-page .source-note h2{margin:0 0 8px!important;padding:0!important;border:0!important;background:none!important;font-size:19px!important}
+.article-page .source-note ul{margin:8px 0 0!important}
+.article-page .source-note a{font-weight:750!important}
+@media(max-width:640px){.article-page .article-facts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}.article-page .article-facts .quick-fact{padding:10px!important}.article-page .article-toc{padding:14px!important}.article-page .article-toc a{font-size:13px!important}}
