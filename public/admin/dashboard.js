@@ -236,16 +236,6 @@ function parseArticleSourceLinks(value){
     return {label:label||'Official source',url};
   }).slice(0,12);
 }
-function parseArticleSourceLinks(value){
-  const lines=String(value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  return lines.map((line,index)=>{
-    const parts=line.split('|');
-    if(parts.length<2)throw new Error('Source line '+(index+1)+': स्रोत का नाम | HTTPS URL format इस्तेमाल करें।');
-    const label=parts.shift().trim(),url=parts.join('|').trim();
-    if(!/^https:\/\//i.test(url))throw new Error('Source line '+(index+1)+': केवल HTTPS source URL स्वीकार है।');
-    return {label:label||'Official source',url};
-  }).slice(0,12);
-}
 function articleData(status,existingPost=null){
   const title=$('title').value.trim();
   const category=$('category').value||'Latest Updates';
