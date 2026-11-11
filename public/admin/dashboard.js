@@ -138,7 +138,10 @@ function fill(p){
   $('searchKeywords').value=Array.isArray(p.searchKeywords)?p.searchKeywords.join(', '):(p.searchKeywords||'');
   $('excerpt').value=p.excerpt||'';$('content').value=p.content||'';
   $('image').value=p.featuredImage||'';updateFeaturedImagePreview();$('notification').value=p.officialNotificationUrl||'';$('apply').value=p.applyOnlineUrl||'';
-  $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';$('tags').value=(p.tags||[]).join(', ');
+  $('official').value=p.officialWebsiteUrl||'';$('pdf').value=p.notificationPdfUrl||'';
+  $('sourceLinks').value=Array.isArray(p.sourceLinks)?p.sourceLinks.map(x=>(x.label||x.title||'Source')+' | '+(x.url||'')).join('\n'):(p.sourceLinks||'');
+  $('lastVerifiedAt').value=p.lastVerifiedAt||'';$('reviewerName').value=p.reviewerName||'';
+  $('tags').value=(p.tags||[]).join(', ');
   $('formTitle').textContent='Edit Article';updateSeoPreview();window.scrollTo({top:0,behavior:'smooth'});
 }
 function updateFeaturedImagePreview(){
@@ -222,6 +225,15 @@ $('suggestSeo').addEventListener('click',suggestSeoFields);
 $('clearSeo').addEventListener('click',()=>{
   $('seoTitle').value='';$('seoDescription').value='';$('searchKeywords').value='';updateSeoPreview();
 });
+function parseArticleSourceLinks(value){
+  return String(value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map((line,index)=>{
+    const parts=line.split('|');
+    if(parts.length<2)throw new Error('Source line '+(index+1)+': स्रोत का नाम | HTTPS URL format इस्तेमाल करें।');
+    const label=parts.shift().trim(),url=parts.join('|').trim();
+    if(!/^https:\/\//i.test(url))throw new Error('Source line '+(index+1)+': केवल HTTPS source URL स्वीकार है।');
+    return {label:label||'Official source',url};
+  }).slice(0,12);
+}
 function articleData(status,existingPost=null){
   const title=$('title').value.trim();
   const category=$('category').value||'Latest Updates';
@@ -263,6 +275,9 @@ function articleData(status,existingPost=null){
     excerpt,content,featuredImage:$('image').value.trim(),
     officialNotificationUrl:$('notification').value.trim(),applyOnlineUrl:$('apply').value.trim(),
     officialWebsiteUrl:$('official').value.trim(),notificationPdfUrl:$('pdf').value.trim(),
+    sourceLinks:parseArticleSourceLinks($('sourceLinks').value),
+    lastVerifiedAt:$('lastVerifiedAt').value.trim(),
+    reviewerName:$('reviewerName').value.trim(),
     tags:$('tags').value.split(',').map(x=>x.trim()).filter(Boolean),
     authorName:'Deepak Joshi',
     authorRole:'Senior Content Writer & Research Editor',
@@ -333,7 +348,7 @@ async function remove(id){
 }
 function clearForm(){
   $('postId').value='';
-  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
+  ['title','slug','seoTitle','seoDescription','searchKeywords','excerpt','content','image','notification','apply','official','pdf','sourceLinks','lastVerifiedAt','reviewerName','tags','aiTopic','aiSource'].forEach(id=>{if($(id))$(id).value=''});
   $('formTitle').textContent='New Article';updateSeoPreview();
   $('aiMsg').textContent='';$('aiImageMsg').textContent='';
   $('aiImagePreview').innerHTML='';
