@@ -101,7 +101,7 @@ jobs:
                   raise SystemExit("Sitemap index is missing its XML declaration.")
               index_xml = (
                   index_xml[:declaration_end + 2]
-                  + "\\n"
+                  + "\n"
                   + stylesheet_pi
                   + index_xml[declaration_end + 2:]
               )
