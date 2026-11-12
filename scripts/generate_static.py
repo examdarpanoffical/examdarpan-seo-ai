@@ -3823,6 +3823,16 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
                 f"FINAL HOMEPAGE CHECK FAILED: missing {marker}"
             )
 
+    if 'href="/author/deepak-joshi"' not in text:
+        raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: author profile link missing")
+    for category_name, category_slug, _, _ in CATEGORIES:
+        category_href = {
+            "rajasthan-jobs": "/rajasthan-government-jobs",
+            "government-jobs": "/all-india-government-jobs",
+        }.get(category_slug, f"/category-{category_slug}")
+        if f'href="{category_href}"' not in text:
+            raise RuntimeError(f"FINAL HOMEPAGE CHECK FAILED: category link missing for {category_name}")
+
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
     text = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="https://examdarpan.in/">', text, count=1)
     schema = {
