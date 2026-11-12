@@ -271,26 +271,16 @@ def main() -> int:
         homepage_html = homepage_path.read_text(encoding="utf-8", errors="ignore")
         generator_path = ROOT / "scripts" / "generate_static.py"
         generator_html = generator_path.read_text(encoding="utf-8", errors="ignore") if generator_path.exists() else ""
-        category_pairs = re.findall(r'^\s*\("[^"]+", "([^"]+)", "[^"]+", "[^"]+"\),?
-    warnings = sum(level == "WARN" for level, _ in issues)
-    print(f"Exam Darpan SEO sanity audit: {len(locs)} sitemap URLs; {errors} errors; {warnings} warnings.")
-    for level, message in issues:
-        print(f"[{level}] {message}")
-    if not issues:
-        print("No issues found by these checks.")
-    # Warnings remain advisory; confirmed technical errors must block deploy.
-    return 1 if errors else 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
-, generator_html, re.M)
-        # Category slugs are derived from the authoritative CATEGORIES list.
-        for category_slug in category_pairs:
-            category_href = f"/category-{category_slug}"
-            if category_href not in homepage_html and category_slug not in {"rajasthan-jobs", "government-jobs"}:
+        category_config = re.search(r"CATEGORIES\s*=\s*\[(.*?)\]\s*\nCATEGORY_BY_NAME", generator_html, re.S)
+        category_slugs = re.findall(r'^\s*\("[^"]+",\s*"([^"]+)"', category_config.group(1), re.M) if category_config else []
+        for category_slug in category_slugs:
+            category_href = {
+                "rajasthan-jobs": "/rajasthan-government-jobs",
+                "government-jobs": "/all-india-government-jobs",
+            }.get(category_slug, f"/category-{category_slug}")
+            if f'href="{category_href}"' not in homepage_html:
                 issues.append(("ERROR", f"Homepage is missing category discovery link: {category_href}"))
-        for required_href in ("/rajasthan-government-jobs", "/all-india-government-jobs", "/categories", "/author/deepak-joshi"):
+        for required_href in ("/categories", "/author/deepak-joshi"):
             if f'href="{required_href}"' not in homepage_html:
                 issues.append(("ERROR", f"Homepage is missing required discovery link: {required_href}"))
     else:
