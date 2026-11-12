@@ -7,6 +7,7 @@ It reports actionable technical inconsistencies for review.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -37,7 +38,7 @@ def main() -> int:
     issues: list[tuple[str, str]] = []
     sitemap_path = PUBLIC / "sitemap.xml"
 
-    split_sitemaps = ["sitemap_index.xml", "post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml"]
+    split_sitemaps = ["sitemap_index.xml", "post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml", "mock-tests-sitemap.xml"]
     for filename in split_sitemaps:
         path = PUBLIC / filename
         if not path.exists():
@@ -85,6 +86,26 @@ def main() -> int:
             issues.append(("WARN", f"Legacy .html URL in sitemap; verify final 200 canonical URL: {url}"))
         if parsed.query or parsed.fragment:
             issues.append(("ERROR", f"Query/fragment URL in sitemap: {url}"))
+
+    # Every child sitemap in the index must expose a truthful lastmod so
+    # crawlers can detect when a child sitemap file has been regenerated.
+    index_file = PUBLIC / "sitemap_index.xml"
+    if index_file.exists():
+        try:
+            index_root = ET.parse(index_file).getroot()
+            for sitemap_node in index_root.findall("sm:sitemap", NS):
+                loc_node = sitemap_node.find("sm:loc", NS)
+                lastmod_node = sitemap_node.find("sm:lastmod", NS)
+                child_name = loc_node.text.strip().rsplit("/", 1)[-1] if loc_node is not None and loc_node.text else "(unknown child)"
+                if lastmod_node is None or not (lastmod_node.text or "").strip():
+                    issues.append(("ERROR", f"Missing child-sitemap lastmod in sitemap_index.xml: {child_name}"))
+                else:
+                    try:
+                        datetime.fromisoformat(lastmod_node.text.strip().replace("Z", "+00:00"))
+                    except ValueError:
+                        issues.append(("ERROR", f"Invalid child-sitemap lastmod in sitemap_index.xml: {child_name}"))
+        except ET.ParseError:
+            pass  # The XML parse error was already reported above.
 
     split_duplicates = [url for url, count in Counter(all_sitemap_urls).items() if count > 1]
     for url in split_duplicates:
