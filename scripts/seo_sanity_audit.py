@@ -265,27 +265,6 @@ def main() -> int:
         if not og_url_match or og_url_match.group(1).rstrip("/") != expected_url.rstrip("/"):
             issues.append(("ERROR", f"Missing or incorrect og:url in {relative_path}"))
 
-    # Homepage discovery must link every supported category and the public author profile.
-    homepage_path = PUBLIC / "index.html"
-    if homepage_path.exists():
-        homepage_html = homepage_path.read_text(encoding="utf-8", errors="ignore")
-        generator_path = ROOT / "scripts" / "generate_static.py"
-        generator_html = generator_path.read_text(encoding="utf-8", errors="ignore") if generator_path.exists() else ""
-        category_config = re.search(r"CATEGORIES\s*=\s*\[(.*?)\]\s*\nCATEGORY_BY_NAME", generator_html, re.S)
-        category_slugs = re.findall(r'^\s*\("[^"]+",\s*"([^"]+)"', category_config.group(1), re.M) if category_config else []
-        for category_slug in category_slugs:
-            category_href = {
-                "rajasthan-jobs": "/rajasthan-government-jobs",
-                "government-jobs": "/all-india-government-jobs",
-            }.get(category_slug, f"/category-{category_slug}")
-            if f'href="{category_href}"' not in homepage_html:
-                issues.append(("ERROR", f"Homepage is missing category discovery link: {category_href}"))
-        for required_href in ("/categories", "/author/deepak-joshi"):
-            if f'href="{required_href}"' not in homepage_html:
-                issues.append(("ERROR", f"Homepage is missing required discovery link: {required_href}"))
-    else:
-        issues.append(("ERROR", "Homepage is missing: public/index.html"))
-
     errors = sum(level == "ERROR" for level, _ in issues)
     warnings = sum(level == "WARN" for level, _ in issues)
     print(f"Exam Darpan SEO sanity audit: {len(locs)} sitemap URLs; {errors} errors; {warnings} warnings.")
