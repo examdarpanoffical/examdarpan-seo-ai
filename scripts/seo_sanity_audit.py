@@ -90,7 +90,7 @@ def main() -> int:
     # Every child sitemap in the index must expose a truthful lastmod so
     # crawlers can detect when a child sitemap file has been regenerated.
     index_file = PUBLIC / "sitemap_index.xml"
-    if index_file.exists():
+    if index_file.exists() and not args.allow_missing_split_sitemaps:
         try:
             index_root = ET.parse(index_file).getroot()
             for sitemap_node in index_root.findall("sm:sitemap", NS):
