@@ -89,6 +89,23 @@ jobs:
               lastmod_node = ET.SubElement(target_entry, f"{{{ns}}}lastmod")
           lastmod_node.text = sitemap_generated_at
           tree.write(index_path, encoding="utf-8", xml_declaration=True)
+
+          # ElementTree drops XML processing instructions while parsing. Restore
+          # the presentation stylesheet after its XML declaration so browsers
+          # can render a human-friendly clickable sitemap; Google reads the same XML.
+          index_xml = index_path.read_text(encoding="utf-8")
+          stylesheet_pi = '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>'
+          if stylesheet_pi not in index_xml:
+              declaration_end = index_xml.find("?>")
+              if declaration_end < 0:
+                  raise SystemExit("Sitemap index is missing its XML declaration.")
+              index_xml = (
+                  index_xml[:declaration_end + 2]
+                  + "\\n"
+                  + stylesheet_pi
+                  + index_xml[declaration_end + 2:]
+              )
+              index_path.write_text(index_xml, encoding="utf-8")
           print("Generated static mock-test sitemap.")
           PY
 
