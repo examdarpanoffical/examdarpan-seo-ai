@@ -74,10 +74,20 @@ jobs:
           tree = ET.parse(index_path)
           index_root = tree.getroot()
           target = f"{base}/mock-tests-sitemap.xml"
-          existing = [el.text for el in index_root.findall(f"{{{ns}}}sitemap/{{{ns}}}loc")]
-          if target not in existing:
-              entry = ET.SubElement(index_root, f"{{{ns}}}sitemap")
-              ET.SubElement(entry, f"{{{ns}}}loc").text = target
+          sitemap_generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+          sitemap_entries = index_root.findall(f"{{{ns}}}sitemap")
+          target_entry = next(
+              (entry for entry in sitemap_entries
+               if (entry.find(f"{{{ns}}}loc") is not None and entry.find(f"{{{ns}}}loc").text == target)),
+              None,
+          )
+          if target_entry is None:
+              target_entry = ET.SubElement(index_root, f"{{{ns}}}sitemap")
+              ET.SubElement(target_entry, f"{{{ns}}}loc").text = target
+          lastmod_node = target_entry.find(f"{{{ns}}}lastmod")
+          if lastmod_node is None:
+              lastmod_node = ET.SubElement(target_entry, f"{{{ns}}}lastmod")
+          lastmod_node.text = sitemap_generated_at
           tree.write(index_path, encoding="utf-8", xml_declaration=True)
           print("Generated static mock-test sitemap.")
           PY
