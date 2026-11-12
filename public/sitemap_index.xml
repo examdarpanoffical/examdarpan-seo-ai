@@ -2,11 +2,14 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://examdarpan.in/post-sitemap.xml</loc>
+    <lastmod>2026-11-12T06:06:45Z</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://examdarpan.in/page-sitemap.xml</loc>
+    <lastmod>2026-11-12T06:06:45Z</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://examdarpan.in/category-sitemap.xml</loc>
+    <lastmod>2026-11-12T06:06:45Z</lastmod>
   </sitemap>
-<sitemap><loc>https://examdarpan.in/mock-tests-sitemap.xml</loc></sitemap></sitemapindex>
+<sitemap><loc>https://examdarpan.in/mock-tests-sitemap.xml</loc><lastmod>2026-11-12T06:06:45Z</lastmod></sitemap></sitemapindex>
