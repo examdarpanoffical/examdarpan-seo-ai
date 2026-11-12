@@ -4690,6 +4690,9 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     write_urlset("page-sitemap.xml", page_urls)
     write_urlset("category-sitemap.xml", category_urls)
 
+    # Sitemap-index lastmod describes when each child sitemap file was generated,
+    # not the modification date of an individual URL inside that child.
+    sitemap_generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     index_rows = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
@@ -4698,6 +4701,7 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     for filename in ("post-sitemap.xml", "page-sitemap.xml", "category-sitemap.xml"):
         index_rows.append("  <sitemap>")
         index_rows.append(f"    <loc>{xml_esc(BASE + '/' + filename)}</loc>")
+        index_rows.append(f"    <lastmod>{sitemap_generated_at}</lastmod>")
         index_rows.append("  </sitemap>")
     index_rows.append("</sitemapindex>")
     index_xml = "\n".join(index_rows) + "\n"
