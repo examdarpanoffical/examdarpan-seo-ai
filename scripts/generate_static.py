@@ -171,11 +171,10 @@ def home_category_directory(posts: list[dict[str, Any]]) -> str:
     cards = []
     for name, slug, title, description in CATEGORIES:
         count = sum(1 for post in posts if normalized_category(post) == name)
-        if not count:
-            continue
+        count_label = f"{count} प्रकाशित अपडेट" if count else "अभी कोई प्रकाशित अपडेट नहीं"
         cards.append(
             f'<a class="ed-home-category-card" href="{esc(category_path(slug))}">'
-            f'<strong>{esc(title)}</strong><span>{count} प्रकाशित अपडेट</span>'
+            f'<strong>{esc(title)}</strong><span>{count_label}</span>'
             f'<small>{esc(description)}</small></a>'
         )
     if not cards:
@@ -1532,6 +1531,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
       <a href="/category-answer-key">Answer Key</a>
       <a href="/category-syllabus">Syllabus</a>
       <a href="/quiz">Daily Practice Test</a>
+      <a href="/author/deepak-joshi">Author Profile</a>
     </div>
 
     <div class="footer-col">
@@ -3822,6 +3822,16 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
             raise RuntimeError(
                 f"FINAL HOMEPAGE CHECK FAILED: missing {marker}"
             )
+
+    if 'href="/author/deepak-joshi"' not in text:
+        raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: author profile link missing")
+    for category_name, category_slug, _, _ in CATEGORIES:
+        category_href = {
+            "rajasthan-jobs": "/rajasthan-government-jobs",
+            "government-jobs": "/all-india-government-jobs",
+        }.get(category_slug, f"/category-{category_slug}")
+        if f'href="{category_href}"' not in text:
+            raise RuntimeError(f"FINAL HOMEPAGE CHECK FAILED: category link missing for {category_name}")
 
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
     text = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="https://examdarpan.in/">', text, count=1)
