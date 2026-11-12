@@ -171,11 +171,10 @@ def home_category_directory(posts: list[dict[str, Any]]) -> str:
     cards = []
     for name, slug, title, description in CATEGORIES:
         count = sum(1 for post in posts if normalized_category(post) == name)
-        if not count:
-            continue
+        count_label = f"{count} प्रकाशित अपडेट" if count else "अभी कोई प्रकाशित अपडेट नहीं"
         cards.append(
             f'<a class="ed-home-category-card" href="{esc(category_path(slug))}">'
-            f'<strong>{esc(title)}</strong><span>{count} प्रकाशित अपडेट</span>'
+            f'<strong>{esc(title)}</strong><span>{count_label}</span>'
             f'<small>{esc(description)}</small></a>'
         )
     if not cards:
@@ -1532,6 +1531,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
       <a href="/category-answer-key">Answer Key</a>
       <a href="/category-syllabus">Syllabus</a>
       <a href="/quiz">Daily Practice Test</a>
+      <a href="/author/deepak-joshi">Author Profile</a>
     </div>
 
     <div class="footer-col">
