@@ -265,6 +265,37 @@ def main() -> int:
         if not og_url_match or og_url_match.group(1).rstrip("/") != expected_url.rstrip("/"):
             issues.append(("ERROR", f"Missing or incorrect og:url in {relative_path}"))
 
+    # Homepage discovery must link every supported category and the public author profile.
+    homepage_path = PUBLIC / "index.html"
+    if homepage_path.exists():
+        homepage_html = homepage_path.read_text(encoding="utf-8", errors="ignore")
+        generator_path = ROOT / "scripts" / "generate_static.py"
+        generator_html = generator_path.read_text(encoding="utf-8", errors="ignore") if generator_path.exists() else ""
+        category_pairs = re.findall(r'^\s*\("[^"]+", "([^"]+)", "[^"]+", "[^"]+"\),?
+    warnings = sum(level == "WARN" for level, _ in issues)
+    print(f"Exam Darpan SEO sanity audit: {len(locs)} sitemap URLs; {errors} errors; {warnings} warnings.")
+    for level, message in issues:
+        print(f"[{level}] {message}")
+    if not issues:
+        print("No issues found by these checks.")
+    # Warnings remain advisory; confirmed technical errors must block deploy.
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+, generator_html, re.M)
+        # Category slugs are derived from the authoritative CATEGORIES list.
+        for category_slug in category_pairs:
+            category_href = f"/category-{category_slug}"
+            if category_href not in homepage_html and category_slug not in {"rajasthan-jobs", "government-jobs"}:
+                issues.append(("ERROR", f"Homepage is missing category discovery link: {category_href}"))
+        for required_href in ("/rajasthan-government-jobs", "/all-india-government-jobs", "/categories", "/author/deepak-joshi"):
+            if f'href="{required_href}"' not in homepage_html:
+                issues.append(("ERROR", f"Homepage is missing required discovery link: {required_href}"))
+    else:
+        issues.append(("ERROR", "Homepage is missing: public/index.html"))
+
     errors = sum(level == "ERROR" for level, _ in issues)
     warnings = sum(level == "WARN" for level, _ in issues)
     print(f"Exam Darpan SEO sanity audit: {len(locs)} sitemap URLs; {errors} errors; {warnings} warnings.")
