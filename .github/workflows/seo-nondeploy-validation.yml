@@ -32,6 +32,10 @@ jobs:
             python -m py_compile scripts/seo_sanity_audit.py
           fi
 
+      - name: Test recruitment lifecycle and apply-link safeguards
+        run: |
+          python -m unittest discover -s scripts -p 'test_*.py' -v
+
       - name: Validate checked-in sitemap XML
         run: |
           python - <<'PY'

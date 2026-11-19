@@ -13,7 +13,7 @@ import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
@@ -154,6 +154,46 @@ def main() -> int:
         for match in re.finditer(r"""([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(['"])(.*?)\2""", tag, re.I | re.S):
             attrs[match.group(1).lower()] = match.group(3).strip()
         return attrs
+
+    # Every submitted page URL must resolve to a real static HTML file and
+    # declare that exact clean URL as its canonical. This catches stale/deleted
+    # pages accidentally left in a sitemap before they reach Google.
+    def resolve_clean_url_to_html(url: str) -> Path | None:
+        parsed = urlparse(url)
+        if parsed.scheme != "https" or parsed.netloc.lower() != "examdarpan.in":
+            return None
+        clean_path = unquote(parsed.path or "/").lstrip("/")
+        if not clean_path:
+            candidates = [PUBLIC / "index.html"]
+        else:
+            candidates = [
+                PUBLIC / f"{clean_path}.html",
+                PUBLIC / clean_path / "index.html",
+                PUBLIC / clean_path,
+            ]
+        return next((candidate for candidate in candidates if candidate.is_file()), None)
+
+    page_sitemap_urls = [
+        url for url in all_sitemap_urls
+        if not urlparse(url).path.lower().endswith(".xml")
+    ]
+    for url in page_sitemap_urls:
+        page_file = resolve_clean_url_to_html(url)
+        if page_file is None:
+            issues.append(("ERROR", f"Sitemap URL has no matching public HTML file: {url}"))
+            continue
+        page_html = page_file.read_text(encoding="utf-8", errors="ignore")
+        canonical_tags = [
+            tag_attrs(tag) for tag in re.findall(r"<link\b[^>]*>", page_html, re.I | re.S)
+            if tag_attrs(tag).get("rel", "").lower() == "canonical"
+        ]
+        expected = url.rstrip("/") or BASE
+        actual = canonical_tags[0].get("href", "").rstrip("/") if len(canonical_tags) == 1 else ""
+        if len(canonical_tags) != 1 or actual != expected:
+            issues.append(("ERROR", f"Sitemap URL does not have one matching self-canonical: {url} ({page_file.relative_to(PUBLIC)})"))
+        robots_match = re.search(r"<meta\s+name=['\"]robots['\"]\s+content=['\"]([^'\"]+)", page_html, re.I)
+        if robots_match and "noindex" in robots_match.group(1).lower():
+            issues.append(("ERROR", f"Noindex page is included in a sitemap: {url}"))
 
     forbidden_hosts = {"examdarpan-dd963.web.app", "examdarpan-dd963.firebaseapp.com"}
     for path in sorted(PUBLIC.rglob("*.html")):
