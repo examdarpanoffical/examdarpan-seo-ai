@@ -184,14 +184,14 @@ def main() -> int:
             continue
         page_html = page_file.read_text(encoding="utf-8", errors="ignore")
         canonical_tags = [
-            tag_attrs(tag) for tag in re.findall(r"<link\\b[^>]*>", page_html, re.I | re.S)
+            tag_attrs(tag) for tag in re.findall(r"<link\b[^>]*>", page_html, re.I | re.S)
             if tag_attrs(tag).get("rel", "").lower() == "canonical"
         ]
         expected = url.rstrip("/") or BASE
         actual = canonical_tags[0].get("href", "").rstrip("/") if len(canonical_tags) == 1 else ""
         if len(canonical_tags) != 1 or actual != expected:
             issues.append(("ERROR", f"Sitemap URL does not have one matching self-canonical: {url} ({page_file.relative_to(PUBLIC)})"))
-        robots_match = re.search(r'<meta\\s+name=["\\']robots["\\']\\s+content=["\\']([^"\\']+)', page_html, re.I)
+        robots_match = re.search(r"<meta\s+name=['\"]robots['\"]\s+content=['\"]([^'\"]+)", page_html, re.I)
         if robots_match and "noindex" in robots_match.group(1).lower():
             issues.append(("ERROR", f"Noindex page is included in a sitemap: {url}"))
 
