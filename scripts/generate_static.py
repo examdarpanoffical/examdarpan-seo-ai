@@ -375,8 +375,8 @@ def application_status(
     current = now or datetime.now(timezone.utc)
     current = current.replace(tzinfo=timezone.utc) if current.tzinfo is None else current.astimezone(timezone.utc)
 
-    # Admit-card/result are later recruitment stages, not open application states.
-    if explicit in {"admit card", "result"}:
+    # Explicit terminal/later-stage labels take precedence over application dates.
+    if explicit in {"closed", "admit card", "result"}:
         return mapping[explicit]
 
     last = application_date(
@@ -395,13 +395,14 @@ def application_status(
     if start and current < start:
         return ("COMING SOON", "status-soon")
 
-    if explicit in mapping:
-        return mapping[explicit]
-
+    # A valid date range is more reliable than stale manually entered OPEN/CLOSING labels.
     if last:
         if (last - current).total_seconds() <= 3 * 86400:
             return ("CLOSING SOON", "status-closing")
         return ("OPEN", "status-open")
+
+    if explicit in mapping:
+        return mapping[explicit]
     return ("UPDATE", "status-update")
 
 def verification_line(p: dict[str, Any]) -> str:
