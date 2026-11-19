@@ -405,7 +405,7 @@ def application_status(
         if p.get(key)
     ).lower()
     if not last and re.search(
-        r"(आवेदन\s*(?:प्रक्रिया\\s*)?(?:बंद|समाप्त)|आवेदन\\s*की\\s*अंतिम\\s*तिथि\\s*(?:निकल|समाप्त)|application\\s*(?:window|process)\\s*(?:is\\s*)?(?:closed|ended))",
+        r"(आवेदन\s*(?:प्रक्रिया\s*)?(?:बंद|समाप्त)|आवेदन\s*की\s*अंतिम\s*तिथि\s*(?:निकल|समाप्त)|application\s*(?:window|process)\s*(?:is\s*)?(?:closed|ended))",
         title_excerpt,
     ):
         return ("CLOSED", "status-closed")
@@ -417,7 +417,7 @@ def application_status(
         if p.get(key)
     ).lower()
     if not last and re.search(
-        r"(पदों?\s*(?:की\\s*)?(?:संख्या\\s*)?प्रस्तावित|भर्ती\\s*प्रस्तावित|प्रस्तावित\\s*भर्ती|अभी\\s*(?:तक\\s*)?आधिकारिक\\s*(?:विज्ञापन|नोटिफिकेशन)\\s*(?:जारी\\s*)?नहीं|notification\\s*(?:has\\s*)?not\\s*(?:yet\\s*)?been\\s*released|proposed\\s+vacanc)",
+        r"(पदों?\s*(?:की\s*)?(?:संख्या\s*)?प्रस्तावित|भर्ती\s*प्रस्तावित|प्रस्तावित\s*भर्ती|अभी\s*(?:तक\s*)?आधिकारिक\s*(?:विज्ञापन|नोटिफिकेशन)\s*(?:जारी\s*)?नहीं|notification\s*(?:has\s*)?not\s*(?:yet\s*)?been\s*released|proposed\s+vacanc)",
         proposal_text,
     ):
         return ("PROPOSED", "status-proposed")
