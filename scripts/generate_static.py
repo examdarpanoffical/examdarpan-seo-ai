@@ -369,6 +369,7 @@ def application_status(
         "closing soon": ("CLOSING SOON", "status-closing"),
         "closed": ("CLOSED", "status-closed"),
         "coming soon": ("COMING SOON", "status-soon"),
+        "proposed": ("PROPOSED", "status-proposed"),
         "admit card": ("ADMIT CARD", "status-admit"),
         "result": ("RESULT", "status-result"),
     }
@@ -380,12 +381,46 @@ def application_status(
         return mapping[explicit]
 
     last = application_date(
-        date_value(p, "applicationLastDate", "lastDate", "lastDateTime", "applyLastDate"),
+        date_value(
+            p, "applicationLastDate", "applicationEndDate", "lastDate",
+            "lastDateTime", "applyLastDate", "formLastDate", "closingDate",
+            "endDate", "last_date", "application_last_date",
+        ),
         end_of_day=True,
     )
     start = application_date(
-        date_value(p, "applicationStartDate", "startDate", "applyStartDate"),
+        date_value(
+            p, "applicationStartDate", "applicationStart", "startDate",
+            "applyStartDate", "formStartDate", "start_date",
+            "application_start_date",
+        ),
     )
+
+    # Some legacy CMS records have no normalized deadline field. Use clear
+    # editorial lifecycle wording as a conservative fallback, not generic
+    # mentions of a deadline elsewhere in the article body.
+    title_excerpt = " ".join(
+        clean_text(p.get(key))
+        for key in ("title", "seoTitle", "excerpt", "shortDescription", "description")
+        if p.get(key)
+    ).lower()
+    if not last and re.search(
+        r"(आवेदन\\s*(?:प्रक्रिया\\s*)?(?:बंद|समाप्त)|आवेदन\\s*की\\s*अंतिम\\s*तिथि\\s*(?:निकल|समाप्त)|application\\s*(?:window|process)\\s*(?:is\\s*)?(?:closed|ended))",
+        title_excerpt,
+    ):
+        return ("CLOSED", "status-closed")
+
+    # Explicit proposal wording must never be presented as an open vacancy.
+    proposal_text = " ".join(
+        clean_text(p.get(key))
+        for key in ("title", "seoTitle", "excerpt", "shortDescription", "description", "content")
+        if p.get(key)
+    ).lower()
+    if not last and re.search(
+        r"(पदों?\\s*(?:की\\s*)?(?:संख्या\\s*)?प्रस्तावित|भर्ती\\s*प्रस्तावित|प्रस्तावित\\s*भर्ती|अभी\\s*(?:तक\\s*)?आधिकारिक\\s*(?:विज्ञापन|नोटिफिकेशन)\\s*(?:जारी\\s*)?नहीं|notification\\s*(?:has\\s*)?not\\s*(?:yet\\s*)?been\\s*released|proposed\\s+vacanc)",
+        proposal_text,
+    ):
+        return ("PROPOSED", "status-proposed")
 
     # The actual deadline always overrides an old manually stored OPEN/ACTIVE label.
     if last and current > last:
@@ -404,6 +439,14 @@ def application_status(
     if explicit in mapping:
         return mapping[explicit]
     return ("UPDATE", "status-update")
+
+def is_homepage_current_job(p: dict[str, Any]) -> bool:
+    """Exclude expired and unconfirmed proposals from active homepage vacancy shelves."""
+    if normalized_category(p) not in {"Government Jobs", "Rajasthan Jobs"}:
+        return True
+    status, _ = application_status(p)
+    return status not in {"CLOSED", "PROPOSED", "ADMIT CARD", "RESULT"}
+
 
 def verification_line(p: dict[str, Any]) -> str:
     verified = date_value(p, "lastVerifiedAt", "verifiedAt", "sourceVerifiedAt")
@@ -1878,6 +1921,8 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 "Government Jobs",
             ):
                 continue
+            if not is_homepage_current_job(p):
+                continue
 
             slug = slugify(p.get("slug"))
 
@@ -1948,7 +1993,12 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         )
 
     # 1. LIVE UPDATES
-    latest = posts[:10]
+    # Keep expired/proposed job notices out of the active ticker; archive pages
+    # remain accessible through their category and article URLs.
+    latest = [
+        p for p in posts
+        if is_homepage_current_job(p)
+    ][:10]
 
     ticker_links = "".join(
         f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
@@ -2002,6 +2052,8 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         matching = []
         for post in posts:
             if normalized_category(post) not in allowed_categories:
+                continue
+            if "Government Jobs" in allowed_categories and not is_homepage_current_job(post):
                 continue
             post_slug = slugify(post.get("slug"))
             if not post_slug or any(slugify(x.get("slug")) == post_slug for x in matching):
