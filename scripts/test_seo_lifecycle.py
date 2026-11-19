@@ -80,6 +80,7 @@ class RecruitmentLifecycleTests(unittest.TestCase):
     def test_proposed_vacancy_is_not_listed_as_open_job(self) -> None:
         post = {
             "title": "Rajasthan Tax Assistant Recruitment 2026",
+            "category": "Rajasthan Jobs",
             "applicationStatus": "open",
             "content": "लगभग 300 पद प्रस्तावित हैं, आधिकारिक विज्ञापन जारी नहीं हुआ है।",
         }
