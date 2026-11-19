@@ -68,6 +68,41 @@ class RecruitmentLifecycleTests(unittest.TestCase):
         }
         self.assertIn("Apply Online", seo.actions(post))
 
+    def test_legacy_title_marked_application_closed_is_not_open(self) -> None:
+        post = {
+            "title": "Rajasthan Safai Karmchari 2026: आवेदन बंद",
+            "applicationStatus": "open",
+        }
+        self.assertEqual(seo.application_status(post)[0], "CLOSED")
+        self.assertFalse(seo.is_homepage_current_job(post))
+
+    def test_proposed_vacancy_is_not_listed_as_open_job(self) -> None:
+        post = {
+            "title": "Rajasthan Tax Assistant Recruitment 2026",
+            "applicationStatus": "open",
+            "content": "लगभग 300 पद प्रस्तावित हैं, आधिकारिक विज्ञापन जारी नहीं हुआ है।",
+        }
+        self.assertEqual(seo.application_status(post)[0], "PROPOSED")
+        self.assertFalse(seo.is_homepage_current_job(post))
+
+    def test_legacy_application_end_date_alias_is_respected(self) -> None:
+        post = {
+            "applicationStatus": "open",
+            "applicationEndDate": "2026-11-18",
+        }
+        self.assertEqual(
+            seo.application_status(post, utc("2026-11-19T00:00:00Z"))[0],
+            "CLOSED",
+        )
+
+    def test_non_job_education_updates_remain_eligible_for_homepage(self) -> None:
+        post = {
+            "category": "University & College",
+            "title": "University admission update",
+            "applicationStatus": "closed",
+        }
+        self.assertTrue(seo.is_homepage_current_job(post))
+
 
 if __name__ == "__main__":
     unittest.main()
