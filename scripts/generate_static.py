@@ -348,7 +348,7 @@ def application_date(value: Any, *, end_of_day: bool = False) -> datetime | None
     """Parse date-only recruitment dates in India time, preserving full-day validity."""
     if isinstance(value, str):
         raw = value.strip()
-        if re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", raw):
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", raw):
             clock = "23:59:59" if end_of_day else "00:00:00"
             try:
                 return datetime.fromisoformat(f"{raw}T{clock}+05:30").astimezone(timezone.utc)
