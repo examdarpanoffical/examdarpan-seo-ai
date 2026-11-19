@@ -4840,6 +4840,9 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: missing title in {path.name}")
         if not re.search(r"<h1\b[^>]*>\s*.+?\s*</h1>", txt, flags=re.S | re.I):
             raise RuntimeError(f"SEO verification failed: missing H1 in generated article {path.name}")
+        lifecycle, _ = application_status(p)
+        if lifecycle in {"CLOSED", "COMING SOON", "ADMIT CARD", "RESULT"} and "Apply Online ↗" in txt:
+            raise RuntimeError(f"SEO verification failed: stale Apply Online CTA remains in {path.name} ({lifecycle})")
         expected_category_path = category_path(CATEGORY_BY_NAME.get(normalized_category(p), CATEGORY_BY_NAME["Latest Updates"])[0])
         if f'href="{expected_category_path}"' not in txt:
             raise RuntimeError(f"SEO verification failed: generated article has no parent-category link in {path.name}")
