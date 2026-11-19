@@ -71,6 +71,7 @@ class RecruitmentLifecycleTests(unittest.TestCase):
     def test_legacy_title_marked_application_closed_is_not_open(self) -> None:
         post = {
             "title": "Rajasthan Safai Karmchari 2026: आवेदन बंद",
+            "category": "Rajasthan Jobs",
             "applicationStatus": "open",
         }
         self.assertEqual(seo.application_status(post)[0], "CLOSED")
