@@ -344,23 +344,65 @@ def date_value(p: dict[str, Any], *keys: str) -> Any:
             return value
     return None
 
-def application_status(p: dict[str, Any]) -> tuple[str, str]:
+def application_date(value: Any, *, end_of_day: bool = False) -> datetime | None:
+    """Parse date-only recruitment dates in India time, preserving full-day validity."""
+    if isinstance(value, str):
+        raw = value.strip()
+        if re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", raw):
+            clock = "23:59:59" if end_of_day else "00:00:00"
+            try:
+                return datetime.fromisoformat(f"{raw}T{clock}+05:30").astimezone(timezone.utc)
+            except ValueError:
+                return None
+    return as_datetime(value)
+
+
+def application_status(
+    p: dict[str, Any],
+    now: datetime | None = None,
+) -> tuple[str, str]:
+    """Resolve recruitment lifecycle with dates taking priority over stale OPEN labels."""
     explicit = str(date_value(p, "applicationStatus", "jobStatus", "statusLabel") or "").strip().lower()
-    mapping = {"open":("OPEN","status-open"),"active":("OPEN","status-open"),"closing soon":("CLOSING SOON","status-closing"),"closed":("CLOSED","status-closed"),"coming soon":("COMING SOON","status-soon"),"admit card":("ADMIT CARD","status-admit"),"result":("RESULT","status-result")}
+    mapping = {
+        "open": ("OPEN", "status-open"),
+        "active": ("OPEN", "status-open"),
+        "closing soon": ("CLOSING SOON", "status-closing"),
+        "closed": ("CLOSED", "status-closed"),
+        "coming soon": ("COMING SOON", "status-soon"),
+        "admit card": ("ADMIT CARD", "status-admit"),
+        "result": ("RESULT", "status-result"),
+    }
+    current = now or datetime.now(timezone.utc)
+    current = current.replace(tzinfo=timezone.utc) if current.tzinfo is None else current.astimezone(timezone.utc)
+
+    # Admit-card/result are later recruitment stages, not open application states.
+    if explicit in {"admit card", "result"}:
+        return mapping[explicit]
+
+    last = application_date(
+        date_value(p, "applicationLastDate", "lastDate", "lastDateTime", "applyLastDate"),
+        end_of_day=True,
+    )
+    start = application_date(
+        date_value(p, "applicationStartDate", "startDate", "applyStartDate"),
+    )
+
+    # The actual deadline always overrides an old manually stored OPEN/ACTIVE label.
+    if last and current > last:
+        return ("CLOSED", "status-closed")
+
+    # A future start date also overrides a stale OPEN label.
+    if start and current < start:
+        return ("COMING SOON", "status-soon")
+
     if explicit in mapping:
         return mapping[explicit]
-    last = as_datetime(date_value(p, "applicationLastDate","lastDate","lastDateTime","applyLastDate"))
-    start = as_datetime(date_value(p, "applicationStartDate","startDate","applyStartDate"))
-    now = datetime.now(timezone.utc)
+
     if last:
-        if now > last:
-            return ("CLOSED","status-closed")
-        if (last-now).total_seconds() <= 3*86400:
-            return ("CLOSING SOON","status-closing")
-        if not start or now >= start:
-            return ("OPEN","status-open")
-        return ("COMING SOON","status-soon")
-    return ("UPDATE","status-update")
+        if (last - current).total_seconds() <= 3 * 86400:
+            return ("CLOSING SOON", "status-closing")
+        return ("OPEN", "status-open")
+    return ("UPDATE", "status-update")
 
 def verification_line(p: dict[str, Any]) -> str:
     verified = date_value(p, "lastVerifiedAt", "verifiedAt", "sourceVerifiedAt")
@@ -719,8 +761,12 @@ def actions(p: dict[str, Any]) -> str:
         ("officialWebsiteUrl", "Official Website ↗", "btn-gold"),
         ("notificationPdfUrl", "Notification PDF ↗", "btn-dark"),
     ]
+    lifecycle, _ = application_status(p)
+    hide_apply = lifecycle in {"CLOSED", "COMING SOON", "ADMIT CARD", "RESULT"}
     out = []
     for key, label, cls in specs:
+        if key == "applyOnlineUrl" and hide_apply:
+            continue
         u = safe_url(p.get(key))
         if u:
             out.append(f'<a class="btn {cls}" href="{esc(u)}" target="_blank" rel="nofollow noopener">{label}</a>')
@@ -1968,7 +2014,12 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
                 '<a class="ed-home-priority-item" '
                 f'href="{esc(article_path(slugify(post.get("slug"))))}">'
                 '<span class="ed-home-priority-dot" aria-hidden="true"></span>'
-                f'<span>{esc(post_title(post))}</span></a>'
+                f'<span>{esc(post_title(post))}</span>'
+                + (
+                    f'<span class="status-badge {application_status(post)[1]}">{esc(application_status(post)[0])}</span>'
+                    if application_status(post)[0] != "UPDATE" else ""
+                )
+                + '</a>'
                 for post in matching
             )
         else:
@@ -2222,7 +2273,11 @@ def homepage_dynamic_sections(posts: list[dict[str, Any]]) -> str:
         '</div>'
         f'<a href="{esc(article_path(slugify(p.get("slug"))))}">'
         f'{esc(post_title(p))}</a>'
-        '<span class="ed-home-latest-arrow" aria-hidden="true">→</span>'
+        + (
+            f'<span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span>'
+            if application_status(p)[0] != "UPDATE" else ""
+        )
+        + '<span class="ed-home-latest-arrow" aria-hidden="true">→</span>'
         '</article>'
         for p in latest_mix
     )
