@@ -1137,7 +1137,7 @@ window.edTrackScroll=function(){{
 window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/article.css?v=20261111-2"><script src="/site-search.js" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><link rel="stylesheet" href="/article.css?v=20261111-2"><script src="/site-search.js" defer></script>
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
 </head>
@@ -3974,7 +3974,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
     robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" if filtered else "noindex,follow"
     return f'''{CATEGORY_MARKER}
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(fit_meta_text(title + " | Exam Darpan", limit=60))}</title><meta name="description" content="{esc(fit_meta_text(description, limit=160))}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
+<title>{esc(fit_meta_text(title + " | Exam Darpan", limit=60))}</title><meta name="description" content="{esc(fit_meta_text(description, limit=160))}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.png">
 <script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
 <style id="exam-darpan-category-design">
@@ -4358,7 +4358,7 @@ def write_author_profile(posts: list[dict[str, Any]]) -> None:
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="{AUTHOR_URL}">
 <meta property="og:url" content="{AUTHOR_URL}">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1">
 {ADSENSE_SCRIPT}
 <script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script>
 <script>
@@ -4533,7 +4533,7 @@ def write_category_directory(posts: list[dict[str, Any]]) -> None:
 <link rel="canonical" href="{BASE}/categories">
 <meta property="og:url" content="{BASE}/categories">
 <link rel="icon" href="/assets/favicon.png">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1">
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>
 <style>
 .ed-category-directory{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0 34px}}
