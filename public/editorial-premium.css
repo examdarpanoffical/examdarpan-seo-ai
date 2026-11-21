@@ -152,3 +152,7 @@ a{ text-underline-offset:3px }
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+.ed-article-hero-media{max-width:850px;margin:22px auto 28px;overflow:hidden;border:1px solid #e2eaf3;border-radius:17px;background:#edf2f7;box-shadow:0 10px 28px rgba(16,42,67,.08)}
+.ed-article-hero-media img{display:block;width:100%;max-height:470px;aspect-ratio:16/9;object-fit:cover;object-position:center}
+@media(max-width:760px){.ed-article-hero-media{margin:17px auto 22px;border-radius:13px}.ed-article-hero-media img{max-height:300px}}
