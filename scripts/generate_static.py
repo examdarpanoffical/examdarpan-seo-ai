@@ -1073,7 +1073,17 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     schema1 = json.dumps(schema_article(p, url), ensure_ascii=False, separators=(",", ":"))
     schema2 = json.dumps(schema_breadcrumb(p, url), ensure_ascii=False, separators=(",", ":"))
 
+    hero_img = safe_url(p.get("_featured_image_url")) or safe_url(p.get("featuredImage"))
     cover = ""
+    # Give each static article a real, article-specific lead image when one is available.
+    # Skip it when the same image is already embedded in the article body.
+    if hero_img and hero_img not in content:
+        cover = (
+            f'<figure class="ed-article-hero-media">'
+            f'<img src="{esc(hero_img)}" alt="{esc(title)}" width="1200" height="675" '
+            f'loading="eager" fetchpriority="high" decoding="async">'
+            f'</figure>'
+        )
 
     return f'''{ARTICLE_MARKER}
 <!doctype html>
@@ -1137,7 +1147,7 @@ window.edTrackScroll=function(){{
 window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><link rel="stylesheet" href="/article.css?v=20261111-2"><script src="/site-search.js" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/article.css?v=20261111-2"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><script src="/site-search.js" defer></script>
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
 </head>
