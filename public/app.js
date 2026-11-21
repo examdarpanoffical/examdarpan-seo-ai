@@ -40,25 +40,33 @@ const readingTime=html=>{
   return Math.max(1,Math.ceil(words/180));
 };
 
-let contentIndex=null;
-let contentIndexPromise=null;
+let postsIndex=null;
+let postsIndexPromise=null;
+let quizIndex=null;
+let quizIndexPromise=null;
 
-async function loadContentIndex(){
-  if(contentIndex) return contentIndex;
-
-  if(!contentIndexPromise){
-    contentIndexPromise=(async()=>{
-      const r=await fetch('/content-index.json',{cache:'default'});
-      if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
+async function loadPostsIndex(){
+  if(postsIndex) return postsIndex;
+  if(!postsIndexPromise){
+    postsIndexPromise=fetch('/posts-index.json',{cache:'default'}).then(r=>{
+      if(!r.ok) throw new Error(`posts-index.json HTTP ${r.status}`);
       return r.json();
-    })().catch(e=>{
-      contentIndexPromise=null;
-      throw e;
-    });
+    }).catch(e=>{postsIndexPromise=null;throw e;});
   }
+  postsIndex=await postsIndexPromise;
+  return postsIndex;
+}
 
-  contentIndex=await contentIndexPromise;
-  return contentIndex;
+async function loadQuizIndex(){
+  if(quizIndex) return quizIndex;
+  if(!quizIndexPromise){
+    quizIndexPromise=fetch('/quiz-index.json',{cache:'default'}).then(r=>{
+      if(!r.ok) throw new Error(`quiz-index.json HTTP ${r.status}`);
+      return r.json();
+    }).catch(e=>{quizIndexPromise=null;throw e;});
+  }
+  quizIndex=await quizIndexPromise;
+  return quizIndex;
 }
 
 
@@ -185,7 +193,7 @@ function getMatrixPosts(){
 
 async function loadPosts(){
   try{
-    const data=await loadContentIndex();
+    const data=await loadPostsIndex();
     posts=Array.isArray(data.posts)?data.posts:[];
     if(!posts.length) posts=getStaticPostsFromDOM();
     postsLoaded=true; postsLoadFailed=false; render();
@@ -271,7 +279,7 @@ function render(){
             <div class="post-meta">
               <span>${formatDate(p.publishedAt)}</span>
               <span>•</span>
-              <span>${readingTime(p.content)} min read</span>
+              <span>${Number(p.readingTimeMinutes)||readingTime(p.excerpt)} min read</span>
             </div>
 
             ${rajasthanHub}
@@ -803,13 +811,13 @@ async function loadDailyQuiz(){
   const summary=$('#dailyQuizSummary');
   if(!meta) return;
   try{
-    const data=await loadContentIndex();
+    const data=await loadQuizIndex();
     const quizzes=Array.isArray(data.quizzes)?data.quizzes:[];
     const now=new Date();
     const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     const quiz=quizzes.find(q=>q&&q.status==='published'&&q.quizDate===today);
     if(!quiz){ meta.textContent='आज का quiz अभी publish नहीं हुआ है।'; cta.textContent='Previous Quizzes →'; cta.href='/quiz.html#previous'; return; }
-    const count=Array.isArray(quiz.questions)?quiz.questions.length:0;
+    const count=Number(quiz.questionCount)||0;
     meta.textContent=`${count} Questions • ${quiz.durationMinutes||10} Minutes`;
     cta.textContent='Start Today’s Quiz →'; cta.href=`/quiz.html?id=${encodeURIComponent(quiz.id)}`;
     if(summary) summary.textContent=quiz.description||'Timer के साथ quiz दें और submit करने के बाद score, सही-गलत answers और explanations देखें।';

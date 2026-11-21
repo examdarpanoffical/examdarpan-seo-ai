@@ -17,8 +17,8 @@
 
 <script>
 async function getDocs(q){
-  const r = await fetch('/content-index.json',{cache:'default'});
-  if(!r.ok) throw new Error(`content-index.json HTTP ${r.status}`);
+  const r = await fetch('/posts-index.json',{cache:'default'});
+  if(!r.ok) throw new Error(`posts-index.json HTTP ${r.status}`);
   const data = await r.json();
   const posts = Array.isArray(data.posts) ? data.posts : [];
   const docs = posts
@@ -992,10 +992,10 @@ async function boot(){
 
   try{
 
-    const response = await fetch('/content-index.json',{cache:'default'});
+    const response = await fetch('/posts-index.json',{cache:'default'});
 
     if(!response.ok)
-      throw new Error(`content-index.json HTTP ${response.status}`);
+      throw new Error(`posts-index.json HTTP ${response.status}`);
 
     const index = await response.json();
 
