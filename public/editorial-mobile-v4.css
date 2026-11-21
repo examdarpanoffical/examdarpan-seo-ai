@@ -1,0 +1,42 @@
+/* EXAM DARPAN — HOME MOBILE CARD LAYOUT V4
+   Fix cramped text columns and awkward stacked header tags on narrow screens. */
+@media(max-width:650px){
+  /* Three priority cards: two balanced cards, then one full-width card. */
+  .ed-home-priority{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;gap:10px!important}
+  .ed-home-priority>.ed-home-priority-card:nth-child(3){grid-column:1/-1!important}
+  .ed-home-priority-card{width:auto!important;min-width:0!important}
+  .ed-home-priority-head{min-height:58px!important;padding:10px!important;gap:8px!important}
+  .ed-home-priority-head h2{font-size:14px!important;line-height:1.2!important}
+  .ed-home-priority-head p{font-size:9px!important;line-height:1.35!important}
+  .ed-home-priority-list{padding:5px 10px 2px!important}
+  .ed-home-priority-item{display:flex!important;gap:7px!important;padding:9px 0!important;font-size:11px!important;line-height:1.42!important}
+  .ed-home-priority-more{min-height:38px!important;padding:8px!important;font-size:10px!important}
+
+  /* Answer Key / Scholarships: keep the descriptive tag full width,
+     rather than squeezing it into a narrow half-column. */
+  .ed-home-secondary{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important}
+  .ed-home-secondary-card{min-width:0!important;width:auto!important;padding:9px!important;border-radius:14px!important}
+  .ed-home-secondary-head{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:7px!important;padding:10px!important;margin-bottom:7px!important}
+  .ed-home-secondary-head h2{width:100%!important;font-size:12px!important;line-height:1.3!important;overflow-wrap:normal!important}
+  .ed-home-secondary-tag{display:block!important;width:100%!important;max-width:none!important;box-sizing:border-box!important;padding:6px 7px!important;font-size:9px!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:break-word!important}
+  .ed-home-secondary-item{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:start!important;justify-content:initial!important;column-gap:6px!important;row-gap:5px!important;width:100%!important;box-sizing:border-box!important;padding:9px 1px!important;font-size:10px!important;line-height:1.4!important;overflow-wrap:break-word!important}
+  .ed-home-secondary-badge{justify-self:end!important;align-self:start!important;margin:0!important;font-size:8px!important;padding:4px 5px!important}
+  .ed-home-secondary-more{justify-content:center!important;padding:9px 2px!important;font-size:9px!important}
+
+  /* Job hubs and category directory: balanced columns without narrow text. */
+  .ed-home-hubs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .ed-home-hub{min-width:0!important}
+  .ed-home-hub-head{padding:10px!important}
+  .ed-home-hub-head h2{font-size:12px!important;line-height:1.3!important}
+  .ed-home-hub-item{align-items:flex-start!important;padding:9px!important;gap:6px!important}
+  .ed-home-hub-title{font-size:10px!important;line-height:1.4!important}
+  .ed-home-category-directory{padding:13px!important}
+  .ed-home-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .ed-home-category-card{min-width:0!important;min-height:100px!important;padding:10px!important}
+  .ed-home-category-card strong{font-size:10px!important;line-height:1.35!important}
+  .ed-home-category-card span,.ed-home-category-card small{font-size:8px!important;line-height:1.4!important}
+}
+@media(max-width:380px){
+  .ed-home-priority,.ed-home-secondary,.ed-home-hubs{grid-template-columns:1fr!important}
+  .ed-home-priority>.ed-home-priority-card:nth-child(3){grid-column:auto!important}
+}
