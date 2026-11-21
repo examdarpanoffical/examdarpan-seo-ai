@@ -1,0 +1,68 @@
+/* EXAM DARPAN — MOBILE DENSITY FIX V3
+   Keep the premium visual language while removing oversized single-column stacking on phones. */
+@media(max-width:650px){
+  .main.container{width:calc(100% - 20px)!important;padding-top:12px!important;padding-bottom:26px!important}
+  .header .head{min-height:64px!important;gap:9px!important;padding-top:9px!important;padding-bottom:9px!important}
+  .header .brand{gap:8px!important;min-width:0}
+  .header .brand img{width:36px!important;height:36px!important}
+  .header .brand-title{font-size:16px!important;line-height:1.1!important}
+  .header .tagline{font-size:7px!important;letter-spacing:.04em!important}
+  .header .search{min-height:38px!important}
+  .header .search input{font-size:12px!important;padding:9px 11px!important}
+  .nav .container{gap:2px!important}
+  .nav a{padding:8px 9px!important;font-size:10px!important;white-space:nowrap}
+  .ed-home-priority{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  .ed-home-priority-card:last-child{grid-column:1/-1}
+  .ed-home-priority-card{border-radius:13px!important}
+  .ed-home-priority-head{min-height:54px!important;padding:9px 10px!important;gap:7px!important}
+  .ed-home-priority-icon{width:30px!important;height:30px!important;font-size:16px!important;border-radius:9px!important}
+  .ed-home-priority-head h2{font-size:13px!important;line-height:1.2!important}
+  .ed-home-priority-head p{font-size:8px!important;line-height:1.3!important;margin-top:2px!important}
+  .ed-home-priority-list{padding:5px 9px 0!important}
+  .ed-home-priority-item{min-height:42px!important;padding:7px 0!important;gap:6px!important;font-size:9.5px!important;line-height:1.38!important}
+  .ed-home-priority-dot{width:6px!important;height:6px!important;flex-basis:6px!important}
+  .ed-home-priority-more,.ed-home-secondary-more,.ed-home-hub-more,.ed-home-section-more{min-height:34px!important;padding:7px!important;font-size:9px!important}
+  .ed-home-secondary{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  .ed-home-secondary-card{border-radius:13px!important}
+  .ed-home-secondary-head{min-height:48px!important;padding:8px 9px!important;gap:5px!important}
+  .ed-home-secondary-head h2{font-size:11px!important}
+  .ed-home-secondary-tag{font-size:7px!important;max-width:50%!important}
+  .ed-home-secondary-item{min-height:42px!important;padding:7px 9px!important;font-size:9px!important;line-height:1.35!important;gap:5px!important}
+  .ed-home-secondary-badge{font-size:7px!important;padding:3px 5px!important}
+  .ed-home-hubs{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  .ed-home-hub{border-radius:13px!important}
+  .ed-home-hub-head{padding:10px!important}
+  .ed-home-hub-head h2{font-size:11px!important;line-height:1.3!important}
+  .ed-home-hub-item{min-height:45px!important;padding:7px 9px!important;gap:6px!important}
+  .ed-home-hub-title{font-size:9px!important;line-height:1.35!important}
+  .ed-home-hub-dot{width:6px!important;height:6px!important;flex-basis:6px!important}
+  .ed-home-daily{padding:14px!important;border-radius:14px!important}
+  .ed-home-daily h2{font-size:18px!important;line-height:1.25!important}
+  .ed-home-daily p{font-size:9px!important;line-height:1.5!important}
+  .ed-home-daily-action{margin-top:10px!important;padding:10px!important}
+  .ed-home-latest-head h2{font-size:17px!important}
+  .ed-home-latest-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  .ed-home-latest-card{min-height:82px!important;padding:9px 25px 9px 9px!important;border-radius:10px!important}
+  .ed-home-latest-card>a{font-size:9px!important;line-height:1.35!important}
+  .ed-home-latest-card-top{gap:4px!important;margin-bottom:5px!important}
+  .ed-home-latest-chip,.ed-home-latest-card time{font-size:7px!important}
+  .ed-home-editorial,.ed-home-social,.ed-home-category-directory{padding:12px!important;border-radius:13px!important}
+  .ed-home-editorial h2{font-size:14px!important}
+  .ed-home-editorial p{font-size:9px!important;line-height:1.5!important}
+  .ed-home-social-heading strong{font-size:14px!important}
+  .ed-home-social-link{min-height:42px!important;padding:7px!important;font-size:9px!important}
+  .ed-home-category-heading h2{font-size:17px!important}
+  .ed-home-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  .ed-home-category-card{min-height:88px!important;padding:9px!important;border-radius:11px!important}
+  .ed-home-category-card strong{font-size:9px!important;line-height:1.3!important}
+  .ed-home-category-card span,.ed-home-category-card small{font-size:7.5px!important;line-height:1.35!important}
+  .article.article-page{padding:16px 13px!important}
+  .article-page>h1{font-size:clamp(23px,6vw,29px)!important}
+  .article-page .article-content{font-size:14px!important;line-height:1.78!important}
+  .article-page .article-content>p:first-child{font-size:14px!important}
+}
+@media(min-width:390px) and (max-width:650px){
+  .ed-home-priority{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .ed-home-priority-card:last-child{grid-column:1/-1}
+}
+@media(prefers-reduced-motion:reduce){.ed-home-priority-card,.ed-home-latest-card,.ed-home-category-card{transition:none!important}}
