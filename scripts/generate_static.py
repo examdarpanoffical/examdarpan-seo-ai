@@ -1085,7 +1085,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
             f'</figure>'
         )
 
-    return f'''{ARTICLE_MARKER}
+    page = f'''{ARTICLE_MARKER}
 <!doctype html>
 <html lang="hi">
 <head>
@@ -1615,6 +1615,89 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
 </body></html>
 '''
+    # Apply the selected portal shell to every generated article while preserving
+    # the crawlable article body, canonical metadata, JSON-LD, action links and content.
+    portal_template_path = PUBLIC / "portal-v1" / "index.html"
+    if not portal_template_path.exists():
+        raise RuntimeError("Selected portal UI template is missing: public/portal-v1/index.html")
+    portal_template = portal_template_path.read_text(encoding="utf-8")
+    shell_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal_template)
+    footer_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal_template)
+    if not (shell_match and footer_match):
+        raise RuntimeError("Selected portal shell is incomplete (header/footer missing)")
+    portal_header = shell_match.group(1)
+    portal_footer = footer_match.group(1)
+    portal_routes = {
+        "Government%20Jobs": "/all-india-government-jobs",
+        "Rajasthan%20Jobs": "/rajasthan-government-jobs",
+        "Results": "/category-results",
+        "Admit%20Card": "/category-admit-card",
+        "Answer%20Key": "/category-answer-key",
+        "Scholarships": "/category-scholarships",
+        "Syllabus": "/category-syllabus",
+        "Police%20%26%20Defence%20Jobs": "/category-police-defence-jobs",
+        "Teaching%20Jobs": "/category-teaching-jobs",
+        "Railway%20Jobs": "/category-railway-jobs",
+        "Banking%20Jobs": "/category-banking-jobs",
+        "SSC%20Jobs": "/category-ssc-jobs",
+        "UPSC%20Jobs": "/category-upsc-jobs",
+        "Entrance%20Exams": "/category-entrance-exams",
+        "University%20%26%20College": "/category-university-college",
+        "Yojana": "/category-yojana",
+        "Latest%20Updates": "/category-latest-updates",
+    }
+    for category_query, destination in portal_routes.items():
+        portal_header = portal_header.replace("category.html?category=" + category_query, destination)
+        portal_footer = portal_footer.replace("category.html?category=" + category_query, destination)
+    portal_header = portal_header.replace('href="index.html"', 'href="/"')
+    portal_footer = portal_footer.replace('href="index.html"', 'href="/"')
+    page = re.sub(r'(?s)<div class="topbar">.*?</header>', lambda _: portal_header, page, count=1)
+    page = re.sub(r'(?s)<footer class="footer">.*?</footer>', lambda _: portal_footer, page, count=1)
+    page = page.replace(
+        '<main class="main container"><article class="article article-page">',
+        '<main class="wrap page"><div class="detail-layout"><article class="detail-main article article-page">',
+        1,
+    )
+    page = page.replace(
+        '</article>\n\n</main>',
+        '</article><aside class="detail-sidebar">'
+        '<section class="side-panel"><h2>Explore Categories</h2><div class="side-links">'
+        '<a href="/rajasthan-government-jobs">Rajasthan Government Jobs</a>'
+        '<a href="/all-india-government-jobs">All India Government Jobs</a>'
+        '<a href="/category-admit-card">Admit Card</a>'
+        '<a href="/category-results">Results</a>'
+        '<a href="/category-answer-key">Answer Key</a>'
+        '<a href="/category-syllabus">Syllabus</a>'
+        '</div></section>'
+        '<section class="side-panel"><h2>Student Resources</h2><div class="side-links">'
+        '<a href="/quiz">Daily Mock Test</a><a href="/job-search.html">Search Jobs</a>'
+        '<a href="/saved-jobs.html">Saved Jobs</a><a href="/previous-papers.html">Previous Papers</a>'
+        '</div></section>'
+        '<section class="verification-note"><strong>Official-source check</strong>'
+        '<p>किसी भी आवेदन या परीक्षा संबंधी कार्रवाई से पहले संबंधित विभाग की आधिकारिक सूचना जरूर देखें।</p></section>'
+        '</aside></div></main>',
+        1,
+    )
+    if 'class="detail-main article article-page"' not in page or 'class="detail-sidebar"' not in page:
+        raise RuntimeError("Article layout integration failed; refusing to emit an incomplete article page")
+    if 'href="/portal-v1/style.css' not in page:
+        page = page.replace(
+            '</head>',
+            '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\n'
+            '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\n'
+            '<link rel="stylesheet" href="/portal-v1/pages.css?v=1">\n'
+            '</head>',
+            1,
+        )
+    page = page.replace(
+        '</body>',
+        '<script src="/portal-v1/preview.js" defer></script>\n'
+        '<script src="/portal-v1/side-menu.js" defer></script>\n'
+        '</body>',
+        1,
+    )
+    return page
+
 
 
 
@@ -3867,37 +3950,41 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         flags=re.S,
     )
 
-    if 'class="ed-home-category-directory"' not in text:
-        raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: category discovery directory missing")
+    # Legacy homepage checks apply only to the legacy HTML shell. The selected portal
+    # renders its dynamic job/result panels from content-index.json and is validated below.
+    selected_portal_home = 'class="site-head"' in text and 'class="main-nav"' in text
+    if not selected_portal_home:
+        if 'class="ed-home-category-directory"' not in text:
+            raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: category discovery directory missing")
 
-    required_home_sections = (
-        'id="exam-darpan-home-final-order"',
-        'class="ed-home-live"',
-        'class="ed-home-priority"',
-        'class="ed-home-secondary"',
-        "Answer Key &amp; Syllabus",
-        "Scholarships &amp; Yojana",
-        "Rajasthan Government Jobs",
-        "All India Government Jobs",
-        'id="daily-test"',
-        "Latest Articles",
-    )
+        required_home_sections = (
+            'id="exam-darpan-home-final-order"',
+            'class="ed-home-live"',
+            'class="ed-home-priority"',
+            'class="ed-home-secondary"',
+            "Answer Key &amp; Syllabus",
+            "Scholarships &amp; Yojana",
+            "Rajasthan Government Jobs",
+            "All India Government Jobs",
+            'id="daily-test"',
+            "Latest Articles",
+        )
 
-    for marker in required_home_sections:
-        if marker not in text:
-            raise RuntimeError(
-                f"FINAL HOMEPAGE CHECK FAILED: missing {marker}"
-            )
+        for marker in required_home_sections:
+            if marker not in text:
+                raise RuntimeError(
+                    f"FINAL HOMEPAGE CHECK FAILED: missing {marker}"
+                )
 
-    if 'href="/author/deepak-joshi"' not in text:
-        raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: author profile link missing")
-    for category_name, category_slug, _, _ in CATEGORIES:
-        category_href = {
-            "rajasthan-jobs": "/rajasthan-government-jobs",
-            "government-jobs": "/all-india-government-jobs",
-        }.get(category_slug, f"/category-{category_slug}")
-        if f'href="{category_href}"' not in text:
-            raise RuntimeError(f"FINAL HOMEPAGE CHECK FAILED: category link missing for {category_name}")
+        if 'href="/author/deepak-joshi"' not in text:
+            raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: author profile link missing")
+        for category_name, category_slug, _, _ in CATEGORIES:
+            category_href = {
+                "rajasthan-jobs": "/rajasthan-government-jobs",
+                "government-jobs": "/all-india-government-jobs",
+            }.get(category_slug, f"/category-{category_slug}")
+            if f'href="{category_href}"' not in text:
+                raise RuntimeError(f"FINAL HOMEPAGE CHECK FAILED: category link missing for {category_name}")
 
     # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1
     # The homepage generator is the source of truth: rebuilds must preserve the selected UI.
