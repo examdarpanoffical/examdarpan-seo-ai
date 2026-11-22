@@ -1,6 +1,9 @@
 name: Exam Darpan Isolated Migration Preview
 
 on:
+  push:
+    branches:
+      - migration/examdarpan-v1-from-main
   workflow_dispatch:
 
 permissions:
