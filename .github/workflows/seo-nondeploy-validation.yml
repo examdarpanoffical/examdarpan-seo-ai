@@ -1,6 +1,14 @@
 name: SEO Non-Deploy Validation
 
 on:
+  push:
+    branches:
+      - "migration/examdarpan-v1-from-main"
+    paths:
+      - "public/**"
+      - "scripts/**"
+      - "firebase.json"
+      - ".github/workflows/**"
   pull_request:
     paths:
       - "public/**"
@@ -19,6 +27,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node for preview JavaScript syntax checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check preview JavaScript syntax
+        run: |
+          node --check public/rebuild-preview/preview.js
+          node --check public/rebuild-preview/pages.js
 
       - name: Setup Python
         uses: actions/setup-python@v5
