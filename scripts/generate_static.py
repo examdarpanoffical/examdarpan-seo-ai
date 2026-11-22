@@ -1759,13 +1759,15 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     if 'src="/portal-v1/preview.js"' not in page:
         page = page.replace(
             '</body>',
-            '<script src="/portal-v1/preview.js" defer></script>\n'
-            '<script src="/portal-v1/side-menu.js" defer></script>\n'
-            '</body>',
+            '<script src="/portal-v1/preview.js" defer></script>\n</body>',
             1,
         )
-    else:
-        page = page.replace('</body>', '<script src="/portal-v1/side-menu.js" defer></script>\n</body>', 1)
+    # Article pages use the preview detail layout but never render the homepage menu.
+    page = re.sub(r'<script src="/portal-v1/side-menu\.js" defer></script>', '', page, flags=re.I)
+    # Remove legacy article stylesheets and embedded style blocks that override
+    # the selected preview detail CSS on mobile (the old layout seen in screenshots).
+    page = re.sub(r'<link rel="stylesheet" href="/(?:styles|article|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
+    page = re.sub(r'<style\b[^>]*>[\s\S]*?</style>', '', page, flags=re.I)
     return page
 
 
@@ -4535,8 +4537,8 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
                 )
         if 'src="/portal-v1/preview.js"' not in text:
             text = text.replace('</body>', '<script src="/portal-v1/preview.js" defer></script>\n</body>', 1)
-        if 'src="/portal-v1/side-menu.js"' not in text:
-            text = text.replace('</body>', '<script src="/portal-v1/side-menu.js" defer></script>\n</body>', 1)
+        # The category side menu is homepage-only; hubs keep the shared preview navigation.
+        text = re.sub(r'<script src="/portal-v1/side-menu\.js" defer></script>', '', text, flags=re.I)
 
         # Government-job hubs must not show the legacy floating WhatsApp popup.
         text = re.sub(
