@@ -862,8 +862,58 @@ def _json_default(value: Any) -> str:
     return str(value)
 
 
+# Explicit public-field allowlists: never serialize raw Firestore documents to a
+# publicly readable JSON file. Internal review fields and quiz answer keys must
+# remain server-side.
+PUBLIC_POST_FIELDS = (
+    "slug", "title", "seoTitle", "seoDescription", "excerpt", "description",
+    "category", "categoryName", "publishedAt", "updatedAt", "featuredImage",
+    "tags", "searchKeywords", "content", "body", "applicationStatus",
+    "jobStatus", "statusLabel", "organization", "postName", "vacancies",
+    "applicationStartDate", "lastDate", "applicationEndDate", "examDate",
+    "eligibility", "applicationFee", "applyOnlineUrl",
+    "officialNotificationUrl", "notificationPdfUrl", "officialWebsiteUrl",
+)
+PUBLIC_RECRUITMENT_FIELDS = (
+    "organization", "postName", "vacancies", "applicationStart",
+    "applicationEnd", "examDate", "eligibilitySummary", "feeSummary",
+    "applyUrl", "notificationUrl", "officialUrl",
+)
+PUBLIC_QUIZ_FIELDS = ("title", "description", "quizDate", "durationMinutes")
+
+
+def public_post_payload(post: dict[str, Any]) -> dict[str, Any]:
+    result = {key: post[key] for key in PUBLIC_POST_FIELDS if key in post}
+    recruitment = post.get("recruitment")
+    if isinstance(recruitment, dict):
+        safe_recruitment = {
+            key: recruitment[key]
+            for key in PUBLIC_RECRUITMENT_FIELDS
+            if key in recruitment
+        }
+        if safe_recruitment:
+            result["recruitment"] = safe_recruitment
+    # The build only passes published records, so expose a constant public status
+    # rather than copying any arbitrary Firestore value.
+    result["status"] = "published"
+    return result
+
+
+def public_quiz_payload(quiz: dict[str, Any]) -> dict[str, Any]:
+    # Public discovery metadata only. Never publish questions, options, answers,
+    # explanations, participant data, or scoring internals in this index.
+    result = {key: quiz[key] for key in PUBLIC_QUIZ_FIELDS if key in quiz}
+    result["status"] = "published"
+    return result
+
+
 def write_content_index(posts: list[dict[str, Any]], quizzes: list[dict[str, Any]]) -> None:
-    payload={"version":1,"generatedAt":datetime.now(timezone.utc).isoformat(),"posts":posts,"quizzes":quizzes}
+    payload={
+        "version": 2,
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "posts": [public_post_payload(post) for post in posts],
+        "quizzes": [public_quiz_payload(quiz) for quiz in quizzes],
+    }
     (PUBLIC/"content-index.json").write_text(
         json.dumps(payload,ensure_ascii=False,separators=(",",":"),default=_json_default),
         encoding="utf-8"
