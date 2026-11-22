@@ -96,8 +96,319 @@ window.addEventListener('scroll',window.edTrackScroll,{passive:true});
 
 
 
+<style>
+.ed-article-follow{
+  max-width:850px;
+  margin:10px auto 18px;
+  padding:10px;
+  border:1px solid #e2e8f0;
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 3px 12px rgba(15,23,42,.04);
+}
+.ed-article-follow-head{
+  display:none;
+}
+.ed-article-follow-label{
+  display:block;
+  color:#2563eb;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.12em;
+  margin-bottom:2px;
+}
+.ed-article-follow-head strong{
+  display:block;
+  color:#172033;
+  font-size:13px;
+  line-height:1.2;
+}
+.ed-article-follow-head p{
+  margin:2px 0 0;
+  color:#64748b;
+  font-size:8.5px;
+  line-height:1.3;
+}
+.ed-article-follow-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+}
+.ed-follow-btn{
+  min-width:0;
+  min-height:52px;
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border:1px solid #e2e8f0;
+  border-radius:11px;
+  background:#fff!important;
+  color:#172033!important;
+  text-decoration:none!important;
+  box-shadow:0 2px 8px rgba(15,23,42,.05);
+  transition:transform .16s ease,box-shadow .16s ease;
+}
+.ed-follow-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 11px rgba(15,23,42,.12);
+}
+.ed-follow-icon{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+}
+.ed-follow-icon img{
+  width:17px;
+  height:17px;
+  display:block;
+}
+.ed-follow-btn span:nth-child(2){
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  line-height:1.05;
+}
+.ed-follow-btn b{
+  font-size:13px;
+  font-weight:850;
+  color:#172033;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ed-follow-btn small{
+  display:none;
+}
+.ed-follow-btn em{
+  font-style:normal;
+  padding:7px 10px;
+  border-radius:7px;
+  color:#fff;
+  font-size:9px;
+  font-weight:850;
+  line-height:1;
+  opacity:1;
+}
+.ed-follow-whatsapp{background:#fff}
+.ed-follow-telegram{background:#fff}
+.ed-follow-instagram{background:#fff}
+.ed-follow-x{background:#fff}
+
+.ed-follow-whatsapp .ed-follow-icon{background:#25d366}
+.ed-follow-telegram .ed-follow-icon{background:#229ed9}
+.ed-follow-instagram .ed-follow-icon{background:linear-gradient(135deg,#833ab4,#e1306c,#f77737)}
+.ed-follow-x .ed-follow-icon{background:#111}
+
+.ed-follow-whatsapp em{background:#25d366}
+.ed-follow-telegram em{background:#229ed9}
+.ed-follow-instagram em{background:#d62f72}
+.ed-follow-x em{background:#111}
+
+@media(max-width:600px){
+  .ed-article-follow{
+    margin:9px auto 16px;
+    padding:9px;
+    border-radius:12px;
+  }
+  .ed-article-follow-head{
+    margin-bottom:7px;
+  }
+  .ed-article-follow-head strong{
+    font-size:12px;
+  }
+  .ed-article-follow-head p{
+    font-size:8px;
+  }
+  .ed-article-follow-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .ed-follow-btn{
+    min-height:48px;
+    grid-template-columns:24px minmax(0,1fr) auto;
+    gap:5px;
+    padding:5px 6px;
+  }
+  .ed-follow-icon{
+    width:24px;
+    height:24px;
+  }
+  .ed-follow-icon img{
+    width:14px;
+    height:14px;
+  }
+  .ed-follow-btn b{
+    font-size:10px;
+  }
+  .ed-follow-btn em{
+    padding:6px 7px;
+    font-size:8px;
+  }
+  .ed-follow-btn small{
+    display:none;
+  }
+}
+
+@media(max-width:360px){
+  .ed-follow-btn{
+    grid-template-columns:26px minmax(0,1fr) auto;
+    gap:5px;
+    padding:5px;
+  }
+  .ed-follow-icon{
+    width:25px;
+    height:25px;
+  }
+  .ed-follow-btn b{
+    font-size:8px;
+  }
+}
 
 
+/* EXAM_DARPAN_PREMIUM_ARTICLE_UI_V1 */
+.article-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.article-facts .quick-fact {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dbe5f2;
+  border-radius: 14px;
+  background: #f8fbff;
+}
+.article-facts .quick-fact span {
+  display: block;
+  margin-bottom: 5px;
+  color: #52627a;
+  font-size: 12px;
+}
+.article-facts .quick-fact strong {
+  color: #10244a;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.article-content {
+  font-size: 16px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.article-content h2 {
+  margin: 30px 0 14px;
+  padding: 12px 14px;
+  border-left: 4px solid #2563eb;
+  border-radius: 0 10px 10px 0;
+  background: #f1f6ff;
+  color: #10244a;
+  font-size: 22px;
+  line-height: 1.45;
+}
+.article-content h3 {
+  margin: 22px 0 10px;
+  color: #17376b;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.article-content table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 18px 0 24px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.65;
+  -webkit-overflow-scrolling: touch;
+}
+.article-content table th {
+  padding: 12px 13px;
+  background: #10244a;
+  color: #fff;
+  text-align: left;
+  font-weight: 800;
+}
+.article-content table td {
+  padding: 11px 13px;
+  border-top: 1px solid #e5eaf2;
+  border-right: 1px solid #edf1f6;
+  vertical-align: top;
+  min-width: 95px;
+}
+.article-content table tr:nth-child(even) td {
+  background: #f7faff;
+}
+.article-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0;
+  padding: 16px;
+  border: 1px solid #dbe5f2;
+  border-radius: 16px;
+  background: #f8fbff;
+}
+.article-actions .btn { min-height: 44px; }
+.notice {
+  margin: 22px 0;
+  padding: 15px 16px;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: 12px;
+  background: #fffbeb;
+  color: #713f12;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.related-section {
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+.related-section .posts-grid { gap: 12px; }
+.related-section .post {
+  border-radius: 15px;
+  background: #fff;
+}
+@media (max-width: 520px) {
+  .article-facts { gap: 8px; }
+  .article-facts .quick-fact {
+    padding: 11px;
+    border-radius: 12px;
+  }
+  .article-facts .quick-fact span { font-size: 11px; }
+  .article-facts .quick-fact strong { font-size: 13px; }
+  .article-content { font-size: 15px; line-height: 1.85; }
+  .article-content h2 { font-size: 19px; }
+  .article-content table { font-size: 13px; }
+  .article-content table th,
+  .article-content table td { padding: 9px 10px; }
+  .article-actions { padding: 12px; gap: 8px; }
+  .article-actions .btn { flex: 1 1 140px; }
+}
+
+</style>
+<style id="ed-article-topic-navigation-css">
+.ed-article-topic-nav{margin:28px 0 8px;padding:16px 18px;border:1px solid #dbe5f2;border-radius:15px;background:#f8fbff}
+.ed-article-topic-nav>p{margin:0 0 9px;color:#475569;font-size:13px;line-height:1.7}
+.ed-article-topic-nav>p a{color:#174ea6;font-weight:800;text-decoration:none}
+.ed-article-topic-nav .ed-topic-links{margin:0;padding:0;border:0;background:transparent}
+.ed-topic-links{margin:20px 0;padding:14px 16px;border:1px solid #e2e8f0;border-radius:13px;background:#f8fafc}
+.ed-topic-links strong{display:block;margin-bottom:9px;color:#334155;font-size:12px}
+.ed-topic-links>div{display:flex;flex-wrap:wrap;gap:8px}
+.ed-topic-links a{display:inline-flex;padding:7px 10px;border:1px solid #dbe5f2;border-radius:999px;background:#fff;color:#174ea6;font-size:11px;font-weight:800;text-decoration:none}
+.ed-topic-links a:hover{border-color:#93c5fd;background:#eff6ff}
+@media(max-width:600px){.ed-article-topic-nav{padding:13px}.ed-topic-links{padding:12px}.ed-topic-links>div{gap:6px}}
+</style>
 
 
 <div class="detail-content article-content">Bank of India SO Recruitment 2026 Latest Update: Bank of India (BOI) ने Project No. 2026-27/02 के तहत विभिन्न Specialist Streams में Scale-I से Scale-IV तक कुल <strong>205 Specialist Officer पदों</strong> पर भर्ती निकाली थी। ऑनलाइन आवेदन 10 सितंबर 2026 से शुरू हुए थे। आवेदन की अंतिम तारीख पहले 25 सितंबर थी, जिसे बढ़ाकर <strong>5 अक्टूबर 2026</strong> कर दिया गया था। अब आवेदन प्रक्रिया बंद हो चुकी है।<p>इस भर्ती में IT, Full-Stack Engineering, Digital Platforms, Information Security, Data Engineering, Law, Fire Safety, Security और Civil Engineering जैसे क्षेत्रों के पद शामिल हैं। उम्मीदवार अब Bank of India SO Exam Date 2026, Admit Card और आगे की चयन प्रक्रिया के लिए आधिकारिक वेबसाइट पर जारी सूचनाएं देखें।</p>
