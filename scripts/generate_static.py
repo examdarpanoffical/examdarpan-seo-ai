@@ -4472,7 +4472,7 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
 
         # Use the exact selected preview navigation and footer on both hub pages.
         text, header_count = re.subn(
-            r'<div class="topbar">[\\s\\S]*?</header>',
+            r'<div class="topbar">[\s\S]*?</header>',
             lambda _: shared_header,
             text,
             count=1,
@@ -4481,7 +4481,7 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         if header_count != 1:
             raise RuntimeError(f"Could not replace legacy header on {filename}")
         text, footer_count = re.subn(
-            r'<footer class="footer">[\\s\\S]*?</footer>',
+            r'<footer class="footer">[\s\S]*?</footer>',
             lambda _: shared_footer,
             text,
             count=1,
@@ -4493,23 +4493,23 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         text = text.replace('<main class="main container">', '<main class="wrap page main container">', 1)
         text = text.replace(
             '<link rel="stylesheet" href="/styles.css">',
-            '<link rel="stylesheet" href="/styles.css">\\n'
-            '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\\n'
-            '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\\n'
+            '<link rel="stylesheet" href="/styles.css">\n'
+            '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\n'
+            '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\n'
             '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">',
             1,
         )
         if 'href="/portal-v1/style.css' not in text:
             text = text.replace(
                 '</head>',
-                '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\\n'
-                '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\\n'
+                '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\n'
+                '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\n'
                 '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">\\n</head>',
                 1,
             )
         text = text.replace(
             '</body>',
-            '<script src="/portal-v1/preview.js" defer></script>\\n'
+            '<script src="/portal-v1/preview.js" defer></script>\n'
             '<script src="/portal-v1/side-menu.js" defer></script>\\n</body>',
             1,
         )
