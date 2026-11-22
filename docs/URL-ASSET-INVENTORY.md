@@ -33,6 +33,7 @@ Counts are from the checked-in branch snapshot. They do not prove all URLs retur
 - The legacy flat `sitemap.xml` repeats the same page/article/category URLs and is not the sitemap declared in `robots.txt`. It is intentionally excluded when counting duplicates across the indexed child sitemaps.
 - `/category-rajasthan-jobs` and `/category-government-jobs` are generated as legacy category files but both canonicals point to dedicated hub URLs. Four explicit 301 rules now cover extensionless and `.html` forms, before the generic `.html` redirect.
 - No article slug redirects were added. Existing published article clean URLs remain unchanged; Search Console / Analytics export is still needed before deciding whether any historical article alias should be redirected or retained.
+- Regression test: `python tests/test_url_migration_redirects.py` checks the four legacy category redirects, target canonicals, redirect ordering, and preservation of the article/clean-URL rules. It has been added to the branch but has not yet been executed in a CI runner.
 ## Redirect rules observed in `firebase.json`
 
 | Source pattern | Destination | Status | Review |
