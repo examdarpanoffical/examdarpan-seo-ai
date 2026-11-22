@@ -3950,37 +3950,41 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         flags=re.S,
     )
 
-    if 'class="ed-home-category-directory"' not in text:
-        raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: category discovery directory missing")
+    # Legacy homepage checks apply only to the legacy HTML shell. The selected portal
+    # renders its dynamic job/result panels from content-index.json and is validated below.
+    selected_portal_home = 'class="site-head"' in text and 'class="main-nav"' in text
+    if not selected_portal_home:
+        if 'class="ed-home-category-directory"' not in text:
+            raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: category discovery directory missing")
 
-    required_home_sections = (
-        'id="exam-darpan-home-final-order"',
-        'class="ed-home-live"',
-        'class="ed-home-priority"',
-        'class="ed-home-secondary"',
-        "Answer Key &amp; Syllabus",
-        "Scholarships &amp; Yojana",
-        "Rajasthan Government Jobs",
-        "All India Government Jobs",
-        'id="daily-test"',
-        "Latest Articles",
-    )
+        required_home_sections = (
+            'id="exam-darpan-home-final-order"',
+            'class="ed-home-live"',
+            'class="ed-home-priority"',
+            'class="ed-home-secondary"',
+            "Answer Key &amp; Syllabus",
+            "Scholarships &amp; Yojana",
+            "Rajasthan Government Jobs",
+            "All India Government Jobs",
+            'id="daily-test"',
+            "Latest Articles",
+        )
 
-    for marker in required_home_sections:
-        if marker not in text:
-            raise RuntimeError(
-                f"FINAL HOMEPAGE CHECK FAILED: missing {marker}"
-            )
+        for marker in required_home_sections:
+            if marker not in text:
+                raise RuntimeError(
+                    f"FINAL HOMEPAGE CHECK FAILED: missing {marker}"
+                )
 
-    if 'href="/author/deepak-joshi"' not in text:
-        raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: author profile link missing")
-    for category_name, category_slug, _, _ in CATEGORIES:
-        category_href = {
-            "rajasthan-jobs": "/rajasthan-government-jobs",
-            "government-jobs": "/all-india-government-jobs",
-        }.get(category_slug, f"/category-{category_slug}")
-        if f'href="{category_href}"' not in text:
-            raise RuntimeError(f"FINAL HOMEPAGE CHECK FAILED: category link missing for {category_name}")
+        if 'href="/author/deepak-joshi"' not in text:
+            raise RuntimeError("FINAL HOMEPAGE CHECK FAILED: author profile link missing")
+        for category_name, category_slug, _, _ in CATEGORIES:
+            category_href = {
+                "rajasthan-jobs": "/rajasthan-government-jobs",
+                "government-jobs": "/all-india-government-jobs",
+            }.get(category_slug, f"/category-{category_slug}")
+            if f'href="{category_href}"' not in text:
+                raise RuntimeError(f"FINAL HOMEPAGE CHECK FAILED: category link missing for {category_name}")
 
     # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1
     # The homepage generator is the source of truth: rebuilds must preserve the selected UI.
