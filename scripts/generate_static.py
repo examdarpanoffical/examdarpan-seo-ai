@@ -4125,13 +4125,13 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1_END
     # Strip legacy homepage-only CSS: the selected preview stylesheet owns this page's visual system.
     text = re.sub(
-        r'<style id="exam-darpan-student-first-home-v3">[\\s\\S]*?</style>',
+        r'<style id="exam-darpan-student-first-home-v3">[\s\S]*?</style>',
         '',
         text,
         count=1,
     )
     text = re.sub(
-        r'<style id="exam-darpan-home-community-cta">[\\s\\S]*?</style>',
+        r'<style id="exam-darpan-home-community-cta">[\s\S]*?</style>',
         '',
         text,
         count=1,
