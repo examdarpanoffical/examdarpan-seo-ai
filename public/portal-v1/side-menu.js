@@ -1,4 +1,6 @@
 (function(){
+  // The slide-out category menu is intentionally homepage-only.
+  if (window.location.pathname !== "/" && window.location.pathname !== "/index.html") return;
   if (document.getElementById("ed-side-menu")) return;
   var host=document.querySelector(".site-head .head-row")||document.querySelector(".top .container");
   if(!host) return;
@@ -12,7 +14,7 @@
   panel.innerHTML='<div class="ed-side-head"><div><b>EXAM <em>DARPAN</em></b><small>Explore categories & student tools</small></div><button type="button" class="ed-menu-close" aria-label="Close menu">×</button></div>'+
   '<div class="ed-side-content">'+
   '<section><h2>मुख्य श्रेणियाँ</h2><a href="/categories.html">सभी Categories <span>›</span></a><a href="/rajasthan-government-jobs">Rajasthan Government Jobs <span>›</span></a><a href="/all-india-government-jobs">All India Government Jobs <span>›</span></a><a href="/category-ssc-jobs">SSC Jobs <span>›</span></a><a href="/category-upsc-jobs">UPSC Jobs <span>›</span></a><a href="/category-railway-jobs">Railway Jobs <span>›</span></a><a href="/category-banking-jobs">Banking Jobs <span>›</span></a><a href="/category-police-defence-jobs">Police & Defence <span>›</span></a><a href="/category-teaching-jobs">Teaching Jobs <span>›</span></a></section>'+
-  '<section><h2>परीक्षा अपडेट</h2><a href="/category-results">Latest Results <span>›</span></a><a href="/category-admit-card">Admit Card & Exam City <span>›</span></a><a href="/category-answer-key">Answer Key <span>›</span></a><a href="/category-scholarships">Admission & Scholarships <span>›</span></a><a href="/category-syllabus">Syllabus & Exam Pattern <span>›</span></a><a href="/category-entrance-exams">Entrance Exams <span>›</span></a></section>'+
+  '<section><h2>परीक्षा अपडेट</h2><a href="/category-results">Latest Results <span>›</span></a><a href="/category-admit-card">Admit Card & Exam City <span>›</span></a><a href="/category-answer-key">Answer Key <span>›</span></a><a href="/category-scholarships">Admission & Scholarships <span>›</span></a><a href="/category-syllabus">Syllabus & Exam Pattern <span>›</span></a><a href="/category-entrance-exams">Entrance Exams <span>›</span></a><a href="/category-university-college">University & College <span>›</span></a><a href="/category-yojana">Yojana <span>›</span></a><a href="/category-latest-updates">Latest Updates <span>›</span></a></section>'+
   '<section><h2>Student Corner</h2><a href="/job-search.html">Smart Job Search <span>↗</span></a><a href="/saved-jobs.html">Saved Jobs <span>↗</span></a><a href="/previous-papers.html">Previous Year Papers <span>↗</span></a><a href="/mock-tests/">Mock Tests & Practice <span>↗</span></a><a href="/quiz">Daily Quiz <span>↗</span></a></section>'+
   '</div><div class="ed-side-foot"><a href="/">Exam Darpan Home</a><span>Rajasthan + All India</span></div>';
   document.body.appendChild(overlay);document.body.appendChild(panel);
