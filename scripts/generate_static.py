@@ -1615,8 +1615,8 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
 </body></html>
 '''
-    # Apply the selected portal shell to every generated article while preserving
-    # the crawlable article body, canonical metadata, JSON-LD, action links and content.
+    # Match the selected rebuild-preview article template, not just its header/footer.
+    # Keep this server-rendered: article text, tables, links, metadata and schema stay crawlable.
     portal_template_path = PUBLIC / "portal-v1" / "index.html"
     if not portal_template_path.exists():
         raise RuntimeError("Selected portal UI template is missing: public/portal-v1/index.html")
@@ -1624,7 +1624,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     shell_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal_template)
     footer_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal_template)
     if not (shell_match and footer_match):
-        raise RuntimeError("Selected portal shell is incomplete (header/footer missing)")
+        raise RuntimeError("Selected portal shell is incomplete (header/navigation/footer missing)")
     portal_header = shell_match.group(1)
     portal_footer = footer_match.group(1)
     portal_routes = {
@@ -1647,39 +1647,105 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
         "Latest%20Updates": "/category-latest-updates",
     }
     for category_query, destination in portal_routes.items():
-        portal_header = portal_header.replace("category.html?category=" + category_query, destination)
-        portal_footer = portal_footer.replace("category.html?category=" + category_query, destination)
+        old = "category.html?category=" + category_query
+        portal_header = portal_header.replace(old, destination)
+        portal_footer = portal_footer.replace(old, destination)
     portal_header = portal_header.replace('href="index.html"', 'href="/"')
     portal_footer = portal_footer.replace('href="index.html"', 'href="/"')
+    portal_header = portal_header.replace('href="job-search.html"', 'href="/job-search.html"')
+    portal_header = portal_header.replace('href="saved-jobs.html"', 'href="/saved-jobs.html"')
+    portal_header = portal_header.replace('href="previous-papers.html"', 'href="/previous-papers.html"')
+    portal_footer = portal_footer.replace('href="job-search.html"', 'href="/job-search.html"')
+    portal_footer = portal_footer.replace('href="saved-jobs.html"', 'href="/saved-jobs.html"')
+    portal_footer = portal_footer.replace('href="previous-papers.html"', 'href="/previous-papers.html"')
+
+    # Move breadcrumbs above the two-column detail card, exactly as in preview.
+    breadcrumb_match = re.search(r'(?s)<nav class="breadcrumbs"[^>]*>.*?</nav>', page)
+    breadcrumb_html = breadcrumb_match.group(0) if breadcrumb_match else (
+        '<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a>'
+        '<span>›</span><a href="' + category_path(cat_slug) + '">' + esc(cat) +
+        '</a><span>›</span><span>Article</span></nav>'
+    )
+    if breadcrumb_match:
+        page = page[:breadcrumb_match.start()] + page[breadcrumb_match.end():]
     page = re.sub(r'(?s)<div class="topbar">.*?</header>', lambda _: portal_header, page, count=1)
     page = re.sub(r'(?s)<footer class="footer">.*?</footer>', lambda _: portal_footer, page, count=1)
     page = page.replace(
         '<main class="main container"><article class="article article-page">',
-        '<main class="wrap page"><div class="detail-layout"><article class="detail-main article article-page">',
+        '<main class="wrap page">' + breadcrumb_html +
+        '<div class="detail-layout"><article class="detail-main article article-page">',
         1,
     )
-    page = page.replace(
-        '</article>\n\n</main>',
-        '</article><aside class="detail-sidebar">'
-        '<section class="side-panel"><h2>Explore Categories</h2><div class="side-links">'
-        '<a href="/rajasthan-government-jobs">Rajasthan Government Jobs</a>'
-        '<a href="/all-india-government-jobs">All India Government Jobs</a>'
-        '<a href="/category-admit-card">Admit Card</a>'
-        '<a href="/category-results">Results</a>'
-        '<a href="/category-answer-key">Answer Key</a>'
-        '<a href="/category-syllabus">Syllabus</a>'
-        '</div></section>'
-        '<section class="side-panel"><h2>Student Resources</h2><div class="side-links">'
-        '<a href="/quiz">Daily Mock Test</a><a href="/job-search.html">Search Jobs</a>'
-        '<a href="/saved-jobs.html">Saved Jobs</a><a href="/previous-papers.html">Previous Papers</a>'
-        '</div></section>'
-        '<section class="verification-note"><strong>Official-source check</strong>'
-        '<p>किसी भी आवेदन या परीक्षा संबंधी कार्रवाई से पहले संबंधित विभाग की आधिकारिक सूचना जरूर देखें।</p></section>'
-        '</aside></div></main>',
-        1,
+
+    # The preview article sidebar is part of the template: action links, student tools,
+    # category directory and latest updates are rendered as real production links.
+    sidebar_actions = []
+    lifecycle = application_status(p)[0]
+    if lifecycle not in {"CLOSED", "COMING SOON", "ADMIT CARD", "RESULT"}:
+        u = safe_url(p.get("applyOnlineUrl"))
+        if u:
+            sidebar_actions.append('<a href="' + esc(u) + '" target="_blank" rel="nofollow noopener">Apply Online ↗</a>')
+    for key, label in (
+        ("officialNotificationUrl", "Official Notification"),
+        ("notificationPdfUrl", "Notification PDF"),
+        ("officialWebsiteUrl", "Official Website"),
+    ):
+        u = safe_url(p.get(key))
+        if u and not any(label in x for x in sidebar_actions):
+            sidebar_actions.append('<a class="secondary" href="' + esc(u) + '" target="_blank" rel="nofollow noopener">' + label + ' ↗</a>')
+    if not sidebar_actions:
+        sidebar_actions.append('<p class="empty-state">इस update के official links उपलब्ध नहीं हैं।</p>')
+
+    category_items = []
+    for category_name, category_slug, _, _ in CATEGORIES:
+        category_items.append(
+            '<a href="' + category_path(category_slug) + '">' + esc(category_name) + ' →</a>'
+        )
+
+    same_category = [
+        x for x in posts
+        if str(x.get("slug") or "") != str(p.get("slug") or "")
+        and normalized_category(x) == normalized_category(p)
+    ][:6]
+    if not same_category:
+        same_category = [x for x in posts if str(x.get("slug") or "") != str(p.get("slug") or "")][:6]
+    latest_items = []
+    for item in same_category:
+        item_slug = slugify(item.get("slug") or item.get("urlSlug") or item.get("seoSlug") or "")
+        if item_slug:
+            latest_items.append(
+                '<a href="' + article_path(item_slug) + '">' +
+                esc(item.get("title") or item.get("seoTitle") or "Latest update") + '</a>'
+            )
+    latest_html = "".join(latest_items) or '<p class="empty-state">अभी related updates उपलब्ध नहीं हैं।</p>'
+
+    sidebar_html = (
+        '<aside class="detail-sidebar">'
+        '<section class="side-panel"><h2>Important Links</h2><div class="action-links">' +
+        "".join(sidebar_actions) + '</div></section>'
+        '<section class="side-panel"><h2>Student Corner</h2>'
+        '<a href="/quiz">Daily Quiz ↗</a>'
+        '<a href="/mock-tests/">Mock Tests &amp; Practice ↗</a>'
+        '<a href="/job-search.html">Smart Job Search ↗</a>'
+        '<a href="/saved-jobs.html">Saved Jobs ↗</a>'
+        '<a href="/previous-papers.html">Previous Papers ↗</a>'
+        '</section>'
+        '<section class="side-panel"><h2>All Categories</h2><div class="side-links">' +
+        "".join(category_items) + '</div></section>'
+        '<section class="side-panel"><h2>Latest Updates</h2><div class="side-links">' +
+        latest_html + '</div></section>'
+        '<div class="verification-note"><b>Important Notice</b>'
+        '<p>आवेदन करने से पहले संबंधित विभाग की official notification, eligibility और dates जरूर verify करें।</p></div>'
+        '</aside></div></main>'
     )
+    page = page.replace('</article>\n\n</main>', '</article>' + sidebar_html, 1)
     if 'class="detail-main article article-page"' not in page or 'class="detail-sidebar"' not in page:
-        raise RuntimeError("Article layout integration failed; refusing to emit an incomplete article page")
+        raise RuntimeError("Preview article detail layout/sidebar integration failed")
+
+    # Use the same detail facts/content classes and exact preview styles.
+    page = page.replace('class="article-facts"', 'class="detail-facts article-facts"')
+    page = page.replace('class="quick-fact', 'class="fact quick-fact')
+    page = page.replace('class="article-content"', 'class="detail-content article-content"')
     if 'href="/portal-v1/style.css' not in page:
         page = page.replace(
             '</head>',
@@ -1689,13 +1755,16 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
             '</head>',
             1,
         )
-    page = page.replace(
-        '</body>',
-        '<script src="/portal-v1/preview.js" defer></script>\n'
-        '<script src="/portal-v1/side-menu.js" defer></script>\n'
-        '</body>',
-        1,
-    )
+    if 'src="/portal-v1/preview.js"' not in page:
+        page = page.replace(
+            '</body>',
+            '<script src="/portal-v1/preview.js" defer></script>\n'
+            '<script src="/portal-v1/side-menu.js" defer></script>\n'
+            '</body>',
+            1,
+        )
+    else:
+        page = page.replace('</body>', '<script src="/portal-v1/side-menu.js" defer></script>\n</body>', 1)
     return page
 
 
