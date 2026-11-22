@@ -1,0 +1,24 @@
+(function(){
+"use strict";
+var KEY="exam-darpan-saved-jobs-v1";
+var esc=function(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+var slug=function(p){return String(p.slug||p.urlSlug||p.seoSlug||"").replace(/^\\/+|\\.html$/g,"")};
+var category=function(p){return String(p.category||p.categoryName||"Latest Updates")};
+var saved=function(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}};
+var write=function(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}};
+var date=function(v){if(!v)return "";var d=new Date(v);return isNaN(d)?"":new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(d)};
+var posts=[];
+function isSaved(s){return saved().some(function(x){return x.slug===s})}
+function toggle(p){var s=slug(p),a=saved();if(!s)return;if(a.some(function(x){return x.slug===s}))a=a.filter(function(x){return x.slug!==s});else a.unshift({slug:s,title:p.title||"Government Job",category:category(p),publishedAt:p.publishedAt||""});write(a);render();}
+function jobText(p){var r=p.recruitment||{};return [p.title,p.category,p.categoryName,p.excerpt,p.description,p.eligibility,r.eligibilitySummary,r.organization,p.organization,p.state,p.location,p.region].concat(p.tags||[]).join(" ").toLowerCase()}
+function card(p,removeMode){var s=slug(p),r=p.recruitment||{},last=r.applicationEnd||p.lastDate||p.applicationEndDate||"",exam=r.examDate||p.examDate||"";return '<article class="tool-job-card"><div><h2>'+esc(p.title||"Government Recruitment")+'</h2><p>'+esc(category(p))+' · Published: '+esc(date(p.publishedAt)||"—")+(last?' · Last date: '+esc(date(last)):"")+(exam?' · Exam: '+esc(date(exam)):"")+'</p><a class="job-open" href="article.html?slug='+encodeURIComponent(s)+'">पूरी जानकारी और official links देखें →</a></div><div class="tool-job-actions"><button type="button" data-save="'+esc(s)+'" class="'+(isSaved(s)?"is-saved":"")+'">'+(isSaved(s)?"★ Saved":"☆ Save Job")+'</button>'+(removeMode?'<button type="button" data-remove="'+esc(s)+'">Remove</button>':"")+'</div></article>'}
+function render(){var root=document.getElementById("job-results"),count=document.getElementById("job-result-count");if(!root)return;
+var savedMode=document.body.dataset.page==="saved",arr;
+if(savedMode){var ids=saved().map(function(x){return x.slug});arr=ids.map(function(id){return posts.find(function(p){return slug(p)===id})||saved().find(function(x){return x.slug===id})}).filter(Boolean);}
+else{var q=(document.getElementById("job-keyword")||{}).value||"",cat=(document.getElementById("job-category")||{}).value||"",qual=(document.getElementById("job-qualification")||{}).value||"",region=(document.getElementById("job-region")||{}).value||"";arr=posts.filter(function(p){var c=category(p),txt=jobText(p),jobCat=/job|recruit|vacan|bharti|police|railway|ssc|upsc|bank|teaching/i.test(c+" "+(p.title||""));return jobCat&&(!q||txt.includes(q.toLowerCase()))&&(!cat||c===cat)&&(!qual||txt.includes(qual.toLowerCase())||(qual==="12th"&&/12th|10\+2|senior secondary|intermediate/i.test(txt)))&&(!region||txt.includes(region.toLowerCase()));});}
+count.textContent=arr.length+" "+(savedMode?"Saved Jobs":"भर्ती मिलीं");
+root.innerHTML=arr.length?arr.map(function(p){return card(p,savedMode)}).join(""):'<div class="tool-empty">'+(savedMode?'अभी कोई Job save नहीं की गई है। <a href="job-search.html">भर्ती खोजें →</a>':'इस filter से कोई published भर्ती नहीं मिली। Filters बदलकर देखें।')+'</div>';
+}
+document.addEventListener("click",function(e){var b=e.target.closest("[data-save],[data-remove]");if(!b)return;var s=b.getAttribute("data-save")||b.getAttribute("data-remove"),p=posts.find(function(x){return slug(x)===s})||saved().find(function(x){return x.slug===s});if(!p)return;if(b.hasAttribute("data-remove")){write(saved().filter(function(x){return x.slug!==s}));render()}else toggle(p)});
+fetch("/content-index.json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw Error("content index unavailable");return r.json()}).then(function(data){posts=(Array.isArray(data.posts)?data.posts:[]).filter(function(p){return p&&p.slug&&p.status==="published"});["job-keyword","job-category","job-qualification","job-region"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("input",render);if(el)el.addEventListener("change",render)});render()}).catch(function(){var root=document.getElementById("job-results");if(root)root.innerHTML='<div class="tool-empty">Published content feed अभी उपलब्ध नहीं है। बाद में फिर कोशिश करें।</div>'});
+})();
