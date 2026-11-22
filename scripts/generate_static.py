@@ -5202,6 +5202,12 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: generated article has no parent-category link in {path.name}")
         if 'href="/categories"' not in txt:
             raise RuntimeError(f"SEO verification failed: generated article has no category-directory link in {path.name}")
+        if 'class="detail-main article article-page"' not in txt or 'class="detail-sidebar"' not in txt:
+            raise RuntimeError(f"SEO verification failed: static article detail layout is incomplete in {path.name}")
+        if 'src="/portal-v1/side-menu.js"' not in txt:
+            raise RuntimeError(f"SEO verification failed: global menu missing from article {path.name}")
+        if 'src="/portal-v1/preview.js"' in txt:
+            raise RuntimeError(f"SEO verification failed: article unexpectedly loads homepage feed script in {path.name}")
         if re.search(r"\$\{esc\(title\)\}", txt, flags=re.I):
             raise RuntimeError(f"SEO verification failed: unresolved title template in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
@@ -5301,6 +5307,12 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: category directory link missing for {category_name}")
         if not (PUBLIC / f"category-{category_slug}.html").exists():
             raise RuntimeError(f"SEO verification failed: generated category page missing for {category_name}")
+        category_file = PUBLIC / f"category-{category_slug}.html"
+        category_html = category_file.read_text(encoding="utf-8", errors="ignore")
+        if f'<link rel="canonical" href="{BASE}{category_href}">' not in category_html:
+            raise RuntimeError(f"SEO verification failed: category canonical mismatch for {category_name}")
+        if 'class="site-head"' not in category_html or 'src="/portal-v1/side-menu.js"' not in category_html:
+            raise RuntimeError(f"SEO verification failed: category shell/menu mismatch for {category_name}")
     if sitemap.count(f"<loc>{xml_esc(BASE + '/categories')}</loc>") != 1:
         raise RuntimeError("SEO verification failed: /categories missing/duplicated in sitemap")
 
