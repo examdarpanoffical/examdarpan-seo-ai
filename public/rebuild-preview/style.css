@@ -48,3 +48,30 @@
 .footer-social-wrap{background:#fff;padding:0 0 20px;color:#243246}.footer-social{background:#142b49;border:1px solid #dce3eb;box-shadow:0 2px 8px rgba(22,39,61,.07)}
 @media(max-width:700px){.cet-hub{padding:14px;margin:16px 0}.cet-head{display:block}.cet-head h2{font-size:18px}.cet-head p{font-size:11px}.cet-all{display:inline-block;margin-top:10px}.cet-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.cet-card{padding:9px;gap:7px}.cet-icon{width:31px;height:31px;flex-basis:31px;font-size:9px}.cet-card b{font-size:10px}.cet-card small{font-size:9px}.cet-topics{gap:5px}.cet-topics span{font-size:9px;padding:4px 6px}.footer-social-wrap{padding-bottom:14px}}
 @media(max-width:370px){.cet-grid{grid-template-columns:1fr}}
+
+/* All India Government Jobs directory section */
+.all-india-jobs{margin:22px 0 24px;padding:20px;background:#fff;border:1px solid #dce3eb;border-top:4px solid #245b94;border-radius:5px;box-shadow:0 2px 8px rgba(22,39,61,.07)}
+.all-india-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:15px}
+.all-india-head h2{margin:3px 0 5px;color:#142b49;font-size:21px}
+.all-india-head p{margin:0;color:#66758a;font-size:12px;line-height:1.6}
+.all-india-head>a{flex:0 0 auto;padding:9px 13px;background:#245b94;color:#fff;border-radius:3px;font-size:11px;font-weight:800}
+.all-india-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.all-india-grid>a{display:flex;align-items:center;gap:9px;min-width:0;padding:11px;border:1px solid #dce3eb;background:#fbfcfe;border-radius:4px}
+.all-india-grid>a:hover{border-color:#8eaccb;background:#f2f7fc}
+.ai-mark{display:grid;place-items:center;width:39px;height:39px;flex:0 0 39px;background:#eaf1f8;color:#245b94;border-radius:4px;font-size:9px;font-weight:900}
+.all-india-grid>a>span:nth-child(2){display:flex;flex-direction:column;gap:3px;min-width:0}
+.all-india-grid b{color:#142b49;font-size:11px}
+.all-india-grid small{color:#66758a;font-size:9px;line-height:1.4}
+.all-india-grid i{margin-left:auto;color:#245b94;font-style:normal}
+.footer-social-wrap{background:#fff!important;color:#243246!important;padding:0 0 20px!important}
+.footer-social{background:#fff!important;border:1px solid #dce3eb!important;box-shadow:0 2px 8px rgba(22,39,61,.07)!important}
+.footer-social-heading h2{color:#142b49!important}
+.footer-social-heading p{color:#66758a!important}
+.footer-social-heading>span{color:#245b94!important}
+.footer-social-link{background:#fff!important;border:1px solid #dce3eb!important;color:#142b49!important}
+.footer-social-link:hover{background:#f5f8fc!important;border-color:#9bb9d7!important}
+.footer-social-link small{color:#66758a!important}
+.footer-social-link i{color:#245b94!important}
+@media(max-width:900px){.all-india-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.all-india-jobs{padding:14px;margin:16px 0}.all-india-head{display:block}.all-india-head h2{font-size:18px}.all-india-head p{font-size:11px}.all-india-head>a{display:inline-block;margin-top:10px}.all-india-grid{gap:7px}.all-india-grid>a{padding:9px;gap:7px}.ai-mark{width:32px;height:32px;flex-basis:32px;font-size:8px}.all-india-grid b{font-size:10px}.all-india-grid small{font-size:8px}}
+@media(max-width:370px){.all-india-grid{grid-template-columns:1fr}}
