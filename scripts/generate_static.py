@@ -867,17 +867,27 @@ def _json_default(value: Any) -> str:
 # remain server-side.
 PUBLIC_POST_FIELDS = (
     "slug", "title", "seoTitle", "seoDescription", "excerpt", "description",
-    "category", "categoryName", "publishedAt", "updatedAt", "featuredImage",
-    "tags", "searchKeywords", "content", "body", "applicationStatus",
-    "jobStatus", "statusLabel", "organization", "postName", "vacancies",
-    "applicationStartDate", "lastDate", "applicationEndDate", "examDate",
-    "eligibility", "applicationFee", "applyOnlineUrl",
+    "summary", "category", "categoryName", "region", "state", "department",
+    "publishedAt", "updatedAt", "featuredImage", "tags", "searchKeywords",
+    "content", "body", "articleContent", "articleBody", "articleHtml",
+    "postContent", "applicationStatus", "jobStatus", "statusLabel",
+    "organization", "postName", "vacancies", "eligibility",
+    "applicationStartDate", "application_start_date", "startDate", "start_date",
+    "applyStartDate", "apply_start_date", "registrationStartDate",
+    "registration_start_date", "applicationFrom", "application_from",
+    "lastDate", "applicationLastDate", "application_last_date", "lastDateTime",
+    "applyLastDate", "apply_last_date", "lastDateToApply", "last_date_to_apply",
+    "applicationDeadline", "application_deadline", "applicationEndDate",
+    "application_end_date", "closingDate", "closing_date", "deadline", "lastDay",
+    "examDate", "applicationFee", "applyOnlineUrl",
     "officialNotificationUrl", "notificationPdfUrl", "officialWebsiteUrl",
 )
 PUBLIC_RECRUITMENT_FIELDS = (
     "organization", "postName", "vacancies", "applicationStart",
-    "applicationEnd", "examDate", "eligibilitySummary", "feeSummary",
-    "applyUrl", "notificationUrl", "officialUrl",
+    "applicationEnd", "applicationLastDate", "startDate", "lastDate",
+    "applyStartDate", "applyLastDate", "registrationStartDate",
+    "applicationDeadline", "closingDate", "examDate", "eligibilitySummary",
+    "feeSummary", "applyUrl", "notificationUrl", "officialUrl",
 )
 PUBLIC_QUIZ_FIELDS = ("title", "description", "quizDate", "durationMinutes")
 
