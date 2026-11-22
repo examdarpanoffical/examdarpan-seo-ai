@@ -1,0 +1,33 @@
+/* Exact rebuild-preview visual alignment for the two live job hubs. */
+.aihub-page,.aihub-container{color:var(--ed-ink);font-family:Arial,"Noto Sans Devanagari",system-ui,sans-serif}
+.aihub-hero,.hero.card{
+  margin:0 0 17px!important;padding:24px 26px!important;border-radius:0!important;
+  border:1px solid var(--ed-line)!important;border-bottom:4px solid var(--ed-gold)!important;
+  box-shadow:none!important;background:linear-gradient(115deg,#142b49,#245b94)!important;color:#fff!important
+}
+.aihub-hero h1,.hero.card h1{font-size:27px!important;line-height:1.25!important;margin:5px 0 8px!important;color:#fff!important}
+.aihub-hero p,.hero.card p{font-size:12px!important;line-height:1.7!important;color:#e0e9f4!important}
+.aihub-section-title,.section-title h2,.ed-raj-live-head h2{font-size:18px!important;color:var(--ed-navy)!important}
+.aihub-section-intro{font-size:12px!important;color:var(--ed-muted)!important}
+.aihub-toolbar{margin:14px 0!important;gap:9px!important}
+.aihub-search,.aihub-count{border-radius:5px!important;border-color:var(--ed-line)!important}
+.aihub-filter{border-radius:5px!important;font-size:11px!important;padding:7px 10px!important}
+.aihub-card,.ed-raj-live-card,.ed-raj-active-link,.seo-raj-grid a,.ed-hub-crawl-card{
+  border:1px solid var(--ed-line)!important;border-radius:0!important;box-shadow:var(--ed-shadow)!important;
+  background:#fff!important;transform:none!important
+}
+.aihub-card{padding:14px!important}
+.aihub-card h3,.ed-raj-live-card h3{font-size:14px!important;line-height:1.45!important}
+.aihub-excerpt,.ed-raj-live-card p{font-size:11px!important;line-height:1.6!important}
+.aihub-source,.ed-raj-live-hub,.seo-raj-clusters,.ed-hub-crawl-section{
+  border:1px solid var(--ed-line)!important;border-radius:0!important;box-shadow:var(--ed-shadow)!important;padding:17px!important
+}
+.aihub-source h2,.ed-hub-crawl-section h2{font-size:17px!important;color:var(--ed-navy)!important}
+.ed-raj-live-head{align-items:flex-start!important}
+.ed-raj-live-count,.aihub-category{border-radius:4px!important}
+@media(max-width:700px){
+ .aihub-hero,.hero.card{padding:18px 16px!important}
+ .aihub-hero h1,.hero.card h1{font-size:22px!important}
+ .aihub-card{padding:12px!important}
+ .ed-raj-live-hub,.seo-raj-clusters,.ed-hub-crawl-section{padding:13px!important}
+}
