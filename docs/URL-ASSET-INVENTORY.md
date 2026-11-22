@@ -25,12 +25,22 @@ Counts are from the checked-in branch snapshot. They do not prove all URLs retur
 - `/category-sitemap.xml`
 - `/mock-tests-sitemap.xml`
 
+## Revalidated sitemap and route findings (branch snapshot)
+
+- `robots.txt` points to `/sitemap_index.xml`, not the older flat `/sitemap.xml`.
+- The four indexed child sitemaps are posts, pages, categories, and mock tests. The deployment workflow generates `mock-tests-sitemap.xml` from the manifest and inserts it into `sitemap_index.xml` after the static-page generator runs. The checked-in pre-workflow snapshot may therefore show only three entries; do not treat that intermediate file alone as the deployed sitemap.
+- Rechecking the four child sitemap files against the branch file tree found 76 URL entries, 76 unique URLs, and no URL without a matching static HTML file in this repository snapshot.
+- The legacy flat `sitemap.xml` repeats the same page/article/category URLs and is not the sitemap declared in `robots.txt`. It is intentionally excluded when counting duplicates across the indexed child sitemaps.
+- `/category-rajasthan-jobs` and `/category-government-jobs` are generated as legacy category files but both canonicals point to dedicated hub URLs. Four explicit 301 rules now cover extensionless and `.html` forms, before the generic `.html` redirect.
+- No article slug redirects were added. Existing published article clean URLs remain unchanged; Search Console / Analytics export is still needed before deciding whether any historical article alias should be redirected or retained.
 ## Redirect rules observed in `firebase.json`
 
 | Source pattern | Destination | Status | Review |
 |---|---|---:|---|
 | `/article` | `/` | 301 | Check whether this legacy route has any backlinks/traffic before retaining |
 | `/latest-jobs` | `/all-india-government-jobs` | 301 | Relevant replacement; verify page content |
+| `/category-rajasthan-jobs` and `.html` | `/rajasthan-government-jobs` | 301 | Added in isolated rebuild branch; legacy page canonical already pointed to this hub |
+| `/category-government-jobs` and `.html` | `/all-india-government-jobs` | 301 | Added in isolated rebuild branch; legacy page canonical already pointed to this hub |
 | `/article/:slug*` | `/:slug` | 301 | Preserve only where matching slug exists |
 | `/index.html` | `/` | 301 | Keep |
 | `/*.html` | clean path | 301 | Validate no collisions and canonical consistency |
