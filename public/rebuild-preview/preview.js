@@ -9,6 +9,8 @@
     {id:"admission",title:"Admissions & Scholarships",cats:["Scholarships","University & College","Entrance Exams"],url:"/category-scholarships"},
     {id:"syllabus",title:"Syllabus & Exam Updates",cats:["Syllabus","Latest Updates","Yojana"],url:"/category-syllabus"}
   ];
+  var categoryAliases={"Rajasthan":"Rajasthan Jobs","All India Jobs":"Government Jobs","Admit Cards":"Admit Card","Result":"Results","Answer Keys":"Answer Key","Exam Syllabus":"Syllabus"};
+  function normalizedCategory(p){var raw=String(p.category||p.categoryName||"").trim();return categoryAliases[raw]||(["Rajasthan Jobs","Government Jobs","Police & Defence Jobs","Teaching Jobs","Railway Jobs","Banking Jobs","SSC Jobs","UPSC Jobs","Admit Card","Results","Answer Key","Syllabus","Entrance Exams","Scholarships","University & College","Yojana","Latest Updates"].indexOf(raw)>=0?raw:"Latest Updates");}
   var categoryPaths={
     "Rajasthan Jobs":"/rajasthan-government-jobs",
     "Government Jobs":"/all-india-government-jobs",
@@ -35,7 +37,7 @@
   function render(posts){
     groups.forEach(function(g){
       var panel=document.getElementById(g.id);if(!panel)return;
-      var arr=posts.filter(function(p){return g.cats.indexOf(String(p.category||p.categoryName||"").trim())!==-1;}).slice(0,6);
+      var arr=posts.filter(function(p){return g.cats.indexOf(normalizedCategory(p))!==-1;}).slice(0,6);
       var body=panel.querySelector(".list-body");
       var foot=panel.querySelector("footer a");
       var head=panel.querySelector("header h2");
@@ -56,7 +58,7 @@
       var q=input.value.trim().toLocaleLowerCase();
       if(q.length<2){box.hidden=true;box.innerHTML="";return;}
       var matches=posts.filter(function(p){return [p.title,p.category,p.excerpt,p.description].concat(p.tags||[]).join(" ").toLocaleLowerCase().includes(q);}).slice(0,8);
-      box.innerHTML=matches.length?matches.map(function(p){return '<a href="'+esc(slugUrl(p))+'"><strong>'+esc(p.title||"Latest update")+'</strong><small>'+esc(p.category||p.categoryName||"Exam Darpan")+'</small></a>';}).join(""):'<p>इस keyword से कोई published update नहीं मिली।</p>';
+      box.innerHTML=matches.length?matches.map(function(p){return '<a href="'+esc(slugUrl(p))+'"><strong>'+esc(p.title||"Latest update")+'</strong><small>'+esc(normalizedCategory(p))+'</small></a>';}).join(""):'<p>इस keyword से कोई published update नहीं मिली।</p>';
       box.hidden=false;
     }
     input.addEventListener("input",update);
