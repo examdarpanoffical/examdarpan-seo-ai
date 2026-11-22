@@ -1147,7 +1147,7 @@ window.edTrackScroll=function(){{
 window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/article.css?v=20261111-2"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><link rel="stylesheet" href="/editorial-experience-v2.css?v=20261121-2"><link rel="stylesheet" href="/editorial-mobile-v3.css?v=20261121-3"><link rel="stylesheet" href="/editorial-mobile-v4.css?v=20261121-4"><script src="/site-search.js" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><link rel="stylesheet" href="/editorial-experience-v2.css?v=20261121-2"><link rel="stylesheet" href="/editorial-mobile-v3.css?v=20261121-3"><link rel="stylesheet" href="/editorial-mobile-v4.css?v=20261121-4"><script src="/site-search.js" defer></script>
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
 </head>
