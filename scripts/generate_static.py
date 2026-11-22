@@ -4569,15 +4569,23 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         )
 
         # Use the exact selected preview navigation and footer on both hub pages.
-        text, header_count = re.subn(
-            r'<div class="topbar">[\s\S]*?</header>',
-            lambda _: shared_header,
-            text,
-            count=1,
-            flags=re.I,
-        )
-        if header_count != 1:
-            raise RuntimeError(f"Could not replace legacy header on {filename}")
+        if '<div class="topbar">' in text:
+            text, header_count = re.subn(
+                r'<div class="topbar">[\s\S]*?</header>',
+                lambda _: shared_header,
+                text,
+                count=1,
+                flags=re.I,
+            )
+            if header_count != 1:
+                raise RuntimeError(f"Could not replace legacy header on {filename}")
+        else:
+            # The All India hub has a purpose-built hero header, not the legacy site navigation.
+            anchor = '<div class="aihub-page">'
+            if anchor not in text:
+                raise RuntimeError(f"Could not find hub content root on {filename}")
+            text = text.replace(anchor, shared_header + '\\n' + anchor, 1)
+
         text, footer_count = re.subn(
             r'<footer class="footer">[\s\S]*?</footer>',
             lambda _: shared_footer,
@@ -4585,9 +4593,8 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
             count=1,
             flags=re.I,
         )
-        if footer_count != 1:
-            # Some hub variants use a differently named footer; fail rather than ship a mixed shell.
-            raise RuntimeError(f"Could not replace legacy footer on {filename}")
+        if footer_count == 0:
+            text = re.sub(r'</body\\s*>', lambda _: shared_footer + '\\n</body>', text, count=1, flags=re.I)
         text = text.replace('<main class="main container">', '<main class="wrap page main container">', 1)
         text = text.replace(
             '<link rel="stylesheet" href="/styles.css">',
