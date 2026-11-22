@@ -270,3 +270,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #f2bd
 @media(max-width:380px){.ed-menu-trigger{padding:8px 9px}.ed-menu-trigger .ed-menu-lines{width:15px}.ed-menu-trigger .ed-menu-lines i{width:15px}}
 
 @media(min-width:1px){.top .container{display:flex;align-items:center;justify-content:space-between;gap:12px}.top .ed-menu-trigger{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff}.top .ed-menu-lines i{background:#fff}}
+
+
+/* Keep category navigation in normal document flow so it never covers article headlines while scrolling. */
+.main-nav{position:relative!important;top:auto!important;z-index:1!important}
