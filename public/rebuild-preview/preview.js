@@ -29,7 +29,7 @@
   var esc=function(v){return String(v==null?"":v).replace(/[&<>'"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c];});};
   var date=function(v){if(!v)return "";var d=new Date(v);return isNaN(d)?"":new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(d);};
   var slugUrl=function(p){var s=String(p.slug||p.urlSlug||p.seoSlug||"").replace(/^\/+|\.html$/g,"");return s?"/rebuild-preview/article.html?slug="+encodeURIComponent(s):"#";};
-  var categoryPath=function(c){return "/rebuild-preview/category.html?category="+encodeURIComponent(c);};return "/"+(m[c]||"category-latest-updates");};
+  var categoryPath=function(c){return "/rebuild-preview/category.html?category="+encodeURIComponent(c);};
   var status=function(p){return String(p.applicationStatus||p.jobStatus||p.statusLabel||"").trim();};
   function postCard(p){
     var href=slugUrl(p),cat=p.category||p.categoryName||"Latest Updates";
