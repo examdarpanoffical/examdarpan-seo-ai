@@ -110,7 +110,7 @@ async function manageQuestionPaper(env, payload) {
   if (response.status === 200) {
     const file = await response.json();
     manifestSha = file.sha;
-    const binary = atob(file.content.replace(/\\s/g, ""));
+    const binary = atob(file.content.replace(/\s/g, ""));
     const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
     manifest = JSON.parse(new TextDecoder().decode(bytes));
   } else if (response.status !== 404) {
@@ -133,7 +133,7 @@ async function manageQuestionPaper(env, payload) {
     const description = String(payload.description || "").trim().slice(0, 500);
     if (!title || !exam) throw new Error("Paper title and exam name are required.");
     if (!QUESTION_PAPER_CATEGORIES.has(category)) throw new Error("Choose a valid question paper category.");
-    if (!/^\\d{4}$/.test(year) || Number(year) < 1990 || Number(year) > 2100) throw new Error("Enter a valid exam year.");
+    if (!/^\d{4}$/.test(year) || Number(year) < 1990 || Number(year) > 2100) throw new Error("Enter a valid exam year.");
     const paperUrl = paperHttpsUrl(payload.paperUrl, "Question Paper PDF URL", true);
     const answerKeyUrl = paperHttpsUrl(payload.answerKeyUrl, "Answer Key URL");
     const sourceUrl = paperHttpsUrl(payload.sourceUrl, "Official Source URL");
@@ -149,7 +149,7 @@ async function manageQuestionPaper(env, payload) {
   }
   manifest.version = 1;
   manifest.updatedAt = new Date().toISOString();
-  await putGitHubFile(env, manifestPath, JSON.stringify(manifest, null, 2) + "\\n",
+  await putGitHubFile(env, manifestPath, JSON.stringify(manifest, null, 2) + "\n",
     (operation === "delete" ? "Remove" : "Publish/update") + " previous question paper: " + id, manifestSha);
   return { published: operation !== "delete", deleted: operation === "delete", id, count: manifest.papers.length,
     url: "https://examdarpan.in/previous-papers", message: "Question paper library updated; Firebase Hosting deployment will publish it." };
