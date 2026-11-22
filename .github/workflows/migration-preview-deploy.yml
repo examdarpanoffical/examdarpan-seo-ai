@@ -1,0 +1,63 @@
+name: Exam Darpan Isolated Migration Preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: examdarpan-migration-preview
+  cancel-in-progress: true
+
+jobs:
+  build-and-preview:
+    if: github.ref == 'refs/heads/migration/examdarpan-v1-from-main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout migration branch
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        run: pip install -r monitor_requirements.txt
+
+      - name: Build static content using read-only published data
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/generate_static.py
+
+      - name: Validate migration preview assets
+        run: |
+          set -euo pipefail
+          node --check public/rebuild-preview/preview.js
+          node --check public/rebuild-preview/pages.js
+          python -m py_compile scripts/generate_static.py
+          test -s public/index.html
+          test -s public/content-index.json
+          test -s public/sitemap.xml
+          test -s public/rebuild-preview/index.html
+          grep -Fq 'name="robots" content="noindex,nofollow"' public/rebuild-preview/index.html
+          grep -Fq 'By Deepak Joshi' public/rebuild-preview/pages.js
+          python scripts/seo_sanity_audit.py
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy isolated temporary Hosting channel
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/firebase-service-account.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-service-account.json"
+          firebase hosting:channel:deploy migration-preview --project examdarpan-dd963 --expires 7d --non-interactive
+
+      - name: Cleanup credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/firebase-service-account.json"
