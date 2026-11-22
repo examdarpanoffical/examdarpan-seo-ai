@@ -106,7 +106,7 @@ function paperHttpsUrl(value, label, required = false) {
 async function manageQuestionPaper(env, payload) {
   const manifestPath = "public/question-papers/manifest.json";
   const response = await fetch(`${API}/repos/${REPO}/contents/${manifestPath}?ref=${BRANCH}`, { headers: ghHeaders(env) });
-  let manifest = { version: 2, papers: [] }, manifestSha = null;
+  let manifest = { version: 3, papers: [] }, manifestSha = null;
   if (response.status === 200) {
     const file = await response.json();
     manifestSha = file.sha;
@@ -135,17 +135,16 @@ async function manageQuestionPaper(env, payload) {
     if (!QUESTION_PAPER_CATEGORIES.has(category)) throw new Error("Choose a valid question paper category.");
     if (!/^\d{4}$/.test(year) || Number(year) < 1990 || Number(year) > 2100) throw new Error("Enter a valid exam year.");
     if (!Number.isInteger(shiftCount) || shiftCount < 1 || shiftCount > 30) throw new Error("Number of shifts must be between 1 and 30.");
-    if (!Array.isArray(payload.shifts) || payload.shifts.length !== shiftCount) throw new Error("Please add the PDF links for every shift.");
+    if (!Array.isArray(payload.shifts) || payload.shifts.length !== shiftCount) throw new Error("Please add every shift.");
     const shifts = payload.shifts.map((shift, index) => {
       const number = index + 1;
-      const paperUrl = paperHttpsUrl(shift && shift.paperUrl, "Shift " + number + " Question Paper PDF URL", true);
-      const answerKeyUrl = paperHttpsUrl(shift && shift.answerKeyUrl, "Shift " + number + " Answer Key URL");
-      const sourceUrl = paperHttpsUrl(shift && shift.sourceUrl, "Shift " + number + " Official Source URL");
-      return { number, label: String(shift.label || ("Shift " + number)).trim().slice(0, 60), paperUrl, answerKeyUrl, sourceUrl };
+      const paper1Url = paperHttpsUrl(shift && shift.paper1Url, "Shift " + number + " Paper 1 PDF URL", true);
+      const paper2Url = paperHttpsUrl(shift && shift.paper2Url, "Shift " + number + " Paper 2 PDF URL", true);
+      return { number, label: String(shift.label || ("Shift " + number)).trim().slice(0, 60), paper1Url, paper2Url };
     });
     const existing = manifest.papers.find(p => p && p.id === id);
     const item = {
-      id, title, exam, category, year, shiftCount, shifts, description,
+      id, title, exam, category, year, shiftCount, paperCount: shiftCount * 2, shifts, description,
       status: "published",
       publishedAt: existing?.publishedAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -153,10 +152,10 @@ async function manageQuestionPaper(env, payload) {
     manifest.papers = manifest.papers.filter(p => p && p.id !== id);
     manifest.papers.unshift(item);
   }
-  manifest.version = 2;
+  manifest.version = 3;
   manifest.updatedAt = new Date().toISOString();
   const saved = await putGitHubFile(env, manifestPath, JSON.stringify(manifest, null, 2) + "\n",
-    (operation === "delete" ? "Remove" : "Publish/update") + " previous question paper: " + id, manifestSha);
+    (operation === "delete" ? "Remove" : "Publish/update") + " previous question papers: " + id, manifestSha);
   return {
     published: operation !== "delete", deleted: operation === "delete", id,
     count: manifest.papers.length, commit: saved.commit?.sha || null,
