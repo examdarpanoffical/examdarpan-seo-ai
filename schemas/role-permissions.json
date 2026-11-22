@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "description": "Proposed authorization policy. UI visibility is not authorization; enforce every permission on trusted backend/security rules.",
+  "roles": {
+    "super_admin": ["system.settings.manage", "roles.manage", "users.manage", "content.read.any", "content.create.any", "content.update.any", "content.delete.any", "content.publish", "content.archive", "review.assign", "review.decide", "media.manage", "quiz.manage", "analytics.read", "audit.read", "integrations.manage", "privacy.requests.manage"],
+    "admin": ["users.read", "content.read.any", "content.create.any", "content.update.any", "content.publish", "content.archive", "review.assign", "review.decide", "media.manage", "quiz.manage", "analytics.read", "audit.read.limited", "privacy.requests.manage"],
+    "editor": ["content.read.any", "content.create.any", "content.update.any", "content.publish", "content.archive", "review.assign", "review.decide", "media.manage", "quiz.read", "quiz.review"],
+    "reviewer": ["content.read.assigned", "review.decide", "quiz.read.assigned", "quiz.review"],
+    "author": ["content.create.own", "content.read.own", "content.update.own.draft", "content.submit_review", "media.upload.own"],
+    "student": ["profile.read.own", "profile.update.own", "bookmark.manage.own", "quiz.take", "quiz_attempt.read.own", "notification.read.own", "privacy.request.own"],
+    "analyst": ["analytics.read", "reports.read"]
+  },
+  "invariants": [
+    "Users cannot grant or elevate their own roles.",
+    "Role assignments are written only by trusted privileged code.",
+    "Authors cannot publish, approve, or alter reviewer decisions.",
+    "Reviewers can decide only content assigned to them.",
+    "Students can read and mutate only their own private records.",
+    "Quiz score and leaderboard values must be calculated or validated server-side.",
+    "Public reads expose published content only and must not reveal private user fields.",
+    "All privileged mutations create an append-only audit event."
+  ],
+  "migration_note": "Do not deploy this policy to the existing Firestore project until existing data, admin accounts, required queries, and emulator tests have been reviewed."
+}
