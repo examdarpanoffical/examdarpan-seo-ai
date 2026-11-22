@@ -5551,6 +5551,20 @@ def main() -> int:
     write_sitemaps(posts, article_slugs, category_slugs)
     write_llms_discovery(posts, article_slugs)
 
+    # Fail the build if the AI-readable directory omits a public policy or article URL.
+    llms_index = (PUBLIC / "llms.txt").read_text(encoding="utf-8")
+    llms_full = (PUBLIC / "llms-full.txt").read_text(encoding="utf-8")
+    required_public_paths = (
+        "/author/deepak-joshi", "/editorial-policy", "/privacy",
+        "/terms", "/disclaimer", "/about", "/contact",
+    )
+    for public_path in required_public_paths:
+        if BASE + public_path not in llms_index or BASE + public_path not in llms_full:
+            raise RuntimeError(f"AI discovery output missing public page: {public_path}")
+    for post, slug in zip(posts, article_slugs):
+        if article_url(slug) not in llms_index or article_url(slug) not in llms_full:
+            raise RuntimeError(f"AI discovery output missing published article: {slug}")
+
     verify_generated_output(posts)
 
     generated_article_files = [
