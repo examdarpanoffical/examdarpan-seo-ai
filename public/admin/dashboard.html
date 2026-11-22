@@ -174,10 +174,18 @@
       <option value="ssc">SSC Exams</option><option value="railway">Railway Exams</option><option value="banking">Banking Exams</option><option value="police">Police &amp; Defence</option><option value="teaching">Teaching Exams</option><option value="upsc">UPSC &amp; State PSC</option><option value="rajasthan">Rajasthan Exams</option><option value="other">Other State &amp; Central Exams</option>
     </select></div>
     <div class="field"><label>Year *</label><input id="paperYear" type="number" min="1990" max="2100" placeholder="2024"></div>
-    <div class="field"><label>Shift / Paper</label><input id="paperShift" placeholder="Shift 1 / Paper I"></div>
-    <div class="field"><label>Question Paper PDF URL *</label><input id="paperUrl" type="url" placeholder="https://.../question-paper.pdf"></div>
-    <div class="field"><label>Answer Key PDF URL</label><input id="paperAnswerKeyUrl" type="url" placeholder="https://.../answer-key.pdf"></div>
-    <div class="field"><label>Official Source URL</label><input id="paperSourceUrl" type="url" placeholder="https://official-site.gov.in/..."></div>
+    <div class="field"><label>कुल Shifts / Papers *</label><input id="paperShiftCount" type="number" min="1" max="30" value="1" inputmode="numeric"><small class="meta">जितनी shifts हों, उतनी संख्या चुनें। CET के लिए 3 चुनने पर Shift 1, 2 और 3 के अलग PDF fields बनेंगे।</small></div>
+    <div class="field"><label>Paper Format</label><div class="meta">हर shift का Question Paper अलग publish होगा। Answer Key और Official Source वैकल्पिक हैं।</div></div>
+  </div>
+  <div id="paperShiftFields" class="admin-form-grid" style="margin-top:12px"></div>
+  <div class="field"><label>Short Description</label><textarea id="paperDescription" rows="2" placeholder="Exam, year और paper details"></textarea></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="publishQuestionPaper" class="btn btn-primary">Publish Question Papers</button><button type="button" id="clearQuestionPaper" class="btn btn-light">Clear Form</button></div>
+  <p id="paperPublisherMsg" class="meta" aria-live="polite"></p>
+  <h3 style="margin-top:18px">Published Question Papers</h3><div id="questionPaperAdminList" class="quiz-admin-list">Loading paper library…</div>
+  <p class="meta">Student page: <a href="/previous-papers" target="_blank" rel="noopener">Open Previous Papers Hub</a></p>
+</section>
+<div class="admin-quiz-box">
+  <div class="section-label">STUDENT PRACTICE</div>
   </div>
   <div class="field"><label>Short Description</label><textarea id="paperDescription" rows="2" placeholder="Exam, year, shift या paper details"></textarea></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="publishQuestionPaper" class="btn btn-primary">Publish Question Paper</button><button type="button" id="clearQuestionPaper" class="btn btn-light">Clear Form</button></div>
