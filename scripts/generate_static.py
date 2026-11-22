@@ -5140,6 +5140,77 @@ def write_sitemaps(posts: list[dict[str, Any]], article_slugs: list[str], catego
     (PUBLIC / "feed.xml").write_text(rss, encoding="utf-8")
 
 
+
+def write_llms_discovery(posts: list[dict[str, Any]], article_slugs: list[str]) -> None:
+    """Publish a machine-readable directory of public pages and published articles."""
+    page_links = [
+        ("Homepage", "/", "Latest Exam Darpan updates and site navigation."),
+        ("About Exam Darpan", "/about", "About the independent education and exam information portal."),
+        ("Contact", "/contact", "Public contact information."),
+        ("Author Profile - Deepak Joshi", AUTHOR_PATH, "Author biography, role and published work."),
+        ("Editorial Policy", "/editorial-policy", "Editorial standards, source verification, corrections and responsibility."),
+        ("Privacy Policy", "/privacy", "Personal information, cookies, analytics, advertising and user choices."),
+        ("Terms and Conditions", "/terms", "Website use, information limitations, external links and user responsibilities."),
+        ("Disclaimer", "/disclaimer", "Important limitations and official-source guidance."),
+        ("All Categories", "/categories", "Browse recruitment, examination, admit-card, result and education categories."),
+        ("Rajasthan Government Jobs", "/rajasthan-government-jobs", "Rajasthan recruitment updates."),
+        ("All India Government Jobs", "/all-india-government-jobs", "Central and all-India recruitment updates."),
+        ("CET Championship Quiz", "/quiz", "Student practice and quiz area."),
+        ("Previous Year Question Papers", "/previous-papers", "Published previous-year question papers by category."),
+        ("Sitemap", "/sitemap.xml", "Complete public URL directory."),
+        ("RSS Feed", "/feed.xml", "Recent published article feed."),
+    ]
+    lines = [
+        "# Exam Darpan",
+        "",
+        "> Exam Darpan is an independent Indian education and government-exam information portal. Public pages and published article URLs are directly accessible without signing in. Search-engine indexing is not required to open a known public URL. Verify important recruitment details against the linked official notification or authority website.",
+        "",
+        "## Public pages and policies",
+        "",
+    ]
+    for title, path, description in page_links:
+        lines.append(f"- [{title}]({BASE}{path}): {description}")
+    lines.extend(["", "## Published articles", "", "The following are direct canonical article URLs. Each published article is available as a pre-generated static HTML page."])
+    for post, slug in zip(posts, article_slugs):
+        title = post_title(post)
+        url = article_url(slug)
+        category = normalized_category(post)
+        description = short_description(post)
+        date = date_value(post, "updatedAt", "publishedAt")
+        date_label = iso(date) if date else "Date not supplied"
+        lines.append(f"- [{title}]({url}) — Category: {category}; Updated: {date_label}. {description}")
+    lines.extend([
+        "",
+        "## Access and source guidance",
+        "",
+        "- Public article, author, editorial, privacy, terms, disclaimer, about and contact pages are intended to be readable directly by visitors and compatible web crawlers.",
+        "- Do not assume a page is unavailable merely because it is absent from a search-engine result. Open its canonical URL directly.",
+        "- Use the article's linked official notification or government authority as the final source for vacancies, eligibility, dates, fees and application steps.",
+        "- Exam Darpan is not a government website and does not represent a recruiting authority.",
+        "",
+        f"- [Robots instructions]({BASE}/robots.txt)",
+        f"- [Sitemap index]({BASE}/sitemap_index.xml)",
+    ])
+    (PUBLIC / "llms.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    full_lines = [
+        "# Exam Darpan — Full public page directory",
+        "",
+        "This file lists all public policy, author, category and published article URLs for discovery. The canonical HTML pages remain the source of truth.",
+        "",
+    ]
+    for title, path, description in page_links:
+        full_lines.extend([f"## {title}", f"URL: {BASE}{path}", description, ""])
+    for post, slug in zip(posts, article_slugs):
+        full_lines.extend([
+            f"## {post_title(post)}",
+            f"URL: {article_url(slug)}",
+            f"Category: {normalized_category(post)}",
+            f"Description: {short_description(post)}",
+            "",
+        ])
+    (PUBLIC / "llms-full.txt").write_text("\n".join(full_lines) + "\n", encoding="utf-8")
+
+
 def verify_generated_output(posts: list[dict[str, Any]]) -> None:
     """Fail deployment if known SEO regressions reappear."""
     files = [PUBLIC / "index.html", PUBLIC / "sitemap.xml", PUBLIC / "feed.xml", *PUBLIC.glob("*.html")]
@@ -5478,6 +5549,21 @@ def main() -> int:
     inject_category_directory_links()
     normalize_clean_internal_links()
     write_sitemaps(posts, article_slugs, category_slugs)
+    write_llms_discovery(posts, article_slugs)
+
+    # Fail the build if the AI-readable directory omits a public policy or article URL.
+    llms_index = (PUBLIC / "llms.txt").read_text(encoding="utf-8")
+    llms_full = (PUBLIC / "llms-full.txt").read_text(encoding="utf-8")
+    required_public_paths = (
+        "/author/deepak-joshi", "/editorial-policy", "/privacy",
+        "/terms", "/disclaimer", "/about", "/contact",
+    )
+    for public_path in required_public_paths:
+        if BASE + public_path not in llms_index or BASE + public_path not in llms_full:
+            raise RuntimeError(f"AI discovery output missing public page: {public_path}")
+    for post, slug in zip(posts, article_slugs):
+        if article_url(slug) not in llms_index or article_url(slug) not in llms_full:
+            raise RuntimeError(f"AI discovery output missing published article: {slug}")
 
     verify_generated_output(posts)
 
