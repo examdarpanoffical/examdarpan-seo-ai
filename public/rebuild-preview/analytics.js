@@ -19,9 +19,10 @@ function track(name,label,callback){
  window.gtag("event",name,{event_category:"exam_darpan_portal",event_label:label||"not_set",event_callback:callback||function(){},event_timeout:900});
 }
 document.addEventListener("click",function(e){
- var a=e.target.closest("a[data-analytics-event]");
+ var a=e.target.closest("a[data-analytics-event], #search-results a");
  if(!a)return;
- var name=a.getAttribute("data-analytics-event");
+ var name=a.getAttribute("data-analytics-event")||(a.closest("#search-results")?"portal_search_result_click":"");
+ if(!name)return;
  var label=a.getAttribute("data-analytics-label")||a.getAttribute("href")||"";
  if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target==="_blank") {
    track(name,label);return;
@@ -34,9 +35,5 @@ document.addEventListener("click",function(e){
 });
 document.addEventListener("submit",function(e){
  if(e.target.matches(".search"))track("portal_search_submit","search_box");
-},true);
-document.addEventListener("click",function(e){
- var a=e.target.closest("#search-results a");
- if(a)track("portal_search_result_click","search_suggestion");
 },true);
 })();
