@@ -2,12 +2,12 @@
 (function(){
   "use strict";
   var groups=[
-    {id:"jobs",title:"Latest Government Jobs",cats:["Rajasthan Jobs","Government Jobs","Police & Defence Jobs","Teaching Jobs","Railway Jobs","Banking Jobs","SSC Jobs","UPSC Jobs"],url:"category.html?category=Government%20Jobs"},
-    {id:"results",title:"Latest Results",cats:["Results"],url:"category.html?category=Results"},
-    {id:"admit",title:"Admit Card",cats:["Admit Card"],url:"category.html?category=Admit%20Card"},
-    {id:"answer",title:"Answer Key",cats:["Answer Key"],url:"category.html?category=Answer%20Key"},
-    {id:"admission",title:"Admissions & Scholarships",cats:["Scholarships","University & College","Entrance Exams"],url:"category.html?category=Scholarships"},
-    {id:"syllabus",title:"Syllabus & Exam Updates",cats:["Syllabus","Latest Updates","Yojana"],url:"category.html?category=Syllabus"}
+    {id:"jobs",title:"Latest Government Jobs",cats:["Rajasthan Jobs","Government Jobs","Police & Defence Jobs","Teaching Jobs","Railway Jobs","Banking Jobs","SSC Jobs","UPSC Jobs"],url:"/all-india-government-jobs"},
+    {id:"results",title:"Latest Results",cats:["Results"],url:"/category-results"},
+    {id:"admit",title:"Admit Card",cats:["Admit Card"],url:"/category-admit-card"},
+    {id:"answer",title:"Answer Key",cats:["Answer Key"],url:"/category-answer-key"},
+    {id:"admission",title:"Admissions & Scholarships",cats:["Scholarships","University & College","Entrance Exams"],url:"/category-scholarships"},
+    {id:"syllabus",title:"Syllabus & Exam Updates",cats:["Syllabus","Latest Updates","Yojana"],url:"/category-syllabus"}
   ];
   var categoryAliases={"Rajasthan":"Rajasthan Jobs","All India Jobs":"Government Jobs","Admit Cards":"Admit Card","Result":"Results","Answer Keys":"Answer Key","Exam Syllabus":"Syllabus"};
   function normalizedCategory(p){var raw=String(p.category||p.categoryName||"").trim();return categoryAliases[raw]||(["Rajasthan Jobs","Government Jobs","Police & Defence Jobs","Teaching Jobs","Railway Jobs","Banking Jobs","SSC Jobs","UPSC Jobs","Admit Card","Results","Answer Key","Syllabus","Entrance Exams","Scholarships","University & College","Yojana","Latest Updates"].indexOf(raw)>=0?raw:"Latest Updates");}
@@ -28,7 +28,8 @@
   };
   var esc=function(v){return String(v==null?"":v).replace(/[&<>'"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c];});};
   var date=function(v){if(!v)return "";var d=new Date(v);return isNaN(d)?"":new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(d);};
-  var slugUrl=function(p){var s=String(p.slug||p.urlSlug||p.seoSlug||"").replace(/^\/+|\.html$/g,"");return s?"article.html?slug="+encodeURIComponent(s):"#";};
+  var slugUrl=function(p){var s=String(p.slug||p.urlSlug||p.seoSlug||"").replace(/^\/+|\.html$/g,"");return s?"/"+encodeURIComponent(s):"#";};
+  var categoryPath=function(c){var m={"Rajasthan Jobs":"rajasthan-government-jobs","Government Jobs":"all-india-government-jobs","Admit Card":"category-admit-card","Results":"category-results","Answer Key":"category-answer-key","Syllabus":"category-syllabus","Scholarships":"category-scholarships","University & College":"category-university-college","Entrance Exams":"category-entrance-exams","Yojana":"category-yojana","Latest Updates":"category-latest-updates","Police & Defence Jobs":"category-police-defence-jobs","Teaching Jobs":"category-teaching-jobs","Railway Jobs":"category-railway-jobs","Banking Jobs":"category-banking-jobs","SSC Jobs":"category-ssc-jobs","UPSC Jobs":"category-upsc-jobs"};return "/"+(m[c]||"category-latest-updates");};
   var status=function(p){return String(p.applicationStatus||p.jobStatus||p.statusLabel||"").trim();};
   function postCard(p){
     var href=slugUrl(p),cat=p.category||p.categoryName||"Latest Updates";
