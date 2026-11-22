@@ -162,6 +162,29 @@
   <p id="htmlQuizPublishedUrl" class="meta"></p><p id="htmlQuizMsg" class="meta" aria-live="polite"></p>
   <p class="meta">Published tests: <a href="/mock-tests/" target="_blank" rel="noopener">Open Mock Tests Library</a></p>
 </section>
+<section class="card pad" id="questionPaperManager" style="margin:18px 0;border:1px solid #bfdbfe;background:#f8fbff">
+  <div class="section-label">PREVIOUS YEAR QUESTION PAPERS</div>
+  <h2>Old Question Paper Publisher</h2>
+  <p class="meta">यहाँ paper की category, exam, year और shift के साथ PDF link publish करें। Published papers Previous Papers Hub में category-wise दिखाई देंगे। Firestore data/rules में बदलाव नहीं होगा; सुरक्षित Admin Worker GitHub manifest update करेगा।</p>
+  <input type="hidden" id="paperId">
+  <div class="admin-form-grid">
+    <div class="field"><label>Paper Title *</label><input id="paperTitle" placeholder="Rajasthan CET 12th Level 2024 Paper"></div>
+    <div class="field"><label>Exam Name *</label><input id="paperExam" placeholder="Rajasthan CET Senior Secondary"></div>
+    <div class="field"><label>Category *</label><select id="paperCategory">
+      <option value="ssc">SSC Exams</option><option value="railway">Railway Exams</option><option value="banking">Banking Exams</option><option value="police">Police &amp; Defence</option><option value="teaching">Teaching Exams</option><option value="upsc">UPSC &amp; State PSC</option><option value="rajasthan">Rajasthan Exams</option><option value="other">Other State &amp; Central Exams</option>
+    </select></div>
+    <div class="field"><label>Year *</label><input id="paperYear" type="number" min="1990" max="2100" placeholder="2024"></div>
+    <div class="field"><label>Shift / Paper</label><input id="paperShift" placeholder="Shift 1 / Paper I"></div>
+    <div class="field"><label>Question Paper PDF URL *</label><input id="paperUrl" type="url" placeholder="https://.../question-paper.pdf"></div>
+    <div class="field"><label>Answer Key PDF URL</label><input id="paperAnswerKeyUrl" type="url" placeholder="https://.../answer-key.pdf"></div>
+    <div class="field"><label>Official Source URL</label><input id="paperSourceUrl" type="url" placeholder="https://official-site.gov.in/..."></div>
+  </div>
+  <div class="field"><label>Short Description</label><textarea id="paperDescription" rows="2" placeholder="Exam, year, shift या paper details"></textarea></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="publishQuestionPaper" class="btn btn-primary">Publish Question Paper</button><button type="button" id="clearQuestionPaper" class="btn btn-light">Clear Form</button></div>
+  <p id="paperPublisherMsg" class="meta" aria-live="polite"></p>
+  <h3 style="margin-top:18px">Published Question Papers</h3><div id="questionPaperAdminList" class="quiz-admin-list">Loading paper library…</div>
+  <p class="meta">Student page: <a href="/previous-papers" target="_blank" rel="noopener">Open Previous Papers Hub</a></p>
+</section>
 <div class="admin-quiz-box">
   <div class="section-label">STUDENT PRACTICE</div><h2>Daily Quiz Publisher</h2>
   <p class="meta">रोज़ का quiz यहीं बनाएं और Publish करते ही students के लिए <strong>/quiz.html</strong> पर live करें। Article deploy की जरूरत नहीं।</p>
@@ -278,7 +301,7 @@
 <button id="aiGenerate" class="btn btn-gold">Generate Draft with Gemini</button><p id="aiMsg" class="meta"></p></section>
 <section><div class="form"><h2>Posts</h2><input id="filter" placeholder="Search posts" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:11px"><div id="posts" style="margin-top:12px"></div></div></section></div></main>
 <script type="module" src="dashboard.js?v=20261111-appcheck-restore1"></script>
-<script type="module" src="html-quiz-publisher.js?v=20261110-diagnostics2"></script>
+<script type="module" src="html-quiz-publisher.js?v=20261110-diagnostics2"></script><script type="module" src="question-paper-publisher.js?v=20261122-1"></script>
 <dialog id="articlePreviewDialog" style="width:min(1100px,96vw);max-width:1100px;height:92vh;max-height:92vh;padding:0;border:1px solid #dbe3ee;border-radius:18px;box-shadow:0 20px 70px #0f172a55">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:#0b1730;color:#fff">
     <strong>Article Preview — Exam Darpan Standard Layout</strong>

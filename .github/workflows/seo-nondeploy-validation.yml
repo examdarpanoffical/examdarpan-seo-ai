@@ -5,6 +5,7 @@ on:
     paths:
       - "public/**"
       - "scripts/**"
+      - "cloudflare-worker/**"
       - "firebase.json"
       - ".github/workflows/**"
   workflow_dispatch:
@@ -31,6 +32,13 @@ jobs:
           if [ -f scripts/seo_sanity_audit.py ]; then
             python -m py_compile scripts/seo_sanity_audit.py
           fi
+
+      - name: Validate JavaScript publishers and portal navigation
+        run: |
+          node --check cloudflare-worker/worker.js
+          node --check public/previous-papers.js
+          node --check public/admin/question-paper-publisher.js
+          node --check public/portal-v1/side-menu.js
 
       - name: Test recruitment lifecycle and apply-link safeguards
         run: |

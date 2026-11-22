@@ -1765,14 +1765,10 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
             '<link rel="stylesheet" href="/article.css?v=20261122-1">\n</head>',
             1,
         )
-    if 'src="/portal-v1/preview.js"' not in page:
-        page = page.replace(
-            '</body>',
-            '<script src="/portal-v1/preview.js" defer></script>\n</body>',
-            1,
-        )
-    # Article pages use the preview detail layout but never render the homepage menu.
-    page = re.sub(r'<script src="/portal-v1/side-menu\.js" defer></script>', '', page, flags=re.I)
+    # Article content is already rendered into this HTML file; do not fetch the homepage content index.
+    # Keep the global category menu available on every portal page.
+    if 'src="/portal-v1/side-menu.js"' not in page:
+        page = page.replace('</body>', '<script src="/portal-v1/side-menu.js" defer></script>\n</body>', 1)
     # Remove legacy article stylesheets and embedded style blocks that override
     # the selected preview detail CSS on mobile (the old layout seen in screenshots).
     page = re.sub(r'<link rel="stylesheet" href="/(?:styles|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
@@ -4957,17 +4953,22 @@ def inject_category_directory_links() -> None:
             content = path.read_text(encoding="utf-8")
         except OSError:
             continue
-        # The selected preview shell already exposes its own navigation and side menu.
-        # Remove stale links injected by older generator versions before skipping it.
+        # Every page using the selected portal shell gets the same category menu.
         if 'class="site-head"' in content:
-            cleaned = re.sub(
+            content = re.sub(
                 r'\s*<a href="/categories">All Categories</a>\s*<a href="/mock-tests/">Mock Tests</a>',
                 '',
                 content,
                 count=1,
             )
-            if cleaned != content:
-                path.write_text(cleaned, encoding="utf-8")
+            if path.name != "dashboard.html" and 'src="/portal-v1/side-menu.js"' not in content:
+                content = content.replace(
+                    "</body>",
+                    '<script src="/portal-v1/side-menu.js" defer></script>\n</body>',
+                    1,
+                )
+            if content != path.read_text(encoding="utf-8"):
+                path.write_text(content, encoding="utf-8")
             continue
         if 'href="/categories"' in content or marker not in content:
             continue
@@ -5201,6 +5202,12 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: generated article has no parent-category link in {path.name}")
         if 'href="/categories"' not in txt:
             raise RuntimeError(f"SEO verification failed: generated article has no category-directory link in {path.name}")
+        if 'class="detail-main article article-page"' not in txt or 'class="detail-sidebar"' not in txt:
+            raise RuntimeError(f"SEO verification failed: static article detail layout is incomplete in {path.name}")
+        if 'src="/portal-v1/side-menu.js"' not in txt:
+            raise RuntimeError(f"SEO verification failed: global menu missing from article {path.name}")
+        if 'src="/portal-v1/preview.js"' in txt:
+            raise RuntimeError(f"SEO verification failed: article unexpectedly loads homepage feed script in {path.name}")
         if re.search(r"\$\{esc\(title\)\}", txt, flags=re.I):
             raise RuntimeError(f"SEO verification failed: unresolved title template in {path.name}")
     sitemap = (PUBLIC / "sitemap.xml").read_text(encoding="utf-8", errors="ignore")
@@ -5300,6 +5307,12 @@ def verify_generated_output(posts: list[dict[str, Any]]) -> None:
             raise RuntimeError(f"SEO verification failed: category directory link missing for {category_name}")
         if not (PUBLIC / f"category-{category_slug}.html").exists():
             raise RuntimeError(f"SEO verification failed: generated category page missing for {category_name}")
+        category_file = PUBLIC / f"category-{category_slug}.html"
+        category_html = category_file.read_text(encoding="utf-8", errors="ignore")
+        if f'<link rel="canonical" href="{BASE}{category_href}">' not in category_html:
+            raise RuntimeError(f"SEO verification failed: category canonical mismatch for {category_name}")
+        if 'class="site-head"' not in category_html or 'src="/portal-v1/side-menu.js"' not in category_html:
+            raise RuntimeError(f"SEO verification failed: category shell/menu mismatch for {category_name}")
     if sitemap.count(f"<loc>{xml_esc(BASE + '/categories')}</loc>") != 1:
         raise RuntimeError("SEO verification failed: /categories missing/duplicated in sitemap")
 

@@ -93,6 +93,68 @@ function prepareQuizHtml(html, slug, title) {
   }
   return source;
 }
+
+const QUESTION_PAPER_CATEGORIES = new Set(["ssc","railway","banking","police","teaching","upsc","rajasthan","other"]);
+function paperHttpsUrl(value, label, required = false) {
+  const raw = String(value || "").trim();
+  if (!raw && !required) return "";
+  let parsed;
+  try { parsed = new URL(raw); } catch (_) { throw new Error(label + " must be a valid HTTPS URL."); }
+  if (parsed.protocol !== "https:") throw new Error(label + " must use HTTPS.");
+  return parsed.href;
+}
+async function manageQuestionPaper(env, payload) {
+  const manifestPath = "public/question-papers/manifest.json";
+  const response = await fetch(`${API}/repos/${REPO}/contents/${manifestPath}?ref=${BRANCH}`, { headers: ghHeaders(env) });
+  let manifest = { version: 1, papers: [] }, manifestSha = null;
+  if (response.status === 200) {
+    const file = await response.json();
+    manifestSha = file.sha;
+    const binary = atob(file.content.replace(/\s/g, ""));
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    manifest = JSON.parse(new TextDecoder().decode(bytes));
+  } else if (response.status !== 404) {
+    throw new Error("Could not read the question paper library.");
+  }
+  if (!Array.isArray(manifest.papers)) manifest.papers = [];
+  const operation = String(payload.operation || "upsert");
+  const id = safeSlug(payload.id || [payload.exam, payload.year, payload.shift, payload.title].filter(Boolean).join("-"));
+  if (id.length < 3) throw new Error("Question paper ID is invalid.");
+  if (operation === "delete") {
+    const before = manifest.papers.length;
+    manifest.papers = manifest.papers.filter(p => p && p.id !== id);
+    if (before === manifest.papers.length) throw new Error("Question paper was not found.");
+  } else {
+    const title = String(payload.title || "").trim().slice(0, 180);
+    const exam = String(payload.exam || "").trim().slice(0, 120);
+    const category = String(payload.category || "");
+    const year = String(payload.year || "").trim();
+    const shift = String(payload.shift || "").trim().slice(0, 80);
+    const description = String(payload.description || "").trim().slice(0, 500);
+    if (!title || !exam) throw new Error("Paper title and exam name are required.");
+    if (!QUESTION_PAPER_CATEGORIES.has(category)) throw new Error("Choose a valid question paper category.");
+    if (!/^\d{4}$/.test(year) || Number(year) < 1990 || Number(year) > 2100) throw new Error("Enter a valid exam year.");
+    const paperUrl = paperHttpsUrl(payload.paperUrl, "Question Paper PDF URL", true);
+    const answerKeyUrl = paperHttpsUrl(payload.answerKeyUrl, "Answer Key URL");
+    const sourceUrl = paperHttpsUrl(payload.sourceUrl, "Official Source URL");
+    const existing = manifest.papers.find(p => p && p.id === id);
+    const item = {
+      id, title, exam, category, year, shift, paperUrl, answerKeyUrl, sourceUrl, description,
+      status: "published",
+      publishedAt: existing?.publishedAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    manifest.papers = manifest.papers.filter(p => p && p.id !== id);
+    manifest.papers.unshift(item);
+  }
+  manifest.version = 1;
+  manifest.updatedAt = new Date().toISOString();
+  await putGitHubFile(env, manifestPath, JSON.stringify(manifest, null, 2) + "\n",
+    (operation === "delete" ? "Remove" : "Publish/update") + " previous question paper: " + id, manifestSha);
+  return { published: operation !== "delete", deleted: operation === "delete", id, count: manifest.papers.length,
+    url: "https://examdarpan.in/previous-papers", message: "Question paper library updated; Firebase Hosting deployment will publish it." };
+}
+
 async function publishHtmlQuiz(env, payload) {
   const title = String(payload.title || "").trim().slice(0, 160);
   const slug = safeSlug(payload.slug);
@@ -159,6 +221,10 @@ export default {
       if (payload.action === "publish-html-quiz") {
         const result = await publishHtmlQuiz(env, payload);
         return reply(result, 201, headers);
+      }
+      if (payload.action === "manage-question-paper") {
+        const result = await manageQuestionPaper(env, payload);
+        return reply(result, 200, headers);
       }
 
       const dispatch = await fetch(
