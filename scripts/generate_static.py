@@ -4584,7 +4584,7 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
             anchor = '<div class="aihub-page">'
             if anchor not in text:
                 raise RuntimeError(f"Could not find hub content root on {filename}")
-            text = text.replace(anchor, shared_header + '\\n' + anchor, 1)
+            text = text.replace(anchor, shared_header + '\n' + anchor, 1)
 
         text, footer_count = re.subn(
             r'<footer class="footer">[\s\S]*?</footer>',
@@ -4594,7 +4594,7 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
             flags=re.I,
         )
         if footer_count == 0:
-            text = re.sub(r'</body\\s*>', lambda _: shared_footer + '\\n</body>', text, count=1, flags=re.I)
+            text = re.sub(r'</body\s*>', lambda _: shared_footer + '\\n</body>', text, count=1, flags=re.I)
         text = text.replace('<main class="main container">', '<main class="wrap page main container">', 1)
         text = text.replace(
             '<link rel="stylesheet" href="/styles.css">',
