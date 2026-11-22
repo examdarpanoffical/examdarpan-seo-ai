@@ -3955,9 +3955,9 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     text = re.sub(r'<main class="main container">[\s\S]*?</main>', lambda _: portal_main, text, count=1)
     text = re.sub(r'<footer class="footer">[\s\S]*?</footer>', lambda _: portal_footer, text, count=1)
     if 'href="/portal-v1/style.css"' not in text:
-        text = text.replace("</head>", '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\\n<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\\n</head>', 1)
+        text = text.replace("</head>", '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\n<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\n</head>', 1)
     if 'src="/portal-v1/preview.js"' not in text:
-        text = text.replace("</body>", '<script src="/portal-v1/preview.js" defer></script>\\n</body>', 1)
+        text = text.replace("</body>", '<script src="/portal-v1/preview.js" defer></script>\n</body>', 1)
     # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1_END
 
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
