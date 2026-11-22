@@ -1767,7 +1767,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     # Remove legacy article stylesheets and embedded style blocks that override
     # the selected preview detail CSS on mobile (the old layout seen in screenshots).
     page = re.sub(r'<link rel="stylesheet" href="/(?:styles|article|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
-    page = re.sub(r'<style\b[^>]*>[\s\S]*?</style>', '', page, flags=re.I)
     return page
 
 
