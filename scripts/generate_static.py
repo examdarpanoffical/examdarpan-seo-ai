@@ -1765,14 +1765,10 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
             '<link rel="stylesheet" href="/article.css?v=20261122-1">\n</head>',
             1,
         )
-    if 'src="/portal-v1/preview.js"' not in page:
-        page = page.replace(
-            '</body>',
-            '<script src="/portal-v1/preview.js" defer></script>\n</body>',
-            1,
-        )
-    # Article pages use the preview detail layout but never render the homepage menu.
-    page = re.sub(r'<script src="/portal-v1/side-menu\.js" defer></script>', '', page, flags=re.I)
+    # Article content is already rendered into this HTML file; do not fetch the homepage content index.
+    # Keep the global category menu available on every portal page.
+    if 'src="/portal-v1/side-menu.js"' not in page:
+        page = page.replace('</body>', '<script src="/portal-v1/side-menu.js" defer></script>\\n</body>', 1)
     # Remove legacy article stylesheets and embedded style blocks that override
     # the selected preview detail CSS on mobile (the old layout seen in screenshots).
     page = re.sub(r'<link rel="stylesheet" href="/(?:styles|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
@@ -4957,17 +4953,22 @@ def inject_category_directory_links() -> None:
             content = path.read_text(encoding="utf-8")
         except OSError:
             continue
-        # The selected preview shell already exposes its own navigation and side menu.
-        # Remove stale links injected by older generator versions before skipping it.
+        # Every page using the selected portal shell gets the same category menu.
         if 'class="site-head"' in content:
-            cleaned = re.sub(
+            content = re.sub(
                 r'\s*<a href="/categories">All Categories</a>\s*<a href="/mock-tests/">Mock Tests</a>',
                 '',
                 content,
                 count=1,
             )
-            if cleaned != content:
-                path.write_text(cleaned, encoding="utf-8")
+            if path.name != "dashboard.html" and 'src="/portal-v1/side-menu.js"' not in content:
+                content = content.replace(
+                    "</body>",
+                    '<script src="/portal-v1/side-menu.js" defer></script>\\n</body>',
+                    1,
+                )
+            if content != path.read_text(encoding="utf-8"):
+                path.write_text(content, encoding="utf-8")
             continue
         if 'href="/categories"' in content or marker not in content:
             continue
