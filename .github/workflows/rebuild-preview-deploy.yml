@@ -1,6 +1,9 @@
 name: Exam Darpan Rebuild Preview (Temporary)
 
 on:
+  push:
+    branches:
+      - rebuild/examdarpan-platform-v1
   workflow_dispatch:
 
 permissions:
