@@ -4517,6 +4517,10 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
                 text = re.sub(r'</body\s*>', lambda _: shared_footer + '\n</body>', text, count=1, flags=re.I)
 
         text = text.replace('<main class="main container">', '<main class="wrap page main container">', 1)
+        # The old global stylesheet conflicts with the exact preview portal shell.
+        text = re.sub(r'<link rel="stylesheet" href="/styles\\.css">', '', text, flags=re.I)
+        if 'href="/portal-v1/hub-parity.css' not in text:
+            text = text.replace('</head>', '<link rel="stylesheet" href="/portal-v1/hub-parity.css?v=1">\\n</head>', 1)
         if 'href="/portal-v1/style.css' not in text:
             text = text.replace(
                 '<link rel="stylesheet" href="/styles.css">',
