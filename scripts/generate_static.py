@@ -3542,6 +3542,104 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         + social_cta
     )
 
+def homepage_preview_sections(posts: list[dict[str, Any]]) -> str:
+    """Render the homepage using the exact selected rebuild-preview section structure."""
+    published = [p for p in posts if str(p.get("status", "")).lower() == "published"]
+    quick = [
+        ("▣", "Latest Jobs", "नई सरकारी भर्तियाँ", "government-jobs"),
+        ("✓", "Latest Results", "रिजल्ट और मेरिट लिस्ट", "results"),
+        ("▤", "Admit Card", "हॉल टिकट और Exam City", "admit-card"),
+        ("☷", "Answer Key", "उत्तर कुंजी और आपत्ति", "answer-key"),
+        ("▧", "Admissions", "प्रवेश और आवेदन", "scholarships"),
+        ("▤", "Syllabus", "पाठ्यक्रम और पैटर्न", "syllabus"),
+    ]
+    quick_html = "".join(
+        f'<a href="{esc(category_path(slug))}"><i>{icon}</i><b>{esc(label)}</b><small>{esc(note)}</small></a>'
+        for icon, label, note, slug in quick
+    )
+
+    def posts_for(categories: set[str], limit: int = 4) -> list[dict[str, Any]]:
+        return [p for p in published if normalized_category(p) in categories][:limit]
+
+    def panel(panel_id: str, heading: str, slug: str, categories: set[str], dot: str) -> str:
+        items = posts_for(categories, 5)
+        rows = "".join(
+            '<a href="' + esc(article_path(slugify(p.get("slug")))) + '">'
+            f'<b class="dot {dot}"></b><span>{esc(post_title(p))}</span>'
+            + (f'<small>{esc(application_status(p)[0])}</small>' if application_status(p)[0] != "UPDATE" else "")
+            + '</a>'
+            for p in items
+        ) or '<div class="list-empty">इस category में अभी कोई published update उपलब्ध नहीं है।</div>'
+        return (
+            f'<article class="list-panel" id="{panel_id}"><header><h2>{esc(heading)}</h2>'
+            f'<a href="{esc(category_path(slug))}">View All »</a></header>'
+            f'<div class="list-body">{rows}</div>'
+            f'<footer><a href="{esc(category_path(slug))}">सभी {esc(heading)} देखें →</a></footer></article>'
+        )
+
+    listing = "".join([
+        panel("jobs", "Latest Government Jobs", "government-jobs", {"Government Jobs", "Rajasthan Jobs"}, "red"),
+        panel("results", "Latest Results", "results", {"Results"}, "green"),
+        panel("admit", "Admit Card", "admit-card", {"Admit Card"}, "blue"),
+        panel("answer", "Answer Key", "answer-key", {"Answer Key"}, "orange"),
+        panel("admission", "Admission & Scholarships", "scholarships", {"Scholarships", "University & College", "Entrance Exams"}, "purple"),
+        panel("syllabus", "Syllabus & Exam Pattern", "syllabus", {"Syllabus"}, "teal"),
+    ])
+
+    all_india_specs = [
+        ("SSC", "SSC Recruitment", "CGL, CHSL, MTS, GD और अन्य परीक्षाएँ", "ssc-jobs"),
+        ("UPSC", "UPSC & Civil Services", "राष्ट्रीय स्तर की सिविल सेवा परीक्षाएँ", "upsc-jobs"),
+        ("RRB", "Railway Recruitment", "RRB NTPC, Group D, ALP और अन्य पद", "railway-jobs"),
+        ("BANK", "Banking Jobs", "IBPS, SBI और बैंकिंग भर्ती अपडेट", "banking-jobs"),
+        ("DEF", "Defence & CAPF", "Defence और केंद्रीय सुरक्षा भर्ती", "police-defence-jobs"),
+        ("EDU", "Teaching & Education", "KVS, NVS और अन्य शिक्षण पद", "teaching-jobs"),
+        ("RJ", "Rajasthan Government Jobs", "RPSC, RSSB, Police और राज्य भर्ती", "rajasthan-jobs"),
+        ("GOV", "Other Central Govt Jobs", "मंत्रालय, विभाग और सार्वजनिक संस्थान", "government-jobs"),
+    ]
+    all_india_cards = "".join(
+        f'<a href="{esc(category_path(slug))}"><span class="ai-mark">{mark}</span>'
+        f'<span><b>{esc(title)}</b><small>{esc(note)}</small></span><i>↗</i></a>'
+        for mark, title, note, slug in all_india_specs
+    )
+    latest_links = "".join(
+        f'<a href="{esc(article_path(slugify(p.get("slug"))))}">{esc(post_title(p))}<b>↗</b></a>'
+        for p in published[:10]
+    ) or '<p>नई published updates जल्द यहाँ दिखाई देंगी।</p>'
+
+    return f'''<div class="notice"><strong>महत्वपूर्ण सूचना</strong><span>सभी भर्ती और परीक्षा संबंधी जानकारी आधिकारिक नोटिफिकेशन से जाँचकर ही आवेदन करें।</span><a href="#updates">सभी अपडेट देखें →</a></div>
+<section class="welcome"><div><div class="eyebrow">YOUR EXAM • YOUR FUTURE</div>
+<h1>सरकारी नौकरी और परीक्षा की <span>हर जरूरी अपडेट</span></h1>
+<p>Central और State Government Jobs, Results, Admit Cards, Answer Keys और Admissions की जानकारी एक ही जगह।</p></div>
+<div class="welcome-side"><b>EXAM DARPAN</b><span>Verified information. Clear updates.</span><small>Rajasthan + All India</small></div></section>
+<section class="quick-grid" aria-label="मुख्य श्रेणियाँ">{quick_html}</section>
+<section class="portal-tools" aria-label="Student tools">
+<div class="portal-tools-head"><div><span class="eyebrow">STUDENT TOOLS</span><h2>जरूरी जानकारी एक जगह</h2>
+<p>भर्ती खोजें, अपनी पसंद की jobs सेव करें और परीक्षा की तैयारी करें।</p></div><a href="/job-search.html">सभी Jobs खोजें →</a></div>
+<div class="portal-tools-grid">
+<a class="portal-tool" href="/job-search.html"><span class="portal-tool-icon">⌕</span><span><b>Smart Job Search</b><small>योग्यता और विभाग के अनुसार भर्ती खोजें</small></span><i>↗</i></a>
+<a class="portal-tool" href="/saved-jobs.html"><span class="portal-tool-icon">☆</span><span><b>Saved Jobs</b><small>अपनी पसंद की भर्ती एक जगह रखें</small></span><i>↗</i></a>
+<a class="portal-tool" href="/previous-papers.html"><span class="portal-tool-icon">▤</span><span><b>Previous Papers</b><small>पुराने प्रश्नपत्र और answer keys</small></span><i>↗</i></a>
+</div>
+<div class="portal-alert"><div><b>Job Alerts पाएं</b><small>नई भर्ती, Admit Card और Result अपडेट के लिए हमारे चैनल से जुड़ें।</small></div>
+<div><a href="https://whatsapp.com/channel/0029VbDehpv4inozdwdMeY36" target="_blank" rel="noopener noreferrer">WhatsApp Alerts ↗</a><a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer">Telegram Alerts ↗</a></div></div>
+</section>
+<div class="section-title" id="updates"><div><span class="eyebrow">LATEST UPDATES</span><h2>ताजा अपडेट</h2></div>
+<span class="section-note"><span>{len(published)} Published Updates</span> · <span>Official-source based</span></span></div>
+<section class="listing-grid">{listing}</section>
+<section class="all-india-jobs" id="all-india-jobs" aria-labelledby="all-india-title">
+<div class="all-india-head"><div><span class="eyebrow">ALL INDIA RECRUITMENT • CENTRAL GOVERNMENT</span>
+<h2 id="all-india-title">All India Government Jobs</h2><p>देशभर की Central Government और राष्ट्रीय स्तर की भर्तियाँ—विभाग, योग्यता और परीक्षा के अनुसार अपडेट देखें।</p></div>
+<a href="/all-india-government-jobs">सभी All India Jobs देखें ↗</a></div>
+<div class="all-india-grid">{all_india_cards}</div></section>
+<section class="lower-grid">
+<div class="lower-panel"><div class="lower-head"><h2>Latest Published Updates</h2><span>नई से पुरानी</span></div><div class="student-links">{latest_links}</div></div>
+<div class="lower-panel" id="states"><div class="lower-head"><h2>Popular Exams & Departments</h2><span>परीक्षा के अनुसार खोजें</span></div>
+<div class="chips"><a href="/category-ssc-jobs">SSC</a><a href="/category-upsc-jobs">UPSC</a><a href="/category-railway-jobs">Railway</a><a href="/category-banking-jobs">Banking</a><a href="/category-police-defence-jobs">Police</a><a href="/category-teaching-jobs">Teaching</a><a href="/rajasthan-government-jobs">Rajasthan RSSB</a><a href="/rajasthan-government-jobs">RPSC</a></div></div>
+<div class="lower-panel"><div class="lower-head"><h2>Student Corner</h2><span>तैयारी के उपयोगी टूल</span></div>
+<div class="student-links"><a href="/quiz">Daily Quiz &amp; Score <b>↗</b></a><a href="/mock-tests/">Mock Tests &amp; Practice <b>↗</b></a><a href="/categories">All Exam Categories <b>↗</b></a><a href="/previous-papers.html">Previous Year Papers <b>↗</b></a><a href="/job-search.html">Smart Job Search <b>↗</b></a><a href="/saved-jobs.html">Saved Jobs <b>↗</b></a></div></div>
+</section>'''
+
+
 def update_home(posts: list[dict[str, Any]]) -> None:
     path = PUBLIC / "index.html"
     if not path.exists():
@@ -4000,7 +4098,7 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     )
     home_community = community_match.group(0) if community_match else ""
 
-    home_sections = homepage_dynamic_sections(posts)
+    home_sections = homepage_preview_sections(posts)
 
     # Keep the premium student-first hero in the FINAL homepage replacement too.
     # The earlier hero substitution is superseded below when <main> is rebuilt.
