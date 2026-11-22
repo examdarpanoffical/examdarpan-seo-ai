@@ -611,11 +611,13 @@ async function getDocs(q){
 
   function isAllIndiaGovernment(p) {
     const category = String(p.category || p.categoryName || "").trim().toLowerCase();
-    const recruitmentCategories = [
-      "rajasthan jobs","government jobs","police & defence jobs","teaching jobs",
-      "railway jobs","banking jobs","ssc jobs","upsc jobs"
-    ];
-    if (recruitmentCategories.includes(category)) return true;
+    const categoryIsRecruitment = /job|jobs|भर्ती|recruitment|vacanc|employment|रोजगार|नौकरी/.test(category);
+    if (categoryIsRecruitment) return true;
+
+    const title = String(p.title || p.postName || "").toLowerCase();
+    const titleLooksLikeRecruitment = /recruitment|vacanc|bharti|भर्ती|government job|govt job|सरकारी नौकरी|नौकरी|आवेदन आमंत्रित|पदों पर/.test(title);
+    if (titleLooksLikeRecruitment) return true;
+
     const text = calendarSourceText(p);
     return /(?:^|[^\w])upsc(?:$|[^\w])|(?:^|[^\w])ssc(?:$|[^\w])|(?:^|[^\w])rrb(?:$|[^\w])|(?:^|[^\w])rrc(?:$|[^\w])|railway|indian\s+railways|ibps|sbi|rbi|nabard|lic|sebi|esic|epfo|capf|cds|nda|afcat|agniveer|army|navy|air\s+force|defence|defense|central\s+government|central\s+govt|government\s+of\s+india|govt\.?\s+of\s+india|ministry\s+of|government\s+job|govt\.?\s+job|government\s+recruitment|recruitment|vacanc(?:y|ies)|bharti|भर्ती|सरकारी\s+नौकरी|केंद्रीय\s+सरकार|राजस्थान\s+सरकारी\s+भर्ती/i.test(text);
   }
@@ -767,8 +769,17 @@ async function getDocs(q){
     if (summary) summary.textContent = rows.length + " active भर्ती मिलीं";
 
     if (!rows.length) {
+      const publishedCount = posts.filter(p => String(p.status || "").toLowerCase() === "published").length;
+      const likelyJobs = posts.filter(p => {
+        const category = String(p.category || p.categoryName || "").toLowerCase();
+        const title = String(p.title || "").toLowerCase();
+        return /job|भर्ती|recruitment|vacanc|रोजगार|नौकरी/.test(category + " " + title);
+      }).length;
       calendar.innerHTML =
-        '<div class="empty">अभी कोई active सरकारी भर्ती नहीं मिली। सभी प्रकाशित jobs देखने के लिए Smart Job Search खोलें।</div>';
+        '<div class="empty"><strong>इस समय कैलेंडर में भर्ती नहीं दिख रही।</strong><br>' +
+        'Content index में Published updates: ' + publishedCount + ' · Job category/title matches: ' + likelyJobs +
+        '<br><a href="job-search.html">Smart Job Search खोलें →</a></div>';
+      if (summary) summary.textContent = publishedCount + " published updates जाँची गईं";
       return;
     }
 
