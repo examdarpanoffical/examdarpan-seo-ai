@@ -190,3 +190,5 @@ body{background:var(--ed-canvas)!important;color:var(--ed-ink)}
  .article-page .related-section .posts-grid{grid-template-columns:1fr!important}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ed-home-priority-card,.ed-home-latest-card,.ed-home-category-card{transition:none!important}}
+
+/* Production refresh trigger: preserve the approved Exam Darpan Experience V2 design. */
