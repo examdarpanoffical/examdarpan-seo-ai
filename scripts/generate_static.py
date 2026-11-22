@@ -1080,7 +1080,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     if hero_img and hero_img not in content:
         cover = (
             f'<figure class="ed-article-hero-media">'
-            f'<img src="{esc(hero_img)}" alt="{esc(title)}" width="1200" height="675" '
+            f'<img class="detail-featured" src="{esc(hero_img)}" alt="{esc(title)}" width="1200" height="675" '
             f'loading="eager" fetchpriority="high" decoding="async">'
             f'</figure>'
         )
@@ -1157,8 +1157,9 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
-<div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
-<div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{read_minutes} मिनट पढ़ने में</span></div>
+<span class="detail-category">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span><h1>{esc(title)}</h1>
+<p class="detail-summary">{esc(short_description(p))}</p>
+<div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="detail-meta article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{read_minutes} मिनट पढ़ने में</span></div>
 {verification_line(p)}
 
 
