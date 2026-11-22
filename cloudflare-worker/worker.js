@@ -106,7 +106,7 @@ function paperHttpsUrl(value, label, required = false) {
 async function manageQuestionPaper(env, payload) {
   const manifestPath = "public/question-papers/manifest.json";
   const response = await fetch(`${API}/repos/${REPO}/contents/${manifestPath}?ref=${BRANCH}`, { headers: ghHeaders(env) });
-  let manifest = { version: 1, papers: [] }, manifestSha = null;
+  let manifest = { version: 2, papers: [] }, manifestSha = null;
   if (response.status === 200) {
     const file = await response.json();
     manifestSha = file.sha;
@@ -118,7 +118,7 @@ async function manageQuestionPaper(env, payload) {
   }
   if (!Array.isArray(manifest.papers)) manifest.papers = [];
   const operation = String(payload.operation || "upsert");
-  const id = safeSlug(payload.id || [payload.exam, payload.year, payload.shift, payload.title].filter(Boolean).join("-"));
+  const id = safeSlug(payload.id || [payload.exam, payload.year, payload.title].filter(Boolean).join("-"));
   if (id.length < 3) throw new Error("Question paper ID is invalid.");
   if (operation === "delete") {
     const before = manifest.papers.length;
@@ -129,17 +129,23 @@ async function manageQuestionPaper(env, payload) {
     const exam = String(payload.exam || "").trim().slice(0, 120);
     const category = String(payload.category || "");
     const year = String(payload.year || "").trim();
-    const shift = String(payload.shift || "").trim().slice(0, 80);
     const description = String(payload.description || "").trim().slice(0, 500);
+    const shiftCount = Number(payload.shiftCount);
     if (!title || !exam) throw new Error("Paper title and exam name are required.");
     if (!QUESTION_PAPER_CATEGORIES.has(category)) throw new Error("Choose a valid question paper category.");
     if (!/^\d{4}$/.test(year) || Number(year) < 1990 || Number(year) > 2100) throw new Error("Enter a valid exam year.");
-    const paperUrl = paperHttpsUrl(payload.paperUrl, "Question Paper PDF URL", true);
-    const answerKeyUrl = paperHttpsUrl(payload.answerKeyUrl, "Answer Key URL");
-    const sourceUrl = paperHttpsUrl(payload.sourceUrl, "Official Source URL");
+    if (!Number.isInteger(shiftCount) || shiftCount < 1 || shiftCount > 30) throw new Error("Number of shifts must be between 1 and 30.");
+    if (!Array.isArray(payload.shifts) || payload.shifts.length !== shiftCount) throw new Error("Please add the PDF links for every shift.");
+    const shifts = payload.shifts.map((shift, index) => {
+      const number = index + 1;
+      const paperUrl = paperHttpsUrl(shift && shift.paperUrl, "Shift " + number + " Question Paper PDF URL", true);
+      const answerKeyUrl = paperHttpsUrl(shift && shift.answerKeyUrl, "Shift " + number + " Answer Key URL");
+      const sourceUrl = paperHttpsUrl(shift && shift.sourceUrl, "Shift " + number + " Official Source URL");
+      return { number, label: String(shift.label || ("Shift " + number)).trim().slice(0, 60), paperUrl, answerKeyUrl, sourceUrl };
+    });
     const existing = manifest.papers.find(p => p && p.id === id);
     const item = {
-      id, title, exam, category, year, shift, paperUrl, answerKeyUrl, sourceUrl, description,
+      id, title, exam, category, year, shiftCount, shifts, description,
       status: "published",
       publishedAt: existing?.publishedAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -147,12 +153,17 @@ async function manageQuestionPaper(env, payload) {
     manifest.papers = manifest.papers.filter(p => p && p.id !== id);
     manifest.papers.unshift(item);
   }
-  manifest.version = 1;
+  manifest.version = 2;
   manifest.updatedAt = new Date().toISOString();
-  await putGitHubFile(env, manifestPath, JSON.stringify(manifest, null, 2) + "\n",
+  const saved = await putGitHubFile(env, manifestPath, JSON.stringify(manifest, null, 2) + "\n",
     (operation === "delete" ? "Remove" : "Publish/update") + " previous question paper: " + id, manifestSha);
-  return { published: operation !== "delete", deleted: operation === "delete", id, count: manifest.papers.length,
-    url: "https://examdarpan.in/previous-papers", message: "Question paper library updated; Firebase Hosting deployment will publish it." };
+  return {
+    published: operation !== "delete", deleted: operation === "delete", id,
+    count: manifest.papers.length, commit: saved.commit?.sha || null,
+    item: operation === "delete" ? null : manifest.papers.find(p => p && p.id === id),
+    url: "https://examdarpan.in/previous-papers",
+    message: "Question paper manifest committed to GitHub."
+  };
 }
 
 async function publishHtmlQuiz(env, payload) {
