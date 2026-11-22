@@ -1767,7 +1767,6 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     # Remove legacy article stylesheets and embedded style blocks that override
     # the selected preview detail CSS on mobile (the old layout seen in screenshots).
     page = re.sub(r'<link rel="stylesheet" href="/(?:styles|article|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
-    page = re.sub(r'<style\b[^>]*>[\s\S]*?</style>', '', page, flags=re.I)
     return page
 
 
@@ -4537,6 +4536,10 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
                 )
         if 'src="/portal-v1/preview.js"' not in text:
             text = text.replace('</body>', '<script src="/portal-v1/preview.js" defer></script>\n</body>', 1)
+        # Remove the legacy global stylesheet and load the hub-specific preview parity layer.
+        text = text.replace('<link rel="stylesheet" href="/styles.css">', '')
+        if 'href="/portal-v1/hub-parity.css' not in text:
+            text = text.replace('</head>', '<link rel="stylesheet" href="/portal-v1/hub-parity.css?v=1">\n</head>', 1)
         # The category side menu is homepage-only; hubs keep the shared preview navigation.
         text = re.sub(r'<script src="/portal-v1/side-menu\.js" defer></script>', '', text, flags=re.I)
 
