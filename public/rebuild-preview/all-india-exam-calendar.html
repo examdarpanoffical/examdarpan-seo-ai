@@ -394,10 +394,14 @@ async function getDocs(q){
 
       // Metadata fields.
       p.category,
+      p.categoryName,
       p.region,
       p.state,
       p.organization,
       p.department,
+      p.searchKeywords,
+      p.eligibility,
+      p.vacancies,
 
       ...(Array.isArray(p.tags) ? p.tags : [])
     ]
