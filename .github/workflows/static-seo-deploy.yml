@@ -147,14 +147,15 @@ jobs:
           grep -Fq 'ed-primary-domain-redirect' public/index.html
           test -f public/sitemap.xml
           test -f public/categories.html
-          grep -Fq 'id="exam-darpan-home-final-order"' public/index.html
-          grep -Fq 'class="ed-home-live"' public/index.html
-          grep -Fq 'class="ed-home-priority"' public/index.html
-          grep -Fq 'class="ed-home-secondary"' public/index.html
-          grep -Fq 'Answer Key &amp; Syllabus' public/index.html
-          grep -Fq 'Scholarships &amp; Yojana' public/index.html
-          grep -Fq 'Rajasthan Government Jobs' public/index.html
-          grep -Fq 'All India Government Jobs' public/index.html
+          grep -Fq 'class="site-head"' public/index.html
+          grep -Fq 'class="main-nav"' public/index.html
+          grep -Fq 'id="portal-search"' public/index.html
+          grep -Fq 'class="listing-grid"' public/index.html
+          grep -Fq 'id="jobs"' public/index.html
+          grep -Fq 'id="results"' public/index.html
+          grep -Fq 'id="admit"' public/index.html
+          grep -Fq 'src="/portal-v1/preview.js"' public/index.html
+          grep -Fq 'href="/portal-v1/style.css' public/index.html
           # Fail closed if split sitemap files are missing or malformed.
           test -s public/sitemap_index.xml
           test -s public/post-sitemap.xml
