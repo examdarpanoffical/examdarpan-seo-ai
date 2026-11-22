@@ -5191,7 +5191,7 @@ def write_llms_discovery(posts: list[dict[str, Any]], article_slugs: list[str]) 
         f"- [Robots instructions]({BASE}/robots.txt)",
         f"- [Sitemap index]({BASE}/sitemap_index.xml)",
     ])
-    (PUBLIC / "llms.txt").write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+    (PUBLIC / "llms.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
     full_lines = [
         "# Exam Darpan — Full public page directory",
         "",
@@ -5208,7 +5208,7 @@ def write_llms_discovery(posts: list[dict[str, Any]], article_slugs: list[str]) 
             f"Description: {short_description(post)}",
             "",
         ])
-    (PUBLIC / "llms-full.txt").write_text("\\n".join(full_lines) + "\\n", encoding="utf-8")
+    (PUBLIC / "llms-full.txt").write_text("\n".join(full_lines) + "\n", encoding="utf-8")
 
 
 def verify_generated_output(posts: list[dict[str, Any]]) -> None:
