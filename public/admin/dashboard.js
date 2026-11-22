@@ -135,7 +135,7 @@ function renderList(){
   document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>remove(b.dataset.delete));
   document.querySelectorAll('[data-share-wa]').forEach(b=>b.onclick=()=>{
     const post=all.find(p=>'https://examdarpan.in/'+slugify(p.slug||'')===b.dataset.shareWa);
-    const message=(post?.title||'Exam Darpan Update')+'\\n'+b.dataset.shareWa;
+    const message=(post?.title||'Exam Darpan Update')+'\n'+b.dataset.shareWa;
     window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener');
   });
   document.querySelectorAll('[data-share-fb]').forEach(b=>b.onclick=()=>{
@@ -398,7 +398,7 @@ async function queueArticleCleanupBuild(){
 }
 async function remove(id){
   const post=all.find(p=>p.id===id);
-  if(!confirm('Delete this article from Firestore? Its generated HTML and sitemap entry will be removed by the next static rebuild.\\n\\n'+(post?.title||id)))return;
+  if(!confirm('Delete this article from Firestore? Its generated HTML and sitemap entry will be removed by the next static rebuild.\n\n'+(post?.title||id)))return;
   try{
     await deleteDoc(doc(db,'posts',id));
     selectedPostIds.delete(id);
@@ -414,9 +414,9 @@ async function remove(id){
 async function bulkDeleteSelectedArticles(){
   const selected=all.filter(p=>selectedPostIds.has(p.id));
   if(!selected.length){$('bulkCleanupMessage').textContent='पहले कम से कम एक article select करें.';return;}
-  const names=selected.slice(0,12).map((p,i)=>(i+1)+'. '+(p.title||p.slug||p.id)).join('\\n');
-  const suffix=selected.length>12?'\\n…और '+(selected.length-12)+' articles':'';
-  const typed=prompt('आप '+selected.length+' articles को Firestore से permanently delete करने जा रहे हैं.\\n\\n'+names+suffix+'\\n\\nआगे बढ़ने के लिए DELETE लिखें:');
+  const names=selected.slice(0,12).map((p,i)=>(i+1)+'. '+(p.title||p.slug||p.id)).join('\n');
+  const suffix=selected.length>12?'\n…और '+(selected.length-12)+' articles':'';
+  const typed=prompt('आप '+selected.length+' articles को Firestore से permanently delete करने जा रहे हैं.\n\n'+names+suffix+'\n\nआगे बढ़ने के लिए DELETE लिखें:');
   if(typed!=='DELETE'){$('bulkCleanupMessage').textContent='Deletion cancel कर दी गई; कोई बदलाव नहीं हुआ.';return;}
   const button=$('bulkDeleteArticles');
   button.disabled=true;button.textContent='Deleting…';
