@@ -2,7 +2,7 @@
 "use strict";
 var KEY="exam-darpan-saved-jobs-v1";
 var esc=function(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
-var slug=function(p){return String(p.slug||p.urlSlug||p.seoSlug||"").replace(/^\\/+|\\.html$/g,"")};
+var slug=function(p){return String(p.slug||p.urlSlug||p.seoSlug||"").replace(/^\/+|\.html$/g,"")};
 var category=function(p){return String(p.category||p.categoryName||"Latest Updates")};
 var saved=function(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}};
 var write=function(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}};
