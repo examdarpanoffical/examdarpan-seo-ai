@@ -4117,6 +4117,9 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         text = text.replace("</head>", '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\n<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\n</head>', 1)
     if 'src="/portal-v1/preview.js"' not in text:
         text = text.replace("</body>", '<script src="/portal-v1/preview.js" defer></script>\n</body>', 1)
+    # The selected preview homepage includes the category side-menu on every page.
+    if 'src="/portal-v1/side-menu.js"' not in text:
+        text = text.replace("</body>", '<script src="/portal-v1/side-menu.js" defer></script>\n</body>', 1)
     # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1_END
     # The old homepage search handler targets #searchInput; the selected UI uses #portal-search.
     text = text.replace(
