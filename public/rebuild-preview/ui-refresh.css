@@ -216,7 +216,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #f2bd
 
 /* Shared footer and final layout refinements */
 .site-footer{padding-top:28px}
-.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:34px;padding-bottom:25px}
+.footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,minmax(0,1fr));gap:28px;padding-bottom:25px}
 .footer-brand b{font-size:21px;letter-spacing:.2px;color:#fff}
 .footer-brand em{font-style:normal;color:#f06a70}
 .footer-brand p{max-width:460px;color:#b9c7d7;font-size:13px;line-height:1.8;margin:9px 0 0}
