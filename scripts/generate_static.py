@@ -1080,7 +1080,7 @@ def article_page(p: dict[str, Any], posts: list[dict[str, Any]]) -> str:
     if hero_img and hero_img not in content:
         cover = (
             f'<figure class="ed-article-hero-media">'
-            f'<img src="{esc(hero_img)}" alt="{esc(title)}" width="1200" height="675" '
+            f'<img class="detail-featured" src="{esc(hero_img)}" alt="{esc(title)}" width="1200" height="675" '
             f'loading="eager" fetchpriority="high" decoding="async">'
             f'</figure>'
         )
@@ -1157,8 +1157,9 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 <nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
 <main class="main container"><article class="article article-page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="{category_path(cat_slug)}">{esc(cat)}</a><span>›</span><span>Article</span></nav>
-<div class="post-badges"><span class="badge">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span></div><h1>{esc(title)}</h1>
-<div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{read_minutes} मिनट पढ़ने में</span></div>
+<span class="detail-category">{esc(cat)}</span><span class="status-badge {application_status(p)[1]}">{esc(application_status(p)[0])}</span><h1>{esc(title)}</h1>
+<p class="detail-summary">{esc(short_description(p))}</p>
+<div class="ed-author-byline"><a class="ed-author-name" href="{AUTHOR_PATH}">By {AUTHOR_NAME}</a></div><div class="detail-meta article-meta"><span>प्रकाशित: {date_hi(p.get('publishedAt'))}</span><span>•</span><span>अपडेट: {date_hi(p.get('updatedAt') or p.get('publishedAt'))}</span><span>•</span><span>{read_minutes} मिनट पढ़ने में</span></div>
 {verification_line(p)}
 
 
@@ -3541,6 +3542,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         + social_cta
     )
 
+
 def update_home(posts: list[dict[str, Any]]) -> None:
     path = PUBLIC / "index.html"
     if not path.exists():
@@ -4117,7 +4119,23 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         text = text.replace("</head>", '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\n<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\n</head>', 1)
     if 'src="/portal-v1/preview.js"' not in text:
         text = text.replace("</body>", '<script src="/portal-v1/preview.js" defer></script>\n</body>', 1)
+    # The selected preview homepage includes the category side-menu on every page.
+    if 'src="/portal-v1/side-menu.js"' not in text:
+        text = text.replace("</body>", '<script src="/portal-v1/side-menu.js" defer></script>\n</body>', 1)
     # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1_END
+    # Strip legacy homepage-only CSS: the selected preview stylesheet owns this page's visual system.
+    text = re.sub(
+        r'<style id="exam-darpan-student-first-home-v3">[\s\S]*?</style>',
+        '',
+        text,
+        count=1,
+    )
+    text = re.sub(
+        r'<style id="exam-darpan-home-community-cta">[\s\S]*?</style>',
+        '',
+        text,
+        count=1,
+    )
     # The old homepage search handler targets #searchInput; the selected UI uses #portal-search.
     text = text.replace(
         "if(u.get('q'))document.getElementById('searchInput').value=u.get('q');",
@@ -4167,40 +4185,16 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
 
 
 def category_page(category_name: str, category_slug: str, title: str, description: str, posts: list[dict[str, Any]]) -> str:
+    """Render every category with the exact selected rebuild-preview layout, server-side."""
     filtered = [p for p in posts if normalized_category(p) == category_name]
     url = f"{BASE}{category_path(category_slug)}"
-    guide_html = category_guide_html(category_name, posts)
-    def render_category_item(p: dict[str, Any]) -> str:
-        s = slugify(p.get("slug"))
-        return (
-            '<article class="ed-category-post">'
-            f'<h3><a href="{article_path(s)}">{esc(post_title(p))}</a></h3>'
-            f'<div class="ed-category-post-meta"><span>{date_hi(p.get("publishedAt"))}</span>'
-            f'<span>•</span><span>{esc(category_name)}</span></div>'
-            f'<p>{esc(short_description(p))}</p>'
-            f'<a class="ed-category-read" href="{article_path(s)}">पूरा article पढ़ें <b>→</b></a>'
-            '</article>'
-        )
-
-    visible_items = filtered[:6]
-    more_items = filtered[6:]
-    items = [render_category_item(p) for p in visible_items]
-
-    if more_items:
-        items.append(
-            '<details class="ed-category-more">'
-            '<summary><span>View More</span><b>⌄</b></summary>'
-            '<div class="ed-category-more-grid">'
-            + "".join(render_category_item(p) for p in more_items)
-            + '</div></details>'
-        )
-
     item_list = {
         "@context": "https://schema.org",
         "@type": "ItemList",
         "name": title,
         "itemListElement": [
-            {"@type": "ListItem", "position": i + 1, "url": article_url(slugify(p.get("slug")))} for i, p in enumerate(filtered[:100])
+            {"@type": "ListItem", "position": i + 1, "url": article_url(slugify(p.get("slug")))}
+            for i, p in enumerate(filtered[:100])
         ],
     }
     breadcrumb = {
@@ -4211,114 +4205,113 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
         ],
     }
     robots = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" if filtered else "noindex,follow"
+
+    # Reuse the exact header, navigation and footer from the selected preview shell.
+    portal_path = PUBLIC / "portal-v1" / "index.html"
+    if not portal_path.exists():
+        raise RuntimeError("Selected preview shell missing: public/portal-v1/index.html")
+    portal = portal_path.read_text(encoding="utf-8")
+    head_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal)
+    foot_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal)
+    if not (head_match and foot_match):
+        raise RuntimeError("Selected preview shell is missing its header/navigation/footer")
+    header = head_match.group(1)
+    footer = foot_match.group(1)
+    route_map = {
+        "Government%20Jobs": "/all-india-government-jobs",
+        "Rajasthan%20Jobs": "/rajasthan-government-jobs",
+        "Results": "/category-results",
+        "Admit%20Card": "/category-admit-card",
+        "Answer%20Key": "/category-answer-key",
+        "Scholarships": "/category-scholarships",
+        "Syllabus": "/category-syllabus",
+        "Police%20%26%20Defence%20Jobs": "/category-police-defence-jobs",
+        "Teaching%20Jobs": "/category-teaching-jobs",
+        "Railway%20Jobs": "/category-railway-jobs",
+        "Banking%20Jobs": "/category-banking-jobs",
+        "SSC%20Jobs": "/category-ssc-jobs",
+        "UPSC%20Jobs": "/category-upsc-jobs",
+        "Entrance%20Exams": "/category-entrance-exams",
+        "University%20%26%20College": "/category-university-college",
+        "Yojana": "/category-yojana",
+        "Latest%20Updates": "/category-latest-updates",
+    }
+    for query, destination in route_map.items():
+        old = "category.html?category=" + query
+        header = header.replace(old, destination)
+        footer = footer.replace(old, destination)
+    header = header.replace('href="index.html"', 'href="/"')
+    footer = footer.replace('href="index.html"', 'href="/"')
+    for fragment_name, fragment in (("header", header), ("footer", footer)):
+        if "category.html?category=" in fragment or 'href="index.html"' in fragment:
+            raise RuntimeError(f"Preview-only link remained in category {fragment_name}")
+
+    def render_item(p: dict[str, Any]) -> str:
+        slug = slugify(p.get("slug"))
+        href = article_path(slug)
+        image = safe_url(p.get("featuredImage"))
+        thumb = (
+            f'<img class="article-thumb" src="{esc(image)}" alt="{esc(post_title(p))}" loading="lazy">'
+            if image else '<div class="article-thumb article-thumb-fallback" aria-hidden="true">ED</div>'
+        )
+        return (
+            f'<article class="article-card">{thumb}<div class="article-card-content">'
+            f'<h3><a href="{href}">{esc(post_title(p))}</a></h3>'
+            f'<p>{esc(short_description(p))}</p>'
+            f'<div class="article-meta"><span>{esc(category_name)}</span><span>Published: {date_hi(p.get("publishedAt"))}</span></div>'
+            f'<a class="article-open" href="{href}">पूरी जानकारी पढ़ें →</a>'
+            '</div></article>'
+        )
+
+    cards = "".join(render_item(p) for p in filtered)
+    if not cards:
+        cards = '<div class="empty-state">इस category में अभी कोई published update उपलब्ध नहीं है। नई verified updates जल्द यहाँ दिखाई देंगी।</div>'
+
+    category_links = "".join(
+        f'<a href="{category_path(slug_name)}">{esc(category_title)} →</a>'
+        for _, slug_name, category_title, _ in CATEGORIES
+    )
+    side_links = (
+        '<div class="side-panel"><h2>All Categories</h2><div class="side-links">'
+        + category_links +
+        '</div></div>'
+        '<div class="side-panel"><h2>Student Corner</h2>'
+        '<a href="/quiz">Daily Quiz ↗</a><a href="/mock-tests/">Mock Tests &amp; Practice ↗</a>'
+        '<a href="/categories">All Exam Categories ↗</a><a href="/previous-papers">Previous Year Papers ↗</a>'
+        '<a href="/job-search">Smart Job Search ↗</a><a href="/saved-jobs">Saved Jobs ↗</a></div>'
+    )
     return f'''{CATEGORY_MARKER}
 <!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(fit_meta_text(title + " | Exam Darpan", limit=60))}</title><meta name="description" content="{esc(fit_meta_text(description, limit=160))}"><meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
-<meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan"><meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}"><meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.png">
-<script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script><script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
-<style id="exam-darpan-category-design">
-.ed-category-page{{max-width:1180px;margin:auto}}
-.ed-category-hero{{margin-bottom:22px;padding:28px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0f172a,#1d4ed8 62%,#2563eb);color:#fff;box-shadow:0 14px 35px rgba(15,23,42,.14)}}
-.ed-category-hero h1{{margin:4px 0 8px;color:#fff;font-size:clamp(28px,4vw,42px);line-height:1.1}}
-.ed-category-hero p{{margin:0;color:#dbeafe;line-height:1.7;max-width:760px}}
-.ed-category-kicker{{display:inline-block;color:#93c5fd;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:8px}}
-.ed-category-actions{{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}}
-.ed-category-trust{{margin-top:18px;padding:13px 15px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(255,255,255,.08)}}
-.ed-category-layout{{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start}}
-.ed-category-toolbar{{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}}
-.ed-category-toolbar h2{{margin:3px 0 0;font-size:25px}}
-.ed-category-count{{white-space:nowrap;padding:7px 11px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:900}}
-.ed-category-posts{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}}
-.ed-category-post{{background:#fff;border:1px solid #e5e9f0;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(15,23,42,.05)}}
-.ed-category-post h3{{margin:0 0 7px;font-size:17px;line-height:1.42}}
-.ed-category-post h3 a{{color:#172033!important;text-decoration:none!important}}
-.ed-category-post h3 a:hover{{color:#2563eb!important}}
-.ed-category-post-meta{{display:flex;gap:7px;align-items:center;color:#8a94a5;font-size:9px;font-weight:800;margin-bottom:8px}}
-.ed-category-post p{{margin:0;color:#667085;font-size:11px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
-.ed-category-read{{display:inline-flex;align-items:center;gap:4px;margin-top:11px;color:#2563eb!important;text-decoration:none!important;font-size:10px;font-weight:900}}
-.ed-category-read b{{font-size:13px}}
-.ed-category-more{{grid-column:1/-1;margin-top:2px}}
-.ed-category-more summary{{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:1px solid #dbe4f0;border-radius:14px;background:linear-gradient(180deg,#fff,#f8fbff);color:#2563eb;font-size:13px;font-weight:950;box-shadow:0 5px 16px rgba(15,23,42,.05)}}
-.ed-category-more summary::-webkit-details-marker{{display:none}}
-.ed-category-more summary b{{font-size:18px;line-height:1;transition:transform .18s ease}}
-.ed-category-more[open] summary b{{transform:rotate(180deg)}}
-.ed-category-more-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:13px}}
-.ed-category-side{{display:grid;gap:14px}}
-.ed-category-side-card{{padding:18px}}
-@media(max-width:900px){{.ed-category-layout{{grid-template-columns:1fr}}}}
-@media(max-width:650px){{.ed-category-posts{{grid-template-columns:1fr}}.ed-category-more-grid{{grid-template-columns:1fr}}.ed-category-toolbar{{align-items:flex-start;flex-direction:column}}}}
-</style>
-<style id="ed-category-guide-css">
-.ed-category-guide{{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.75fr);gap:16px;margin:0 0 22px;padding:20px;border:1px solid #dbe5f2;border-radius:17px;background:#fff;box-shadow:0 6px 20px rgba(15,23,42,.035)}}
-.ed-category-guide-kicker{{color:#2563eb;font-size:9px;font-weight:950;letter-spacing:.12em}}
-.ed-category-guide h2{{margin:6px 0 8px;color:#172033;font-size:19px}}
-.ed-category-guide p{{margin:0;color:#536176;font-size:12px;line-height:1.8}}
-.ed-category-guide-note{{grid-column:1/-1;padding-top:12px;border-top:1px solid #edf1f6;font-size:11px!important}}
-.ed-category-guide-note a{{color:#1d4ed8;font-weight:800}}
-.ed-category-guide .ed-topic-links{{margin:0;align-self:start}}
-@media(max-width:760px){{.ed-category-guide{{grid-template-columns:1fr;padding:16px}}.ed-category-guide-note{{grid-column:auto}}}}
-</style>
-
+<title>{esc(fit_meta_text(title + " | Exam Darpan", limit=60))}</title>
+<meta name="description" content="{esc(fit_meta_text(description, limit=160))}">
+<meta name="robots" content="{robots}"><link rel="canonical" href="{esc(url)}">
+<link rel="icon" href="/assets/favicon.png">
+<link rel="stylesheet" href="/portal-v1/style.css?v=1">
+<link rel="stylesheet" href="/portal-v1/pages.css?v=1">
+<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">
+<script src="/site-search.js" defer></script>{ONESIGNAL_SCRIPT}
+<meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan">
+<meta property="og:title" content="{esc(title)} | Exam Darpan"><meta property="og:description" content="{esc(description[:200])}">
+<meta property="og:url" content="{esc(url)}"><meta property="og:image" content="{BASE}/assets/logo.png">
+<script type="application/ld+json">{json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))}</script>
+<script type="application/ld+json">{json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))}</script>
 </head><body>
-<div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span><span class="topbar-dot">•</span><span class="topbar-note">Official source verify करें</span></div></div>
-<header class="header"><div class="container head"><a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a><a class="btn btn-gold" href="/">Home</a></div><nav class="nav"><div class="container"><a href="/">Home</a><a href="{category_path('rajasthan-jobs')}">राजस्थान Jobs</a><a href="{category_path('government-jobs')}">All India Jobs</a><a href="{category_path('admit-card')}">Admit Card</a><a href="{category_path('results')}">Results</a><a href="{category_path('answer-key')}">Answer Key</a><a href="{category_path('syllabus')}">Syllabus</a></div></nav></header>
-<main class="main container"><div class="ed-category-page"><section class="ed-category-hero"><div><span class="ed-category-kicker">EXAM DARPAN CATEGORY</span><h1>{esc(title)}</h1><p>{esc(description)}</p><div class="ed-category-actions"><a class="btn btn-primary" href="#articles">Latest Articles <b>→</b></a><a class="btn btn-light" href="/">Home</a></div></div><div class="ed-category-trust"><span class="hero-trust-icon">✓</span><div><strong>Official-source based</strong><p>महत्वपूर्ण dates और links को official source से verify करें।</p></div></div></section>
-{guide_html}
-<section id="articles" class="ed-category-layout"><div><div class="ed-category-toolbar"><div><span class="eyebrow">IMPORTANT LATEST</span><h2>Latest {esc(title)}</h2></div><span class="ed-category-count">{len(filtered)} updates</span></div><div class="ed-category-posts">{"".join(items) if items else '<div class="card empty"><strong>इस category में अभी कोई published update नहीं है।</strong><br>नई verified updates जल्द यहाँ दिखाई देंगी।</div>'}</div></div><aside class="ed-category-side"><div class="card ed-category-side-card"><strong>Official source first</strong><p class="meta">Exam Darpan independent information portal है। आवेदन, परीक्षा या परिणाम से जुड़ी अंतिम कार्रवाई official notification देखकर ही करें।</p></div><div class="card ed-category-side-card"><div class="section-label">EDITORIAL TEAM</div><div class="author"><div class="author-avatar">ED</div><div><strong>Exam Darpan Editorial Team</strong><div class="meta">Verified Information Desk</div></div></div><a class="btn btn-dark" href="/editorial-policy">Editorial Policy <b>→</b></a></div></aside></section></div></main>
-<footer class="footer">
-  <div class="container footer-main">
-    <div class="footer-brand">
-      <div class="footer-brand-title">EXAM <span>DARPAN</span></div>
-      <div class="footer-trust-line">
-        <span>✓ Official-source based</span>
-        <span>✓ Clear dates</span>
-        <span>✓ Rajasthan + All India</span>
-      </div>
-      <div class="footer-socials">
-        <a href="https://chat.whatsapp.com/CoYGyHfbN1A61H66yUV4aK" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        <a href="https://t.me/examdarpanofficial" target="_blank" rel="noopener noreferrer">Telegram</a>
-        <a href="https://www.instagram.com/examdarpan_official/" target="_blank" rel="noopener noreferrer">Instagram</a>
-        <a href="https://x.com/exam_darpan" target="_blank" rel="noopener noreferrer">X</a>
-      </div>
-    </div>
-
-    <div class="footer-col">
-      <h4>Explore</h4>
-      <a href="/rajasthan-government-jobs">Rajasthan Jobs</a>
-      <a href="/all-india-government-jobs">All India Jobs</a>
-      <a href="/category-admit-card">Admit Card</a>
-      <a href="/category-results">Results</a>
-    </div>
-
-    <div class="footer-col">
-      <h4>Resources</h4>
-      <a href="/category-answer-key">Answer Key</a>
-      <a href="/category-syllabus">Syllabus</a>
-      <a href="/quiz">Daily Practice Test</a>
-    </div>
-
-    <div class="footer-col">
-      <h4>Important &amp; Legal</h4>
-      <a href="/about">About Us</a>
-      <a href="/editorial-policy">Editorial Policy</a>
-      <a href="/contact">Contact</a>
-      <a href="/privacy">Privacy Policy</a>
-      <a href="/disclaimer">Disclaimer</a>
-      <a href="/terms">Terms &amp; Conditions</a>
-    </div>
-  </div>
-
-  <div class="container footer-bottom">
-    <div>
-      <strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong>
-      
-    </div>
-    <div class="footer-bottom-note">
-      Information is provided for educational purposes. Final confirmation should always be made from the official notification.
-    </div>
-  </div>
-</footer><script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script></body></html>'''
-
+{header}
+<main class="wrap page">
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>{esc(title)}</span></nav>
+<section class="category-hero"><span class="eyebrow">EXAM DARPAN CATEGORY</span>
+<h1>{esc(title)}</h1><p>{esc(description)}</p>
+<div class="category-meta"><span>{len(filtered)} Published Updates</span><span>Official-source checked information</span></div></section>
+<div class="category-layout"><section class="category-results">
+<div class="section-title"><div><span class="eyebrow">LATEST PUBLISHED</span><h2>Latest {esc(title)}</h2></div>
+<label class="sort-label">Sort: Newest first</label></div>
+<div id="category-list" class="article-list">{cards}</div>
+</section><aside class="category-sidebar">{side_links}</aside></div>
+</main>
+{footer}
+<script src="/portal-v1/preview.js" defer></script>
+<script src="/portal-v1/side-menu.js" defer></script>
+</body></html>'''
 
 
 
@@ -4453,6 +4446,33 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         ),
     )
 
+    portal_path = PUBLIC / "portal-v1" / "index.html"
+    if not portal_path.exists():
+        raise RuntimeError("Selected preview shell missing for government-job hubs")
+    portal = portal_path.read_text(encoding="utf-8")
+    head_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal)
+    foot_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal)
+    if not (head_match and foot_match):
+        raise RuntimeError("Selected preview shell is missing hub header/footer")
+    shared_header, shared_footer = head_match.group(1), foot_match.group(1)
+    route_map = {
+        "Government%20Jobs": "/all-india-government-jobs",
+        "Rajasthan%20Jobs": "/rajasthan-government-jobs",
+        "Results": "/category-results", "Admit%20Card": "/category-admit-card",
+        "Answer%20Key": "/category-answer-key", "Scholarships": "/category-scholarships",
+        "Syllabus": "/category-syllabus", "Police%20%26%20Defence%20Jobs": "/category-police-defence-jobs",
+        "Teaching%20Jobs": "/category-teaching-jobs", "Railway%20Jobs": "/category-railway-jobs",
+        "Banking%20Jobs": "/category-banking-jobs", "SSC%20Jobs": "/category-ssc-jobs",
+        "UPSC%20Jobs": "/category-upsc-jobs", "Entrance%20Exams": "/category-entrance-exams",
+        "University%20%26%20College": "/category-university-college",
+        "Yojana": "/category-yojana", "Latest%20Updates": "/category-latest-updates",
+    }
+    for query, destination in route_map.items():
+        shared_header = shared_header.replace("category.html?category=" + query, destination)
+        shared_footer = shared_footer.replace("category.html?category=" + query, destination)
+    shared_header = shared_header.replace('href="index.html"', 'href="/"')
+    shared_footer = shared_footer.replace('href="index.html"', 'href="/"')
+
     for filename, heading, category_name in hub_specs:
         path = PUBLIC / filename
 
@@ -4462,6 +4482,57 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         text = path.read_text(
             encoding="utf-8",
             errors="ignore",
+        )
+
+        # Use the exact selected preview navigation and footer on both hub pages.
+        if '<div class="topbar">' in text:
+            text, header_count = re.subn(
+                r'<div class="topbar">[\s\S]*?</header>',
+                lambda _: shared_header,
+                text,
+                count=1,
+                flags=re.I,
+            )
+            if header_count != 1:
+                raise RuntimeError(f"Could not replace legacy header on {filename}")
+        else:
+            # The All India hub has a purpose-built hero header, not the legacy site navigation.
+            anchor = '<div class="aihub-page">'
+            if anchor not in text:
+                raise RuntimeError(f"Could not find hub content root on {filename}")
+            text = text.replace(anchor, shared_header + '\n' + anchor, 1)
+
+        text, footer_count = re.subn(
+            r'<footer class="footer">[\s\S]*?</footer>',
+            lambda _: shared_footer,
+            text,
+            count=1,
+            flags=re.I,
+        )
+        if footer_count == 0:
+            text = re.sub(r'</body\s*>', lambda _: shared_footer + '\\n</body>', text, count=1, flags=re.I)
+        text = text.replace('<main class="main container">', '<main class="wrap page main container">', 1)
+        text = text.replace(
+            '<link rel="stylesheet" href="/styles.css">',
+            '<link rel="stylesheet" href="/styles.css">\n'
+            '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\n'
+            '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\n'
+            '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">',
+            1,
+        )
+        if 'href="/portal-v1/style.css' not in text:
+            text = text.replace(
+                '</head>',
+                '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\n'
+                '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\n'
+                '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">\\n</head>',
+                1,
+            )
+        text = text.replace(
+            '</body>',
+            '<script src="/portal-v1/preview.js" defer></script>\n'
+            '<script src="/portal-v1/side-menu.js" defer></script>\\n</body>',
+            1,
         )
 
         # Government-job hubs must not show the legacy floating WhatsApp popup.
@@ -4729,84 +4800,98 @@ document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().get
 
 
 def write_category_directory(posts: list[dict[str, Any]]) -> None:
-    """Generate a single crawlable directory linking every supported category."""
+    """Generate the all-categories directory with the selected rebuild-preview shell."""
     cards = []
     item_list = []
+    icons = {
+        "rajasthan-jobs": "RJ", "government-jobs": "IN",
+        "police-defence-jobs": "PD", "teaching-jobs": "ED",
+        "railway-jobs": "RR", "banking-jobs": "BK", "ssc-jobs": "SSC",
+        "upsc-jobs": "UP", "admit-card": "AC", "results": "RS",
+        "answer-key": "AK", "syllabus": "SY", "entrance-exams": "EX",
+        "scholarships": "SC", "university-college": "UC",
+        "yojana": "YO", "latest-updates": "UP",
+    }
     for position, (name, slug_name, title, description) in enumerate(CATEGORIES, start=1):
         count = sum(1 for post in posts if normalized_category(post) == name)
         url = f"{BASE}{category_path(slug_name)}"
         cards.append(
-            '<article class="ed-category-directory-card">'
-            f'<h2><a href="{esc(category_path(slug_name))}">{esc(title)}</a></h2>'
-            f'<p>{esc(description)}</p>'
-            f'<div class="ed-category-directory-meta"><span>{count} published article{"s" if count != 1 else ""}</span>'
-            f'<a href="{esc(category_path(slug_name))}">View updates →</a></div>'
-            '</article>'
+            f'<a class="directory-card" href="{esc(category_path(slug_name))}">'
+            f'<span class="directory-icon">{icons.get(slug_name, "ED")}</span>'
+            f'<span><b>{esc(title)}</b><small>{esc(description)}</small></span>'
+            '<i aria-hidden="true">→</i></a>'
         )
         item_list.append({
-            "@type": "ListItem",
-            "position": position,
-            "name": title,
-            "url": url,
+            "@type": "ListItem", "position": position, "name": title, "url": url,
         })
-
     schema = {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": "All Categories | Exam Darpan",
-        "url": f"{BASE}/categories",
-        "mainEntity": {
-            "@type": "ItemList",
-            "itemListElement": item_list,
-        },
+        "@context": "https://schema.org", "@type": "CollectionPage",
+        "name": "All Exam Categories | Exam Darpan", "url": f"{BASE}/categories",
+        "mainEntity": {"@type": "ItemList", "itemListElement": item_list},
     }
-    page = f"""<!-- EXAM-DARPAN-GENERATED-CATEGORIES-DIRECTORY -->
-<!doctype html>
-<html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Government Jobs Categories &amp; Exam Updates | Exam Darpan</title>
-<meta name="description" content="Rajasthan और All India सरकारी नौकरी, Railway, SSC, Banking, Admit Card, Result, Answer Key और Scholarship updates की सभी categories यहाँ देखें।">
+
+    portal_path = PUBLIC / "portal-v1" / "index.html"
+    if not portal_path.exists():
+        raise RuntimeError("Selected preview shell missing for category directory")
+    portal = portal_path.read_text(encoding="utf-8")
+    head_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal)
+    foot_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal)
+    if not (head_match and foot_match):
+        raise RuntimeError("Selected preview shell is missing directory header/footer")
+    header, footer = head_match.group(1), foot_match.group(1)
+    route_map = {
+        "Government%20Jobs": "/all-india-government-jobs",
+        "Rajasthan%20Jobs": "/rajasthan-government-jobs",
+        "Results": "/category-results", "Admit%20Card": "/category-admit-card",
+        "Answer%20Key": "/category-answer-key", "Scholarships": "/category-scholarships",
+        "Syllabus": "/category-syllabus", "Police%20%26%20Defence%20Jobs": "/category-police-defence-jobs",
+        "Teaching%20Jobs": "/category-teaching-jobs", "Railway%20Jobs": "/category-railway-jobs",
+        "Banking%20Jobs": "/category-banking-jobs", "SSC%20Jobs": "/category-ssc-jobs",
+        "UPSC%20Jobs": "/category-upsc-jobs", "Entrance%20Exams": "/category-entrance-exams",
+        "University%20%26%20College": "/category-university-college",
+        "Yojana": "/category-yojana", "Latest%20Updates": "/category-latest-updates",
+    }
+    for query, destination in route_map.items():
+        header = header.replace("category.html?category=" + query, destination)
+        footer = footer.replace("category.html?category=" + query, destination)
+    header = header.replace('href="index.html"', 'href="/"')
+    footer = footer.replace('href="index.html"', 'href="/"')
+    for fragment in (header, footer):
+        if "category.html?category=" in fragment or 'href="index.html"' in fragment:
+            raise RuntimeError("Preview-only link remained in category directory shell")
+
+    page = f'''<!-- EXAM-DARPAN-GENERATED-CATEGORIES-DIRECTORY -->
+<!doctype html><html lang="hi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>All Exam Categories | Government Jobs, Results &amp; Admit Cards | Exam Darpan</title>
+<meta name="description" content="Rajasthan और All India सरकारी नौकरी, Railway, SSC, Banking, Admit Card, Result, Answer Key, Scholarship और सभी exam updates की categories यहाँ देखें।">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-<link rel="canonical" href="{BASE}/categories">
+<link rel="canonical" href="{BASE}/categories"><link rel="icon" href="/assets/favicon.png">
+<link rel="stylesheet" href="/portal-v1/style.css?v=2">
+<link rel="stylesheet" href="/portal-v1/pages.css?v=2">
+<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">
+<link rel="stylesheet" href="/portal-v1/directory.css?v=2">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan">
+<meta property="og:title" content="All Exam Categories | Exam Darpan">
+<meta property="og:description" content="सभी सरकारी नौकरी और परीक्षा categories एक जगह।">
 <meta property="og:url" content="{BASE}/categories">
-<link rel="icon" href="/assets/favicon.png">
-<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1">
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>
-<style>
-.ed-category-directory{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0 34px}}
-.ed-category-directory-card{{padding:18px;border:1px solid #e2e8f0;border-radius:15px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.04)}}
-.ed-category-directory-card h2{{font-size:18px;line-height:1.4;margin:0 0 8px}}
-.ed-category-directory-card h2 a{{color:#17376b;text-decoration:none}}
-.ed-category-directory-card p{{color:#667085;font-size:13px;line-height:1.65;margin:0 0 14px}}
-.ed-category-directory-meta{{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid #edf0f4;padding-top:12px;color:#667085;font-size:11px}}
-.ed-category-directory-meta a{{color:#2563eb;font-weight:800;text-decoration:none}}
-@media(max-width:850px){{.ed-category-directory{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
-@media(max-width:560px){{.ed-category-directory{{grid-template-columns:1fr}}}}
-</style>
-</head>
-<body>
-<div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
-<header class="header"><div class="container head">
-<a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a>
-</div>
-<nav class="nav"><div class="container"><a href="/">Home</a><a href="/rajasthan-government-jobs">राजस्थान Jobs</a><a href="/all-india-government-jobs">All India Jobs</a><a href="/categories" aria-current="page">All Categories</a><a href="/category-admit-card">Admit Card</a><a href="/category-results">Results</a></div></nav>
-</header>
-<main class="main container">
+</head><body>
+{header}
+<main class="wrap page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>All Categories</span></nav>
-<section class="ed-category-hero" style="margin-top:20px;padding:26px;border-radius:18px;background:linear-gradient(135deg,#10244a,#2563eb);color:#fff">
-<span style="font-size:11px;font-weight:900;letter-spacing:.12em;color:#bfdbfe">EXPLORE EXAM DARPAN</span>
-<h1 style="margin:8px 0;color:#fff;font-size:clamp(28px,4vw,40px)">सभी Categories एक जगह</h1>
-<p style="max-width:780px;line-height:1.75;color:#dbeafe">अपनी जरूरत के अनुसार भर्ती, परीक्षा, Admit Card, Result और शिक्षा से जुड़ी category चुनें। हर category में उपलब्ध published updates के links दिए गए हैं।</p>
-</section>
-<div class="ed-category-directory">{"".join(cards)}</div>
+<section class="directory-hero"><span class="eyebrow">EXPLORE EXAM DARPAN</span>
+<h1>सभी Exam Categories एक जगह</h1>
+<p>अपनी जरूरत के अनुसार भर्ती, परीक्षा, Admit Card, Result और शिक्षा से जुड़ी category चुनें। हर category में उपलब्ध published updates देख सकते हैं।</p>
+<div class="directory-search-note">17 विषय श्रेणियाँ <span>•</span> Rajasthan + All India</div></section>
+<section class="directory-grid" aria-label="All exam categories">{"".join(cards)}</section>
 </main>
-<footer class="footer"><div class="container footer-bottom"><div><strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong></div><div><a href="/editorial-policy">Editorial Policy</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div></div></footer>
-<script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
-</body>
-</html>"""
+{footer}
+<script src="/portal-v1/preview.js" defer></script>
+<script src="/portal-v1/side-menu.js" defer></script>
+</body></html>'''
     (PUBLIC / "categories.html").write_text(page, encoding="utf-8")
+
 
 
 def normalize_clean_internal_links() -> None:
