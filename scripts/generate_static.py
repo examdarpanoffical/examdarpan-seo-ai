@@ -1768,7 +1768,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     # Article content is already rendered into this HTML file; do not fetch the homepage content index.
     # Keep the global category menu available on every portal page.
     if 'src="/portal-v1/side-menu.js"' not in page:
-        page = page.replace('</body>', '<script src="/portal-v1/side-menu.js" defer></script>\\n</body>', 1)
+        page = page.replace('</body>', '<script src="/portal-v1/side-menu.js" defer></script>\n</body>', 1)
     # Remove legacy article stylesheets and embedded style blocks that override
     # the selected preview detail CSS on mobile (the old layout seen in screenshots).
     page = re.sub(r'<link rel="stylesheet" href="/(?:styles|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
@@ -4964,7 +4964,7 @@ def inject_category_directory_links() -> None:
             if path.name != "dashboard.html" and 'src="/portal-v1/side-menu.js"' not in content:
                 content = content.replace(
                     "</body>",
-                    '<script src="/portal-v1/side-menu.js" defer></script>\\n</body>',
+                    '<script src="/portal-v1/side-menu.js" defer></script>\n</body>',
                     1,
                 )
             if content != path.read_text(encoding="utf-8"):
