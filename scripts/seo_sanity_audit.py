@@ -137,8 +137,10 @@ def main() -> int:
             # Check the title only. JavaScript template literals elsewhere in
             # HTML are valid and must not be reported as unexpanded placeholders.
             issues.append(("ERROR", f"Unexpanded title template in {rel}"))
+        robots_meta = re.search(r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)', html, re.I)
+        page_is_noindex = bool(robots_meta and "noindex" in robots_meta.group(1).lower())
         canonicals = re.findall(r'<link\b[^>]*rel=["\']canonical["\'][^>]*href=["\']([^"\']+)', html, re.I)
-        if len(canonicals) != 1:
+        if not page_is_noindex and len(canonicals) != 1:
             issues.append(("WARN", f"Expected exactly one canonical; found {len(canonicals)} in {rel}"))
         h1s = re.findall(r"<h1\b", html, re.I)
         if len(h1s) == 0:
@@ -213,6 +215,8 @@ def main() -> int:
             tag_attrs(tag) for tag in re.findall(r"<meta\b[^>]*>", page_html, re.I | re.S)
             if tag_attrs(tag).get("property", "").lower() == "og:url"
         ]
+        robots_match = re.search(r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)', page_html, re.I)
+        page_is_noindex = bool(robots_match and "noindex" in robots_match.group(1).lower())
 
         for attrs in canonical_tags:
             value = attrs.get("href", "")
@@ -229,13 +233,14 @@ def main() -> int:
             parsed = urlparse(value)
             if parsed.scheme != "https" or parsed.netloc.lower() != "examdarpan.in":
                 issues.append(("ERROR", f"Non-preferred og:url in {rel}: {value or 'missing content'}"))
-        if len(canonical_tags) == 1 and len(og_url_tags) == 1:
-            canonical = canonical_tags[0].get("href", "").rstrip("/")
-            og_url = og_url_tags[0].get("content", "").rstrip("/")
-            if canonical != og_url:
-                issues.append(("ERROR", f"og:url does not match canonical in {rel}: {og_url} != {canonical}"))
-        elif rel != "article.html" and (len(canonical_tags) != 1 or len(og_url_tags) != 1):
-            issues.append(("WARN", f"Expected one canonical and one og:url in {rel}; found {len(canonical_tags)} and {len(og_url_tags)}"))
+        if not page_is_noindex:
+            if len(canonical_tags) == 1 and len(og_url_tags) == 1:
+                canonical = canonical_tags[0].get("href", "").rstrip("/")
+                og_url = og_url_tags[0].get("content", "").rstrip("/")
+                if canonical != og_url:
+                    issues.append(("ERROR", f"og:url does not match canonical in {rel}: {og_url} != {canonical}"))
+            elif rel != "article.html" and (len(canonical_tags) != 1 or len(og_url_tags) != 1):
+                issues.append(("WARN", f"Expected one canonical and one og:url in {rel}; found {len(canonical_tags)} and {len(og_url_tags)}"))
 
     # The legacy article shell creates these tags with JavaScript at runtime.
     article_shell = PUBLIC / "article.html"
