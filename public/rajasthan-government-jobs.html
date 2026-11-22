@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="hi">
 <head>
+<script id="ed-primary-domain-redirect">
+(function () {
+  var host = window.location.hostname.toLowerCase();
+  if (host === "examdarpan-dd963.web.app" || host === "examdarpan-dd963.firebaseapp.com") {
+    window.location.replace("https://examdarpan.in" + window.location.pathname + window.location.search + window.location.hash);
+  }
+})();
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
@@ -428,14 +436,7 @@ async function getDocs(q){
   }
 }
 </style>
-<script id="ed-primary-domain-redirect">
-(function () {
-  var host = window.location.hostname.toLowerCase();
-  if (host === "examdarpan-dd963.web.app" || host === "examdarpan-dd963.firebaseapp.com") {
-    window.location.replace("https://examdarpan.in" + window.location.pathname + window.location.search + window.location.hash);
-  }
-})();
-</script>
+
 <link rel="stylesheet" href="/portal-v1/hub-parity.css?v=1">
 </head>
 
@@ -982,6 +983,7 @@ boot();
 
 <script src="/portal-v1/preview.js" defer></script>
 \n
+
 
 
 

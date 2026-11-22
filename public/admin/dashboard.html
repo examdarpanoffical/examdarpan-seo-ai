@@ -1,4 +1,12 @@
-<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="hi"><head>
+<script id="ed-primary-domain-redirect">
+(function () {
+  var host = window.location.hostname.toLowerCase();
+  if (host === "examdarpan-dd963.web.app" || host === "examdarpan-dd963.firebaseapp.com") {
+    window.location.replace("https://examdarpan.in" + window.location.pathname + window.location.search + window.location.hash);
+  }
+})();
+</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin Dashboard | Exam Darpan</title><link rel="stylesheet" href="../styles.css"><script src="../firebase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script><link rel="icon" type="image/png" href="/assets/logo.png?v=20260924-3"><link rel="apple-touch-icon" href="/assets/logo.png?v=20260924-3"><meta property="og:image" content="https://examdarpan.in/assets/og-logo.png"><script>
 /* Exam Darpan: remove legacy splash/service-worker/cache */
@@ -23,14 +31,7 @@
   } catch(e) {}
 })();
 </script>
-<script id="ed-primary-domain-redirect">
-(function () {
-  var host = window.location.hostname.toLowerCase();
-  if (host === "examdarpan-dd963.web.app" || host === "examdarpan-dd963.firebaseapp.com") {
-    window.location.replace("https://examdarpan.in" + window.location.pathname + window.location.search + window.location.hash);
-  }
-})();
-</script>
+
 <meta name="robots" content="noindex,nofollow"></head>
 <body class="admin-shell"><header class="admin-nav"><div class="container" style="display:flex;justify-content:space-between;align-items:center">
 <strong style="display:flex;align-items:center;gap:10px">
