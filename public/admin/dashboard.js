@@ -934,6 +934,54 @@ $('clearEditorialWorkspace')?.addEventListener('click',()=>{
   $('editorialRevision').value='';$('editorialReviewResult').textContent='';$('editorialReviewResult').style.display='none';$('editorialWorkspaceMsg').textContent='';
 });
 
+function getArticleFormatGuidance(){
+  const selected=$('articleFormat')?.value||'auto';
+  const title=String($('aiTopic')?.value||$('title')?.value||'').toLowerCase();
+  const category=String($('category')?.value||'').toLowerCase();
+  let format=selected;
+  if(format==='auto'){
+    if(/admit card|hall ticket|प्रवेश पत्र|exam city|city intimation/.test(title)||category.includes('admit'))format='admit';
+    else if(/result|merit list|score card|परिणाम/.test(title)||category.includes('result'))format='result';
+    else if(/answer key|उत्तर कुंजी|objection/.test(title)||category.includes('answer'))format='answer-key';
+    else if(/syllabus|पाठ्यक्रम|exam pattern/.test(title)||category.includes('syllabus'))format='syllabus';
+    else if(/admission|entrance|प्रवेश/.test(title)||category.includes('entrance')||category.includes('university'))format='admission';
+    else if(/scholarship|छात्रवृत्ति/.test(title)||category.includes('scholarship'))format='scholarship';
+    else if(/yojana|scheme|योजना/.test(title)||category.includes('yojana'))format='scheme';
+    else if(/recruitment|vacancy|bharti|भर्ती|रिक्ति|पदों/.test(title)||/jobs/.test(category))format='recruitment';
+    else format='general';
+  }
+  const formats={
+    recruitment:{label:'Recruitment / Vacancy',sections:'(1) भर्ती का संक्षिप्त परिचय और किसके लिए है, (2) महत्वपूर्ण तिथियाँ, (3) पद/रिक्तियाँ व category-wise breakup केवल source में हो तो, (4) योग्यता और आयु सीमा, (5) आवेदन शुल्क, (6) चयन प्रक्रिया, (7) वेतन/भत्ते यदि notified हों, (8) आवेदन प्रक्रिया step-by-step, (9) जरूरी दस्तावेज/सावधानियाँ यदि source-supported हों, (10) Important Links, (11) 4–6 वास्तविक FAQs।'},
+    admit:{label:'Admit Card / Exam City',sections:'(1) जारी होने की स्थिति और किस परीक्षा के लिए, (2) उपलब्ध तारीखें/समय, (3) Admit Card या Exam City देखने की प्रक्रिया, (4) Login के लिए जरूरी details केवल official source के अनुसार, (5) परीक्षा केंद्र/प्रवेश से जुड़ी निर्देशित सावधानियाँ, (6) समस्या होने पर official helpdesk यदि दिया हो, (7) Important Links, (8) FAQs। Admit card जारी न हुआ हो तो download link उपलब्ध होने का दावा न करें।'},
+    result:{label:'Result / Merit List',sections:'(1) Result status और संबंधित परीक्षा, (2) result/merit list की तारीख यदि घोषित हो, (3) Result PDF/scorecard देखने और डाउनलोड करने के steps, (4) roll number/name खोजने का तरीका यदि लागू हो, (5) cutoff/merit/selection details केवल published source में हों तो, (6) आगे की प्रक्रिया और जरूरी सावधानियाँ, (7) Important Links, (8) FAQs। Result जारी होने का झूठा दावा न करें।'},
+    'answer-key':{label:'Answer Key / Objection',sections:'(1) Answer key status और परीक्षा विवरण, (2) provisional/final status स्पष्ट करें, (3) paper/shift-wise links केवल उपलब्ध हों तो, (4) response sheet मिलान की प्रक्रिया, (5) objection window, fee और deadline केवल source में हों तो, (6) objection submit करने के steps, (7) Important Links, (8) FAQs। Objection fee/deadline कभी अनुमान से न लिखें।'},
+    syllabus:{label:'Syllabus / Exam Pattern',sections:'(1) परीक्षा का परिचय, (2) exam pattern: subjects, marks, duration और negative marking केवल source के अनुसार, (3) subject-wise syllabus व्यवस्थित table/list में, (4) official PDF download steps/link, (5) तैयारी के लिए source से अलग स्पष्ट रूप से चिह्नित सामान्य अध्ययन-सुझाव, (6) Important Links, (7) FAQs। कोई topic या marks invent न करें।'},
+    admission:{label:'Admission / Entrance Exam',sections:'(1) Course/entrance और institution का परिचय, (2) eligibility, (3) application/admission dates, (4) fees only if notified, (5) selection/counselling process, (6) required documents only if listed, (7) apply/registration steps, (8) Important Links, (9) FAQs। सीट, फीस या approval status अनुमान से न जोड़ें।'},
+    scholarship:{label:'Scholarship',sections:'(1) योजना/छात्रवृत्ति का उद्देश्य और किसके लिए, (2) eligibility और income/category criteria यदि source में हों, (3) लाभ/राशि और अवधि केवल notified हों तो, (4) आवेदन अवधि, (5) जरूरी documents, (6) आवेदन और status-check steps, (7) renewal/selection conditions यदि उपलब्ध हों, (8) Important Links, (9) FAQs।'},
+    scheme:{label:'Government Scheme',sections:'(1) योजना का उद्देश्य और संबंधित विभाग, (2) पात्र लाभार्थी, (3) लाभ/सहायता, (4) पात्रता और शर्तें, (5) आवश्यक दस्तावेज, (6) आवेदन प्रक्रिया, (7) आवेदन/status/helpdesk links, (8) FAQs। योजना को सरकारी बताने से पहले official source में पुष्टि जरूरी है।'},
+    general:{label:'General Update / Information',sections:'(1) क्या नया अपडेट है और किससे संबंधित है, (2) official status/date, (3) विद्यार्थी/पाठक पर इसका व्यावहारिक असर, (4) क्या करना चाहिए — केवल verified instructions, (5) Important Links, (6) FAQs। विषय के अनुसार ही headings रखें; अनावश्यक recruitment sections न जोड़ें।'}
+  };
+  const item=formats[format]||formats.general;
+  return 'SELECTED ARTICLE FORMAT: '+item.label+'\nRECOMMENDED STRUCTURE: '+item.sections+'\n\nVALUE & EDITORIAL REQUIREMENTS:\n- शुरुआत में 2–3 वाक्यों में सीधे बताओ कि यह update किसके लिए है और पाठक को क्या जानना जरूरी है।\n- महत्वपूर्ण जानकारी को साफ table/list में रखो; वही table दोबारा prose में न दोहराओ।\n- Official notification से आगे केवल ऐसी उपयोगी व्याख्या जोड़ो जो दिए गए facts से तार्किक रूप से समझाई जा सके; उसे official rule बताकर पेश न करो।\n- “किसे क्या करना चाहिए”, common mistakes और next step तभी शामिल करो जब source या सामान्य प्रक्रिया से सुरक्षित रूप से समर्थित हो।\n- FAQs वास्तविक user questions हों; जिनका उत्तर source में नहीं है, उन्हें शामिल न करो।\n- अनुपलब्ध fields को omit करो या “आधिकारिक सूचना में उपलब्ध नहीं” लिखो; कभी अनुमान मत लगाओ।\n- अंत में छोटा “Official Source & Verification” section दो जिसमें केवल supplied source का नाम/link हो।';
+}
+function updateArticleFormatHint(){
+  const hints={
+    auto:'Auto Detect चुने गए category और title के अनुसार उपयुक्त format चुनेगा.',
+    recruitment:'भर्ती, योग्यता, आयु, फीस, चयन प्रक्रिया, आवेदन steps और links.',
+    admit:'Admit Card/Exam City status, download steps, जरूरी login details और exam instructions.',
+    result:'Result status, PDF/scorecard steps, merit/cutoff और next steps.',
+    'answer-key':'Provisional/final key, response sheet, objection dates/fee और process.',
+    syllabus:'Exam pattern, subject-wise syllabus और official PDF.',
+    admission:'Course eligibility, dates, fees, counselling और documents.',
+    scholarship:'Eligibility, benefits, documents, dates और application steps.',
+    scheme:'लाभार्थी, पात्रता, लाभ, दस्तावेज और आवेदन प्रक्रिया.',
+    general:'किसी अन्य update के लिए विषय के अनुसार छोटा, उपयोगी और स्पष्ट format.'
+  };
+  const el=$('articleFormatHint');if(el)el.textContent=hints[$('articleFormat')?.value||'auto']||hints.auto;
+}
+$('articleFormat')?.addEventListener('change',updateArticleFormatHint);
+updateArticleFormatHint();
+
 const AI_PROMPT=`You are the senior Hindi editorial assistant for Exam Darpan, an independent Indian education and government-job information portal.
 
 Write a publication-quality Hindi article using ONLY the official source text supplied by the editor.
@@ -967,7 +1015,7 @@ $('aiGenerate').onclick=async()=>{
   if(!topic||!source){m.textContent='Topic और official source text दोनों भरना जरूरी है.';return}
   btn.disabled=true;btn.textContent='Generating Draft…';m.textContent='Gemini article draft तैयार कर रही है…';
   try{
-    const result=await model.generateContent(`${AI_PROMPT}\n\nTOPIC:\n${topic}\n\nOFFICIAL SOURCE TEXT:\n${source}`);
+    const result=await model.generateContent(`${AI_PROMPT}\n\n${getArticleFormatGuidance()}\n\nTOPIC:\n${topic}\n\nOFFICIAL SOURCE TEXT:\n${source}`);
     const text=result?.response?.text?.()||'';
     if(!text.trim())throw new Error('Gemini ने empty response दिया.');
     $('content').value=cleanContent(text);
