@@ -4708,84 +4708,98 @@ document.querySelectorAll('[data-year]').forEach(x=>x.textContent=new Date().get
 
 
 def write_category_directory(posts: list[dict[str, Any]]) -> None:
-    """Generate a single crawlable directory linking every supported category."""
+    """Generate the all-categories directory with the selected rebuild-preview shell."""
     cards = []
     item_list = []
+    icons = {
+        "rajasthan-jobs": "RJ", "government-jobs": "IN",
+        "police-defence-jobs": "PD", "teaching-jobs": "ED",
+        "railway-jobs": "RR", "banking-jobs": "BK", "ssc-jobs": "SSC",
+        "upsc-jobs": "UP", "admit-card": "AC", "results": "RS",
+        "answer-key": "AK", "syllabus": "SY", "entrance-exams": "EX",
+        "scholarships": "SC", "university-college": "UC",
+        "yojana": "YO", "latest-updates": "UP",
+    }
     for position, (name, slug_name, title, description) in enumerate(CATEGORIES, start=1):
         count = sum(1 for post in posts if normalized_category(post) == name)
         url = f"{BASE}{category_path(slug_name)}"
         cards.append(
-            '<article class="ed-category-directory-card">'
-            f'<h2><a href="{esc(category_path(slug_name))}">{esc(title)}</a></h2>'
-            f'<p>{esc(description)}</p>'
-            f'<div class="ed-category-directory-meta"><span>{count} published article{"s" if count != 1 else ""}</span>'
-            f'<a href="{esc(category_path(slug_name))}">View updates →</a></div>'
-            '</article>'
+            f'<a class="directory-card" href="{esc(category_path(slug_name))}">'
+            f'<span class="directory-icon">{icons.get(slug_name, "ED")}</span>'
+            f'<span><b>{esc(title)}</b><small>{esc(description)}</small></span>'
+            '<i aria-hidden="true">→</i></a>'
         )
         item_list.append({
-            "@type": "ListItem",
-            "position": position,
-            "name": title,
-            "url": url,
+            "@type": "ListItem", "position": position, "name": title, "url": url,
         })
-
     schema = {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": "All Categories | Exam Darpan",
-        "url": f"{BASE}/categories",
-        "mainEntity": {
-            "@type": "ItemList",
-            "itemListElement": item_list,
-        },
+        "@context": "https://schema.org", "@type": "CollectionPage",
+        "name": "All Exam Categories | Exam Darpan", "url": f"{BASE}/categories",
+        "mainEntity": {"@type": "ItemList", "itemListElement": item_list},
     }
-    page = f"""<!-- EXAM-DARPAN-GENERATED-CATEGORIES-DIRECTORY -->
-<!doctype html>
-<html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Government Jobs Categories &amp; Exam Updates | Exam Darpan</title>
-<meta name="description" content="Rajasthan और All India सरकारी नौकरी, Railway, SSC, Banking, Admit Card, Result, Answer Key और Scholarship updates की सभी categories यहाँ देखें।">
+
+    portal_path = PUBLIC / "portal-v1" / "index.html"
+    if not portal_path.exists():
+        raise RuntimeError("Selected preview shell missing for category directory")
+    portal = portal_path.read_text(encoding="utf-8")
+    head_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal)
+    foot_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal)
+    if not (head_match and foot_match):
+        raise RuntimeError("Selected preview shell is missing directory header/footer")
+    header, footer = head_match.group(1), foot_match.group(1)
+    route_map = {
+        "Government%20Jobs": "/all-india-government-jobs",
+        "Rajasthan%20Jobs": "/rajasthan-government-jobs",
+        "Results": "/category-results", "Admit%20Card": "/category-admit-card",
+        "Answer%20Key": "/category-answer-key", "Scholarships": "/category-scholarships",
+        "Syllabus": "/category-syllabus", "Police%20%26%20Defence%20Jobs": "/category-police-defence-jobs",
+        "Teaching%20Jobs": "/category-teaching-jobs", "Railway%20Jobs": "/category-railway-jobs",
+        "Banking%20Jobs": "/category-banking-jobs", "SSC%20Jobs": "/category-ssc-jobs",
+        "UPSC%20Jobs": "/category-upsc-jobs", "Entrance%20Exams": "/category-entrance-exams",
+        "University%20%26%20College": "/category-university-college",
+        "Yojana": "/category-yojana", "Latest%20Updates": "/category-latest-updates",
+    }
+    for query, destination in route_map.items():
+        header = header.replace("category.html?category=" + query, destination)
+        footer = footer.replace("category.html?category=" + query, destination)
+    header = header.replace('href="index.html"', 'href="/"')
+    footer = footer.replace('href="index.html"', 'href="/"')
+    for fragment in (header, footer):
+        if "category.html?category=" in fragment or 'href="index.html"' in fragment:
+            raise RuntimeError("Preview-only link remained in category directory shell")
+
+    page = f'''<!-- EXAM-DARPAN-GENERATED-CATEGORIES-DIRECTORY -->
+<!doctype html><html lang="hi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>All Exam Categories | Government Jobs, Results &amp; Admit Cards | Exam Darpan</title>
+<meta name="description" content="Rajasthan और All India सरकारी नौकरी, Railway, SSC, Banking, Admit Card, Result, Answer Key, Scholarship और सभी exam updates की categories यहाँ देखें।">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-<link rel="canonical" href="{BASE}/categories">
+<link rel="canonical" href="{BASE}/categories"><link rel="icon" href="/assets/favicon.png">
+<link rel="stylesheet" href="/portal-v1/style.css?v=2">
+<link rel="stylesheet" href="/portal-v1/pages.css?v=2">
+<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">
+<link rel="stylesheet" href="/portal-v1/directory.css?v=2">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Exam Darpan">
+<meta property="og:title" content="All Exam Categories | Exam Darpan">
+<meta property="og:description" content="सभी सरकारी नौकरी और परीक्षा categories एक जगह।">
 <meta property="og:url" content="{BASE}/categories">
-<link rel="icon" href="/assets/favicon.png">
-<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1">
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>
-<style>
-.ed-category-directory{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0 34px}}
-.ed-category-directory-card{{padding:18px;border:1px solid #e2e8f0;border-radius:15px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.04)}}
-.ed-category-directory-card h2{{font-size:18px;line-height:1.4;margin:0 0 8px}}
-.ed-category-directory-card h2 a{{color:#17376b;text-decoration:none}}
-.ed-category-directory-card p{{color:#667085;font-size:13px;line-height:1.65;margin:0 0 14px}}
-.ed-category-directory-meta{{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid #edf0f4;padding-top:12px;color:#667085;font-size:11px}}
-.ed-category-directory-meta a{{color:#2563eb;font-weight:800;text-decoration:none}}
-@media(max-width:850px){{.ed-category-directory{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
-@media(max-width:560px){{.ed-category-directory{{grid-template-columns:1fr}}}}
-</style>
-</head>
-<body>
-<div class="topbar"><div class="container topbar-inner"><span class="live"><i></i> LIVE</span><span>सरकारी नौकरी, परीक्षा और रिजल्ट की नवीनतम जानकारी</span></div></div>
-<header class="header"><div class="container head">
-<a class="brand" href="/" aria-label="Exam Darpan Home"><img src="/assets/logo-v2.webp" width="52" height="52" alt="Exam Darpan logo" loading="eager" decoding="async"><div><div class="brand-title">EXAM<span>DARPAN</span></div><div class="tagline">Vacancy Se Result Tak, Har Jankari Ek Jagah</div></div></a>
-</div>
-<nav class="nav"><div class="container"><a href="/">Home</a><a href="/rajasthan-government-jobs">राजस्थान Jobs</a><a href="/all-india-government-jobs">All India Jobs</a><a href="/categories" aria-current="page">All Categories</a><a href="/category-admit-card">Admit Card</a><a href="/category-results">Results</a></div></nav>
-</header>
-<main class="main container">
+</head><body>
+{header}
+<main class="wrap page">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>All Categories</span></nav>
-<section class="ed-category-hero" style="margin-top:20px;padding:26px;border-radius:18px;background:linear-gradient(135deg,#10244a,#2563eb);color:#fff">
-<span style="font-size:11px;font-weight:900;letter-spacing:.12em;color:#bfdbfe">EXPLORE EXAM DARPAN</span>
-<h1 style="margin:8px 0;color:#fff;font-size:clamp(28px,4vw,40px)">सभी Categories एक जगह</h1>
-<p style="max-width:780px;line-height:1.75;color:#dbeafe">अपनी जरूरत के अनुसार भर्ती, परीक्षा, Admit Card, Result और शिक्षा से जुड़ी category चुनें। हर category में उपलब्ध published updates के links दिए गए हैं।</p>
-</section>
-<div class="ed-category-directory">{"".join(cards)}</div>
+<section class="directory-hero"><span class="eyebrow">EXPLORE EXAM DARPAN</span>
+<h1>सभी Exam Categories एक जगह</h1>
+<p>अपनी जरूरत के अनुसार भर्ती, परीक्षा, Admit Card, Result और शिक्षा से जुड़ी category चुनें। हर category में उपलब्ध published updates देख सकते हैं।</p>
+<div class="directory-search-note">17 विषय श्रेणियाँ <span>•</span> Rajasthan + All India</div></section>
+<section class="directory-grid" aria-label="All exam categories">{"".join(cards)}</section>
 </main>
-<footer class="footer"><div class="container footer-bottom"><div><strong>© <span data-year></span> Exam Darpan. All Rights Reserved.</strong></div><div><a href="/editorial-policy">Editorial Policy</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a></div></div></footer>
-<script>document.querySelectorAll('[data-year]').forEach(function(x){{x.textContent=new Date().getFullYear()}});</script>
-</body>
-</html>"""
+{footer}
+<script src="/portal-v1/preview.js" defer></script>
+<script src="/portal-v1/side-menu.js" defer></script>
+</body></html>'''
     (PUBLIC / "categories.html").write_text(page, encoding="utf-8")
+
 
 
 def normalize_clean_internal_links() -> None:
