@@ -4342,7 +4342,7 @@ def category_page(category_name: str, category_slug: str, title: str, descriptio
             f'<article class="article-card">{thumb}<div class="article-card-content">'
             f'<h3><a href="{href}">{esc(post_title(p))}</a></h3>'
             f'<p>{esc(short_description(p))}</p>'
-            f'<div class="article-meta"><span>{esc(category_name)}</span><span>Published: {date(p.get("publishedAt"))}</span></div>'
+            f'<div class="article-meta"><span>{esc(category_name)}</span><span>Published: {date_hi(p.get("publishedAt"))}</span></div>'
             f'<a class="article-open" href="{href}">पूरी जानकारी पढ़ें →</a>'
             '</div></article>'
         )
