@@ -32,6 +32,7 @@ const ai=getAI(app,{backend:new GoogleAIBackend()});
 const model=getGenerativeModel(ai,{model:'gemini-3.6-flash'});
 
 let uid=null,all=[];
+const selectedPostIds=new Set();
 const $=id=>document.getElementById(id);
 const translit=s=>String(s||'').toLowerCase().replace(/[àáâãäå]/g,'a').replace(/[æ]/g,'ae').replace(/[ç]/g,'c').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i').replace(/[ñ]/g,'n').replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ýÿ]/g,'y');
 const slugify=s=>translit(s).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,110);
@@ -109,6 +110,14 @@ async function loadPosts(){
     $('posts').innerHTML='<div class="empty"><strong>Posts load नहीं हुए.</strong><br>'+escapeHtml(e.message||'Firestore error')+'</div>';
   }
 }
+function updateBulkSelectionUI(visibleList){
+  const visibleIds=visibleList.map(p=>p.id);
+  const selectedVisible=visibleIds.filter(id=>selectedPostIds.has(id)).length;
+  const count=$('bulkSelectionCount'),button=$('bulkDeleteArticles'),allBox=$('selectAllVisible');
+  if(count)count.textContent=selectedPostIds.size+' selected';
+  if(button){button.disabled=selectedPostIds.size===0;button.textContent=selectedPostIds.size?'Delete Selected ('+selectedPostIds.size+')':'Delete Selected Articles';}
+  if(allBox){allBox.checked=visibleIds.length>0&&selectedVisible===visibleIds.length;allBox.indeterminate=selectedVisible>0&&selectedVisible<visibleIds.length;}
+}
 function renderList(){
   const term=($('filter').value||'').toLowerCase().trim();
   const list=all.filter(p=>(p.title||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term));
@@ -116,18 +125,23 @@ function renderList(){
     const slug=slugify(p.slug||'');
     const articleUrl=slug?'https://examdarpan.in/'+slug:'';
     const share=p.status==='published'&&articleUrl?'<button class="btn btn-primary" data-share-wa="'+escapeHtml(articleUrl)+'">WhatsApp</button> <button class="btn btn-dark" data-share-fb="'+escapeHtml(articleUrl)+'">Facebook</button>':'';
-    return '<div class="card pad" style="margin-bottom:10px"><strong>'+escapeHtml(p.title||'Untitled')+'</strong><div class="meta">'+escapeHtml(p.category||'')+' · '+escapeHtml(p.status||'')+' · '+(p.publishedAt?'Published':'Draft')+(p.telegramSentAt?' · Telegram sent':(p.status==='published'?' · Telegram pending':''))+'</div><div style="margin-top:8px"><button class="btn btn-dark" data-edit="'+p.id+'">Edit</button> <button class="btn btn-gold" data-delete="'+p.id+'">Delete</button> '+share+'</div></div>';
+    return '<div class="card pad" style="margin-bottom:10px"><div style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" aria-label="Select '+escapeHtml(p.title||'article')+'" data-bulk-select="'+escapeHtml(p.id)+'" '+(selectedPostIds.has(p.id)?'checked':'')+' style="margin-top:4px;flex:0 0 auto"><div style="min-width:0;flex:1"><strong>'+escapeHtml(p.title||'Untitled')+'</strong><div class="meta">'+escapeHtml(p.category||'')+' · '+escapeHtml(p.status||'')+' · '+(p.publishedAt?'Published':'Draft')+(p.telegramSentAt?' · Telegram sent':(p.status==='published'?' · Telegram pending':''))+'</div><div style="margin-top:8px"><button class="btn btn-dark" data-edit="'+escapeHtml(p.id)+'">Edit</button> <button class="btn btn-gold" data-delete="'+escapeHtml(p.id)+'">Delete</button> '+share+'</div></div></div></div>';
   }).join('')||'<div class="empty">No posts found.</div>';
+  document.querySelectorAll('[data-bulk-select]').forEach(box=>box.onchange=()=>{
+    if(box.checked)selectedPostIds.add(box.dataset.bulkSelect);else selectedPostIds.delete(box.dataset.bulkSelect);
+    updateBulkSelectionUI(list);
+  });
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>fill(all.find(p=>p.id===b.dataset.edit)));
   document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>remove(b.dataset.delete));
   document.querySelectorAll('[data-share-wa]').forEach(b=>b.onclick=()=>{
     const post=all.find(p=>'https://examdarpan.in/'+slugify(p.slug||'')===b.dataset.shareWa);
-    const message=(post?.title||'Exam Darpan Update')+'\n'+b.dataset.shareWa;
+    const message=(post?.title||'Exam Darpan Update')+'\\n'+b.dataset.shareWa;
     window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener');
   });
   document.querySelectorAll('[data-share-fb]').forEach(b=>b.onclick=()=>{
     window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(b.dataset.shareFb),'_blank','noopener');
   });
+  updateBulkSelectionUI(list);
 }
 function fill(p){
   if(!p)return;
@@ -379,9 +393,61 @@ async function save(status){
     clearForm();await loadPosts();
   }catch(e){console.error(e);$('msg').textContent='Save error: '+(e.message||e)}
 }
+async function queueArticleCleanupBuild(){
+  return await triggerStaticSeoBuild();
+}
 async function remove(id){
-  if(!confirm('Delete this post?'))return;
-  try{await deleteDoc(doc(db,'posts',id));await loadPosts()}catch(e){alert(e.message||'Delete failed')}
+  const post=all.find(p=>p.id===id);
+  if(!confirm('Delete this article from Firestore? Its generated HTML and sitemap entry will be removed by the next static rebuild.\\n\\n'+(post?.title||id)))return;
+  try{
+    await deleteDoc(doc(db,'posts',id));
+    selectedPostIds.delete(id);
+    await loadPosts();
+    try{
+      await queueArticleCleanupBuild();
+      $('bulkCleanupMessage').textContent='Article Firestore से delete हो गया। GitHub static rebuild और Hosting deployment queue हो गई है.';
+    }catch(buildError){
+      $('bulkCleanupMessage').textContent='Firestore से article delete हो गया, लेकिन static rebuild queue नहीं हुई: '+(buildError.message||buildError)+'.';
+    }
+  }catch(e){alert(e.message||'Delete failed')}
+}
+async function bulkDeleteSelectedArticles(){
+  const selected=all.filter(p=>selectedPostIds.has(p.id));
+  if(!selected.length){$('bulkCleanupMessage').textContent='पहले कम से कम एक article select करें.';return;}
+  const names=selected.slice(0,12).map((p,i)=>(i+1)+'. '+(p.title||p.slug||p.id)).join('\\n');
+  const suffix=selected.length>12?'\\n…और '+(selected.length-12)+' articles':'';
+  const typed=prompt('आप '+selected.length+' articles को Firestore से permanently delete करने जा रहे हैं.\\n\\n'+names+suffix+'\\n\\nआगे बढ़ने के लिए DELETE लिखें:');
+  if(typed!=='DELETE'){$('bulkCleanupMessage').textContent='Deletion cancel कर दी गई; कोई बदलाव नहीं हुआ.';return;}
+  const button=$('bulkDeleteArticles');
+  button.disabled=true;button.textContent='Deleting…';
+  $('bulkCleanupMessage').textContent='Firestore records delete हो रहे हैं… कृपया tab बंद न करें.';
+  const results=[];
+  try{
+    for(let i=0;i<selected.length;i+=40){
+      const chunk=selected.slice(i,i+40);
+      const settled=await Promise.allSettled(chunk.map(p=>deleteDoc(doc(db,'posts',p.id))));
+      settled.forEach((r,index)=>results.push({id:chunk[index].id,ok:r.status==='fulfilled'}));
+    }
+    const deleted=results.filter(x=>x.ok);
+    deleted.forEach(x=>selectedPostIds.delete(x.id));
+    await loadPosts();
+    if(deleted.length){
+      try{
+        await queueArticleCleanupBuild();
+        $('bulkCleanupMessage').textContent=deleted.length+' articles Firestore से delete हुए; '+(results.length-deleted.length)+' delete नहीं हो पाए. GitHub HTML, sitemap, RSS, llms और category/internal listings के लिए static rebuild + Hosting deployment queue हो गई है.';
+      }catch(buildError){
+        $('bulkCleanupMessage').textContent=deleted.length+' articles Firestore से delete हुए, लेकिन static rebuild queue नहीं हुई. बाकी failed: '+(results.length-deleted.length)+'. Error: '+(buildError.message||buildError);
+      }
+    }else{
+      $('bulkCleanupMessage').textContent='कोई article delete नहीं हुआ. '+results.length+' operations fail हुईं.';
+    }
+  }catch(e){
+    $('bulkCleanupMessage').textContent='Cleanup में error: '+(e.message||e)+'. Firestore state reload करें और फिर से जाँचें.';
+    await loadPosts();
+  }finally{
+    const term=($('filter').value||'').toLowerCase().trim();
+    updateBulkSelectionUI(all.filter(p=>(p.title||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term)));
+  }
 }
 function clearForm(){
   $('postId').value='';
@@ -438,6 +504,13 @@ $('saveDraft').onclick=()=>save('draft');
 $('publish').onclick=()=>save('published');
 $('clear').onclick=clearForm;
 $('filter').oninput=renderList;
+$('selectAllVisible').onchange=()=>{
+  const term=($('filter').value||'').toLowerCase().trim();
+  const visible=all.filter(p=>(p.title||'').toLowerCase().includes(term)||(p.category||'').toLowerCase().includes(term));
+  visible.forEach(p=>$('selectAllVisible').checked?selectedPostIds.add(p.id):selectedPostIds.delete(p.id));
+  renderList();
+};
+$('bulkDeleteArticles').onclick=bulkDeleteSelectedArticles;
 $('logout').onclick=()=>signOut(auth);
 
 
