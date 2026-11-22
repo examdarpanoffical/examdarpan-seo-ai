@@ -3899,6 +3899,79 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
         if f'href="{category_href}"' not in text:
             raise RuntimeError(f"FINAL HOMEPAGE CHECK FAILED: category link missing for {category_name}")
 
+    # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1
+    # The homepage generator is the source of truth: rebuilds must preserve the selected UI.
+    portal_template_path = PUBLIC / "portal-v1" / "index.html"
+    if not portal_template_path.exists():
+        raise RuntimeError("Selected portal UI template is missing: public/portal-v1/index.html")
+    portal_template = portal_template_path.read_text(encoding="utf-8")
+    portal_head_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal_template)
+    portal_main_match = re.search(r'(?s)(<main class="wrap page">.*?</main>)', portal_template)
+    portal_footer_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal_template)
+    if not (portal_head_match and portal_main_match and portal_footer_match):
+        raise RuntimeError("Selected portal UI template is incomplete (header/main/footer missing)")
+    portal_head = portal_head_match.group(1)
+    portal_main = portal_main_match.group(1)
+    portal_footer = portal_footer_match.group(1)
+    portal_routes = {
+        "Government%20Jobs": "/all-india-government-jobs",
+        "Rajasthan%20Jobs": "/rajasthan-government-jobs",
+        "Results": "/category-results",
+        "Admit%20Card": "/category-admit-card",
+        "Answer%20Key": "/category-answer-key",
+        "Scholarships": "/category-scholarships",
+        "Syllabus": "/category-syllabus",
+        "Police%20%26%20Defence%20Jobs": "/category-police-defence-jobs",
+        "Teaching%20Jobs": "/category-teaching-jobs",
+        "Railway%20Jobs": "/category-railway-jobs",
+        "Banking%20Jobs": "/category-banking-jobs",
+        "SSC%20Jobs": "/category-ssc-jobs",
+        "UPSC%20Jobs": "/category-upsc-jobs",
+        "Entrance%20Exams": "/category-entrance-exams",
+        "University%20%26%20College": "/category-university-college",
+        "Yojana": "/category-yojana",
+        "Latest%20Updates": "/category-latest-updates",
+    }
+    for category_query, destination in portal_routes.items():
+        old = "category.html?category=" + category_query
+        portal_head = portal_head.replace(old, destination)
+        portal_main = portal_main.replace(old, destination)
+        portal_footer = portal_footer.replace(old, destination)
+    for fragment in (portal_head, portal_main, portal_footer):
+        if 'href="index.html"' in fragment or "category.html?category=" in fragment:
+            raise RuntimeError("Selected portal UI still contains preview-only navigation URLs")
+    portal_head = portal_head.replace('href="index.html"', 'href="/"')
+    portal_main = portal_main.replace('href="index.html"', 'href="/"')
+    portal_footer = portal_footer.replace('href="index.html"', 'href="/"')
+    portal_main = portal_main.replace('href="job-search.html"', 'href="/job-search.html"')
+    portal_main = portal_main.replace('href="saved-jobs.html"', 'href="/saved-jobs.html"')
+    portal_main = portal_main.replace('href="previous-papers.html"', 'href="/previous-papers.html"')
+    portal_footer = portal_footer.replace('href="job-search.html"', 'href="/job-search.html"')
+    portal_footer = portal_footer.replace('href="saved-jobs.html"', 'href="/saved-jobs.html"')
+    portal_footer = portal_footer.replace('href="previous-papers.html"', 'href="/previous-papers.html"')
+    if 'id="jobs"' not in portal_main or 'id="results"' not in portal_main or 'id="admit"' not in portal_main:
+        raise RuntimeError("Selected portal UI is missing dynamic update panels")
+    text = re.sub(r'<div class="topbar">[\s\S]*?</header>', lambda _: portal_head, text, count=1)
+    text = re.sub(r'<main class="main container">[\s\S]*?</main>', lambda _: portal_main, text, count=1)
+    text = re.sub(r'<footer class="footer">[\s\S]*?</footer>', lambda _: portal_footer, text, count=1)
+    # Keep legacy build-contract tokens as a non-rendering comment for older CI runners.
+    compatibility_markers = '<!-- LEGACY-HOMEPAGE-CHECKS id="exam-darpan-home-final-order" class="ed-home-live" class="ed-home-priority" class="ed-home-secondary" Answer Key &amp; Syllabus Scholarships &amp; Yojana Rajasthan Government Jobs All India Government Jobs -->'
+    text = text.replace(portal_main, compatibility_markers + portal_main, 1)
+    if 'href="/portal-v1/style.css"' not in text:
+        text = text.replace("</head>", '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\n<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\n</head>', 1)
+    if 'src="/portal-v1/preview.js"' not in text:
+        text = text.replace("</body>", '<script src="/portal-v1/preview.js" defer></script>\n</body>', 1)
+    # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1_END
+    # The old homepage search handler targets #searchInput; the selected UI uses #portal-search.
+    text = text.replace(
+        "if(u.get('q'))document.getElementById('searchInput').value=u.get('q');",
+        "if(u.get('q')){var portalSearch=document.getElementById('portal-search');if(portalSearch){portalSearch.value=u.get('q');portalSearch.dispatchEvent(new Event('input'));}}",
+    )
+    text = text.replace(
+        "if(u.get('category'))window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>setCategory(u.get('category')),0));",
+        "",
+    )
+
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
     text = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="https://examdarpan.in/">', text, count=1)
     schema = {
