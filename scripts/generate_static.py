@@ -3959,6 +3959,15 @@ body{background:#f4f7fc!important;color:var(--ed-v3-ink)}
     if 'src="/portal-v1/preview.js"' not in text:
         text = text.replace("</body>", '<script src="/portal-v1/preview.js" defer></script>\n</body>', 1)
     # EXAM_DARPAN_SELECTED_PREVIEW_UI_V1_END
+    # The old homepage search handler targets #searchInput; the selected UI uses #portal-search.
+    text = text.replace(
+        "if(u.get('q'))document.getElementById('searchInput').value=u.get('q');",
+        "if(u.get('q')){var portalSearch=document.getElementById('portal-search');if(portalSearch){portalSearch.value=u.get('q');portalSearch.dispatchEvent(new Event('input'));}}",
+    )
+    text = text.replace(
+        "if(u.get('category'))window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>setCategory(u.get('category')),0));",
+        "",
+    )
 
     # Homepage canonical/description/schema are deterministic and don't depend on JS.
     text = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="https://examdarpan.in/">', text, count=1)
