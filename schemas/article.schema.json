@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://examdarpan.in/schemas/article.schema.json",
+  "title": "Exam Darpan Article",
+  "description": "Logical validation contract for new content records. This schema is not applied to Firestore.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "slug", "type", "status", "translations", "categoryIds", "authorUid", "createdAt", "updatedAt"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "type": {"enum": ["job", "exam", "admit_card", "result", "answer_key", "syllabus", "admission", "scholarship", "education", "news", "scheme", "mock_test"]},
+    "status": {"enum": ["draft", "pending_review", "changes_requested", "approved", "scheduled", "published", "archived"]},
+    "translations": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"enum": ["hi", "en"]},
+      "additionalProperties": {"$ref": "#/$defs/translation"}
+    },
+    "categoryIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "tagIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true, "default": []},
+    "authorUid": {"type": "string", "minLength": 1},
+    "reviewerUid": {"type": ["string", "null"]},
+    "sourceRefs": {"type": "array", "items": {"$ref": "#/$defs/source"}, "minItems": 1},
+    "featuredMediaId": {"type": ["string", "null"]},
+    "publishedAt": {"type": ["string", "null"], "format": "date-time"},
+    "scheduledAt": {"type": ["string", "null"], "format": "date-time"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"},
+    "archivedAt": {"type": ["string", "null"], "format": "date-time"},
+    "legacyUrls": {"type": "array", "items": {"type": "string", "format": "uri"}, "default": []},
+    "recruitment": {"$ref": "#/$defs/recruitment"},
+    "revision": {"type": "integer", "minimum": 1, "default": 1}
+  },
+  "$defs": {
+    "translation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "summary", "body", "seoTitle", "seoDescription"],
+      "properties": {
+        "title": {"type": "string", "minLength": 5, "maxLength": 180},
+        "summary": {"type": "string", "minLength": 10, "maxLength": 500},
+        "body": {"type": "string", "minLength": 1},
+        "seoTitle": {"type": "string", "minLength": 5, "maxLength": 70},
+        "seoDescription": {"type": "string", "minLength": 30, "maxLength": 180},
+        "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "openGraphImageAlt": {"type": "string"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "url", "sourceType", "verifiedAt"],
+      "properties": {
+        "label": {"type": "string"},
+        "url": {"type": "string", "format": "uri"},
+        "sourceType": {"enum": ["official_notification", "official_website", "official_pdf", "press_release", "other"]},
+        "verifiedAt": {"type": "string", "format": "date-time"},
+        "verifiedBy": {"type": ["string", "null"]}
+      }
+    },
+    "recruitment": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "organization": {"type": "string"},
+        "postName": {"type": "string"},
+        "vacancies": {"type": ["integer", "null"], "minimum": 0},
+        "applicationStart": {"type": ["string", "null"], "format": "date"},
+        "applicationEnd": {"type": ["string", "null"], "format": "date"},
+        "examDate": {"type": ["string", "null"], "format": "date"},
+        "eligibilitySummary": {"type": "string"},
+        "feeSummary": {"type": "string"},
+        "applyUrl": {"type": ["string", "null"], "format": "uri"},
+        "notificationUrl": {"type": ["string", "null"], "format": "uri"},
+        "officialUrl": {"type": ["string", "null"], "format": "uri"}
+      }
+    }
+  }
+}
