@@ -1,6 +1,4 @@
 (function(){
-  // The slide-out category menu is intentionally homepage-only.
-  if (window.location.pathname !== "/" && window.location.pathname !== "/index.html") return;
   if (document.getElementById("ed-side-menu")) return;
   var host=document.querySelector(".site-head .head-row")||document.querySelector(".top .container");
   if(!host) return;
