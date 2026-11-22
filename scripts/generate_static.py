@@ -1683,16 +1683,16 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     if 'href="/portal-v1/style.css' not in page:
         page = page.replace(
             '</head>',
-            '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\\n'
-            '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\\n'
-            '<link rel="stylesheet" href="/portal-v1/pages.css?v=1">\\n'
+            '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\n'
+            '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\n'
+            '<link rel="stylesheet" href="/portal-v1/pages.css?v=1">\n'
             '</head>',
             1,
         )
     page = page.replace(
         '</body>',
-        '<script src="/portal-v1/preview.js" defer></script>\\n'
-        '<script src="/portal-v1/side-menu.js" defer></script>\\n'
+        '<script src="/portal-v1/preview.js" defer></script>\n'
+        '<script src="/portal-v1/side-menu.js" defer></script>\n'
         '</body>',
         1,
     )
