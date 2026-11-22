@@ -65,6 +65,27 @@
 </select>
 <p class="meta" style="margin:7px 0 0">Publish करने पर article अपनी चुनी हुई category में जाएगा। नीचे category pages के direct links हैं; static build पूरा होने पर नई post वहाँ दिखाई देगी।</p>
 <div id="categoryLinksPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+<div class="card pad" style="margin-top:12px;background:#f8fbff;border:1px solid #bfdbfe">
+  <div class="section-label">ARTICLE QUALITY FORMAT</div>
+  <strong>Article का सही ढाँचा चुनें</strong>
+  <p class="meta">Generator भर्ती, Result, Admit Card, Answer Key, Syllabus और अन्य विषयों के लिए अलग structure अपनाएगा। केवल source से समर्थित जानकारी लिखेगा; कोई detail उपलब्ध न हो तो उसे अनुमान से नहीं भरेगा।</p>
+  <div class="field" style="margin-bottom:8px">
+    <label for="articleFormat">Article Format</label>
+    <select id="articleFormat">
+      <option value="auto">Auto Detect (Recommended)</option>
+      <option value="recruitment">Recruitment / Vacancy</option>
+      <option value="admit">Admit Card / Exam City</option>
+      <option value="result">Result / Merit List</option>
+      <option value="answer-key">Answer Key / Objection</option>
+      <option value="syllabus">Syllabus / Exam Pattern</option>
+      <option value="admission">Admission / Entrance Exam</option>
+      <option value="scholarship">Scholarship</option>
+      <option value="scheme">Government Scheme</option>
+      <option value="general">General Update / Information</option>
+    </select>
+  </div>
+  <div id="articleFormatHint" class="meta" aria-live="polite">Auto Detect चुने गए category और title के अनुसार उपयुक्त format चुनेगा।</div>
+</div>
 </div>
 
 <div class="card pad" style="margin:14px 0;background:#f8fafc;border:1px solid #e2e8f0">
