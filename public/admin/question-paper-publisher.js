@@ -17,15 +17,20 @@ async function readManifest(){
 }
 function shiftsOf(p){
  if(Array.isArray(p.shifts)&&p.shifts.length)return p.shifts;
- if(p.paperUrl)return [{number:1,label:p.shift||"Shift 1",paperUrl:p.paperUrl,answerKeyUrl:p.answerKeyUrl||"",sourceUrl:p.sourceUrl||""}];
+ if(p.paperUrl)return [{number:1,label:p.shift||"Shift 1",paper1Url:p.paperUrl,paper2Url:""}];
  return [];
+}
+function paperLinks(shift,index){
+ const first=shift.paper1Url||shift.paperUrl||"";
+ const second=shift.paper2Url||"";
+ return [first,second].filter(Boolean).map((url,i)=>'<a href="'+esc(url)+'" target="_blank" rel="noopener">Shift '+(index+1)+' · Paper '+(i+1)+' ↗</a>').join(" ");
 }
 function renderList(){
  const host=$("questionPaperAdminList");
  const rows=papers.filter(p=>p&&p.status!=="draft");
  host.innerHTML=rows.length?rows.map(p=>{
   const shifts=shiftsOf(p);
-  return '<div class="card pad" style="margin:8px 0"><strong>'+esc(p.title)+'</strong><div class="meta">'+esc(categories[p.category]||p.category)+' · '+esc(p.exam)+' · '+esc(p.year)+' · '+shifts.length+' Shifts</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" class="btn btn-dark" data-paper-edit="'+esc(p.id)+'">Edit</button><button type="button" class="btn btn-gold" data-paper-delete="'+esc(p.id)+'">Delete</button>'+shifts.map((x,i)=>'<a href="'+esc(x.paperUrl)+'" target="_blank" rel="noopener">Shift '+(i+1)+' PDF ↗</a>').join(" ")+'</div></div>';
+  return '<div class="card pad" style="margin:8px 0"><strong>'+esc(p.title)+'</strong><div class="meta">'+esc(categories[p.category]||p.category)+' · '+esc(p.exam)+' · '+esc(p.year)+' · '+shifts.length+' Shifts / '+shifts.reduce((n,s)=>n+Number(Boolean(s.paper1Url||s.paperUrl))+Number(Boolean(s.paper2Url)),0)+' Papers</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" class="btn btn-dark" data-paper-edit="'+esc(p.id)+'">Edit</button><button type="button" class="btn btn-gold" data-paper-delete="'+esc(p.id)+'">Delete</button>'+shifts.map(paperLinks).join(" ")+'</div></div>';
  }).join(""):"अभी कोई paper manifest में publish नहीं हुआ है।";
  host.querySelectorAll("[data-paper-edit]").forEach(b=>b.addEventListener("click",()=>fill(papers.find(p=>p.id===b.dataset.paperEdit))));
  host.querySelectorAll("[data-paper-delete]").forEach(b=>b.addEventListener("click",()=>removePaper(b.dataset.paperDelete)));
@@ -34,25 +39,24 @@ function renderShiftFields(count,values=[]){
  const host=$("paperShiftFields");
  const old=Array.from(host.querySelectorAll("[data-shift-index]")).map(box=>({
   label:box.querySelector("[data-shift-label]")?.value||"",
-  paperUrl:box.querySelector("[data-shift-paper]")?.value||"",
-  answerKeyUrl:box.querySelector("[data-shift-key]")?.value||"",
-  sourceUrl:box.querySelector("[data-shift-source]")?.value||""
+  paper1Url:box.querySelector("[data-shift-paper1]")?.value||"",
+  paper2Url:box.querySelector("[data-shift-paper2]")?.value||""
  }));
  const prior=values.length?values:old;
  host.innerHTML="";
  for(let i=0;i<count;i++){
   const v=prior[i]||{};
   const box=document.createElement("section");box.className="card pad";box.style.cssText="grid-column:1/-1;margin:8px 0;border:1px solid #dbe4ef;background:#fff";box.dataset.shiftIndex=String(i+1);
-  box.innerHTML='<h3 style="margin:0 0 12px">Shift '+(i+1)+' Paper</h3><div class="admin-form-grid"><div class="field"><label>Shift Name</label><input data-shift-label placeholder="Shift '+(i+1)+'" value="'+esc(v.label||("Shift "+(i+1)))+'"></div><div class="field"><label>Question Paper PDF URL *</label><input data-shift-paper type="url" placeholder="https://.../shift-'+(i+1)+'.pdf" value="'+esc(v.paperUrl||"")+'"></div><div class="field"><label>Answer Key PDF URL</label><input data-shift-key type="url" placeholder="https://.../answer-key-shift-'+(i+1)+'.pdf" value="'+esc(v.answerKeyUrl||"")+'"></div><div class="field"><label>Official Source URL</label><input data-shift-source type="url" placeholder="https://official-site.gov.in/..." value="'+esc(v.sourceUrl||"")+'"></div></div>';
+  const legacy1=v.paper1Url||v.paperUrl||"",legacy2=v.paper2Url||"";
+  box.innerHTML='<h3 style="margin:0 0 12px">Shift '+(i+1)+' — 2 Papers</h3><div class="admin-form-grid"><div class="field"><label>Shift Name</label><input data-shift-label placeholder="Shift '+(i+1)+'" value="'+esc(v.label||("Shift "+(i+1)))+'"></div><div class="field"><label>Paper 1 PDF Link *</label><input data-shift-paper1 type="url" required placeholder="https://.../shift-'+(i+1)+'-paper-1.pdf" value="'+esc(legacy1)+'"></div><div class="field"><label>Paper 2 PDF Link *</label><input data-shift-paper2 type="url" required placeholder="https://.../shift-'+(i+1)+'-paper-2.pdf" value="'+esc(legacy2)+'"></div></div>';
   host.appendChild(box);
  }
 }
 function collectShifts(){
  return Array.from($("paperShiftFields").querySelectorAll("[data-shift-index]")).map((box,i)=>({
-  label:box.querySelector("[data-shift-label]").value.trim()||"Shift "+(i+1),
-  paperUrl:box.querySelector("[data-shift-paper]").value.trim(),
-  answerKeyUrl:box.querySelector("[data-shift-key]").value.trim(),
-  sourceUrl:box.querySelector("[data-shift-source]").value.trim()
+  number:i+1,label:box.querySelector("[data-shift-label]").value.trim()||"Shift "+(i+1),
+  paper1Url:box.querySelector("[data-shift-paper1]").value.trim(),
+  paper2Url:box.querySelector("[data-shift-paper2]").value.trim()
  }));
 }
 function fill(p){
@@ -88,24 +92,27 @@ $("publishQuestionPaper")?.addEventListener("click",async()=>{
   if(!title||!exam||!/^\d{4}$/.test(year))throw new Error("Title, Exam और valid Year जरूरी हैं।");
   if(!Number.isInteger(shiftCount)||shiftCount<1||shiftCount>30)throw new Error("1 से 30 तक shifts की संख्या चुनें।");
   const shifts=collectShifts();
-  if(shifts.length!==shiftCount)throw new Error("सभी shifts के PDF fields बनाएं।");
+  if(shifts.length!==shiftCount)throw new Error("सभी shifts के fields बनाएं।");
   shifts.forEach((x,i)=>{
-   if(!x.paperUrl)throw new Error("Shift "+(i+1)+" का Question Paper PDF URL जरूरी है।");
-   for(const key of ["paperUrl","answerKeyUrl","sourceUrl"])if(x[key]&&new URL(x[key]).protocol!=="https:")throw new Error("Shift "+(i+1)+" के सभी links HTTPS होने चाहिए।");
+   for(const key of ["paper1Url","paper2Url"]){
+    if(!x[key])throw new Error("Shift "+(i+1)+" के Paper "+(key==="paper1Url"?"1":"2")+" का PDF link जरूरी है।");
+    let u;try{u=new URL(x[key])}catch(_){throw new Error("Shift "+(i+1)+" के Paper link का URL सही नहीं है।")}
+    if(u.protocol!=="https:")throw new Error("सभी Paper PDF links HTTPS होने चाहिए।");
+   }
   });
   const data={id:$("paperId").value||slug([exam,year,title].join("-")),title,exam,category:$("paperCategory").value,year,shiftCount,shifts,description:$("paperDescription").value.trim()};
-  button.disabled=true;message("हर shift के links verify करके GitHub में save किया जा रहा है…");
+  button.disabled=true;message("सभी "+(shiftCount*2)+" PDF links verify करके save किए जा रहे हैं…");
   const result=await callWorker(data);
   const saved=result.item;
   if(!saved||!saved.id)throw new Error("GitHub commit हुआ, लेकिन saved exam record response में नहीं मिला।");
   papers=[saved,...papers.filter(p=>p.id!==saved.id)];renderList();clearForm();
-  message("सभी "+shiftCount+" shifts GitHub commit में save हुईं ("+result.commit.slice(0,7)+")। Firebase deploy के बाद student hub पर दिखाई देंगी।");
+  message("सभी "+shiftCount+" shifts के "+(shiftCount*2)+" papers GitHub commit में save हुए ("+result.commit.slice(0,7)+")।");
  }catch(e){message(e.message||String(e),true)}
  finally{button.disabled=false}
 });
 async function removePaper(id){
  if(!confirm("इस exam के सभी shift papers को Previous Papers Hub से हटाना है?"))return;
- try{const result=await callWorker({operation:"delete",id});papers=papers.filter(p=>p.id!==id);renderList();message("Exam और उसकी सभी shifts delete commit में हटाई गईं ("+result.commit.slice(0,7)+")।")}
+ try{const result=await callWorker({operation:"delete",id});papers=papers.filter(p=>p.id!==id);renderList();message("Exam और उसके सभी papers delete commit में हटाए गए ("+result.commit.slice(0,7)+")।")}
  catch(e){message(e.message||String(e),true)}
 }
 $("clearQuestionPaper")?.addEventListener("click",clearForm);
