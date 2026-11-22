@@ -1,0 +1,77 @@
+name: Exam Darpan Rebuild Preview (Temporary)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: examdarpan-rebuild-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout isolated rebuild branch
+        uses: actions/checkout@v4
+        with:
+          ref: rebuild/examdarpan-platform-v1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        run: |
+          pip install -r monitor_requirements.txt
+
+      - name: Generate published content for preview (read-only Firestore)
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python scripts/generate_static.py
+
+      - name: Stage isolated preview files
+        run: |
+          set -euo pipefail
+          rm -rf preview-dist
+          mkdir -p preview-dist
+          cp -R public/rebuild-preview preview-dist/rebuild-preview
+          cp public/content-index.json preview-dist/content-index.json
+          if [ -d public/assets ]; then cp -R public/assets preview-dist/assets; fi
+          cat > firebase.preview.json <<'JSON'
+          {
+            "hosting": {
+              "public": "preview-dist",
+              "ignore": ["firebase.preview.json", "**/.*", "**/node_modules/**"],
+              "cleanUrls": false,
+              "headers": [
+                {
+                  "source": "**",
+                  "headers": [
+                    {"key": "X-Robots-Tag", "value": "noindex, nofollow"},
+                    {"key": "Cache-Control", "value": "no-store"}
+                  ]
+                }
+              ]
+            }
+          }
+          JSON
+
+      - name: Deploy temporary Firebase Hosting preview channel
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/firebase-service-account.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-service-account.json"
+          npx --yes firebase-tools hosting:channel:deploy examdarpan-ui-preview --project examdarpan-dd963 --config firebase.preview.json --expires 7d --non-interactive
+
+      - name: Remove temporary credentials
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/firebase-service-account.json"
