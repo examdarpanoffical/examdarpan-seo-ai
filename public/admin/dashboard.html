@@ -165,30 +165,21 @@
 <section class="card pad" id="questionPaperManager" style="margin:18px 0;border:1px solid #bfdbfe;background:#f8fbff">
   <div class="section-label">PREVIOUS YEAR QUESTION PAPERS</div>
   <h2>Old Question Paper Publisher</h2>
-  <p class="meta">यहाँ paper की category, exam, year और shift के साथ PDF link publish करें। Published papers Previous Papers Hub में category-wise दिखाई देंगे। Firestore data/rules में बदलाव नहीं होगा; सुरक्षित Admin Worker GitHub manifest update करेगा।</p>
+  <p class="meta">एक exam के लिए total shifts चुनें और हर shift का अलग question paper PDF जोड़ें। सभी shifts एक ही exam card में Previous Papers Hub पर दिखाई देंगी।</p>
   <input type="hidden" id="paperId">
   <div class="admin-form-grid">
-    <div class="field"><label>Paper Title *</label><input id="paperTitle" placeholder="Rajasthan CET 12th Level 2024 Paper"></div>
+    <div class="field"><label>Paper Title *</label><input id="paperTitle" placeholder="Rajasthan CET 12th Level 2024"></div>
     <div class="field"><label>Exam Name *</label><input id="paperExam" placeholder="Rajasthan CET Senior Secondary"></div>
     <div class="field"><label>Category *</label><select id="paperCategory">
       <option value="ssc">SSC Exams</option><option value="railway">Railway Exams</option><option value="banking">Banking Exams</option><option value="police">Police &amp; Defence</option><option value="teaching">Teaching Exams</option><option value="upsc">UPSC &amp; State PSC</option><option value="rajasthan">Rajasthan Exams</option><option value="other">Other State &amp; Central Exams</option>
     </select></div>
     <div class="field"><label>Year *</label><input id="paperYear" type="number" min="1990" max="2100" placeholder="2024"></div>
-    <div class="field"><label>कुल Shifts / Papers *</label><input id="paperShiftCount" type="number" min="1" max="30" value="1" inputmode="numeric"><small class="meta">जितनी shifts हों, उतनी संख्या चुनें। CET के लिए 3 चुनने पर Shift 1, 2 और 3 के अलग PDF fields बनेंगे।</small></div>
-    <div class="field"><label>Paper Format</label><div class="meta">हर shift का Question Paper अलग publish होगा। Answer Key और Official Source वैकल्पिक हैं।</div></div>
+    <div class="field"><label>कुल Shifts / Papers *</label><input id="paperShiftCount" type="number" min="1" max="30" value="1" inputmode="numeric"></div>
+    <div class="field"><label>Paper Format</label><div class="meta">हर shift के लिए अलग Question Paper PDF link अनिवार्य है। Answer Key और Official Source optional हैं।</div></div>
   </div>
   <div id="paperShiftFields" class="admin-form-grid" style="margin-top:12px"></div>
   <div class="field"><label>Short Description</label><textarea id="paperDescription" rows="2" placeholder="Exam, year और paper details"></textarea></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="publishQuestionPaper" class="btn btn-primary">Publish Question Papers</button><button type="button" id="clearQuestionPaper" class="btn btn-light">Clear Form</button></div>
-  <p id="paperPublisherMsg" class="meta" aria-live="polite"></p>
-  <h3 style="margin-top:18px">Published Question Papers</h3><div id="questionPaperAdminList" class="quiz-admin-list">Loading paper library…</div>
-  <p class="meta">Student page: <a href="/previous-papers" target="_blank" rel="noopener">Open Previous Papers Hub</a></p>
-</section>
-<div class="admin-quiz-box">
-  <div class="section-label">STUDENT PRACTICE</div>
-  </div>
-  <div class="field"><label>Short Description</label><textarea id="paperDescription" rows="2" placeholder="Exam, year, shift या paper details"></textarea></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="publishQuestionPaper" class="btn btn-primary">Publish Question Paper</button><button type="button" id="clearQuestionPaper" class="btn btn-light">Clear Form</button></div>
   <p id="paperPublisherMsg" class="meta" aria-live="polite"></p>
   <h3 style="margin-top:18px">Published Question Papers</h3><div id="questionPaperAdminList" class="quiz-admin-list">Loading paper library…</div>
   <p class="meta">Student page: <a href="/previous-papers" target="_blank" rel="noopener">Open Previous Papers Hub</a></p>
