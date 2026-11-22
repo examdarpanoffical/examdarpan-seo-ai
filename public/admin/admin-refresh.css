@@ -1,0 +1,40 @@
+/* Exam Darpan CMS visual refresh — presentation only; existing dashboard.js handlers stay intact. */
+:root{--cms-ink:#172b45;--cms-blue:#245b94;--cms-navy:#142b49;--cms-line:#dbe3ec;--cms-bg:#f2f5f9;--cms-gold:#f2b544}
+body.admin-shell{background:var(--cms-bg);color:#26364a;font-family:Inter,Arial,"Noto Sans Devanagari",system-ui,sans-serif}
+.admin-nav{position:sticky;top:0;z-index:100;background:linear-gradient(110deg,#10233e,#1e4774)!important;border-bottom:3px solid var(--cms-gold);box-shadow:0 3px 15px #10233e20;padding:9px 0}
+.admin-nav .container{min-height:52px;gap:12px;flex-wrap:wrap}
+.admin-nav strong{font-size:15px;letter-spacing:.3px;color:#fff}
+.admin-nav strong img{width:42px;height:42px;object-fit:contain}
+.admin-nav a{font-size:12px;font-weight:800;text-decoration:none}
+.admin-nav #authStatus{font-size:11px!important}
+.admin-nav #logout{padding:9px 14px;border-radius:6px;font-weight:900}
+.admin-shell .main{padding-top:20px;padding-bottom:44px}
+.admin-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(310px,.92fr);gap:16px;align-items:start}
+.admin-grid>section{min-width:0}
+.admin-shell .form,.admin-shell .card{background:#fff!important;border:1px solid var(--cms-line)!important;border-radius:12px!important;box-shadow:0 3px 14px rgba(20,43,73,.055);padding:18px!important}
+.admin-shell .form h2,.admin-shell .card h2{font-size:18px;color:var(--cms-navy);margin:0 0 15px;padding-bottom:11px;border-bottom:1px solid #e8edf3}
+.admin-shell h3{color:var(--cms-navy)}
+.admin-shell .section-label{font-size:10px;letter-spacing:1.1px;font-weight:950;color:var(--cms-blue)}
+.admin-shell .field{margin:0 0 13px}
+.admin-shell .field label{display:block;margin-bottom:6px;color:#34465d;font-size:11px;font-weight:850}
+.admin-shell input:not([type=checkbox]):not([type=radio]),.admin-shell select,.admin-shell textarea{width:100%;max-width:100%;min-height:41px;padding:10px 12px;border:1px solid #cbd5e1!important;border-radius:7px!important;background:#fff!important;color:#1d2c40;font:inherit;font-size:13px;box-shadow:none!important}
+.admin-shell textarea{min-height:115px;line-height:1.65;resize:vertical}
+.admin-shell input:focus,.admin-shell select:focus,.admin-shell textarea:focus{outline:3px solid rgba(36,91,148,.13);border-color:#4d83b7!important}
+.admin-shell .meta{color:#6b7a8e;font-size:11px;line-height:1.6}
+.admin-shell .btn{min-height:38px;padding:9px 13px;border-radius:6px;font-size:11px;font-weight:900;cursor:pointer}
+.admin-shell .btn-primary{background:var(--cms-blue);color:#fff}
+.admin-shell .btn-dark{background:var(--cms-navy);color:#fff}
+.admin-shell .btn-gold{background:var(--cms-gold);color:#18283b}
+.admin-shell .btn-light{background:#eef3f8;color:var(--cms-navy);border:1px solid var(--cms-line)}
+.admin-shell .admin-quiz-box,.admin-shell .admin-quiz-analytics,.admin-shell .admin-quiz-list{border:1px solid var(--cms-line);border-radius:10px;background:#fff;padding:14px;margin-top:13px}
+.admin-shell .admin-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.admin-shell .quiz-admin-questions{display:grid;gap:10px}
+.admin-shell .quiz-admin-questions>*{min-width:0}
+.admin-shell #posts{display:grid;gap:9px}
+.admin-shell #posts>*{border:1px solid var(--cms-line);border-radius:8px;padding:11px;background:#fbfcfe}
+.admin-shell #categoryLinksPreview a{padding:6px 9px;background:#edf3f9;border:1px solid #d8e3ef;border-radius:5px;color:var(--cms-blue);font-size:10px;font-weight:800}
+.admin-shell #featuredImagePreview img{max-width:100%;height:auto;max-height:180px;object-fit:contain}
+.admin-shell #articlePreviewDialog{max-width:1100px}
+.admin-shell #msg,.admin-shell #aiMsg,.admin-shell #quizMsg,.admin-shell #quizAiMsg{font-weight:700}
+@media(max-width:900px){.admin-grid{grid-template-columns:1fr}.admin-shell .main{padding-top:13px}}
+@media(max-width:600px){.admin-nav .container{align-items:flex-start!important}.admin-nav .container>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.admin-nav #authStatus{margin:0!important}.admin-nav a{margin:0!important}.admin-shell .main{width:calc(100% - 18px)}.admin-shell .form,.admin-shell .card{padding:13px!important}.admin-shell .admin-form-grid{grid-template-columns:1fr}.admin-shell .form h2{font-size:16px}.admin-shell input:not([type=checkbox]):not([type=radio]),.admin-shell select,.admin-shell textarea{font-size:16px}.admin-shell #articlePreviewDialog{width:98vw!important;height:94vh!important}}
