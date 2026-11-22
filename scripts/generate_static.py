@@ -4940,6 +4940,11 @@ def inject_category_directory_links() -> None:
             content = path.read_text(encoding="utf-8")
         except OSError:
             continue
+        # The selected preview shell already exposes the complete category menu.
+        # Do not append legacy navigation items to its header on homepage, category,
+        # article, directory or hub pages.
+        if 'class="site-head"' in content:
+            continue
         if 'href="/categories"' in content or marker not in content:
             continue
         path.write_text(content.replace(marker, replacement, 1), encoding="utf-8")
