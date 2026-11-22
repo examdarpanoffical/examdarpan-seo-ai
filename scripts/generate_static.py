@@ -4432,6 +4432,33 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         ),
     )
 
+    portal_path = PUBLIC / "portal-v1" / "index.html"
+    if not portal_path.exists():
+        raise RuntimeError("Selected preview shell missing for government-job hubs")
+    portal = portal_path.read_text(encoding="utf-8")
+    head_match = re.search(r'(?s)(<div class="utility">.*?</nav>)', portal)
+    foot_match = re.search(r'(?s)(<footer class="site-footer">.*?</footer>)', portal)
+    if not (head_match and foot_match):
+        raise RuntimeError("Selected preview shell is missing hub header/footer")
+    shared_header, shared_footer = head_match.group(1), foot_match.group(1)
+    route_map = {
+        "Government%20Jobs": "/all-india-government-jobs",
+        "Rajasthan%20Jobs": "/rajasthan-government-jobs",
+        "Results": "/category-results", "Admit%20Card": "/category-admit-card",
+        "Answer%20Key": "/category-answer-key", "Scholarships": "/category-scholarships",
+        "Syllabus": "/category-syllabus", "Police%20%26%20Defence%20Jobs": "/category-police-defence-jobs",
+        "Teaching%20Jobs": "/category-teaching-jobs", "Railway%20Jobs": "/category-railway-jobs",
+        "Banking%20Jobs": "/category-banking-jobs", "SSC%20Jobs": "/category-ssc-jobs",
+        "UPSC%20Jobs": "/category-upsc-jobs", "Entrance%20Exams": "/category-entrance-exams",
+        "University%20%26%20College": "/category-university-college",
+        "Yojana": "/category-yojana", "Latest%20Updates": "/category-latest-updates",
+    }
+    for query, destination in route_map.items():
+        shared_header = shared_header.replace("category.html?category=" + query, destination)
+        shared_footer = shared_footer.replace("category.html?category=" + query, destination)
+    shared_header = shared_header.replace('href="index.html"', 'href="/"')
+    shared_footer = shared_footer.replace('href="index.html"', 'href="/"')
+
     for filename, heading, category_name in hub_specs:
         path = PUBLIC / filename
 
@@ -4441,6 +4468,50 @@ def update_hub_pages(posts: list[dict[str, Any]]) -> None:
         text = path.read_text(
             encoding="utf-8",
             errors="ignore",
+        )
+
+        # Use the exact selected preview navigation and footer on both hub pages.
+        text, header_count = re.subn(
+            r'<div class="topbar">[\\s\\S]*?</header>',
+            lambda _: shared_header,
+            text,
+            count=1,
+            flags=re.I,
+        )
+        if header_count != 1:
+            raise RuntimeError(f"Could not replace legacy header on {filename}")
+        text, footer_count = re.subn(
+            r'<footer class="footer">[\\s\\S]*?</footer>',
+            lambda _: shared_footer,
+            text,
+            count=1,
+            flags=re.I,
+        )
+        if footer_count != 1:
+            # Some hub variants use a differently named footer; fail rather than ship a mixed shell.
+            raise RuntimeError(f"Could not replace legacy footer on {filename}")
+        text = text.replace('<main class="main container">', '<main class="wrap page main container">', 1)
+        text = text.replace(
+            '<link rel="stylesheet" href="/styles.css">',
+            '<link rel="stylesheet" href="/styles.css">\\n'
+            '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\\n'
+            '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\\n'
+            '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">',
+            1,
+        )
+        if 'href="/portal-v1/style.css' not in text:
+            text = text.replace(
+                '</head>',
+                '<link rel="stylesheet" href="/portal-v1/style.css?v=2">\\n'
+                '<link rel="stylesheet" href="/portal-v1/pages.css?v=2">\\n'
+                '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=2">\\n</head>',
+                1,
+            )
+        text = text.replace(
+            '</body>',
+            '<script src="/portal-v1/preview.js" defer></script>\\n'
+            '<script src="/portal-v1/side-menu.js" defer></script>\\n</body>',
+            1,
         )
 
         # Government-job hubs must not show the legacy floating WhatsApp popup.
