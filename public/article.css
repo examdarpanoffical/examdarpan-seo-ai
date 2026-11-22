@@ -165,3 +165,37 @@
 .article-page .source-note ul{margin:8px 0 0!important}
 .article-page .source-note a{font-weight:750!important}
 @media(max-width:640px){.article-page .article-facts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}.article-page .article-facts .quick-fact{padding:10px!important}.article-page .article-toc{padding:14px!important}.article-page .article-toc a{font-size:13px!important}}
+
+
+/* Preview parity: use the same two-column article frame as legal/info pages. */
+.detail-layout>.article-page{
+  width:100%!important;max-width:none!important;min-width:0!important;
+  margin:0!important;padding:clamp(18px,3vw,30px)!important;
+  border:1px solid var(--ed-line,#d8e1eb)!important;border-radius:9px!important;
+  background:#fff!important;box-shadow:var(--ed-shadow,0 5px 18px rgba(16,42,76,.07))!important;
+}
+.article-page #articleRoot{min-width:0;overflow-wrap:anywhere}
+.article-page #articleRoot>.breadcrumbs{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:3px 0 16px;color:var(--ed-muted,#66758a);font-size:12px}
+.article-page #articleRoot>.breadcrumbs a{color:var(--ed-blue,#155da8);font-weight:800;text-decoration:underline}
+.article-page #articleRoot>.post-badges{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.article-page #articleRoot>.post-badges .badge{display:inline-block;padding:5px 9px;border-radius:4px;background:#eaf2fb;color:#174c82;font-size:11px;font-weight:800}
+.article-page #articleRoot>h1{margin:8px 0 12px;color:var(--ed-navy,#102a4c);font-size:clamp(25px,3.6vw,34px);line-height:1.3;font-weight:900;overflow-wrap:anywhere}
+.article-page #articleRoot>.article-meta{display:flex;flex-wrap:wrap;gap:7px 14px;margin:0 0 12px;color:var(--ed-muted,#66758a);font-size:12px;line-height:1.6}
+.article-page #articleRoot .ed-author-byline{margin:0 0 15px;font-size:13px}
+.article-page #articleRoot .article-cover{margin:18px 0;padding:24px;border:1px solid #dce6f0;border-radius:8px;background:linear-gradient(120deg,#102a4c,#245b94);color:#fff}
+.article-page #articleRoot .article-cover h2{margin:8px 0;color:#fff;font-size:clamp(19px,2.5vw,25px);line-height:1.4}
+.article-page #articleRoot .article-cover-kicker{font-size:11px;font-weight:800;color:#f5d48e}
+.article-page #articleRoot .article-cover-brand{display:flex;flex-direction:column;gap:2px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.25);font-size:11px}
+.article-page .article-content{max-width:100%;color:#29384d;font-size:15px;line-height:1.85;overflow-wrap:anywhere}
+.article-page .article-content h2{margin:28px 0 12px;padding:11px 14px;border:1px solid #dce8f7;border-left:4px solid #155da8;border-radius:0 7px 7px 0;background:#f3f7fc;color:#163b70;font-size:clamp(18px,2.3vw,22px);line-height:1.45}
+.article-page .article-content h3{margin:22px 0 9px;color:#1e4b82;font-size:18px;line-height:1.5}
+.article-page .article-content p,.article-page .article-content li{line-height:1.85}
+.article-page .article-content table{border-radius:6px}
+.article-page #articleRoot>.notice{margin:20px 0;padding:13px 15px;border:1px solid #ead8ad;border-left:4px solid var(--ed-gold,#f2bd52);border-radius:6px;background:#fffaf0;color:#59451d;font-size:13px;line-height:1.75}
+.article-page #articleRoot>.article-actions{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0;padding:0}
+.article-page #articleRoot>.article-actions .btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 14px;border-radius:5px;font-weight:800}
+.detail-sidebar .side-panel{background:#fff;border:1px solid var(--ed-line,#d8e1eb);box-shadow:var(--ed-shadow);margin-bottom:13px}
+.detail-sidebar .side-panel h2{margin:0;padding:11px 13px;background:var(--ed-navy,#102a4c);border-bottom:3px solid var(--ed-gold,#f2bd52);color:#fff;font-size:13px}
+.detail-sidebar .side-panel>a{display:block;padding:10px 13px;border-bottom:1px dashed var(--ed-line,#d8e1eb);font-size:12px;font-weight:700}
+@media(max-width:760px){.detail-layout{grid-template-columns:1fr!important;gap:13px!important}.detail-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-sidebar .side-panel{margin:0}}
+@media(max-width:520px){.detail-layout>.article-page{padding:17px 14px!important}.detail-sidebar{grid-template-columns:1fr}.article-page #articleRoot>h1{font-size:25px}.article-page .article-content{font-size:15px}}
