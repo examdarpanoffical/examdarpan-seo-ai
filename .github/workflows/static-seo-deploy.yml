@@ -125,19 +125,26 @@ jobs:
           })();
           </script>"""
           count = 0
+          redirect_pattern = re.compile(
+            r'<script\s+id="ed-primary-domain-redirect".*?</script>',
+            flags=re.I | re.S
+          )
           for path in public.rglob("*.html"):
             text = path.read_text(encoding="utf-8")
-            if 'id="ed-primary-domain-redirect"' in text:
-              continue
-            if re.search(r"</head\s*>", text, flags=re.I):
-              text = re.sub(r"</head\s*>", snippet + "\n</head>", text, count=1, flags=re.I)
+            # Normalize the redirect to the very beginning of <head>.
+            # It must run before analytics, advertising tags, or page scripts.
+            text = redirect_pattern.sub("", text)
+            head_match = re.search(r"<head\b[^>]*>", text, flags=re.I)
+            if head_match:
+              insert_at = head_match.end()
+              text = text[:insert_at] + "\n" + snippet + text[insert_at:]
             else:
               text = snippet + "\n" + text
             path.write_text(text, encoding="utf-8")
             count += 1
           if count == 0:
             raise SystemExit("No HTML files were updated with the primary-domain redirect.")
-          print(f"Added primary-domain redirect to {count} HTML files.")
+          print(f"Placed primary-domain redirect first in <head> for {count} HTML files.")
           PY
 
       - name: Verify generated homepage
@@ -145,6 +152,15 @@ jobs:
           set -euo pipefail
           test -f public/index.html
           grep -Fq 'ed-primary-domain-redirect' public/index.html
+          python - <<'PY'
+          from pathlib import Path
+          html = Path("public/index.html").read_text(encoding="utf-8")
+          redirect_at = html.index('id="ed-primary-domain-redirect"')
+          for marker in ('googlesyndication.com', "gtag('config'", 'googletagmanager.com'):
+              if marker in html and html.index(marker) < redirect_at:
+                  raise SystemExit(f"Primary-domain redirect must precede {marker}.")
+          print("Primary-domain redirect runs before analytics and ad scripts.")
+          PY
           test -f public/sitemap.xml
           test -f public/categories.html
           grep -Fq 'class="site-head"' public/index.html
