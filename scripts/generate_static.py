@@ -1147,7 +1147,7 @@ window.edTrackScroll=function(){{
 window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
 </script>
 
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/article.css?v=20261111-2"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><link rel="stylesheet" href="/editorial-experience-v2.css?v=20261121-2"><link rel="stylesheet" href="/editorial-mobile-v3.css?v=20261121-3"><link rel="stylesheet" href="/editorial-mobile-v4.css?v=20261121-4"><script src="/site-search.js" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/editorial-premium.css?v=20261121-1"><link rel="stylesheet" href="/editorial-experience-v2.css?v=20261121-2"><link rel="stylesheet" href="/editorial-mobile-v3.css?v=20261121-3"><link rel="stylesheet" href="/editorial-mobile-v4.css?v=20261121-4"><script src="/site-search.js" defer></script>
 <script type="application/ld+json">{schema1}</script>
 <script type="application/ld+json">{schema2}</script>
 </head>
@@ -1750,10 +1750,19 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     if 'href="/portal-v1/style.css' not in page:
         page = page.replace(
             '</head>',
-            '<link rel="stylesheet" href="/portal-v1/style.css?v=1">\n'
-            '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=1">\n'
-            '<link rel="stylesheet" href="/portal-v1/pages.css?v=1">\n'
+            '<link rel="stylesheet" href="/portal-v1/style.css?v=4">\n'
+            '<link rel="stylesheet" href="/portal-v1/ui-refresh.css?v=4">\n'
+            '<link rel="stylesheet" href="/portal-v1/pages.css?v=4">\n'
+            '<link rel="stylesheet" href="/portal-v1/directory.css?v=4">\n'
+            '<link rel="stylesheet" href="/portal-v1/info.css?v=4">\n'
+            '<link rel="stylesheet" href="/article.css?v=20261122-1">\n'
             '</head>',
+            1,
+        )
+    elif 'href="/article.css' not in page:
+        page = page.replace(
+            '</head>',
+            '<link rel="stylesheet" href="/article.css?v=20261122-1">\n</head>',
             1,
         )
     if 'src="/portal-v1/preview.js"' not in page:
@@ -1766,7 +1775,7 @@ window.addEventListener('scroll',window.edTrackScroll,{{passive:true}});
     page = re.sub(r'<script src="/portal-v1/side-menu\.js" defer></script>', '', page, flags=re.I)
     # Remove legacy article stylesheets and embedded style blocks that override
     # the selected preview detail CSS on mobile (the old layout seen in screenshots).
-    page = re.sub(r'<link rel="stylesheet" href="/(?:styles|article|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
+    page = re.sub(r'<link rel="stylesheet" href="/(?:styles|editorial-premium|editorial-experience-v2|editorial-mobile-v3|editorial-mobile-v4)\.css[^"]*"\s*/?>', '', page, flags=re.I)
     return page
 
 
